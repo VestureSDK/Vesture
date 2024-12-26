@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<RootNamespace>Crucible.Mediator</RootNamespace>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Crucible.Mediator.Abstractions.Annotations\Crucible.Mediator.Abstractions.Annotations.csproj" />
+	</ItemGroup>
+
+</Project>

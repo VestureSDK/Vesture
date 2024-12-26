@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<GenerateDocumentationFile>false</GenerateDocumentationFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="BenchmarkDotNet" />
+		<PackageReference Include="MediatR" Version="12.4.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\Crucible.Mediator.Abstractions.Annotations\Crucible.Mediator.Abstractions.Annotations.csproj" />
+	  <ProjectReference Include="..\..\Crucible.Mediator.Abstractions\Crucible.Mediator.Abstractions.csproj" />
+	  <ProjectReference Include="..\..\Crucible.Mediator\Crucible.Mediator.csproj" />
+	</ItemGroup>
+
+</Project>

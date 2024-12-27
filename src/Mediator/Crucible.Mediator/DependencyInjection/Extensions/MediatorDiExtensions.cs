@@ -5,6 +5,7 @@ using Crucible.Mediator.DependencyInjection;
 namespace Microsoft.Extensions.DependencyInjection
 #pragma warning restore IDE0130 // Namespace does not match folder structure
 {
+    /// <exclude />
     /// <summary>
     /// Extension methods related to <see cref="IMediator"/> for dependency injection.
     /// </summary>

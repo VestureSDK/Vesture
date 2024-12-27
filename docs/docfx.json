@@ -1,0 +1,51 @@
+{
+  "metadata": [
+    {
+      "src": [
+        {
+          "src": "../src",
+          "files": [
+            "**/Mediator/*/*.csproj"
+          ],
+          "exclude": [
+            "**/*.Benchmarks.csproj",
+            "**/*.Tests.csproj"
+          ]
+        }
+      ],
+      "dest": "References",
+      "namespaceLayout": "nested",
+      "outputFormat": "markdown"
+    }
+  ],
+  "build": {
+    "content": [
+      {
+        "files": [
+          "**/*.{md,yml}"
+        ],
+        "exclude": [
+          "_site/**"
+        ]
+      }
+    ],
+    "resource": [
+      {
+        "files": [
+          "images/**"
+        ]
+      }
+    ],
+    "output": "_site",
+    "template": [
+      "default",
+      "modern"
+    ],
+    "globalMetadata": {
+      "_appName": "crucible-docs",
+      "_appTitle": "crucible-docs",
+      "_enableSearch": true,
+      "pdf": false
+    }
+  }
+}

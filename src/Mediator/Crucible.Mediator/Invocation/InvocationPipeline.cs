@@ -28,6 +28,7 @@ namespace Crucible.Mediator.Invocation
 
     /// <inheritdoc cref="InvocationPipeline{TResponse}"/>
     /// <typeparam name="TRequest">The <see cref="IRequest{TResponse}"/>, <see cref="ICommand"/> or <see cref="IEvent"/> type.</typeparam>
+    /// <typeparam name="TResponse">The expected response from the <see cref="IRequest{TResponse}"/>, <see cref="ICommand"/> or <see cref="IEvent"/>.</typeparam>
     [DebuggerDisplay("{typeof(TRequest).Name} -> {typeof(TResponse).Name}")]
     public class InvocationPipeline<TRequest, TResponse> : InvocationPipeline<TResponse>
     {

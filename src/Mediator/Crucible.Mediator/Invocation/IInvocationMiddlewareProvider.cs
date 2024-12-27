@@ -2,6 +2,9 @@
 
 namespace Crucible.Mediator.Invocation
 {
+    /// <summary>
+    /// Defines an <see cref="IInvocationMiddleware{TRequest, TResponse}"/> provider.
+    /// </summary>
     public interface IInvocationMiddlewareProvider
     {
         /// <summary>
@@ -14,15 +17,23 @@ namespace Crucible.Mediator.Invocation
         IReadOnlyList<InvocationMiddlewareWrapper> GetMiddlewaresForContext<TRequest, TResponse>(IInvocationContext<TRequest, TResponse> context);
     }
 
+    /// <summary>
+    /// Default implementation of <see cref="IInvocationMiddlewareProvider"/>.
+    /// </summary>
     public class InvocationMiddlewareProvider : IInvocationMiddlewareProvider
     {
         private readonly IServiceProvider _services;
 
+        /// <summary>
+        /// Initializes a new <see cref="InvocationMiddlewareProvider"/> instance.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceProvider"/> instance.</param>
         public InvocationMiddlewareProvider(IServiceProvider services)
         {
             _services = services;
         }
 
+        /// <inheritdoc/>
         public IReadOnlyList<InvocationMiddlewareWrapper> GetMiddlewaresForContext<TRequest, TResponse>(IInvocationContext<TRequest, TResponse> context)
         {
             // Resolve the middlewares with their defined lifetime and

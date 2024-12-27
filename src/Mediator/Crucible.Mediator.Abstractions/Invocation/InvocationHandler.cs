@@ -43,6 +43,7 @@
     /// Base implementation of an invocation handler.
     /// </summary>
     /// <typeparam name="TRequest">The request type.</typeparam>
+    /// <typeparam name="TNoResponse">The <see cref="NoResponse"/> produced as specified in <typeparamref name="TRequest"/>.</typeparam>
     public abstract class NoResponseInvocationHandler<TRequest, TNoResponse> : InvocationHandler
         where TNoResponse: NoResponse
     {
@@ -71,6 +72,7 @@
     }
 
     /// <inheritdoc cref="NoResponseInvocationHandler{TRequest, TNoResponse}"/>
+    /// <typeparam name="TRequest">The request type.</typeparam>
     /// <typeparam name="TResponse">The response type produced as specified in <typeparamref name="TRequest"/>.</typeparam>
     public abstract class InvocationHandler<TRequest, TResponse> : InvocationHandler
     {

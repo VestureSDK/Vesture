@@ -88,6 +88,7 @@ namespace Crucible.Mediator.Invocation
 
     /// <inheritdoc cref="IInvocationContext{TResponse}"/>
     /// <typeparam name="TRequest">The request type as specified by <see cref="Request"/>.</typeparam>
+    /// <typeparam name="TResponse">The expected response from the <see cref="IRequest{TResponse}"/>, <see cref="ICommand"/> or <see cref="IEvent"/>.</typeparam>
     public interface IInvocationContext<out TRequest, out TResponse> : IInvocationContext<TResponse>
     {
         /// <inheritdoc/>

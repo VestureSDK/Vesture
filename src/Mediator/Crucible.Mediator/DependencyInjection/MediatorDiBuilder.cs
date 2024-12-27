@@ -22,6 +22,7 @@ namespace Crucible.Mediator.DependencyInjection
         /// Initializes a new <see cref="MediatorDiBuilder"/> instance.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/> instance.</param>
+        /// <param name="setup">The <see cref="MediatorConfiguration"/> setup.</param>
         public MediatorDiBuilder(IServiceCollection services, Action<MediatorConfiguration>? setup = null)
         {
             Services = services;

@@ -47,16 +47,28 @@ namespace Crucible.Mediator.DependencyInjection
             return this;
         }
 
+        /// <summary>
+        /// Sets the execution strategy to <see cref="ParallelMultiRequestHandlerStrategy{TRequest, TResponse}"/>.
+        /// </summary>
+        /// <returns>The <see cref="MediatorDiBuilder"/> for chaining.</returns>
         public MediatorDiEventBuilder<TEvent> PublishInParallel()
         {
             return WithPublishStrategy<ParallelMultiRequestHandlerStrategy<TEvent, EventResponse>>();
         }
 
+        /// <summary>
+        /// Sets the execution strategy to <see cref="SequentialMultiRequestHandlerStrategy{TRequest, TResponse}"/>.
+        /// </summary>
+        /// <returns>The <see cref="MediatorDiBuilder"/> for chaining.</returns>
         public MediatorDiEventBuilder<TEvent> PublishSequentially()
         {
             return WithPublishStrategy<SequentialMultiRequestHandlerStrategy<TEvent, EventResponse>>();
         }
 
+        /// <summary>
+        /// Sets the execution strategy to the specified <typeparamref name="TStrategy"/>.
+        /// </summary>
+        /// <returns>The <see cref="MediatorDiBuilder"/> for chaining.</returns>
         public MediatorDiEventBuilder<TEvent> WithPublishStrategy<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TStrategy>()
             where TStrategy: class, IRequestHandlerStrategy<TEvent, EventResponse>
         {

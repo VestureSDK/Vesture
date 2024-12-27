@@ -10,6 +10,7 @@
 		<Nullable>enable</Nullable>
 		<IsAotCompatible>True</IsAotCompatible>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
 	</PropertyGroup>
 
 </Project>

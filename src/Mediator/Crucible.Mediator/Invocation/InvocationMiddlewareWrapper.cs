@@ -1,6 +1,4 @@
-﻿using Crucible.Mediator.Requests;
-using Microsoft.Diagnostics.Tracing.Parsers.MicrosoftWindowsTCPIP;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 namespace Crucible.Mediator.Invocation
 {

@@ -7,7 +7,8 @@
 
 	<ItemGroup>
 		<PackageReference Include="BenchmarkDotNet" />
-		<PackageReference Include="MediatR" Version="12.4.1" />
+		<PackageReference Include="MediatR" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" />
 	</ItemGroup>
 
 	<ItemGroup>

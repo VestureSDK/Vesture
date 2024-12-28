@@ -8,6 +8,13 @@
         "docfx"
       ],
       "rollForward": false
+    },
+    "ib": {
+      "version": "5.12.1",
+      "commands": [
+        "ib"
+      ],
+      "rollForward": false
     }
   }
 }

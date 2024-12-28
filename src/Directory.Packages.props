@@ -1,17 +1,11 @@
 <Project>
 	<ItemGroup>
 		<PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
-	</ItemGroup>
-	<ItemGroup>
-		<PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
-		<PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0" />
-	</ItemGroup>
-	<ItemGroup>
-		<PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
-		<PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="9.0.0" />
-	</ItemGroup>
-	<ItemGroup>
-		<PackageVersion Include="BenchmarkDotNet" Version="0.14.1-nightly.20241213.200" />
-		<PackageVersion Include="MediatR" Version="12.4.1" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="9.0.0" />
+    <PackageVersion Include="BenchmarkDotNet" Version="0.14.1-nightly.20241213.200" />
+    <PackageVersion Include="MediatR" Version="12.4.1" />
 	</ItemGroup>
 </Project>

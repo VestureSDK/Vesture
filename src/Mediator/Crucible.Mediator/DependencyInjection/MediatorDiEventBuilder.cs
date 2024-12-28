@@ -1,9 +1,9 @@
-﻿using Crucible.Mediator.Commands;
+﻿using System.Diagnostics.CodeAnalysis;
+using Crucible.Mediator.Commands;
 using Crucible.Mediator.Events;
 using Crucible.Mediator.Invocation;
 using Crucible.Mediator.Invocation.Strategies;
 using Crucible.Mediator.Requests;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Crucible.Mediator.DependencyInjection
 {
@@ -70,7 +70,7 @@ namespace Crucible.Mediator.DependencyInjection
         /// </summary>
         /// <returns>The <see cref="MediatorDiBuilder"/> for chaining.</returns>
         public MediatorDiEventBuilder<TEvent> WithPublishStrategy<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TStrategy>()
-            where TStrategy: class, IRequestHandlerStrategy<TEvent, EventResponse>
+            where TStrategy : class, IRequestHandlerStrategy<TEvent, EventResponse>
         {
             _builder.AddHandlerStrategy<TEvent, EventResponse, TStrategy>();
             return this;

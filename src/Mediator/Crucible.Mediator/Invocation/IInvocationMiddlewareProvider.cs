@@ -41,7 +41,7 @@ namespace Crucible.Mediator.Invocation
             // to ensure the outer most handler is executed first.
             var contextType = context.GetType();
             var middlewares = _services.GetServices<InvocationMiddlewareWrapper>().ToList();
-            for (int i = middlewares.Count -1; i>=0; i--)
+            for (int i = middlewares.Count - 1; i >= 0; i--)
             {
                 if (!middlewares[i].IsApplicable(context, contextType))
                 {

@@ -1,8 +1,8 @@
-﻿using Crucible.Mediator.Commands;
+﻿using System.Diagnostics;
+using Crucible.Mediator.Commands;
 using Crucible.Mediator.Events;
 using Crucible.Mediator.Invocation.Strategies;
 using Crucible.Mediator.Requests;
-using System.Diagnostics;
 
 namespace Crucible.Mediator.Invocation
 {
@@ -35,7 +35,7 @@ namespace Crucible.Mediator.Invocation
         private readonly IInvocationMiddlewareProvider _middlewareProvider;
 
         private readonly IRequestHandlerStrategy<TRequest, TResponse> _strategy;
-        
+
         private readonly IInvocationContextFactory _contextFactory;
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace Crucible.Mediator.Invocation
 
             // Build the chain of responsibility and return the new root func.
             var middlewares = _middlewareProvider.GetMiddlewaresForContext(context);
-            for(int i = middlewares.Count -1; i>=0;i--)
+            for (int i = middlewares.Count - 1; i >= 0; i--)
             {
                 var prevNext = root;
                 var middleware = middlewares[i];

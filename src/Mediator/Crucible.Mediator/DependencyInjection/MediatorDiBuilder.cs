@@ -1,11 +1,11 @@
-﻿using Crucible.Mediator.Commands;
+﻿using System.Diagnostics.CodeAnalysis;
+using Crucible.Mediator.Commands;
 using Crucible.Mediator.Events;
 using Crucible.Mediator.Invocation;
 using Crucible.Mediator.Invocation.Strategies;
 using Crucible.Mediator.Requests;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Crucible.Mediator.DependencyInjection
 {
@@ -14,7 +14,7 @@ namespace Crucible.Mediator.DependencyInjection
     /// </summary>
     public class MediatorDiBuilder
     {
-        private readonly MediatorConfiguration _configuration = new ();
+        private readonly MediatorConfiguration _configuration = new();
 
         private readonly Dictionary<(Type request, Type response), bool> _tracker = new Dictionary<(Type request, Type response), bool>();
 
@@ -109,7 +109,7 @@ namespace Crucible.Mediator.DependencyInjection
         {
             return new MediatorDiInvocationBuilder<TRequest, TResponse>(this);
         }
-        
+
         internal MediatorDiBuilder AddMiddleware<TRequest, TResponse, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TMiddleware>(int? order = null)
             where TMiddleware : class, IInvocationMiddleware<TRequest, TResponse>
         {
@@ -134,10 +134,10 @@ namespace Crucible.Mediator.DependencyInjection
 
             return this;
         }
-        
+
         internal MediatorDiBuilder AddHandler<TRequest, TResponse, THandlerService, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] THandlerImplementation>()
-            where THandlerService: class
-            where THandlerImplementation: class, THandlerService
+            where THandlerService : class
+            where THandlerImplementation : class, THandlerService
         {
             Services.AddTransient<THandlerService, THandlerImplementation>();
             Services.TryAddKeyedSingleton<InvocationPipeline<TResponse>, InvocationPipeline<TRequest, TResponse>>(typeof(TRequest));

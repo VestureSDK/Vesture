@@ -39,9 +39,9 @@ namespace Crucible.Mediator.Invocation
         private int? _order;
 
         /// <inheritdoc/>
-        public override int Order 
-        { 
-            get => _order ?? _middleware.Order ?? InvocationMiddlewareOrder.Default; 
+        public override int Order
+        {
+            get => _order ?? _middleware.Order ?? InvocationMiddlewareOrder.Default;
             set => _order = value;
         }
 

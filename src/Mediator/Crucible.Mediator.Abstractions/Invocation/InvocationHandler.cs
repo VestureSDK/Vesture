@@ -45,7 +45,7 @@
     /// <typeparam name="TRequest">The request type.</typeparam>
     /// <typeparam name="TNoResponse">The <see cref="NoResponse"/> produced as specified in <typeparamref name="TRequest"/>.</typeparam>
     public abstract class NoResponseInvocationHandler<TRequest, TNoResponse> : InvocationHandler
-        where TNoResponse: NoResponse
+        where TNoResponse : NoResponse
     {
         /// <inheritdoc/>
         /// <remarks>

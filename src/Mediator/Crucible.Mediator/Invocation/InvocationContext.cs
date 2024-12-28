@@ -1,7 +1,7 @@
-﻿using Crucible.Mediator.Commands;
+﻿using System.Diagnostics;
+using Crucible.Mediator.Commands;
 using Crucible.Mediator.Events;
 using Crucible.Mediator.Requests;
-using System.Diagnostics;
 
 namespace Crucible.Mediator.Invocation
 {

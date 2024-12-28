@@ -1,8 +1,8 @@
-﻿using Crucible.Mediator.Commands;
-using Crucible.Mediator.Requests;
-using Crucible.Mediator.Invocation;
+﻿using System.Diagnostics.CodeAnalysis;
+using Crucible.Mediator.Commands;
 using Crucible.Mediator.Events;
-using System.Diagnostics.CodeAnalysis;
+using Crucible.Mediator.Invocation;
+using Crucible.Mediator.Requests;
 
 namespace Crucible.Mediator.DependencyInjection
 {

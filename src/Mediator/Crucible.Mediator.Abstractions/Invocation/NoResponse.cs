@@ -1,5 +1,5 @@
-﻿using Crucible.Mediator.Events;
-using Crucible.Mediator.Commands;
+﻿using Crucible.Mediator.Commands;
+using Crucible.Mediator.Events;
 
 namespace Crucible.Mediator.Invocation
 {

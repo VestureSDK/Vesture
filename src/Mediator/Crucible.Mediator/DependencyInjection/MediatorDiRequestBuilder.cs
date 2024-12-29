@@ -43,5 +43,15 @@ namespace Crucible.Mediator.DependencyInjection
         {
             return _builder.AddHandler<TRequest, TResponse, IRequestHandler<TRequest, TResponse>, THandler>();
         }
+
+        /// <summary>
+        /// Defines the <see cref="IRequestHandler{TRequest, TResponse}"/> or <see cref="ICommandHandler{TCommand}"/> associated with the <see cref="IRequest{TResponse}"/> or <see cref="ICommand"/> type.
+        /// </summary>
+        /// <param name="handler">The <see cref="IRequestHandler{TRequest, TResponse}"/> instance.</param>
+        /// <returns>The <see cref="MediatorDiBuilder"/> for chaining.</returns>
+        public MediatorDiBuilder HandleWith(IRequestHandler<TRequest, TResponse> handler)
+        {
+            return _builder.AddHandler<TRequest, TResponse, IRequestHandler<TRequest, TResponse>>(handler);
+        }
     }
 }

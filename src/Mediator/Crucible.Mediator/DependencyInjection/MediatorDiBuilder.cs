@@ -135,6 +135,16 @@ namespace Crucible.Mediator.DependencyInjection
             return this;
         }
 
+        internal MediatorDiBuilder AddHandler<TRequest, TResponse, THandlerService>(THandlerService handler)
+            where THandlerService : class
+        {
+            Services.AddSingleton(handler);
+            Services.TryAddKeyedSingleton<InvocationPipeline<TResponse>, InvocationPipeline<TRequest, TResponse>>(typeof(TRequest));
+            TryAddDefaultRequestHandlerStrategy<TRequest, TResponse>();
+
+            return this;
+        }
+
         internal MediatorDiBuilder AddHandler<TRequest, TResponse, THandlerService, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] THandlerImplementation>()
             where THandlerService : class
             where THandlerImplementation : class, THandlerService

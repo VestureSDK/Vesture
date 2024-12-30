@@ -15,9 +15,9 @@ namespace Crucible.Mediator.Requests
         /// <summary>
         /// Executes the handling process for the related <typeparamref name="TRequest"/>.
         /// </summary>
-        /// <param name="context">The invocation context related to the <typeparamref name="TRequest"/>.</param>
+        /// <param name="request">The request to handle.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> to cancel the execution.</param>
-        /// <returns>The executing process.</returns>
-        Task ExecuteAsync(IInvocationContext<TRequest, TResponse> context, CancellationToken cancellationToken = default);
+        /// <returns>The response as expected by the <paramref name="request"/>.</returns>
+        Task<TResponse> ExecuteAsync(TRequest request, CancellationToken cancellationToken = default);
     }
 }

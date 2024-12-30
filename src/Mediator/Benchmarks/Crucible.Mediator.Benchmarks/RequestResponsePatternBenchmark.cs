@@ -85,7 +85,7 @@ namespace Crucible.Mediator.Benchmarks
                 return ExecuteAsync(request, cancellationToken);
             }
 
-            protected override Task<SampleResponse> ExecuteAsync(SampleRequest request, CancellationToken cancellationToken)
+            public override Task<SampleResponse> ExecuteAsync(SampleRequest request, CancellationToken cancellationToken)
             {
                 return SampleRequest.GetResponseAsync(request, cancellationToken);
             }

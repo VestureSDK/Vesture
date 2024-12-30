@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Crucible.Mediator.Commands;
 
-namespace Crucible.Mediator.Tests.Commands
+namespace Crucible.Mediator.Tests.Commands.Mocks
 {
-    public class TestMediatorCommand : ICommand
+    public class MockCommand : ICommand
     {
 
     }

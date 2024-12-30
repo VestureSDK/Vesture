@@ -7,7 +7,7 @@ namespace Crucible.Mediator.Invocation.Strategies
     /// </summary>
     /// <typeparam name="TRequest"></typeparam>
     /// <typeparam name="TResponse"></typeparam>
-    public class ParallelMultiRequestHandlerStrategy<TRequest, TResponse> : IRequestHandlerStrategy<TRequest, TResponse>
+    public class ParallelMultiRequestHandlerStrategy<TRequest, TResponse> : RequestHandlerStrategy<TRequest, TResponse>
     {
         private readonly IEnumerable<IRequestHandler<TRequest, TResponse>> _handlers;
 
@@ -22,11 +22,11 @@ namespace Crucible.Mediator.Invocation.Strategies
         }
 
         /// <inheritdoc/>
-        public Task ExecuteAsync(IInvocationContext<TRequest, TResponse> context, CancellationToken cancellationToken = default)
+        public override Task ExecuteAsync(IInvocationContext<TRequest, TResponse> context, CancellationToken cancellationToken = default)
         {
             var handlerTasks = _handlers.Select(async h =>
             {
-                await h.ExecuteAsync(context, cancellationToken);
+                await ExecuteHandlerAsync(h, context, cancellationToken);
             });
 
             return Task.WhenAll(handlerTasks);

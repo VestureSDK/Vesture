@@ -7,7 +7,7 @@ namespace Crucible.Mediator.Invocation.Strategies
     /// </summary>
     /// <typeparam name="TRequest"></typeparam>
     /// <typeparam name="TResponse"></typeparam>
-    public class SingleRequestHandlerStrategy<TRequest, TResponse> : IRequestHandlerStrategy<TRequest, TResponse>
+    public class SingleRequestHandlerStrategy<TRequest, TResponse> : RequestHandlerStrategy<TRequest, TResponse>
     {
         private readonly IRequestHandler<TRequest, TResponse> _handler;
 
@@ -22,9 +22,9 @@ namespace Crucible.Mediator.Invocation.Strategies
         }
 
         /// <inheritdoc/>
-        public async Task ExecuteAsync(IInvocationContext<TRequest, TResponse> context, CancellationToken cancellationToken = default)
+        public override Task ExecuteAsync(IInvocationContext<TRequest, TResponse> context, CancellationToken cancellationToken = default)
         {
-            await _handler.ExecuteAsync(context, cancellationToken);
+            return ExecuteHandlerAsync(_handler, context, cancellationToken);
         }
     }
 }

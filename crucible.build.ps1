@@ -1,20 +1,20 @@
-task Src-Format {
-    dotnet format ./src
+task Src-Clean {
+    dotnet clean ./src --verbosity detailed
 }
 
-task Src-Clean {
-    dotnet clean ./src
+task Src-Format {
+    dotnet format ./src --verbosity detailed
 }
 
 task Src-Restore {
-    dotnet restore ./src
+    dotnet restore ./src --verbosity detailed
 }
 
 task Src-Build {
-    dotnet build ./src
+    dotnet build ./src --verbosity detailed
 }
 
-task Build Src-Format, Src-Clean, Src-Restore, Src-Build
+task Build Src-Clean, Src-Format, Src-Restore, Src-Build
 
 task Docs-Clean {
     rm -Force -Recurse ./docs/References

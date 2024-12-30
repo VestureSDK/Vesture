@@ -8,7 +8,7 @@ namespace Crucible.Mediator.Tests.Requests
     public class RequestExecutorTest : RequestExecutorTest<IRequestExecutor> { }
 
     public abstract class RequestExecutorTest<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TRequestExecutor> : MediatorDiTestBase<TRequestExecutor>
-        where TRequestExecutor: class, IRequestExecutor
+        where TRequestExecutor : class, IRequestExecutor
     {
         protected IRequestExecutor RequestExecutor => Sut;
 

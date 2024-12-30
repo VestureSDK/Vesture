@@ -1,6 +1,4 @@
-﻿using Crucible.Mediator.Requests;
-
-namespace Crucible.Mediator.Invocation
+﻿namespace Crucible.Mediator.Invocation
 {
     /// <summary>
     /// Defines a base invoker.

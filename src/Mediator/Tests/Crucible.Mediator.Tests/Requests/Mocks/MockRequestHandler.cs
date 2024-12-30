@@ -1,5 +1,4 @@
-﻿using Crucible.Mediator.Invocation;
-using Crucible.Mediator.Requests;
+﻿using Crucible.Mediator.Requests;
 
 namespace Crucible.Mediator.Tests.Requests.Mocks
 {

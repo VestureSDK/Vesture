@@ -1,6 +1,6 @@
 ﻿// Ensures the instances are using ctor/disposable for setup/teardown in order to
 // mimic XUnit default behavior and transpose tests to another framework more easily.
-[assembly:FixtureLifeCycle(LifeCycle.InstancePerTestCase)]
+[assembly: FixtureLifeCycle(LifeCycle.InstancePerTestCase)]
 
 namespace Crucible.Mediator.Abstractions.Tests
 {

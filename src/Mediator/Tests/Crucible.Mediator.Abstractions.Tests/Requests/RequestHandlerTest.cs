@@ -3,7 +3,7 @@
 namespace Crucible.Mediator.Abstractions.Tests.Requests
 {
     public abstract class RequestHandlerTest<THandler, TRequest, TResult>
-        where THandler: IRequestHandler<TRequest, TResult>
+        where THandler : IRequestHandler<TRequest, TResult>
     {
         protected Lazy<IRequestHandler<TRequest, TResult>> RequestHandlerInitializer;
 

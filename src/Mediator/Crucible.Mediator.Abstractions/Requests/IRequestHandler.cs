@@ -1,6 +1,4 @@
-﻿using Crucible.Mediator.Invocation;
-
-namespace Crucible.Mediator.Requests
+﻿namespace Crucible.Mediator.Requests
 {
     /// <summary>
     /// Defines a <see cref="IRequest{TResponse}"/> handler.

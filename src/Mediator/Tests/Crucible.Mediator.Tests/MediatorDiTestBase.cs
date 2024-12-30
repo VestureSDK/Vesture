@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Crucible.Mediator.DependencyInjection;
+﻿using Crucible.Mediator.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Crucible.Mediator.Tests

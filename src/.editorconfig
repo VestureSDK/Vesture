@@ -18,6 +18,8 @@ indent_size = 2
 [*.{cs,vb}]
 charset = utf-8-bom
 
+dotnet_public_api_analyzer.require_api_files = true
+
 # Code quality analyzers
 dotnet_analyzer_diagnostic.category-Security.severity = error
 dotnet_code_quality.ca1802.api_surface = private, internal

@@ -17,19 +17,17 @@
         }
 
         /// <inheritdoc/>
-        public async Task<IInvocationContext<TResponse>> HandleAndCaptureAsync<TResponse>(object request, CancellationToken cancellationToken = default)
+        public Task<IInvocationContext<TResponse>> HandleAndCaptureAsync<TResponse>(object request, CancellationToken cancellationToken = default)
         {
             var pipeline = _pipelineProvider.GetInvocationPipeline<TResponse>(request);
-            var context = await pipeline.ExecuteAndCaptureAsync(request, cancellationToken);
-
-            return context;
+            return pipeline.ExecuteAndCaptureAsync(request, cancellationToken);
         }
 
         /// <inheritdoc/>
         public async Task<TResponse> HandleAsync<TResponse>(object request, CancellationToken cancellationToken = default)
         {
             var pipeline = _pipelineProvider.GetInvocationPipeline<TResponse>(request);
-            var context = await pipeline.ExecuteAndCaptureAsync(request, cancellationToken);
+            var context = await pipeline.ExecuteAndCaptureAsync(request, cancellationToken).ConfigureAwait(false);
 
             return ThrowIfContextHasErrorOrReturnResponse(context);
         }

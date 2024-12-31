@@ -26,13 +26,13 @@ namespace Crucible.Mediator.Invocation
         /// <item>And finally <see cref="OnAfterNextAsync(IInvocationContext{TRequest, TResponse}, CancellationToken)"/>. Override <see cref="OnAfterNextAsync(IInvocationContext{TRequest, TResponse}, CancellationToken)"/> to alter the behavior.</item>
         /// </list>
         /// </remarks>
-        public virtual async ValueTask ExecuteAsync(IInvocationContext<TRequest, TResponse> context, Func<CancellationToken, ValueTask> next, CancellationToken cancellationToken)
+        public virtual async Task ExecuteAsync(IInvocationContext<TRequest, TResponse> context, Func<CancellationToken, Task> next, CancellationToken cancellationToken)
         {
-            await OnBeforeNextAsync(context, cancellationToken);
+            await OnBeforeNextAsync(context, cancellationToken).ConfigureAwait(false);
 
-            await next.Invoke(cancellationToken);
+            await next.Invoke(cancellationToken).ConfigureAwait(false);
 
-            await OnAfterNextAsync(context, cancellationToken);
+            await OnAfterNextAsync(context, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -41,9 +41,9 @@ namespace Crucible.Mediator.Invocation
         /// <param name="context">The invocation context related to the <see cref="IRequest{TResponse}"/>, <see cref="ICommand"/> or <see cref="IEvent"/>.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> to cancel the execution.</param>
         /// <returns>The executing process.</returns>
-        protected virtual ValueTask OnBeforeNextAsync(IInvocationContext<TRequest, TResponse> context, CancellationToken cancellationToken)
+        protected virtual Task OnBeforeNextAsync(IInvocationContext<TRequest, TResponse> context, CancellationToken cancellationToken)
         {
-            return ValueTask.CompletedTask;
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace Crucible.Mediator.Invocation
         /// <param name="context">The invocation context related to the <see cref="IRequest{TResponse}"/>, <see cref="ICommand"/> or <see cref="IEvent"/>.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> to cancel the execution.</param>
         /// <returns>The executing process.</returns>
-        protected virtual ValueTask OnAfterNextAsync(IInvocationContext<TRequest, TResponse> context, CancellationToken cancellationToken)
+        protected virtual Task OnAfterNextAsync(IInvocationContext<TRequest, TResponse> context, CancellationToken cancellationToken)
         {
             if (context.HasError)
             {
@@ -74,9 +74,9 @@ namespace Crucible.Mediator.Invocation
         /// <param name="context">The invocation context related to the <see cref="IRequest{TResponse}"/>, <see cref="ICommand"/> or <see cref="IEvent"/>.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> to cancel the execution.</param>
         /// <returns>The executing process.</returns>
-        protected virtual ValueTask OnErrorAsync(IInvocationContext<TRequest, TResponse> context, CancellationToken cancellationToken)
+        protected virtual Task OnErrorAsync(IInvocationContext<TRequest, TResponse> context, CancellationToken cancellationToken)
         {
-            return ValueTask.CompletedTask;
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -85,9 +85,9 @@ namespace Crucible.Mediator.Invocation
         /// <param name="context">The invocation context related to the <see cref="IRequest{TResponse}"/>, <see cref="ICommand"/> or <see cref="IEvent"/>.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> to cancel the execution.</param>
         /// <returns>The executing process.</returns>
-        protected virtual ValueTask OnSucessAsync(IInvocationContext<TRequest, TResponse> context, CancellationToken cancellationToken)
+        protected virtual Task OnSucessAsync(IInvocationContext<TRequest, TResponse> context, CancellationToken cancellationToken)
         {
-            return ValueTask.CompletedTask;
+            return Task.CompletedTask;
         }
     }
 }

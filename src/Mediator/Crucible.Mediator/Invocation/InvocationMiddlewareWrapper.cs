@@ -7,20 +7,23 @@ namespace Crucible.Mediator.Invocation
     /// </summary>
     public abstract class InvocationMiddlewareWrapper
     {
-        /// <inheritdoc cref="IInvocationMiddleware{TRequest, TResponse}.Order"/>
-        public abstract int Order { get; set; }
+        public int Order { get; }
+
+        protected InvocationMiddlewareWrapper(int order)
+        {
+            Order = order;
+        }
 
         /// <summary>
         /// Defines if the underlying <see cref="IInvocationMiddleware{TRequest, TResponse}"/> 
-        /// is applicable for the <paramref name="context"/>.
+        /// is applicable for the <paramref name="contextType"/>.
         /// </summary>
-        /// <param name="context">The <paramref name="context"/> to check against.</param>
-        /// <param name="contextType">The <see cref="Type"/> of <paramref name="context"/>.</param>
+        /// <param name="contextType">The <see cref="Type"/> of <see cref="IInvocationContext{TRequest, TResponse}"/>.</param>
         /// <returns><c>True</c> if the underlying <see cref="IInvocationMiddleware{TRequest, TResponse}"/> is applicable for <paramref name="context"/>; otherwise <c>False</c>.</returns>
-        public abstract bool IsApplicable(IInvocationContext context, Type contextType);
+        public abstract bool IsApplicable(Type contextType);
 
         /// <inheritdoc cref="IInvocationMiddleware{TRequest, TResponse}.ExecuteAsync(IInvocationContext{TRequest, TResponse}, Func{CancellationToken, ValueTask}, CancellationToken)"/>
-        public abstract ValueTask ExecuteAsync(IInvocationContext context, Func<CancellationToken, ValueTask> next, CancellationToken cancellationToken);
+        public abstract Task ExecuteAsync(IInvocationContext context, Func<CancellationToken, Task> next, CancellationToken cancellationToken);
     }
 
     /// <summary>
@@ -36,32 +39,24 @@ namespace Crucible.Mediator.Invocation
 
         private IInvocationMiddleware<TRequest, TResponse> _middleware => _middlewareInitializer.Value;
 
-        private int? _order;
-
-        /// <inheritdoc/>
-        public override int Order
-        {
-            get => _order ?? _middleware.Order ?? InvocationMiddlewareOrder.Default;
-            set => _order = value;
-        }
-
         /// <summary>
         /// Initializes a new <see cref="InvocationMiddlewareWrapper{TRequest, TResponse}"/> instance.
         /// </summary>
         /// <param name="middlewareInitializer">The <see cref="Lazy{T}"/> of the <see cref="IInvocationMiddleware{TRequest, TResponse}"/>.</param>
-        public InvocationMiddlewareWrapper(Lazy<IInvocationMiddleware<TRequest, TResponse>> middlewareInitializer)
+        public InvocationMiddlewareWrapper(int order, Lazy<IInvocationMiddleware<TRequest, TResponse>> middlewareInitializer)
+            : base(order)
         {
             _middlewareInitializer = middlewareInitializer;
         }
 
         /// <inheritdoc/>
-        public override bool IsApplicable(IInvocationContext context, Type contextType)
+        public override bool IsApplicable(Type contextType)
         {
             return _matchingInvocationContextType.IsAssignableFrom(contextType);
         }
 
         /// <inheritdoc/>
-        public override ValueTask ExecuteAsync(IInvocationContext context, Func<CancellationToken, ValueTask> next, CancellationToken cancellationToken = default)
+        public override Task ExecuteAsync(IInvocationContext context, Func<CancellationToken, Task> next, CancellationToken cancellationToken = default)
         {
             return _middleware.ExecuteAsync((IInvocationContext<TRequest, TResponse>)context, next, cancellationToken);
         }

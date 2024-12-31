@@ -52,6 +52,7 @@ namespace Crucible.Mediator.Invocation
             _contextFactory = contextFactory;
             _middlewareProvider = middlewareProvider;
             _strategy = strategy;
+            _chainOfResponsibility = new Lazy<Func<IInvocationContext<TRequest, TResponse>, CancellationToken, Task>>(CreateChainOfresponsibility);
         }
 
         /// <inheritdoc/>
@@ -60,33 +61,28 @@ namespace Crucible.Mediator.Invocation
             // Creates the context the pipeline will process
             var context = _contextFactory.CreateContextForRequest<TRequest, TResponse>(request);
 
-            // Creates a chain of responsibility
-            var chainOfResponsibility = CreateChainOfresponsibility(context);
-
             // Invoke the chain of responsibility and returns the context
             // affected by all the middlewares and the handler
-            await chainOfResponsibility.Invoke(cancellationToken);
+            await _chainOfResponsibility.Value.Invoke(context, cancellationToken).ConfigureAwait(false);
 
             return context;
         }
 
-        private Func<CancellationToken, ValueTask> CreateChainOfresponsibility(IInvocationContext<TRequest, TResponse> context)
+        private Lazy<Func<IInvocationContext<TRequest, TResponse>, CancellationToken, Task>> _chainOfResponsibility;
+
+        private Func<IInvocationContext<TRequest, TResponse>, CancellationToken, Task> CreateChainOfresponsibility()
         {
             // Creates a chain of responsibility with
             // all the middlewares and finish by the handler
-            Func<CancellationToken, ValueTask> root = (ct) =>
-            {
-                var task = _strategy.ExecuteAsync(context, ct);
-                return new ValueTask(task);
-            };
+            Func<IInvocationContext<TRequest, TResponse>, CancellationToken, Task> root = (ctx, ct) => _strategy.ExecuteAsync(ctx, ct);
 
             // Build the chain of responsibility and return the new root func.
-            var middlewares = _middlewareProvider.GetMiddlewaresForContext(context);
+            var middlewares = _middlewareProvider.GetMiddlewaresForContext<TRequest, TResponse>();
             for (int i = middlewares.Count - 1; i >= 0; i--)
             {
                 var prevNext = root;
                 var middleware = middlewares[i];
-                root = (ct) => middleware.ExecuteAsync(context, prevNext, ct);
+                root = (ctx, ct) => middleware.ExecuteAsync(ctx, (ct) => prevNext(ctx, ct), ct);
             }
 
             return root;

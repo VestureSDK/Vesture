@@ -24,11 +24,7 @@ namespace Crucible.Mediator.Invocation.Strategies
         /// <inheritdoc/>
         public override Task ExecuteAsync(IInvocationContext<TRequest, TResponse> context, CancellationToken cancellationToken = default)
         {
-            var handlerTasks = _handlers.Select(async h =>
-            {
-                await ExecuteHandlerAsync(h, context, cancellationToken);
-            });
-
+            var handlerTasks = _handlers.Select(h => ExecuteHandlerAsync(h, context, cancellationToken));
             return Task.WhenAll(handlerTasks);
         }
     }

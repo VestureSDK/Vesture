@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Crucible.Mediator.Benchmarks": {
+      "commandName": "Project",
+      "commandLineArgs": "local-test"
+    }
+  }
+}

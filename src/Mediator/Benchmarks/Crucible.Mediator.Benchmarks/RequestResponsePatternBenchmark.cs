@@ -5,9 +5,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Crucible.Mediator.Benchmarks
 {
-    [SimpleJob(RuntimeMoniker.Net90)]
+    [SimpleJob(RuntimeMoniker.NativeAot90)]
     public class RequestResponsePatternBenchmark
     {
+        private IMediator _mediator;
+        private MediatR.IMediator _mediatr;
+        private SampleHandler _handler;
+        private SampleRequest _request;
+
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
         private ServiceProvider _serviceProvider;
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
@@ -20,7 +25,7 @@ namespace Crucible.Mediator.Benchmarks
             serviceCollection.AddTransient<SampleHandler>();
 
             // MediatR
-            serviceCollection.AddMediatR(c => c.RegisterServicesFromAssemblyContaining<RequestResponsePatternBenchmark>());
+            //serviceCollection.AddMediatR(c => c.RegisterServicesFromAssemblyContaining<RequestResponsePatternBenchmark>());
 
             // Crucible
             serviceCollection.AddMediator()
@@ -28,47 +33,40 @@ namespace Crucible.Mediator.Benchmarks
                     .HandleWith<SampleHandler>();
 
             _serviceProvider = serviceCollection.BuildServiceProvider();
+            _mediator = _serviceProvider.GetRequiredService<IMediator>();
+            //_mediatr = _serviceProvider.GetRequiredService<MediatR.IMediator>();
+            _handler = new SampleHandler();
+            _request = new SampleRequest() { Value = "Sample value" };
+
+            Crucible().GetAwaiter().GetResult();
+            //MediatR().GetAwaiter().GetResult();
         }
 
-        [Benchmark(Baseline = true)]
-        public async Task NoDi()
-        {
-            var request = new SampleRequest() { Value = "Sample value" };
-            var handler = new SampleHandler();
-            var response = await handler.Handle(request);
-        }
-
-        [Benchmark]
-        public async Task SimpleDi()
-        {
-            var request = new SampleRequest() { Value = "Sample value" };
-            var handler = _serviceProvider.GetRequiredService<SampleHandler>();
-            var response = await handler.Handle(request);
-        }
+        //[Benchmark(Baseline = true)]
+        //public Task Vanilla()
+        //{
+        //    return _handler.Handle(_request);
+        //}
 
         [Benchmark]
-        public async Task Crucible()
+        public Task Crucible()
         {
-            var request = new SampleRequest() { Value = "Sample value" };
-            var mediator = _serviceProvider.GetRequiredService<IMediator>();
-            var response = await mediator.ExecuteAsync(request);
+            return _mediator.ExecuteAsync(_request);
         }
 
-        [Benchmark]
-        public async Task MediatR()
-        {
-            var request = new SampleRequest() { Value = "Sample value" };
-            var mediator = _serviceProvider.GetRequiredService<MediatR.IMediator>();
-            var response = await mediator.Send(request);
-        }
+        //[Benchmark]
+        //public Task MediatR()
+        //{
+        //    return _mediatr.Send(_request);
+        //}
 
         public class SampleRequest : IRequest<SampleResponse>, MediatR.IRequest<SampleResponse>
         {
             public string? Value { get; set; }
 
-            internal static async Task<SampleResponse> GetResponseAsync(SampleRequest request, CancellationToken cancellationToken)
+            internal static async Task<SampleResponse> GetResponseAsync(SampleRequest request, CancellationToken cancellationToken = default)
             {
-                await Task.Delay(1);
+                await Task.CompletedTask.ConfigureAwait(false);
                 return new SampleResponse { Value = request.Value };
             }
         }

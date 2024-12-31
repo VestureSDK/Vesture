@@ -26,7 +26,7 @@ namespace Crucible.Mediator.Invocation.Strategies
         {
             foreach (var handler in _handlers)
             {
-                await ExecuteHandlerAsync(handler, context, cancellationToken);
+                await ExecuteHandlerAsync(handler, context, cancellationToken).ConfigureAwait(false);
                 if (!context.IsSuccess)
                 {
                     break;

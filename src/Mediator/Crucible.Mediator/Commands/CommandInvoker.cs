@@ -21,7 +21,7 @@ namespace Crucible.Mediator.Commands
         /// <inheritdoc/>
         public async Task<IInvocationContext> InvokeAndCaptureAsync(ICommand command, CancellationToken cancellationToken = default)
         {
-            return await HandleAndCaptureAsync<CommandResponse>(command, cancellationToken);
+            return await HandleAndCaptureAsync<CommandResponse>(command, cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>

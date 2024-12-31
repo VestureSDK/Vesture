@@ -24,7 +24,7 @@ namespace Crucible.Mediator.Invocation
 
         async Task<TNoResponse> IRequestHandler<TRequest, TNoResponse>.ExecuteAsync(TRequest request, CancellationToken cancellationToken)
         {
-            await ExecuteAsync(request, cancellationToken);
+            await ExecuteAsync(request, cancellationToken).ConfigureAwait(false);
             return default!;
         }
     }

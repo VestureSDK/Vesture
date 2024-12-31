@@ -27,8 +27,8 @@ dotnet_code_quality.ca1802.api_surface = private, internal
 # Miscellaneous style rules
 dotnet_diagnostic.IDE0005.severity = warning
 dotnet_sort_system_directives_first = true
-dotnet_style_predefined_type_for_locals_parameters_members = true:suggestion
-dotnet_style_predefined_type_for_member_access = true:suggestion
+dotnet_style_predefined_type_for_locals_parameters_members = true:none
+dotnet_style_predefined_type_for_member_access = true:none
 
 # avoid this. unless absolutely necessary
 dotnet_style_qualification_for_field = false:suggestion

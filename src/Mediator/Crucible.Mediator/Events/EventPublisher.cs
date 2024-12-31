@@ -21,7 +21,7 @@ namespace Crucible.Mediator.Events
         /// <inheritdoc/>
         public async Task<IInvocationContext> PublishAndCaptureAsync(IEvent @event, CancellationToken cancellationToken = default)
         {
-            return await HandleAndCaptureAsync<EventResponse>(@event, cancellationToken);
+            return await HandleAndCaptureAsync<EventResponse>(@event, cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>

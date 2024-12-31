@@ -12,9 +12,8 @@ namespace Crucible.Mediator.Invocation
         /// </summary>
         /// <typeparam name="TRequest"></typeparam>
         /// <typeparam name="TResponse"></typeparam>
-        /// <param name="context"></param>
         /// <returns></returns>
-        IReadOnlyList<InvocationMiddlewareWrapper> GetMiddlewaresForContext<TRequest, TResponse>(IInvocationContext<TRequest, TResponse> context);
+        IReadOnlyList<InvocationMiddlewareWrapper> GetMiddlewaresForContext<TRequest, TResponse>();
     }
 
     /// <summary>
@@ -34,16 +33,16 @@ namespace Crucible.Mediator.Invocation
         }
 
         /// <inheritdoc/>
-        public IReadOnlyList<InvocationMiddlewareWrapper> GetMiddlewaresForContext<TRequest, TResponse>(IInvocationContext<TRequest, TResponse> context)
+        public IReadOnlyList<InvocationMiddlewareWrapper> GetMiddlewaresForContext<TRequest, TResponse>()
         {
             // Resolve the middlewares with their defined lifetime and
             // order them by their defined Order. Then reverse the collection
             // to ensure the outer most handler is executed first.
-            var contextType = context.GetType();
+            var contextType = typeof(IInvocationContext<TRequest, TResponse>);
             var middlewares = _services.GetServices<InvocationMiddlewareWrapper>().ToList();
             for (int i = middlewares.Count - 1; i >= 0; i--)
             {
-                if (!middlewares[i].IsApplicable(context, contextType))
+                if (!middlewares[i].IsApplicable(contextType))
                 {
                     middlewares.RemoveAt(i);
                 }

@@ -24,6 +24,6 @@ namespace Crucible.Mediator.Invocation
         /// <param name="next">The next <see cref="IInvocationMiddleware{TRequest, TResponse}"/> or the underlying handler.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> to cancel the execution.</param>
         /// <returns>The executing process.</returns>
-        ValueTask ExecuteAsync(IInvocationContext<TRequest, TResponse> context, Func<CancellationToken, ValueTask> next, CancellationToken cancellationToken);
+        Task ExecuteAsync(IInvocationContext<TRequest, TResponse> context, Func<CancellationToken, Task> next, CancellationToken cancellationToken);
     }
 }

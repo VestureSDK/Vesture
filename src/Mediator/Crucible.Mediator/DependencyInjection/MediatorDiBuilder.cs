@@ -122,13 +122,7 @@ namespace Crucible.Mediator.DependencyInjection
                 Services.AddTransient<InvocationMiddlewareWrapper>(sp =>
                 {
                     var lazy = new Lazy<IInvocationMiddleware<TRequest, TResponse>>(() => sp.GetRequiredService<TMiddleware>());
-                    var wrapper = new InvocationMiddlewareWrapper<TRequest, TResponse>(lazy);
-                    if (order != null)
-                    {
-                        wrapper.Order = order.Value;
-                    }
-
-                    return wrapper;
+                    return new InvocationMiddlewareWrapper<TRequest, TResponse>(order ?? InvocationMiddlewareOrder.Default, lazy);
                 });
             }
 

@@ -11,7 +11,7 @@ namespace Crucible.Mediator.Benchmarks
                 var benchmark = new RequestResponsePatternBenchmark();
                 benchmark.GlobalSetup();
                 ;
-                for (int i = 0; i < 100000000; i++)
+                for (int i = 0; i < 1000000; i++)
                 {
                     await benchmark.Crucible().ConfigureAwait(false);
                 }

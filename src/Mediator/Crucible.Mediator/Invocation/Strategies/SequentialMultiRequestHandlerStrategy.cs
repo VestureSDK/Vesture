@@ -1,4 +1,5 @@
-﻿using Crucible.Mediator.Requests;
+﻿using Crucible.Mediator.Invocation.Accessors;
+using Crucible.Mediator.Requests;
 
 namespace Crucible.Mediator.Invocation.Strategies
 {
@@ -9,23 +10,23 @@ namespace Crucible.Mediator.Invocation.Strategies
     /// <typeparam name="TResponse"></typeparam>
     public class SequentialMultiRequestHandlerStrategy<TRequest, TResponse> : RequestHandlerStrategy<TRequest, TResponse>
     {
-        private readonly IEnumerable<IRequestHandler<TRequest, TResponse>> _handlers;
+        private readonly IEnumerable<IInvocationComponentAccessor<IRequestHandler<TRequest, TResponse>>> _handlersAccessor;
 
         /// <summary>
         /// Initializes a new <see cref="SequentialMultiRequestHandlerStrategy{TRequest, TResponse}"/> instance.
         /// </summary>
         /// <param name="handlers">The underlying <see cref="IRequestHandler{TRequest, TResponse}"/> instances.</param>
-        public SequentialMultiRequestHandlerStrategy(
-            IEnumerable<IRequestHandler<TRequest, TResponse>> handlers)
+        public SequentialMultiRequestHandlerStrategy(IEnumerable<IInvocationComponentAccessor<IRequestHandler<TRequest, TResponse>>> handlersAccessor)
         {
-            _handlers = handlers;
+            _handlersAccessor = handlersAccessor;
         }
 
         /// <inheritdoc/>
         public override async Task ExecuteAsync(IInvocationContext<TRequest, TResponse> context, CancellationToken cancellationToken = default)
         {
-            foreach (var handler in _handlers)
+            foreach (var handlerAccessor in _handlersAccessor)
             {
+                var handler = handlerAccessor.GetComponent();
                 await ExecuteHandlerAsync(handler, context, cancellationToken).ConfigureAwait(false);
                 if (!context.IsSuccess)
                 {

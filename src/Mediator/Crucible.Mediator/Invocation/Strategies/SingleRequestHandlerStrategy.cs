@@ -1,4 +1,5 @@
-﻿using Crucible.Mediator.Requests;
+﻿using Crucible.Mediator.Invocation.Accessors;
+using Crucible.Mediator.Requests;
 
 namespace Crucible.Mediator.Invocation.Strategies
 {
@@ -9,22 +10,22 @@ namespace Crucible.Mediator.Invocation.Strategies
     /// <typeparam name="TResponse"></typeparam>
     public class SingleRequestHandlerStrategy<TRequest, TResponse> : RequestHandlerStrategy<TRequest, TResponse>
     {
-        private readonly IRequestHandler<TRequest, TResponse> _handler;
+        private readonly IInvocationComponentAccessor<IRequestHandler<TRequest, TResponse>> _handlerAccessor;
 
         /// <summary>
         /// Initializes a new <see cref="SingleRequestHandlerStrategy{TRequest, TResponse}"/> instance.
         /// </summary>
         /// <param name="handler">The underlying <see cref="IRequestHandler{TRequest, TResponse}"/> instance.</param>
-        public SingleRequestHandlerStrategy(
-            IRequestHandler<TRequest, TResponse> handler)
+        public SingleRequestHandlerStrategy(IInvocationComponentAccessor<IRequestHandler<TRequest, TResponse>> handlerAccessor)
         {
-            _handler = handler;
+            _handlerAccessor = handlerAccessor;
         }
 
         /// <inheritdoc/>
         public override Task ExecuteAsync(IInvocationContext<TRequest, TResponse> context, CancellationToken cancellationToken = default)
         {
-            return ExecuteHandlerAsync(_handler, context, cancellationToken);
+            var handler = _handlerAccessor.GetComponent();
+            return ExecuteHandlerAsync(handler, context, cancellationToken);
         }
     }
 }

@@ -41,7 +41,7 @@ Crucible.Mediator.Invocation.IInvocationContext<TRequest, TResponse>.Request.get
 Crucible.Mediator.Invocation.IInvocationContext<TResponse>
 Crucible.Mediator.Invocation.IInvocationContext<TResponse>.Response.get -> TResponse?
 Crucible.Mediator.Invocation.IInvocationMiddleware<TRequest, TResponse>
-Crucible.Mediator.Invocation.IInvocationMiddleware<TRequest, TResponse>.ExecuteAsync(Crucible.Mediator.Invocation.IInvocationContext<TRequest, TResponse>! context, System.Func<System.Threading.CancellationToken, System.Threading.Tasks.ValueTask>! next, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
+Crucible.Mediator.Invocation.IInvocationMiddleware<TRequest, TResponse>.ExecuteAsync(Crucible.Mediator.Invocation.IInvocationContext<TRequest, TResponse>! context, System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task!>! next, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
 Crucible.Mediator.Invocation.IInvocationMiddleware<TRequest, TResponse>.Order.get -> int?
 Crucible.Mediator.Invocation.IInvocationMiddleware<TRequest, TResponse>.Order.set -> void
 Crucible.Mediator.Invocation.InvocationMiddleware<TRequest, TResponse>
@@ -62,10 +62,10 @@ Crucible.Mediator.Requests.RequestHandler<TRequest, TResponse>.RequestHandler() 
 static readonly Crucible.Mediator.Commands.CommandResponse.Type -> System.Type!
 static readonly Crucible.Mediator.Events.EventResponse.Type -> System.Type!
 static readonly Crucible.Mediator.Invocation.NoResponse.Type -> System.Type!
-virtual Crucible.Mediator.Invocation.InvocationMiddleware<TRequest, TResponse>.ExecuteAsync(Crucible.Mediator.Invocation.IInvocationContext<TRequest, TResponse>! context, System.Func<System.Threading.CancellationToken, System.Threading.Tasks.ValueTask>! next, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
-virtual Crucible.Mediator.Invocation.InvocationMiddleware<TRequest, TResponse>.OnAfterNextAsync(Crucible.Mediator.Invocation.IInvocationContext<TRequest, TResponse>! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
-virtual Crucible.Mediator.Invocation.InvocationMiddleware<TRequest, TResponse>.OnBeforeNextAsync(Crucible.Mediator.Invocation.IInvocationContext<TRequest, TResponse>! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
-virtual Crucible.Mediator.Invocation.InvocationMiddleware<TRequest, TResponse>.OnErrorAsync(Crucible.Mediator.Invocation.IInvocationContext<TRequest, TResponse>! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
-virtual Crucible.Mediator.Invocation.InvocationMiddleware<TRequest, TResponse>.OnSucessAsync(Crucible.Mediator.Invocation.IInvocationContext<TRequest, TResponse>! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
+virtual Crucible.Mediator.Invocation.InvocationMiddleware<TRequest, TResponse>.ExecuteAsync(Crucible.Mediator.Invocation.IInvocationContext<TRequest, TResponse>! context, System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task!>! next, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
+virtual Crucible.Mediator.Invocation.InvocationMiddleware<TRequest, TResponse>.OnAfterNextAsync(Crucible.Mediator.Invocation.IInvocationContext<TRequest, TResponse>! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
+virtual Crucible.Mediator.Invocation.InvocationMiddleware<TRequest, TResponse>.OnBeforeNextAsync(Crucible.Mediator.Invocation.IInvocationContext<TRequest, TResponse>! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
+virtual Crucible.Mediator.Invocation.InvocationMiddleware<TRequest, TResponse>.OnErrorAsync(Crucible.Mediator.Invocation.IInvocationContext<TRequest, TResponse>! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
+virtual Crucible.Mediator.Invocation.InvocationMiddleware<TRequest, TResponse>.OnSucessAsync(Crucible.Mediator.Invocation.IInvocationContext<TRequest, TResponse>! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
 virtual Crucible.Mediator.Invocation.InvocationMiddleware<TRequest, TResponse>.Order.get -> int?
 virtual Crucible.Mediator.Invocation.InvocationMiddleware<TRequest, TResponse>.Order.set -> void

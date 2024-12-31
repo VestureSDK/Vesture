@@ -2,6 +2,7 @@
 using Crucible.Mediator.Commands;
 using Crucible.Mediator.Events;
 using Crucible.Mediator.Invocation;
+using Crucible.Mediator.Invocation.Accessors;
 using Crucible.Mediator.Invocation.Strategies;
 using Crucible.Mediator.Requests;
 using Microsoft.Extensions.DependencyInjection;
@@ -113,16 +114,20 @@ namespace Crucible.Mediator.DependencyInjection
         internal MediatorDiBuilder AddMiddleware<TRequest, TResponse, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TMiddleware>(int? order = null)
             where TMiddleware : class, IInvocationMiddleware<TRequest, TResponse>
         {
-            Services.TryAddTransient<TMiddleware>();
-
-            var trackerTuple = (typeof(TRequest), typeof(TResponse));
-            if (!_tracker.ContainsKey(trackerTuple))
+            if (!Services.Any(sd => sd.ServiceType == typeof(TMiddleware)))
             {
-                _tracker.Add(trackerTuple, true);
+                Services.AddSingleton<TMiddleware>();
+
+                Services.AddSingleton<IInvocationComponentAccessor<TMiddleware>>(sp =>
+                {
+                    var lazy = new Lazy<TMiddleware>(() => sp.GetRequiredService<TMiddleware>());
+                    return new LazyInvocationComponentAccessor<TMiddleware>(lazy);
+                });
+
                 Services.AddTransient<InvocationMiddlewareWrapper>(sp =>
                 {
-                    var lazy = new Lazy<IInvocationMiddleware<TRequest, TResponse>>(() => sp.GetRequiredService<TMiddleware>());
-                    return new InvocationMiddlewareWrapper<TRequest, TResponse>(order ?? InvocationMiddlewareOrder.Default, lazy);
+                    var accessor = sp.GetRequiredService<IInvocationComponentAccessor<TMiddleware>>();
+                    return new InvocationMiddlewareWrapper<TRequest, TResponse>(order ?? InvocationMiddlewareOrder.Default, accessor);
                 });
             }
 
@@ -130,9 +135,10 @@ namespace Crucible.Mediator.DependencyInjection
         }
 
         internal MediatorDiBuilder AddHandler<TRequest, TResponse, THandlerService>(THandlerService handler)
-            where THandlerService : class
+            where THandlerService : class, IRequestHandler<TRequest, TResponse>
         {
             Services.AddSingleton(handler);
+            Services.AddSingleton<IInvocationComponentAccessor<IRequestHandler<TRequest, TResponse>>>(new SingletonInvocationComponentAccessor<THandlerService>(handler));
             Services.TryAddKeyedSingleton<InvocationPipeline<TResponse>, InvocationPipeline<TRequest, TResponse>>(typeof(TRequest));
             TryAddDefaultRequestHandlerStrategy<TRequest, TResponse>();
 
@@ -140,10 +146,11 @@ namespace Crucible.Mediator.DependencyInjection
         }
 
         internal MediatorDiBuilder AddHandler<TRequest, TResponse, THandlerService, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] THandlerImplementation>()
-            where THandlerService : class
+            where THandlerService : class, IRequestHandler<TRequest, TResponse>
             where THandlerImplementation : class, THandlerService
         {
             Services.AddTransient<THandlerService, THandlerImplementation>();
+            Services.AddSingleton<IInvocationComponentAccessor<IRequestHandler<TRequest, TResponse>>>((sp) => new InvocationComponentAccessor<THandlerService>(() => sp.GetRequiredService<THandlerService>()));
             Services.TryAddKeyedSingleton<InvocationPipeline<TResponse>, InvocationPipeline<TRequest, TResponse>>(typeof(TRequest));
             TryAddDefaultRequestHandlerStrategy<TRequest, TResponse>();
 

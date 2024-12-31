@@ -1,10 +1,8 @@
 ﻿#nullable enable
 abstract Crucible.Mediator.Invocation.InvocationContext.RequestType.get -> System.Type!
 abstract Crucible.Mediator.Invocation.InvocationContext.ResponseType.get -> System.Type!
-abstract Crucible.Mediator.Invocation.InvocationMiddlewareWrapper.ExecuteAsync(Crucible.Mediator.Invocation.IInvocationContext! context, System.Func<System.Threading.CancellationToken, System.Threading.Tasks.ValueTask>! next, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask
-abstract Crucible.Mediator.Invocation.InvocationMiddlewareWrapper.IsApplicable(Crucible.Mediator.Invocation.IInvocationContext! context, System.Type! contextType) -> bool
-abstract Crucible.Mediator.Invocation.InvocationMiddlewareWrapper.Order.get -> int
-abstract Crucible.Mediator.Invocation.InvocationMiddlewareWrapper.Order.set -> void
+abstract Crucible.Mediator.Invocation.InvocationMiddlewareWrapper.ExecuteAsync(Crucible.Mediator.Invocation.IInvocationContext! context, System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task!>! next, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
+abstract Crucible.Mediator.Invocation.InvocationMiddlewareWrapper.IsApplicable(System.Type! contextType) -> bool
 abstract Crucible.Mediator.Invocation.InvocationPipeline<TResponse>.ExecuteAndCaptureAsync(object! request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Crucible.Mediator.Invocation.IInvocationContext<TResponse>!>!
 abstract Crucible.Mediator.Invocation.Strategies.RequestHandlerStrategy<TRequest, TResponse>.ExecuteAsync(Crucible.Mediator.Invocation.IInvocationContext<TRequest, TResponse>! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Crucible.Mediator.Commands.CommandInvoker
@@ -44,10 +42,21 @@ Crucible.Mediator.DependencyInjection.MediatorDiRequestBuilder<TRequest, TRespon
 Crucible.Mediator.DependencyInjection.MediatorDiRequestBuilder<TRequest, TResponse>.HandleWith(Crucible.Mediator.Requests.IRequestHandler<TRequest, TResponse>! handler) -> Crucible.Mediator.DependencyInjection.MediatorDiBuilder!
 Crucible.Mediator.DependencyInjection.MediatorDiRequestBuilder<TRequest, TResponse>.HandleWith<THandler>() -> Crucible.Mediator.DependencyInjection.MediatorDiBuilder!
 Crucible.Mediator.DependencyInjection.MediatorDiRequestBuilder<TRequest, TResponse>.MediatorDiRequestBuilder(Crucible.Mediator.DependencyInjection.MediatorDiBuilder! builder) -> void
+Crucible.Mediator.Invocation.Accessors.IInvocationComponentAccessor<TComponent>
+Crucible.Mediator.Invocation.Accessors.IInvocationComponentAccessor<TComponent>.GetComponent() -> TComponent
+Crucible.Mediator.Invocation.Accessors.InvocationComponentAccessor<TComponent>
+Crucible.Mediator.Invocation.Accessors.InvocationComponentAccessor<TComponent>.GetComponent() -> TComponent
+Crucible.Mediator.Invocation.Accessors.InvocationComponentAccessor<TComponent>.InvocationComponentAccessor(System.Func<TComponent>! componentFactory) -> void
+Crucible.Mediator.Invocation.Accessors.LazyInvocationComponentAccessor<TComponent>
+Crucible.Mediator.Invocation.Accessors.LazyInvocationComponentAccessor<TComponent>.GetComponent() -> TComponent
+Crucible.Mediator.Invocation.Accessors.LazyInvocationComponentAccessor<TComponent>.LazyInvocationComponentAccessor(System.Lazy<TComponent>! componentInitializer) -> void
+Crucible.Mediator.Invocation.Accessors.SingletonInvocationComponentAccessor<TComponent>
+Crucible.Mediator.Invocation.Accessors.SingletonInvocationComponentAccessor<TComponent>.GetComponent() -> TComponent
+Crucible.Mediator.Invocation.Accessors.SingletonInvocationComponentAccessor<TComponent>.SingletonInvocationComponentAccessor(TComponent component) -> void
 Crucible.Mediator.Invocation.IInvocationContextFactory
 Crucible.Mediator.Invocation.IInvocationContextFactory.CreateContextForRequest<TRequest, TResponse>(object! request) -> Crucible.Mediator.Invocation.IInvocationContext<TRequest, TResponse>!
 Crucible.Mediator.Invocation.IInvocationMiddlewareProvider
-Crucible.Mediator.Invocation.IInvocationMiddlewareProvider.GetMiddlewaresForContext<TRequest, TResponse>(Crucible.Mediator.Invocation.IInvocationContext<TRequest, TResponse>! context) -> System.Collections.Generic.IReadOnlyList<Crucible.Mediator.Invocation.InvocationMiddlewareWrapper!>!
+Crucible.Mediator.Invocation.IInvocationMiddlewareProvider.GetMiddlewaresForContext<TRequest, TResponse>() -> System.Collections.Generic.IReadOnlyList<Crucible.Mediator.Invocation.InvocationMiddlewareWrapper!>!
 Crucible.Mediator.Invocation.IInvocationPipelineProvider
 Crucible.Mediator.Invocation.IInvocationPipelineProvider.GetInvocationPipeline<TResponse>(object! request) -> Crucible.Mediator.Invocation.InvocationPipeline<TResponse>!
 Crucible.Mediator.Invocation.InvocationContext
@@ -69,12 +78,13 @@ Crucible.Mediator.Invocation.InvocationContextFactory
 Crucible.Mediator.Invocation.InvocationContextFactory.CreateContextForRequest<TRequest, TResponse>(object! request) -> Crucible.Mediator.Invocation.IInvocationContext<TRequest, TResponse>!
 Crucible.Mediator.Invocation.InvocationContextFactory.InvocationContextFactory() -> void
 Crucible.Mediator.Invocation.InvocationMiddlewareProvider
-Crucible.Mediator.Invocation.InvocationMiddlewareProvider.GetMiddlewaresForContext<TRequest, TResponse>(Crucible.Mediator.Invocation.IInvocationContext<TRequest, TResponse>! context) -> System.Collections.Generic.IReadOnlyList<Crucible.Mediator.Invocation.InvocationMiddlewareWrapper!>!
+Crucible.Mediator.Invocation.InvocationMiddlewareProvider.GetMiddlewaresForContext<TRequest, TResponse>() -> System.Collections.Generic.IReadOnlyList<Crucible.Mediator.Invocation.InvocationMiddlewareWrapper!>!
 Crucible.Mediator.Invocation.InvocationMiddlewareProvider.InvocationMiddlewareProvider(System.IServiceProvider! services) -> void
 Crucible.Mediator.Invocation.InvocationMiddlewareWrapper
-Crucible.Mediator.Invocation.InvocationMiddlewareWrapper.InvocationMiddlewareWrapper() -> void
+Crucible.Mediator.Invocation.InvocationMiddlewareWrapper.InvocationMiddlewareWrapper(int order) -> void
+Crucible.Mediator.Invocation.InvocationMiddlewareWrapper.Order.get -> int
 Crucible.Mediator.Invocation.InvocationMiddlewareWrapper<TRequest, TResponse>
-Crucible.Mediator.Invocation.InvocationMiddlewareWrapper<TRequest, TResponse>.InvocationMiddlewareWrapper(System.Lazy<Crucible.Mediator.Invocation.IInvocationMiddleware<TRequest, TResponse>!>! middlewareInitializer) -> void
+Crucible.Mediator.Invocation.InvocationMiddlewareWrapper<TRequest, TResponse>.InvocationMiddlewareWrapper(int order, Crucible.Mediator.Invocation.Accessors.IInvocationComponentAccessor<Crucible.Mediator.Invocation.IInvocationMiddleware<TRequest, TResponse>!>! middlewareAccessor) -> void
 Crucible.Mediator.Invocation.InvocationPipeline<TRequest, TResponse>
 Crucible.Mediator.Invocation.InvocationPipeline<TRequest, TResponse>.InvocationPipeline(Crucible.Mediator.Invocation.IInvocationContextFactory! contextFactory, Crucible.Mediator.Invocation.IInvocationMiddlewareProvider! middlewareProvider, Crucible.Mediator.Invocation.Strategies.IRequestHandlerStrategy<TRequest, TResponse>! strategy) -> void
 Crucible.Mediator.Invocation.InvocationPipeline<TResponse>
@@ -91,7 +101,7 @@ Crucible.Mediator.Invocation.Strategies.IRequestHandlerStrategy<TRequest, TRespo
 Crucible.Mediator.Invocation.Strategies.IRequestHandlerStrategyProvider
 Crucible.Mediator.Invocation.Strategies.IRequestHandlerStrategyProvider.GetRequestHandlerStrategyForContext<TRequest, TResponse>(Crucible.Mediator.Invocation.IInvocationContext<TRequest, TResponse>! context) -> Crucible.Mediator.Invocation.Strategies.IRequestHandlerStrategy<TRequest, TResponse>!
 Crucible.Mediator.Invocation.Strategies.ParallelMultiRequestHandlerStrategy<TRequest, TResponse>
-Crucible.Mediator.Invocation.Strategies.ParallelMultiRequestHandlerStrategy<TRequest, TResponse>.ParallelMultiRequestHandlerStrategy(System.Collections.Generic.IEnumerable<Crucible.Mediator.Requests.IRequestHandler<TRequest, TResponse>!>! handlers) -> void
+Crucible.Mediator.Invocation.Strategies.ParallelMultiRequestHandlerStrategy<TRequest, TResponse>.ParallelMultiRequestHandlerStrategy(System.Collections.Generic.IEnumerable<Crucible.Mediator.Invocation.Accessors.IInvocationComponentAccessor<Crucible.Mediator.Requests.IRequestHandler<TRequest, TResponse>!>!>! handlersAccessor) -> void
 Crucible.Mediator.Invocation.Strategies.RequestHandlerStrategy<TRequest, TResponse>
 Crucible.Mediator.Invocation.Strategies.RequestHandlerStrategy<TRequest, TResponse>.ExecuteHandlerAsync(Crucible.Mediator.Requests.IRequestHandler<TRequest, TResponse>! handler, Crucible.Mediator.Invocation.IInvocationContext<TRequest, TResponse>! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Crucible.Mediator.Invocation.Strategies.RequestHandlerStrategy<TRequest, TResponse>.RequestHandlerStrategy() -> void
@@ -99,9 +109,9 @@ Crucible.Mediator.Invocation.Strategies.RequestHandlerStrategyProvider
 Crucible.Mediator.Invocation.Strategies.RequestHandlerStrategyProvider.GetRequestHandlerStrategyForContext<TRequest, TResponse>(Crucible.Mediator.Invocation.IInvocationContext<TRequest, TResponse>! context) -> Crucible.Mediator.Invocation.Strategies.IRequestHandlerStrategy<TRequest, TResponse>!
 Crucible.Mediator.Invocation.Strategies.RequestHandlerStrategyProvider.RequestHandlerStrategyProvider(System.IServiceProvider! services) -> void
 Crucible.Mediator.Invocation.Strategies.SequentialMultiRequestHandlerStrategy<TRequest, TResponse>
-Crucible.Mediator.Invocation.Strategies.SequentialMultiRequestHandlerStrategy<TRequest, TResponse>.SequentialMultiRequestHandlerStrategy(System.Collections.Generic.IEnumerable<Crucible.Mediator.Requests.IRequestHandler<TRequest, TResponse>!>! handlers) -> void
+Crucible.Mediator.Invocation.Strategies.SequentialMultiRequestHandlerStrategy<TRequest, TResponse>.SequentialMultiRequestHandlerStrategy(System.Collections.Generic.IEnumerable<Crucible.Mediator.Invocation.Accessors.IInvocationComponentAccessor<Crucible.Mediator.Requests.IRequestHandler<TRequest, TResponse>!>!>! handlersAccessor) -> void
 Crucible.Mediator.Invocation.Strategies.SingleRequestHandlerStrategy<TRequest, TResponse>
-Crucible.Mediator.Invocation.Strategies.SingleRequestHandlerStrategy<TRequest, TResponse>.SingleRequestHandlerStrategy(Crucible.Mediator.Requests.IRequestHandler<TRequest, TResponse>! handler) -> void
+Crucible.Mediator.Invocation.Strategies.SingleRequestHandlerStrategy<TRequest, TResponse>.SingleRequestHandlerStrategy(Crucible.Mediator.Invocation.Accessors.IInvocationComponentAccessor<Crucible.Mediator.Requests.IRequestHandler<TRequest, TResponse>!>! handlerAccessor) -> void
 Crucible.Mediator.Mediator
 Crucible.Mediator.Mediator.ExecuteAndCaptureAsync<TResponse>(Crucible.Mediator.Requests.IRequest<TResponse>! request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Crucible.Mediator.Invocation.IInvocationContext<TResponse>!>!
 Crucible.Mediator.Mediator.ExecuteAsync<TResponse>(Crucible.Mediator.Requests.IRequest<TResponse>! request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TResponse>!
@@ -117,10 +127,8 @@ Crucible.Mediator.Requests.RequestInvoker.RequestInvoker(Crucible.Mediator.Invoc
 Microsoft.Extensions.DependencyInjection.MediatorDiExtensions
 override Crucible.Mediator.Invocation.InvocationContext<TRequest, TResponse>.RequestType.get -> System.Type!
 override Crucible.Mediator.Invocation.InvocationContext<TRequest, TResponse>.ResponseType.get -> System.Type!
-override Crucible.Mediator.Invocation.InvocationMiddlewareWrapper<TRequest, TResponse>.ExecuteAsync(Crucible.Mediator.Invocation.IInvocationContext! context, System.Func<System.Threading.CancellationToken, System.Threading.Tasks.ValueTask>! next, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
-override Crucible.Mediator.Invocation.InvocationMiddlewareWrapper<TRequest, TResponse>.IsApplicable(Crucible.Mediator.Invocation.IInvocationContext! context, System.Type! contextType) -> bool
-override Crucible.Mediator.Invocation.InvocationMiddlewareWrapper<TRequest, TResponse>.Order.get -> int
-override Crucible.Mediator.Invocation.InvocationMiddlewareWrapper<TRequest, TResponse>.Order.set -> void
+override Crucible.Mediator.Invocation.InvocationMiddlewareWrapper<TRequest, TResponse>.ExecuteAsync(Crucible.Mediator.Invocation.IInvocationContext! context, System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task!>! next, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+override Crucible.Mediator.Invocation.InvocationMiddlewareWrapper<TRequest, TResponse>.IsApplicable(System.Type! contextType) -> bool
 override Crucible.Mediator.Invocation.InvocationPipeline<TRequest, TResponse>.ExecuteAndCaptureAsync(object! request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Crucible.Mediator.Invocation.IInvocationContext<TResponse>!>!
 override Crucible.Mediator.Invocation.Strategies.ParallelMultiRequestHandlerStrategy<TRequest, TResponse>.ExecuteAsync(Crucible.Mediator.Invocation.IInvocationContext<TRequest, TResponse>! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 override Crucible.Mediator.Invocation.Strategies.SequentialMultiRequestHandlerStrategy<TRequest, TResponse>.ExecuteAsync(Crucible.Mediator.Invocation.IInvocationContext<TRequest, TResponse>! context, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!

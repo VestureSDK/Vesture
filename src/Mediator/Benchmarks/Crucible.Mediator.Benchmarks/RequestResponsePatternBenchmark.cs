@@ -2,7 +2,6 @@
 using BenchmarkDotNet.Jobs;
 using Crucible.Mediator.Invocation;
 using Crucible.Mediator.Requests;
-using Microsoft.Diagnostics.Tracing.Parsers.MicrosoftWindowsTCPIP;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Crucible.Mediator.Benchmarks

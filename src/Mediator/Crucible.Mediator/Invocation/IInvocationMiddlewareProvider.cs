@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-namespace Crucible.Mediator.Invocation
+﻿namespace Crucible.Mediator.Invocation
 {
     /// <summary>
     /// Defines an <see cref="IInvocationMiddleware{TRequest, TResponse}"/> provider.
@@ -21,15 +19,15 @@ namespace Crucible.Mediator.Invocation
     /// </summary>
     public class InvocationMiddlewareProvider : IInvocationMiddlewareProvider
     {
-        private readonly IServiceProvider _services;
+        private readonly IEnumerable<InvocationMiddlewareWrapper> _middlewareWrappers;
 
         /// <summary>
         /// Initializes a new <see cref="InvocationMiddlewareProvider"/> instance.
         /// </summary>
         /// <param name="services">The <see cref="IServiceProvider"/> instance.</param>
-        public InvocationMiddlewareProvider(IServiceProvider services)
+        public InvocationMiddlewareProvider(IEnumerable<InvocationMiddlewareWrapper> middlewareWrappers)
         {
-            _services = services;
+            _middlewareWrappers = middlewareWrappers;
         }
 
         /// <inheritdoc/>
@@ -39,7 +37,7 @@ namespace Crucible.Mediator.Invocation
             // order them by their defined Order. Then reverse the collection
             // to ensure the outer most handler is executed first.
             var contextType = typeof(IInvocationContext<TRequest, TResponse>);
-            var middlewares = _services.GetServices<InvocationMiddlewareWrapper>().ToList();
+            var middlewares = _middlewareWrappers.ToList();
             for (int i = middlewares.Count - 1; i >= 0; i--)
             {
                 if (!middlewares[i].IsApplicable(contextType))

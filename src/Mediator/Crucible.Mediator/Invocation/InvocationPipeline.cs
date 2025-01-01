@@ -78,11 +78,11 @@ namespace Crucible.Mediator.Invocation
 
             // Build the chain of responsibility and return the new root func.
             var middlewares = _middlewareProvider.GetMiddlewaresForContext<TRequest, TResponse>();
-            for (int i = middlewares.Count - 1; i >= 0; i--)
+            for (var i = middlewares.Count - 1; i >= 0; i--)
             {
-                var prevNext = root;
+                var next = root;
                 var middleware = middlewares[i];
-                root = (ctx, ct) => middleware.ExecuteAsync(ctx, (ct) => prevNext(ctx, ct), ct);
+                root = (ctx, ct) => middleware.ExecuteAsync(ctx, (ct) => next(ctx, ct), ct);
             }
 
             return root;

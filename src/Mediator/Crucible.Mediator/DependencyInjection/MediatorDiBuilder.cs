@@ -17,8 +17,6 @@ namespace Crucible.Mediator.DependencyInjection
     {
         private readonly MediatorConfiguration _configuration = new();
 
-        private readonly Dictionary<(Type request, Type response), bool> _tracker = new Dictionary<(Type request, Type response), bool>();
-
         /// <summary>
         /// Initializes a new <see cref="MediatorDiBuilder"/> instance.
         /// </summary>

@@ -79,7 +79,7 @@ Crucible.Mediator.Invocation.InvocationContextFactory.CreateContextForRequest<TR
 Crucible.Mediator.Invocation.InvocationContextFactory.InvocationContextFactory() -> void
 Crucible.Mediator.Invocation.InvocationMiddlewareProvider
 Crucible.Mediator.Invocation.InvocationMiddlewareProvider.GetMiddlewaresForContext<TRequest, TResponse>() -> System.Collections.Generic.IReadOnlyList<Crucible.Mediator.Invocation.InvocationMiddlewareWrapper!>!
-Crucible.Mediator.Invocation.InvocationMiddlewareProvider.InvocationMiddlewareProvider(System.IServiceProvider! services) -> void
+Crucible.Mediator.Invocation.InvocationMiddlewareProvider.InvocationMiddlewareProvider(System.Collections.Generic.IEnumerable<Crucible.Mediator.Invocation.InvocationMiddlewareWrapper!>! middlewareWrappers) -> void
 Crucible.Mediator.Invocation.InvocationMiddlewareWrapper
 Crucible.Mediator.Invocation.InvocationMiddlewareWrapper.InvocationMiddlewareWrapper(int order) -> void
 Crucible.Mediator.Invocation.InvocationMiddlewareWrapper.Order.get -> int

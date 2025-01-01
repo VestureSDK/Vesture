@@ -19,6 +19,7 @@ namespace Crucible.Mediator.Requests
     /// <seealso cref="IMediator"/>
     /// <seealso cref="ICommandHandler{TCommand}"/>
     /// <seealso cref="IEventHandler{TEvent}"/>
+    /// <inheritdoc cref="IRequest{TResponse}" path="/example"/>
     public interface IRequestHandler<TRequest, TResponse>
     {
         /// <summary>
@@ -27,6 +28,6 @@ namespace Crucible.Mediator.Requests
         /// <param name="request">The <see cref="IRequest{TResponse}"/> to handle.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> to cancel the execution.</param>
         /// <returns>The <typeparamref name="TResponse"/> as expected by the specified <typeparamref name="TRequest"/>.</returns>
-        Task<TResponse> ExecuteAsync(TRequest request, CancellationToken cancellationToken = default);
+        Task<TResponse> HandleAsync(TRequest request, CancellationToken cancellationToken = default);
     }
 }

@@ -16,6 +16,7 @@ namespace Crucible.Mediator.Commands
     /// <seealso cref="CommandHandler{TCommand}"/>
     /// <seealso cref="IRequestHandler{TRequest, TResponse}"/>
     /// <seealso cref="IMediator"/>
+    /// <inheritdoc cref="ICommand" path="/example"/>
     public interface ICommandHandler<TCommand> : IRequestHandler<TCommand, CommandResponse>
     {
     }

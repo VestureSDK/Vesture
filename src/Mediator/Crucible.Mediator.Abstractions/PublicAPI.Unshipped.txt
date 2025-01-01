@@ -1,8 +1,8 @@
 ﻿#nullable enable
-abstract Crucible.Mediator.Commands.CommandHandler<TCommand>.InvokeAsync(TCommand command, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
+abstract Crucible.Mediator.Commands.CommandHandler<TCommand>.HandleAsync(TCommand command, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
 abstract Crucible.Mediator.Events.EventHandler<TEvent>.HandleAsync(TEvent event, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
 abstract Crucible.Mediator.Invocation.NoResponseInvocationHandler<TRequest, TNoResponse>.ExecuteAsync(TRequest request, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
-abstract Crucible.Mediator.Requests.RequestHandler<TRequest, TResponse>.ExecuteAsync(TRequest request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TResponse>!
+abstract Crucible.Mediator.Requests.RequestHandler<TRequest, TResponse>.HandleAsync(TRequest request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TResponse>!
 const Crucible.Mediator.Invocation.InvocationMiddlewareOrder.AfterAllOthers = 2147473647 -> int
 const Crucible.Mediator.Invocation.InvocationMiddlewareOrder.BeforeAllOthers = -2147473648 -> int
 const Crucible.Mediator.Invocation.InvocationMiddlewareOrder.Default = 0 -> int
@@ -64,7 +64,7 @@ Crucible.Mediator.Requests.IRequestExecutor
 Crucible.Mediator.Requests.IRequestExecutor.ExecuteAndCaptureAsync<TResponse>(Crucible.Mediator.Requests.IRequest<TResponse>! request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Crucible.Mediator.Invocation.IInvocationContext<TResponse>!>!
 Crucible.Mediator.Requests.IRequestExecutor.ExecuteAsync<TResponse>(Crucible.Mediator.Requests.IRequest<TResponse>! request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TResponse>!
 Crucible.Mediator.Requests.IRequestHandler<TRequest, TResponse>
-Crucible.Mediator.Requests.IRequestHandler<TRequest, TResponse>.ExecuteAsync(TRequest request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TResponse>!
+Crucible.Mediator.Requests.IRequestHandler<TRequest, TResponse>.HandleAsync(TRequest request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TResponse>!
 Crucible.Mediator.Requests.RequestHandler<TRequest, TResponse>
 Crucible.Mediator.Requests.RequestHandler<TRequest, TResponse>.RequestHandler() -> void
 static readonly Crucible.Mediator.Commands.CommandResponse.Type -> System.Type!

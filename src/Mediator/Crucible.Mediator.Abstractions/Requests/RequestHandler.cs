@@ -9,14 +9,18 @@ namespace Crucible.Mediator.Requests
     /// <remarks>
     /// <list type="bullet">
     /// <item>To handle <see cref="ICommand"/> or <see cref="IEvent"/>, kindly see <see cref="CommandHandler{TCommand}"/> and <see cref="EventHandler{TEvent}"/> respectively.</item>
-    /// <item>Override <see cref="ExecuteAsync(TRequest, CancellationToken)"/> to implement the <see cref="IRequestHandler{TRequest, TResponse}"/> logic.</item>
+    /// <item>Override <see cref="HandleAsync(TRequest, CancellationToken)"/> to implement the <see cref="IRequestHandler{TRequest, TResponse}"/> logic.</item>
     /// </list>
     /// </remarks>
     /// <typeparam name="TRequest">The <see cref="IRequest{TResponse}"/> type.</typeparam>
     /// <typeparam name="TResponse">The <c>TResponse</c> type as expected by the <see cref="IRequest{TResponse}"/> specified by <typeparamref name="TRequest"/>.</typeparam>
+    /// <seealso cref="IMediator"/>
+    /// <seealso cref="CommandHandler{TCommand}"/>
+    /// <seealso cref="EventHandler{TEvent}"/>
+    /// <inheritdoc cref="IRequest{TResponse}" path="/example"/>
     public abstract class RequestHandler<TRequest, TResponse> : IRequestHandler<TRequest, TResponse>
     {
         /// <inheritdoc/>
-        public abstract Task<TResponse> ExecuteAsync(TRequest request, CancellationToken cancellationToken = default);
+        public abstract Task<TResponse> HandleAsync(TRequest request, CancellationToken cancellationToken = default);
     }
 }

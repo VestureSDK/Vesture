@@ -20,7 +20,7 @@ namespace Crucible.Mediator.Invocation.Strategies
         {
             try
             {
-                var response = await handler.ExecuteAsync(context.Request, cancellationToken).ConfigureAwait(false);
+                var response = await handler.HandleAsync(context.Request, cancellationToken).ConfigureAwait(false);
                 context.SetResponse(response);
             }
             catch (Exception ex)

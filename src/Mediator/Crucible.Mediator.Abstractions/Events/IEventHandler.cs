@@ -16,6 +16,7 @@ namespace Crucible.Mediator.Events
     /// <seealso cref="EventHandler{TEvent}"/>
     /// <seealso cref="IRequestHandler{TRequest, TResponse}"/>
     /// <seealso cref="IMediator"/>
+    /// <inheritdoc cref="IEvent" path="/example"/>
     public interface IEventHandler<TEvent> : IRequestHandler<TEvent, EventResponse>
     {
 

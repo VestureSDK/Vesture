@@ -15,7 +15,8 @@
       ],
       "dest": "References",
       "namespaceLayout": "nested",
-      "outputFormat": "markdown"
+      // "memberLayout": "separatePages",
+      // "outputFormat": "markdown"
     }
   ],
   "build": {

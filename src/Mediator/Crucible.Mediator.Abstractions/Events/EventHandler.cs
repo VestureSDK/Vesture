@@ -4,8 +4,8 @@ using Crucible.Mediator.Requests;
 namespace Crucible.Mediator.Events
 {
     /// <summary>
-    /// Base implementation of <see cref="IEventHandler{TEvent}"/> invoked by a <see cref="IMediator"/> for an <see cref="IEvent"/>.
-    /// </summary>
+    /// Base implementation of <seealso cref="IEventHandler{TEvent}"/> invoked by a <see cref="IMediator"/> for an <see cref="IEvent"/>.
+    /// </summary>  
     /// <remarks>
     /// <list type="bullet">
     /// <item>To handle <see cref="ICommand"/> or <see cref="IRequest{TResponse}"/>, kindly see <see cref="CommandHandler{TEvent}"/> and <see cref="RequestHandler{TRequest, TResponse}"/> respectively.</item>
@@ -13,6 +13,10 @@ namespace Crucible.Mediator.Events
     /// </list>
     /// </remarks>
     /// <typeparam name="TEvent">The <see cref="IEvent"/> type.</typeparam>
+    /// <seealso cref="IMediator"/>
+    /// <seealso cref="CommandHandler{TCommand}"/>
+    /// <seealso cref="RequestHandler{TRequest, TResponse}"/>
+    /// <inheritdoc cref="IEvent" path="/example"/>
     public abstract class EventHandler<TEvent> : IEventHandler<TEvent>
     {
         /// <summary>
@@ -22,7 +26,7 @@ namespace Crucible.Mediator.Events
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> to cancel the execution.</param>
         public abstract Task HandleAsync(TEvent @event, CancellationToken cancellationToken);
 
-        async Task<EventResponse> IRequestHandler<TEvent, EventResponse>.ExecuteAsync(TEvent request, CancellationToken cancellationToken)
+        async Task<EventResponse> IRequestHandler<TEvent, EventResponse>.HandleAsync(TEvent request, CancellationToken cancellationToken)
         {
             await HandleAsync(request, cancellationToken).ConfigureAwait(false);
             return default!;

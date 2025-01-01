@@ -97,10 +97,10 @@ namespace Crucible.Mediator.Benchmarks
         {
             public Task<SampleResponse> Handle(SampleRequest request, CancellationToken cancellationToken = default)
             {
-                return ExecuteAsync(request, cancellationToken);
+                return HandleAsync(request, cancellationToken);
             }
 
-            public override Task<SampleResponse> ExecuteAsync(SampleRequest request, CancellationToken cancellationToken)
+            public override Task<SampleResponse> HandleAsync(SampleRequest request, CancellationToken cancellationToken)
             {
                 return SampleRequest.GetResponseAsync(request, cancellationToken);
             }

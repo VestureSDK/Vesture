@@ -74,7 +74,7 @@ namespace Crucible.Mediator.Invocation
         {
             // Creates a chain of responsibility with
             // all the middlewares and finish by the handler
-            Func<IInvocationContext<TRequest, TResponse>, CancellationToken, Task> root = (ctx, ct) => _strategy.ExecuteAsync(ctx, ct);
+            Func<IInvocationContext<TRequest, TResponse>, CancellationToken, Task> root = _strategy.ExecuteAsync;
 
             // Build the chain of responsibility and return the new root func.
             var middlewares = _middlewareProvider.GetMiddlewaresForContext<TRequest, TResponse>();

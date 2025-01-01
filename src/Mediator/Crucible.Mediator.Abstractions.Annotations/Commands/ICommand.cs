@@ -1,14 +1,16 @@
 ﻿namespace Crucible.Mediator.Commands
 {
     /// <summary>
-    /// Defines a mediator related command with no response when invoked via a mediator.
+    /// Defines a command not returning a reponse when invoked via a mediator.
     /// </summary>
     /// <remarks>
-    /// This is a marker interface to sugarcoat some C# syntax. 
-    /// While not necessary to implement it, it will help the developer experience.
+    /// <list type="bullet">
+    /// <item>While not necessary to implement it; This marker interface will enhance the developer experience.</item>
+    /// <item>It is strongly suggested the command is also serializable for distributed application scenario.</item>
+    /// </list>
     /// </remarks>
     public interface ICommand
     {
-
+        // Marker interface
     }
 }

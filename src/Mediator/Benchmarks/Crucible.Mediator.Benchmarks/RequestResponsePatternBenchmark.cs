@@ -13,7 +13,6 @@ namespace Crucible.Mediator.Benchmarks
         private MediatR.IMediator _mediatr;
         private SampleHandler _handler;
         private SampleRequest _request;
-        private Test test;
         private OtherTest otherTest = new OtherTest();
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
@@ -23,28 +22,29 @@ namespace Crucible.Mediator.Benchmarks
         [GlobalSetup]
         public void GlobalSetup()
         {
+            _handler = new SampleHandler();
+            _request = new SampleRequest() { Value = "Sample value" };
+
             var serviceCollection = new ServiceCollection();
 
             // serviceCollection.AddSingleton<SampleHandler>();
 
             // MediatR
-            serviceCollection.AddMediatR(c => c.RegisterServicesFromAssemblyContaining<RequestResponsePatternBenchmark>());
+            // serviceCollection.AddMediatR(c => c.RegisterServicesFromAssemblyContaining<RequestResponsePatternBenchmark>());
 
             // Crucible
             serviceCollection.AddMediator()
                 .Request<SampleRequest, SampleResponse>()
-                    .HandleWith<SampleHandler>();
+                    .HandleWith(_handler);
 
             _serviceProvider = serviceCollection.BuildServiceProvider();
             _mediator = _serviceProvider.GetRequiredService<IMediator>();
-            _mediatr = _serviceProvider.GetRequiredService<MediatR.IMediator>();
-            _handler = new SampleHandler();
-            _request = new SampleRequest() { Value = "Sample value" };
+            // _mediatr = _serviceProvider.GetRequiredService<MediatR.IMediator>();
 
             // test = new Test(_serviceProvider);
 
             Crucible().GetAwaiter().GetResult();
-            MediatR().GetAwaiter().GetResult();
+            // MediatR().GetAwaiter().GetResult();
         }
 
         //[Benchmark(Baseline = true)]
@@ -71,11 +71,11 @@ namespace Crucible.Mediator.Benchmarks
         //    return new ValueTask(test.ExecuteAsync(_request));
         //}
 
-        [Benchmark(Baseline = true)]
-        public Task MediatR()
-        {
-            return _mediatr.Send(_request);
-        }
+        //[Benchmark(Baseline = true)]
+        //public Task MediatR()
+        //{
+        //    return _mediatr.Send(_request);
+        //}
 
         public class SampleRequest : IRequest<SampleResponse>, MediatR.IRequest<SampleResponse>
         {
@@ -124,33 +124,6 @@ namespace Crucible.Mediator.Benchmarks
 
                 exec.SetResponse(response);
                 return exec.Response!;
-            }
-        }
-
-        public class Test : IRequestExecutor
-        {
-            private readonly IServiceProvider _serviceProvider;
-
-            public Test(IServiceProvider serviceProvider)
-            {
-                _serviceProvider = serviceProvider;
-            }
-
-            public Task<IInvocationContext<TResponse>> ExecuteAndCaptureAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-
-            public async Task<TResponse> ExecuteAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
-            {
-                IInvocationContext<SampleRequest, TResponse> exec = new InvocationContext<SampleRequest, TResponse>((SampleRequest)request);
-                var _sampleHandler = _serviceProvider.GetRequiredKeyedService<SampleHandler>(typeof(SampleHandler));
-                var response = await _sampleHandler.ExecuteAsync(exec.Request, cancellationToken).ConfigureAwait(false);
-                if (response is TResponse r)
-                {
-                    return r;
-                }
-                else
-                {
-                    return default!;
-                }
             }
         }
     }

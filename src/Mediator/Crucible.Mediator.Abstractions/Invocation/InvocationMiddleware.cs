@@ -15,9 +15,6 @@ namespace Crucible.Mediator.Invocation
     public abstract class InvocationMiddleware<TRequest, TResponse> : IInvocationMiddleware<TRequest, TResponse>
     {
         /// <inheritdoc/>
-        public virtual int? Order { get; set; }
-
-        /// <inheritdoc/>
         /// <remarks>
         /// By default it will do the following:
         /// <list type="number">

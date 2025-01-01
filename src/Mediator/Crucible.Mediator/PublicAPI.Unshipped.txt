@@ -42,6 +42,10 @@ Crucible.Mediator.DependencyInjection.MediatorDiRequestBuilder<TRequest, TRespon
 Crucible.Mediator.DependencyInjection.MediatorDiRequestBuilder<TRequest, TResponse>.HandleWith(Crucible.Mediator.Requests.IRequestHandler<TRequest, TResponse>! handler) -> Crucible.Mediator.DependencyInjection.MediatorDiBuilder!
 Crucible.Mediator.DependencyInjection.MediatorDiRequestBuilder<TRequest, TResponse>.HandleWith<THandler>() -> Crucible.Mediator.DependencyInjection.MediatorDiBuilder!
 Crucible.Mediator.DependencyInjection.MediatorDiRequestBuilder<TRequest, TResponse>.MediatorDiRequestBuilder(Crucible.Mediator.DependencyInjection.MediatorDiBuilder! builder) -> void
+Crucible.Mediator.Events.EventPublisher
+Crucible.Mediator.Events.EventPublisher.EventPublisher(Crucible.Mediator.Invocation.IInvocationPipelineProvider! pipelineProvider) -> void
+Crucible.Mediator.Events.EventPublisher.PublishAndCaptureAsync(Crucible.Mediator.Events.IEvent! event, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Crucible.Mediator.Invocation.IInvocationContext!>!
+Crucible.Mediator.Events.EventPublisher.PublishAsync(Crucible.Mediator.Events.IEvent! event, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Crucible.Mediator.Invocation.Accessors.IInvocationComponentAccessor<TComponent>
 Crucible.Mediator.Invocation.Accessors.IInvocationComponentAccessor<TComponent>.GetComponent() -> TComponent
 Crucible.Mediator.Invocation.Accessors.InvocationComponentAccessor<TComponent>
@@ -115,15 +119,17 @@ Crucible.Mediator.Invocation.Strategies.SingleRequestHandlerStrategy<TRequest, T
 Crucible.Mediator.Mediator
 Crucible.Mediator.Mediator.ExecuteAndCaptureAsync<TResponse>(Crucible.Mediator.Requests.IRequest<TResponse>! request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Crucible.Mediator.Invocation.IInvocationContext<TResponse>!>!
 Crucible.Mediator.Mediator.ExecuteAsync<TResponse>(Crucible.Mediator.Requests.IRequest<TResponse>! request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TResponse>!
+Crucible.Mediator.Mediator.HandleAndCaptureAsync<TResponse>(object! request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Crucible.Mediator.Invocation.IInvocationContext<TResponse>!>!
+Crucible.Mediator.Mediator.HandleAsync<TResponse>(object! request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TResponse>!
 Crucible.Mediator.Mediator.InvokeAndCaptureAsync(Crucible.Mediator.Commands.ICommand! command, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Crucible.Mediator.Invocation.IInvocationContext!>!
 Crucible.Mediator.Mediator.InvokeAsync(Crucible.Mediator.Commands.ICommand! command, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
-Crucible.Mediator.Mediator.Mediator(Crucible.Mediator.Invocation.IInvocationPipelineProvider! invocationPipelineProvider, Crucible.Mediator.Commands.ICommandInvoker! commandInvoker, Crucible.Mediator.Requests.IRequestExecutor! requestInvoker, Crucible.Mediator.Events.IEventPublisher! eventPublisher) -> void
+Crucible.Mediator.Mediator.Mediator(Crucible.Mediator.Invocation.IInvocationPipelineProvider! pipelineProvider) -> void
 Crucible.Mediator.Mediator.PublishAndCaptureAsync(Crucible.Mediator.Events.IEvent! event, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Crucible.Mediator.Invocation.IInvocationContext!>!
 Crucible.Mediator.Mediator.PublishAsync(Crucible.Mediator.Events.IEvent! event, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
-Crucible.Mediator.Requests.RequestInvoker
-Crucible.Mediator.Requests.RequestInvoker.ExecuteAndCaptureAsync<TResponse>(Crucible.Mediator.Requests.IRequest<TResponse>! request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Crucible.Mediator.Invocation.IInvocationContext<TResponse>!>!
-Crucible.Mediator.Requests.RequestInvoker.ExecuteAsync<TResponse>(Crucible.Mediator.Requests.IRequest<TResponse>! request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TResponse>!
-Crucible.Mediator.Requests.RequestInvoker.RequestInvoker(Crucible.Mediator.Invocation.IInvocationPipelineProvider! pipelineProvider) -> void
+Crucible.Mediator.Requests.RequestExecutor
+Crucible.Mediator.Requests.RequestExecutor.ExecuteAndCaptureAsync<TResponse>(Crucible.Mediator.Requests.IRequest<TResponse>! request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Crucible.Mediator.Invocation.IInvocationContext<TResponse>!>!
+Crucible.Mediator.Requests.RequestExecutor.ExecuteAsync<TResponse>(Crucible.Mediator.Requests.IRequest<TResponse>! request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TResponse>!
+Crucible.Mediator.Requests.RequestExecutor.RequestExecutor(Crucible.Mediator.Invocation.IInvocationPipelineProvider! pipelineProvider) -> void
 Microsoft.Extensions.DependencyInjection.MediatorDiExtensions
 override Crucible.Mediator.Invocation.InvocationContext<TRequest, TResponse>.RequestType.get -> System.Type!
 override Crucible.Mediator.Invocation.InvocationContext<TRequest, TResponse>.ResponseType.get -> System.Type!

@@ -3,19 +3,24 @@
 namespace Crucible.Mediator.Commands
 {
     /// <summary>
-    /// Type used as a <see cref="NoResponse"/> for <see cref="ICommand"/>.
+    /// <see cref="System.Type"/> used as a response placeholder when handling a <see cref="ICommand"/> via a <see cref="IMediator"/>.
     /// </summary>
     /// <remarks>
-    /// This is used for middlewares and invocation context to determine if it relates to a <see cref="ICommand"/>.
+    /// <list type="bullet">
+    /// <item>Allows to determine if an <see cref="IInvocationContext{TRequest, TResponse}"/> relates to a <see cref="ICommand"/>.</item>
+    /// <item>You can use <see cref="CommandResponse"/> when registering an <see cref="IInvocationMiddleware{TRequest, TResponse}"/> to handle any <see cref="ICommand"/>.</item>
+    /// </list>
     /// </remarks>
+    /// <seealso cref="NoResponse"/>
     public class CommandResponse : NoResponse
     {
         /// <summary>
         /// The <see cref="System.Type"/> of <see cref="CommandResponse"/>.
         /// </summary>
         /// <remarks>
-        /// This property is for ease of access and ensure the code base is lean.
+        /// This property is for ease of access and avoid typing <c>typeof(CommandResponse)</c> in multiple places.
         /// </remarks>
-        public static readonly new Type Type = typeof(CommandResponse);
+        /// <seealso cref="NoResponse.Type"/>
+        public static new readonly Type Type = typeof(CommandResponse);
     }
 }

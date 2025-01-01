@@ -37,18 +37,7 @@ namespace Crucible.Mediator.DependencyInjection
         {
             setup?.Invoke(_configuration);
 
-            // Adds the require services for the mediator
-            Services.TryAddSingleton<ICommandInvoker, CommandInvoker>();
-            Services.TryAddSingleton<IRequestExecutor, RequestInvoker>();
-            Services.TryAddSingleton<IEventPublisher, EventPublisher>();
-
-            Services.TryAddSingleton<IMediator>((sp) => new Mediator(
-                sp.GetRequiredService<IInvocationPipelineProvider>(),
-                sp.GetRequiredService<ICommandInvoker>(),
-                sp.GetRequiredService<IRequestExecutor>(),
-                sp.GetRequiredService<IEventPublisher>()
-            ));
-
+            Services.TryAddSingleton<IMediator, Mediator>();
             Services.TryAddSingleton<IInvocationPipelineProvider, InvocationPipelineProvider>();
             Services.TryAddSingleton<IInvocationMiddlewareProvider, InvocationMiddlewareProvider>();
             Services.TryAddSingleton<IInvocationContextFactory, InvocationContextFactory>();

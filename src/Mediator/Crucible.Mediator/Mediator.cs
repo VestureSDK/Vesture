@@ -11,63 +11,88 @@ namespace Crucible.Mediator
     /// <remarks>
     /// It uses <see cref="ICommandInvoker"/>, <see cref="IRequestExecutor"/> and <see cref="IEventPublisher"/> under the hood.
     /// </remarks>
-    public class Mediator : Invoker, IMediator
+    public class Mediator : IMediator
     {
-        private readonly ICommandInvoker _commandInvoker;
-
-        private readonly IRequestExecutor _requestInvoker;
-
-        private readonly IEventPublisher _eventPublisher;
+        private readonly IInvocationPipelineProvider _pipelineProvider;
 
         /// <summary>
         /// Initializes a new <see cref="Mediator"/> instance.
         /// </summary>
-        /// <param name="invocationPipelineProvider">The <see cref="IInvocationPipelineProvider"/> instance.</param>
-        /// <param name="commandInvoker">The <see cref="ICommandInvoker"/> instance.</param>
-        /// <param name="requestInvoker">The <see cref="IRequestExecutor"/> instance.</param>
-        /// <param name="eventPublisher">The <see cref="IEventPublisher"/> instance.</param>
-        public Mediator(IInvocationPipelineProvider invocationPipelineProvider, ICommandInvoker commandInvoker, IRequestExecutor requestInvoker, IEventPublisher eventPublisher)
-            : base(invocationPipelineProvider)
+        /// <param name="pipelineProvider">The <see cref="IInvocationPipelineProvider"/> instance.</param>
+        public Mediator(IInvocationPipelineProvider pipelineProvider)
         {
-            _commandInvoker = commandInvoker;
-            _requestInvoker = requestInvoker;
-            _eventPublisher = eventPublisher;
+            _pipelineProvider = pipelineProvider;
+        }
+
+        /// <inheritdoc/>
+        public Task<IInvocationContext<TResponse>> HandleAndCaptureAsync<TResponse>(object request, CancellationToken cancellationToken = default)
+        {
+            var pipeline = _pipelineProvider.GetInvocationPipeline<TResponse>(request);
+            return pipeline.ExecuteAndCaptureAsync(request, cancellationToken);
+        }
+
+        /// <inheritdoc/>
+        public async Task<TResponse> HandleAsync<TResponse>(object request, CancellationToken cancellationToken = default)
+        {
+            var pipeline = _pipelineProvider.GetInvocationPipeline<TResponse>(request);
+            var context = await pipeline.ExecuteAndCaptureAsync(request, cancellationToken).ConfigureAwait(false);
+
+            return ThrowIfContextHasErrorOrReturnResponse(context);
         }
 
         /// <inheritdoc/>
         public Task<IInvocationContext<TResponse>> ExecuteAndCaptureAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
         {
-            return _requestInvoker.ExecuteAndCaptureAsync(request, cancellationToken);
+            return HandleAndCaptureAsync<TResponse>(request, cancellationToken);
         }
 
         /// <inheritdoc/>
         public Task<TResponse> ExecuteAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
         {
-            return _requestInvoker.ExecuteAsync(request, cancellationToken);
+            return HandleAsync<TResponse>(request, cancellationToken);
         }
 
         /// <inheritdoc/>
-        public Task<IInvocationContext> InvokeAndCaptureAsync(ICommand command, CancellationToken cancellationToken = default)
+        public async Task<IInvocationContext> InvokeAndCaptureAsync(ICommand command, CancellationToken cancellationToken = default)
         {
-            return _commandInvoker.InvokeAndCaptureAsync(command, cancellationToken);
+            return await HandleAndCaptureAsync<CommandResponse>(command, cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
         public Task InvokeAsync(ICommand command, CancellationToken cancellationToken = default)
         {
-            return _commandInvoker.InvokeAsync(command, cancellationToken);
+            return HandleAsync<CommandResponse>(command, cancellationToken);
         }
 
         /// <inheritdoc/>
-        public Task<IInvocationContext> PublishAndCaptureAsync(IEvent @event, CancellationToken cancellationToken = default)
+        public async Task<IInvocationContext> PublishAndCaptureAsync(IEvent @event, CancellationToken cancellationToken = default)
         {
-            return _eventPublisher.PublishAndCaptureAsync(@event, cancellationToken);
+            return await HandleAndCaptureAsync<EventResponse>(@event, cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
         public Task PublishAsync(IEvent @event, CancellationToken cancellationToken = default)
         {
-            return _eventPublisher.PublishAsync(@event, cancellationToken);
+            return HandleAsync<EventResponse>(@event, cancellationToken);
+        }
+
+        private static void ThrowIfContextHasError(IInvocationContext context)
+        {
+            if (context.HasError)
+            {
+                // If an error occured, then throw it.
+                throw context.Error!;
+            }
+        }
+
+        private static TResponse ThrowIfContextHasErrorOrReturnResponse<TResponse>(IInvocationContext<TResponse> context)
+        {
+            ThrowIfContextHasError(context);
+
+#pragma warning disable CS8603 // Possible null reference return.
+            // If the context is successful, then return the response
+            return context.HasResponse ? context.Response! : default;
+#pragma warning restore CS8603 // Possible null reference return.
         }
     }
 }

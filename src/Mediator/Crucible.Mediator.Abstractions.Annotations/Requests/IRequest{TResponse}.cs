@@ -1,16 +1,17 @@
 ﻿namespace Crucible.Mediator.Requests
 {
     /// <summary>
-    /// Defines a mediator related request returning a 
-    /// <typeparamref name="TResponse"/> when invoked via a mediator.
+    /// Defines a request returning a <typeparamref name="TResponse"/> when invoked via a mediator.
     /// </summary>
     /// <remarks>
-    /// This is a marker interface to sugarcoat some C# syntax. 
-    /// While not necessary to implement it, it will help the developer experience.
+    /// <list type="bullet">
+    /// <item>While not necessary to implement it; This marker interface will enhance the developer experience.</item>
+    /// <item>It is strongly suggested the request and response are also serializable for distributed application scenario.</item>
+    /// </list>
     /// </remarks>
     /// <typeparam name="TResponse">The type of response expected from the mediator.</typeparam>
     public interface IRequest<TResponse>
     {
-
+        // Marker interface
     }
 }

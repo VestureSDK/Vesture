@@ -36,12 +36,12 @@ namespace Crucible.Mediator.DependencyInjection
         }
 
         /// <summary>
-        /// Defines the <see cref="IEventListener{TEvent}"/> associated with the <see cref="IEvent"/> type.
+        /// Defines the <see cref="IEventHandler{TEvent}"/> associated with the <see cref="IEvent"/> type.
         /// </summary>
-        /// <typeparam name="THandler">The <see cref="IEventListener{TEvent}"/> type.</typeparam>
+        /// <typeparam name="THandler">The <see cref="IEventHandler{TEvent}"/> type.</typeparam>
         /// <returns>The <see cref="MediatorDiBuilder"/> for chaining.</returns>
         public MediatorDiEventBuilder<TEvent> AddListener<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] THandler>()
-            where THandler : class, IEventListener<TEvent>
+            where THandler : class, IEventHandler<TEvent>
         {
             _builder.AddHandler<TEvent, EventResponse, IRequestHandler<TEvent, EventResponse>, THandler>();
             return this;

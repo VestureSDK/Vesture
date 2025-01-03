@@ -124,7 +124,19 @@ namespace Crucible.Mediator.DependencyInjection
         internal MediatorDiBuilder AddHandler<TRequest, TResponse, THandlerService>(THandlerService handler)
             where THandlerService : class, IRequestHandler<TRequest, TResponse>
         {
-            Services.AddSingleton(handler);
+            if (handler is ISaga saga)
+            {
+                Services.AddSingleton((sp) =>
+                {
+                    saga.Mediator = sp.GetRequiredService<IMediator>();
+                    return handler;
+                });
+            }
+            else
+            {
+                Services.AddSingleton(handler);
+            }
+
             Services.AddSingleton<IInvocationComponentAccessor<IRequestHandler<TRequest, TResponse>>>(new SingletonInvocationComponentAccessor<THandlerService>(handler));
             Services.TryAddKeyedSingleton<InvocationPipeline<TResponse>, InvocationPipeline<TRequest, TResponse>>(typeof(TRequest));
             TryAddDefaultRequestHandlerStrategy<TRequest, TResponse>();
@@ -136,7 +148,22 @@ namespace Crucible.Mediator.DependencyInjection
             where THandlerService : class, IRequestHandler<TRequest, TResponse>
             where THandlerImplementation : class, THandlerService
         {
-            Services.AddTransient<THandlerService, THandlerImplementation>();
+            if (typeof(THandlerImplementation).IsAssignableTo(typeof(ISaga)))
+            {
+                Services.TryAddTransient<THandlerImplementation>();
+                Services.AddTransient<THandlerService>((sp) =>
+                {
+                    var implementation = sp.GetRequiredService<THandlerImplementation>();
+                    var saga = (ISaga)implementation;
+                    saga.Mediator = sp.GetRequiredService<IMediator>();
+                    return implementation;
+                });
+            }
+            else
+            {
+                Services.AddTransient<THandlerService, THandlerImplementation>();
+            }
+
             Services.AddSingleton<IInvocationComponentAccessor<IRequestHandler<TRequest, TResponse>>>((sp) => new InvocationComponentAccessor<THandlerService>(() => sp.GetRequiredService<THandlerService>()));
             Services.TryAddKeyedSingleton<InvocationPipeline<TResponse>, InvocationPipeline<TRequest, TResponse>>(typeof(TRequest));
             TryAddDefaultRequestHandlerStrategy<TRequest, TResponse>();

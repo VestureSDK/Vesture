@@ -396,5 +396,7 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
-/docs/References
+
+# DocFx
 /docs/_site
+/docs/**/References

@@ -1,0 +1,12 @@
+- name: Setup
+  href: setup.md
+- name: Execute a Request
+  href: setup-request.md
+- name: Invoke a Command
+  href: setup-command.md
+- name: Publish an Event
+  href: setup-event.md
+- name: Orchestrate with Sagas
+  href: setup-saga.md
+- name: Add a Middleware
+  href: setup-middleware.md

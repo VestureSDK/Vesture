@@ -1,0 +1,6 @@
+- name: Response/Request Pattern
+  href: capture-invocation-context.md
+- name: Handling Progress
+  href: setup-progress.md
+- name: Instrumentation
+  href: setup-instrumentation.md

@@ -17,8 +17,8 @@ task Src-Build {
 task Build Src-Clean, Src-Format, Src-Restore, Src-Build
 
 task Docs-Clean {
-    rm -Force -Recurse ./docs/References
-    rm -Force -Recurse ./docs/_site
+    rm -Force -Recurse ./docs/docs/Mediator/References -ErrorAction SilentlyContinue
+    rm -Force -Recurse ./docs/_site -ErrorAction SilentlyContinue
 }
 
 task Docs-Build {

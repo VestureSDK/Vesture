@@ -13,8 +13,8 @@
           ]
         }
       ],
-      "dest": "References",
-      "namespaceLayout": "nested",
+      "dest": "docs/Mediator/References",
+      "namespaceLayout": "nested"
       // "memberLayout": "separatePages",
       // "outputFormat": "markdown"
     }
@@ -26,7 +26,9 @@
           "**/*.{md,yml}"
         ],
         "exclude": [
-          "_site/**"
+          "_site/**",
+          "**/Overrides/**",
+          "**/Fragments/**"
         ]
       }
     ],
@@ -37,6 +39,7 @@
         ]
       }
     ],
+    "overwrite": "**/Overrides/*.md",
     "output": "_site",
     "template": [
       "default",

@@ -4,7 +4,7 @@ namespace Crucible.Mediator.Events
 {
     /// <summary>
     /// <para>
-    /// Provides a base implementation of the <see cref="IEventHandler{TEvent}"/>.
+    /// The <see cref="EventHandler{TEvent}"/> provides a base implementation of the <see cref="IEventHandler{TEvent}"/>.
     /// You should inherit from this class and override the <see cref="HandleAsync"/> method 
     /// to define the logic for processing a specific <see cref="IEvent"/> contract.
     /// </para>

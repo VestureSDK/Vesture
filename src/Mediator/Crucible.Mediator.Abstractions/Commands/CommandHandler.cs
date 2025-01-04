@@ -1,11 +1,10 @@
 ﻿using Crucible.Mediator.Invocation;
-using Crucible.Mediator.Requests;
 
 namespace Crucible.Mediator.Commands
 {
     /// <summary>
     /// <para>
-    /// Provides a base implementation of the <see cref="ICommandHandler{TCommand}"/>.
+    /// The <see cref="CommandHandler{TCommand}"/> provides a base implementation of the <see cref="ICommandHandler{TCommand}"/>.
     /// You should inherit from this class and override the <see cref="HandleAsync"/> method 
     /// to define the logic for processing a specific <see cref="ICommand"/> contract.
     /// </para>
@@ -28,7 +27,7 @@ namespace Crucible.Mediator.Commands
         /// The <see cref="ICommand"/> contract instance to process.
         /// </param>
         /// <param name="cancellationToken">
-        /// <inheritdoc cref="IRequestHandler{TRequest, TResponse}.HandleAsync(TRequest, CancellationToken)" path="/param[@name='cancellationToken']"/>
+        /// <inheritdoc cref="IInvocationHandler{TRequest, TResponse}.HandleAsync(TRequest, CancellationToken)" path="/param[@name='cancellationToken']"/>
         /// </param>
         /// <returns>
         /// A <see cref="Task"/> representing the asynchronous operation.

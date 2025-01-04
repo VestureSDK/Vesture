@@ -44,21 +44,8 @@ namespace Crucible.Mediator.Requests
     /// <seealso cref="RequestWorkflow{TRequest, TResponse}"/>
     /// <seealso cref="IMediator"/>
     public interface IRequestHandler<TRequest, TResponse> : IInvocationHandler<TRequest, TResponse>
+        where TRequest: IRequest<TResponse>
     {
-        /// <summary>
-        /// Processes the specified <see cref="IRequest{TResponse}"/> contract and returns the expected 
-        /// <typeparamref name="TResponse"/>.
-        /// </summary>
-        /// <param name="request">
-        /// The <see cref="IRequest{TResponse}"/> contract instance to process.
-        /// </param>
-        /// <param name="cancellationToken">
-        /// A token that propagates notification that the operation should be canceled.
-        /// </param>
-        /// <returns>
-        /// A <see cref="Task{TResult}"/> representing the asynchronous operation, with 
-        /// a result of type <typeparamref name="TResponse"/>.
-        /// </returns>
-        new Task<TResponse> HandleAsync(TRequest request, CancellationToken cancellationToken = default);
+
     }
 }

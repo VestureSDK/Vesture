@@ -7,11 +7,9 @@ namespace Crucible.Mediator
 {
     /// <summary>
     /// <para>
-    /// Represents a mediator that coordinates the execution of different types of contracts 
-    /// such as requests, commands, and events by invoking the appropriate handlers.
+    /// An <see cref="IMediator"/> coordinates the execution of different types of contracts 
+    /// such as requests, commands, and events by invoking the appropriate handlers and middlewares.
     /// </para>
-    /// </summary>
-    /// <remarks>
     /// <para>
     /// The mediator acts as a central point of communication in your application, 
     /// decoupling the components that send requests, commands, or events from those that handle them.
@@ -28,7 +26,7 @@ namespace Crucible.Mediator
     /// The mediator ensures that the right handler for each type of contract is invoked, allowing for a 
     /// cleaner and more modular codebase by promoting loose coupling between components.
     /// </para>
-    /// </remarks>
+    /// </summary>
     /// <seealso cref="IRequest{TResponse}"/>
     /// <seealso cref="RequestHandler{TRequest, TResponse}"/>
     /// <seealso cref="ICommand"/>
@@ -48,7 +46,7 @@ namespace Crucible.Mediator
         /// The unmarked contract instance to process.
         /// </param>
         /// <param name="cancellationToken">
-        /// <inheritdoc cref="IRequestHandler{TRequest, TResponse}.HandleAsync(TRequest, CancellationToken)" path="/param[@name='cancellationToken']"/>
+        /// <inheritdoc cref="IInvocationHandler{TRequest, TResponse}.HandleAsync(TRequest, CancellationToken)" path="/param[@name='cancellationToken']"/>
         /// </param>
         /// <returns>
         /// A <see cref="Task{TResult}"/> representing the asynchronous operation, with 
@@ -77,13 +75,13 @@ namespace Crucible.Mediator
         /// The response type produced by processing the specified <see cref="IRequest{TResponse}"/> contract.
         /// </typeparam>
         /// <param name="request">
-        /// <inheritdoc cref="IRequestHandler{TRequest, TResponse}.HandleAsync(TRequest, CancellationToken)" path="/param[@name='request']"/>
+        /// <inheritdoc cref="IInvocationHandler{TRequest, TResponse}.HandleAsync(TRequest, CancellationToken)" path="/param[@name='request']"/>
         /// </param>
         /// <param name="cancellationToken">
-        /// <inheritdoc cref="IRequestHandler{TRequest, TResponse}.HandleAsync(TRequest, CancellationToken)" path="/param[@name='cancellationToken']"/>
+        /// <inheritdoc cref="IInvocationHandler{TRequest, TResponse}.HandleAsync(TRequest, CancellationToken)" path="/param[@name='cancellationToken']"/>
         /// </param>
         /// <returns>
-        /// <inheritdoc cref="IRequestHandler{TRequest, TResponse}.HandleAsync(TRequest, CancellationToken)" path="/returns"/>
+        /// <inheritdoc cref="IInvocationHandler{TRequest, TResponse}.HandleAsync(TRequest, CancellationToken)" path="/returns"/>
         /// </returns>
         Task<TResponse> ExecuteAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default);
 

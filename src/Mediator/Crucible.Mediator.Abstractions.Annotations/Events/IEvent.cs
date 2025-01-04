@@ -2,14 +2,14 @@
 {
     /// <summary>
     /// <para>
-    /// The <see cref="IEvent"/> interface defines a contract for events in your application. 
+    /// An <see cref="IEvent"/> defines a contract for events in your application. 
     /// </para>
     /// <para>
     /// Events represent occurrences or actions that have already taken place, and they typically notify other parts 
     /// of the system to react. For instance, events may be used to trigger notifications, logging, or other system-wide changes.
     /// </para>
     /// <para>
-    /// When published via the <c>IMediator</c>, the event is processed by one or more handlers that implement <c>IEventHandler</c>, 
+    /// When published via the <c>IMediator</c>, the event is processed by one or more <c>IEventHandler</c>, 
     /// enabling the system to respond to the event accordingly. This separation of concerns allows for cleaner and more flexible code, 
     /// as event handling logic is decoupled from the components that trigger events.
     /// </para>

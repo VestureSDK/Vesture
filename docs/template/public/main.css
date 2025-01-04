@@ -1,3 +1,70 @@
-﻿body {
-    background:darkblue!important;
+﻿a {
+    text-decoration: none;
+}
+
+body[data-yaml-mime=ManagedReference] article dl.parameters > dt, body[data-yaml-mime=ApiPage] article dl.parameters > dt {
+    margin: 0;
+}
+
+body[data-yaml-mime=ManagedReference] article h3[data-uid], body[data-yaml-mime=ApiPage] article h3[data-uid] {
+    margin-top: 4rem;
+}
+
+body[data-yaml-mime=ManagedReference] h2 {
+    margin-top: 3rem;
+}
+
+body[data-yaml-mime=ManagedReference] article h4.section, body[data-yaml-mime=ApiPage] article h4.section {
+    opacity: .75;
+    font-size: 1.2rem;
+}
+
+h1,h2,h3 {
+    margin-bottom: 1rem;
+    padding-bottom: .5rem;
+    border-bottom: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color) !important;
+}
+
+.jumplist {
+    margin-bottom: 2.3rem;
+}
+
+.jumplist dt {
+    font-size: 1.3rem;
+    margin-bottom: .7rem;
+}
+
+.jumplist dt a {
+    color: unset;
+}
+
+.jumplist dd {
+    border-left: .3rem var(--bs-border-style) var(--bs-border-color) !important;
+    padding-left: 1rem;
+    margin-left: .5rem !important;
+}
+
+dl.parameters dd p {
+    margin-bottom:.5rem;
+}
+
+.inheritedMembers {
+    display: none;
+}
+
+.section[id^='property-value'] {
+    display: none;
+}
+
+.section[id^='property-value'] + dl {
+    display: none;
+}
+
+
+.section[id^='field-value'] {
+    display: none;
+}
+
+.section[id^='field-value'] + dl {
+    display: none;
 }

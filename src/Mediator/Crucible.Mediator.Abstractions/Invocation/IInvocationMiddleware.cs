@@ -6,7 +6,7 @@ namespace Crucible.Mediator.Invocation
 {
     /// <summary>
     /// <para>
-    /// A <see cref="IInvocationMiddleware{TRequest, TResponse}"/> in the context of the mediator pattern provides 
+    /// An <see cref="IInvocationMiddleware{TRequest, TResponse}"/> in the context of the mediator pattern provides 
     /// a mechanism for injecting cross-cutting concerns into the request, command, or event processing pipeline. 
     /// This interface allows you to define custom logic that  can be executed before, after, or even instead 
     /// of the actual handler for the given contract.
@@ -48,6 +48,6 @@ namespace Crucible.Mediator.Invocation
         /// <returns>
         /// A <see cref="Task"/> representing the asynchronous execution of the middleware and handler chain process.
         /// </returns>
-        Task ExecuteAsync(IInvocationContext<TRequest, TResponse> context, Func<CancellationToken, Task> next, CancellationToken cancellationToken);
+        Task HandleAsync(IInvocationContext<TRequest, TResponse> context, Func<CancellationToken, Task> next, CancellationToken cancellationToken);
     }
 }

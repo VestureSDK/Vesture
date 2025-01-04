@@ -2,7 +2,7 @@
 {
     /// <summary>
     /// <para>
-    /// The <see cref="IRequest{TResponse}"/> interface defines a contract for requests in your application. 
+    /// A <see cref="IRequest{TResponse}"/> defines a contract for requests in your application. 
     /// </para>
     /// <para>
     /// Requests typically represent queries or operations that require a response or result, such as retrieving data 
@@ -10,8 +10,8 @@
     /// expect a response in return. 
     /// </para>
     /// <para>
-    /// When processed by an <c>IRequestHandler</c> and executed via the <c>IMediator</c>, 
-    /// the appropriate handler is determined and the corresponding logic is executed to produce the expected <typeparamref name="TResponse"/>.
+    /// When executed via the <c>IMediator</c>, the appropriate <c>IRequestHandler</c> is determined 
+    /// and the corresponding logic is executed to produce the expected <typeparamref name="TResponse"/>.
     /// This process promotes clean, decoupled code by separating the request's definition from the handling logic,
     /// leading to a more maintainable and flexible design.
     /// </para>

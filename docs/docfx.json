@@ -19,20 +19,20 @@
       // "memberLayout": "separatePages",
       // "outputFormat": "markdown"
     },
-    {
-      "src": [
-        {
-          "src": "../src",
-          "files": [
-            "**/Crucible.Mediator.csproj"
-          ]
-        }
-      ],
-      "dest": "docs/Mediator/Advanced/References",
-      "namespaceLayout": "nested"
-      // "memberLayout": "separatePages",
-      // "outputFormat": "markdown"
-    }
+    //{
+    //  "src": [
+    //    {
+    //      "src": "../src",
+    //      "files": [
+    //        "**/Crucible.Mediator.csproj"
+    //      ]
+    //    }
+    //  ],
+    //  "dest": "docs/Mediator/Advanced/References",
+    //  "namespaceLayout": "nested"
+    //  // "memberLayout": "separatePages",
+    //  // "outputFormat": "markdown"
+    //}
   ],
   "build": {
     "content": [

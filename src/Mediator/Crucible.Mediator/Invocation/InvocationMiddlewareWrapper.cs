@@ -23,7 +23,7 @@ namespace Crucible.Mediator.Invocation
         /// <returns><c>True</c> if the underlying <see cref="IInvocationMiddleware{TRequest, TResponse}"/> is applicable for <paramref name="context"/>; otherwise <c>False</c>.</returns>
         public abstract bool IsApplicable(Type contextType);
 
-        /// <inheritdoc cref="IInvocationMiddleware{TRequest, TResponse}.ExecuteAsync(IInvocationContext{TRequest, TResponse}, Func{CancellationToken, Task}, CancellationToken)"/>
+        /// <inheritdoc cref="IInvocationMiddleware{TRequest, TResponse}.HandleAsync(IInvocationContext{TRequest, TResponse}, Func{CancellationToken, Task}, CancellationToken)"/>
         public abstract Task ExecuteAsync(IInvocationContext context, Func<CancellationToken, Task> next, CancellationToken cancellationToken);
     }
 
@@ -57,7 +57,7 @@ namespace Crucible.Mediator.Invocation
         public override Task ExecuteAsync(IInvocationContext context, Func<CancellationToken, Task> next, CancellationToken cancellationToken = default)
         {
             var middleware = _middlewareAccessor.GetComponent();
-            return middleware.ExecuteAsync((IInvocationContext<TRequest, TResponse>)context, next, cancellationToken);
+            return middleware.HandleAsync((IInvocationContext<TRequest, TResponse>)context, next, cancellationToken);
         }
     }
 }

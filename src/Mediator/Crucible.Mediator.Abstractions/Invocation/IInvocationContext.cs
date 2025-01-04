@@ -5,7 +5,8 @@ using Crucible.Mediator.Requests;
 namespace Crucible.Mediator.Invocation
 {
     /// <summary>
-    /// Defines an invocation context for a <see cref="IRequest{TResponse}"/>, <see cref="ICommand"/> or <see cref="IEvent"/>.
+    /// An <see cref="IInvocationContext"/> defines an invocation context 
+    /// for a <see cref="IRequest{TResponse}"/>, <see cref="ICommand"/> or <see cref="IEvent"/>.
     /// This context is used throughout the mediator pipeline to hold and manage the state of the request,
     /// response, and any errors that may occur during processing.
     /// </summary>
@@ -80,12 +81,11 @@ namespace Crucible.Mediator.Invocation
         void SetError(Exception? error);
     }
 
-    /// <exclude />
     /// <typeparam name="TResponse">The response type as expected by the <see cref="IInvocationContext.Request"/>.</typeparam>
     /// <inheritdoc cref="IInvocationContext"/>
     public interface IInvocationContext<out TResponse> : IInvocationContext
     {
-        /// <inheritdoc/>
+        /// <inheritdoc cref="IInvocationContext.Response"/>
         new TResponse? Response { get; }
     }
 
@@ -95,7 +95,7 @@ namespace Crucible.Mediator.Invocation
     /// <typeparam name="TResponse">The expected response type from the <see cref="IRequest{TResponse}"/>, <see cref="ICommand"/> or <see cref="IEvent"/>.</typeparam>
     public interface IInvocationContext<out TRequest, out TResponse> : IInvocationContext<TResponse>
     {
-        /// <inheritdoc/>
+        /// <inheritdoc cref="IInvocationContext.Request"/>
         new TRequest Request { get; }
     }
 }

@@ -9,7 +9,7 @@ namespace Crucible.Mediator.Invocation
 {
     /// <summary>
     /// <para>
-    /// A <see cref="IInvocationWorkflow"/> serves as a higher-level orchestrator within the mediator pattern, designed to manage 
+    /// An <see cref="IInvocationWorkflow"/> serves as a higher-level orchestrator within the mediator pattern, designed to manage 
     /// and coordinate the flow of multiple operations across different handlers.
     /// </para>
     /// <para>
@@ -39,6 +39,7 @@ namespace Crucible.Mediator.Invocation
     /// <seealso cref="IRequest{TResponse}"/>
     /// <seealso cref="ICommand"/>
     /// <seealso cref="IEvent"/>
+    /// <seealso cref="IInvocationHandler{TRequest, TResponse}"/>
     /// <seealso cref="IMediator"/>
     public interface IInvocationWorkflow
     {

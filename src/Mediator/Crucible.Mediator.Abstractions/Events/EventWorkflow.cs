@@ -6,7 +6,7 @@ namespace Crucible.Mediator.Events
 {
     /// <summary>
     /// <para>
-    /// Provides a base implementation of the <see cref="IInvocationWorkflow"/>.
+    /// The <see cref="EventWorkflow{TEvent}"/> provides a base implementation of the <see cref="IInvocationWorkflow"/>.
     /// You should inherit from this class and override the 
     /// <see cref="EventHandler{TEvent}.HandleAsync(TEvent, CancellationToken)"/> method 
     /// to manage and coordinate the flow of multiple operations across different handlers for a 

@@ -7,7 +7,7 @@ namespace Crucible.Mediator.Invocation
 {
     /// <summary>
     /// <para>
-    /// Provides a base implementation of <see cref="IInvocationMiddleware{TRequest, TResponse}"/>.
+    /// The <see cref="InvocationMiddleware{TRequest, TResponse}"/> provides a base implementation of <see cref="IInvocationMiddleware{TRequest, TResponse}"/>.
     /// This class defines the common structure for middleware that can be used in the request, 
     /// command, or event processing pipeline in the context of the mediator pattern.
     /// </para>
@@ -35,7 +35,7 @@ namespace Crucible.Mediator.Invocation
     /// This replaces the <c>OnSucessAsync</c> and <c>OnErrorAsync</c> overrides.</description>
     /// </item>
     /// <item>
-    /// <term><see cref="ExecuteAsync(IInvocationContext{TRequest, TResponse}, Func{CancellationToken, Task}, CancellationToken)"/></term>
+    /// <term><see cref="HandleAsync(IInvocationContext{TRequest, TResponse}, Func{CancellationToken, Task}, CancellationToken)"/></term>
     /// <description>for fully custom logic. This replaces all the other overrides.</description>
     /// </item>
     /// </list>
@@ -67,7 +67,7 @@ namespace Crucible.Mediator.Invocation
         /// and <see cref="OnAfterNextAsync(IInvocationContext{TRequest, TResponse}, CancellationToken)"/> to customize 
         /// the behavior for your specific use case.
         /// </remarks>
-        public virtual async Task ExecuteAsync(IInvocationContext<TRequest, TResponse> context, Func<CancellationToken, Task> next, CancellationToken cancellationToken)
+        public virtual async Task HandleAsync(IInvocationContext<TRequest, TResponse> context, Func<CancellationToken, Task> next, CancellationToken cancellationToken)
         {
             await OnBeforeNextAsync(context, cancellationToken).ConfigureAwait(false);
 
@@ -81,10 +81,10 @@ namespace Crucible.Mediator.Invocation
         /// before calling the next middleware or handler.
         /// </summary>
         /// <param name="context">
-        /// <inheritdoc cref="IInvocationMiddleware{TRequest, TResponse}.ExecuteAsync(IInvocationContext{TRequest, TResponse}, Func{CancellationToken, Task}, CancellationToken)" path="/param[@name='context']"/>
+        /// <inheritdoc cref="IInvocationMiddleware{TRequest, TResponse}.HandleAsync(IInvocationContext{TRequest, TResponse}, Func{CancellationToken, Task}, CancellationToken)" path="/param[@name='context']"/>
         /// </param>
         /// <param name="cancellationToken">
-        /// <inheritdoc cref="IInvocationMiddleware{TRequest, TResponse}.ExecuteAsync(IInvocationContext{TRequest, TResponse}, Func{CancellationToken, Task}, CancellationToken)" path="/param[@name='cancellationToken']"/>
+        /// <inheritdoc cref="IInvocationMiddleware{TRequest, TResponse}.HandleAsync(IInvocationContext{TRequest, TResponse}, Func{CancellationToken, Task}, CancellationToken)" path="/param[@name='cancellationToken']"/>
         /// </param>
         /// <returns>
         /// A <see cref="Task"/> representing the asynchronous operation.

@@ -6,7 +6,7 @@ namespace Crucible.Mediator.Requests
 {
     /// <summary>
     /// <para>
-    /// Provides a base implementation of the <see cref="IInvocationWorkflow"/>.
+    /// The <see cref="RequestWorkflow{TRequest, TResponse}"/> provides a base implementation of the <see cref="IInvocationWorkflow"/>.
     /// You should inherit from this class and override the 
     /// <see cref="RequestHandler{TRequest, TResponse}.HandleAsync(TRequest, CancellationToken)"/> method 
     /// to manage and coordinate the flow of multiple operations across different handlers for a 

@@ -4,7 +4,7 @@ namespace Crucible.Mediator.Events
 {
     /// <summary>
     /// <para>
-    /// A <see cref="IEventHandler{TEvent}"/> is responsible for the actual 
+    /// An <see cref="IEventHandler{TEvent}"/> is responsible for the actual 
     /// logic of processing a specific <see cref="IEvent"/> contract.
     /// </para>
     /// <para>

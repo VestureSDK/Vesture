@@ -1,5 +1,11 @@
 ---
 uid: Crucible.Mediator.Commands.ICommand
+---
+
+[!INCLUDE [example](../Fragments/marker-devx-tip.md)]
+
+---
+uid: Crucible.Mediator.Commands.ICommand
 example: [*content]
 ---
 

@@ -4,19 +4,19 @@ using Crucible.Mediator.Requests;
 namespace Crucible.Mediator.Invocation.Strategies
 {
     /// <summary>
-    /// <see cref="IRequestHandlerStrategy{TRequest, TResponse}"/> executing multiple <see cref="IRequestHandler{TRequest, TResponse}"/> in parallel.
+    /// <see cref="IRequestHandlerStrategy{TRequest, TResponse}"/> executing multiple <see cref="IInvocationHandler{TRequest, TResponse}"/> in parallel.
     /// </summary>
     /// <typeparam name="TRequest"></typeparam>
     /// <typeparam name="TResponse"></typeparam>
     public class ParallelMultiRequestHandlerStrategy<TRequest, TResponse> : RequestHandlerStrategy<TRequest, TResponse>
     {
-        private readonly IEnumerable<IInvocationComponentAccessor<IRequestHandler<TRequest, TResponse>>> _handlersAccessor;
+        private readonly IEnumerable<IInvocationComponentAccessor<IInvocationHandler<TRequest, TResponse>>> _handlersAccessor;
 
         /// <summary>
         /// Initializes a new <see cref="ParallelMultiRequestHandlerStrategy{TRequest, TResponse}"/> instance.
         /// </summary>
         /// <param name="handlers">The underlying <see cref="IRequestHandler{TRequest, TResponse}"/> instances.</param>
-        public ParallelMultiRequestHandlerStrategy(IEnumerable<IInvocationComponentAccessor<IRequestHandler<TRequest, TResponse>>> handlersAccessor)
+        public ParallelMultiRequestHandlerStrategy(IEnumerable<IInvocationComponentAccessor<IInvocationHandler<TRequest, TResponse>>> handlersAccessor)
         {
             _handlersAccessor = handlersAccessor;
         }

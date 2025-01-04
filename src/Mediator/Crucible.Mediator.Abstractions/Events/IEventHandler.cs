@@ -1,23 +1,45 @@
-﻿using Crucible.Mediator.Requests;
+﻿using Crucible.Mediator.Invocation;
 
 namespace Crucible.Mediator.Events
 {
     /// <summary>
-    /// Defines an handler invoked by a <see cref="IMediator"/> for a <see cref="IEvent"/> (as specified by <typeparamref name="TEvent"/>).
+    /// <para>
+    /// A <see cref="IEventHandler{TEvent}"/> is responsible for the actual 
+    /// logic of processing a specific <see cref="IEvent"/> contract.
+    /// </para>
+    /// <para>
+    /// When an <see cref="IEvent"/> contract is sent to the mediator, the mediator 
+    /// routes it to the appropriate handler, which then processes the event.
+    /// It helps decouple event processing logic from the core application logic, enabling 
+    /// cleaner, more modular code.
+    /// </para>
     /// </summary>
+    /// <typeparam name="TEvent">
+    /// The <see cref="IEvent"/> contract type handled by this handler.
+    /// </typeparam>
     /// <remarks>
-    /// <list type="bullet">
-    /// <item><see cref="IEventHandler{TEvent}"/> is a <see cref="IRequestHandler{TRequest, TResponse}"/> with <see cref="EventResponse"/> as <c>TResponse</c> implying no response is expected.</item>
-    /// <item>You should inherit from <see cref="EventHandler{TEvent}"/> to implement a <see cref="IEventHandler{TEvent}"/>.</item>
-    /// </list>
+    /// <para>
+    /// <see cref="IEventHandler{TEvent}"/> should not directly depend on or invoke 
+    /// <see cref="IMediator"/> for subsequent operations, as this can lead to tightly 
+    /// coupled and difficult-to-maintain code.
+    /// </para>
+    /// <para>
+    /// Instead, a <seealso cref="EventWorkflow{TEvent}"/> should be used to orchestrate 
+    /// the flow of operations. <see cref="IInvocationWorkflow"/> provide a higher-level abstraction for 
+    /// managing complex workflows, ensuring that different handlers are executed in the 
+    /// correct order while maintaining a clear separation of concerns. 
+    /// </para>
+    /// <para>
+    /// By using workflows, you ensure that each handler remains focused on its individual 
+    /// responsibility, leaving orchestration and sequencing to the workflows, thus adhering 
+    /// to the principles of loose coupling and maintainability.
+    /// </para>
     /// </remarks>
-    /// <typeparam name="TEvent">The <see cref="IEvent"/> type.</typeparam>
     /// <seealso cref="IEvent"/>
     /// <seealso cref="EventHandler{TEvent}"/>
-    /// <seealso cref="IRequestHandler{TRequest, TResponse}"/>
+    /// <seealso cref="EventWorkflow{TEvent}"/>
     /// <seealso cref="IMediator"/>
-    /// <inheritdoc cref="IEvent" path="/example"/>
-    public interface IEventHandler<TEvent> : IRequestHandler<TEvent, EventResponse>
+    public interface IEventHandler<TEvent> : IInvocationHandler<TEvent, EventResponse>
     {
 
     }

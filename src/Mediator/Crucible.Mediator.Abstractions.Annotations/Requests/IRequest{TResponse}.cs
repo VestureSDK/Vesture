@@ -1,15 +1,27 @@
-﻿using System.Runtime.InteropServices;
-
-namespace Crucible.Mediator.Requests
+﻿namespace Crucible.Mediator.Requests
 {
     /// <summary>
-    /// Defines a request returning a <typeparamref name="TResponse"/> when invoked via a mediator.
+    /// <para>
+    /// The <see cref="IRequest{TResponse}"/> interface defines a contract for requests in your application. 
+    /// </para>
+    /// <para>
+    /// Requests typically represent queries or operations that require a response or result, such as retrieving data 
+    /// or performing calculations. They are used when you need to request information or perform an operation and 
+    /// expect a response in return. 
+    /// </para>
+    /// <para>
+    /// When processed by an <c>IRequestHandler</c> and executed via the <c>IMediator</c>, 
+    /// the appropriate handler is determined and the corresponding logic is executed to produce the expected <typeparamref name="TResponse"/>.
+    /// This process promotes clean, decoupled code by separating the request's definition from the handling logic,
+    /// leading to a more maintainable and flexible design.
+    /// </para>
+    /// <para>
+    /// Using the mediator pattern with requests helps ensure that the request-handling logic is centralized, 
+    /// and you can easily swap or extend handlers without affecting the core logic that uses them. It also facilitates 
+    /// handling cross-cutting concerns like logging, validation, or transaction management in a clean, centralized manner.
+    /// </para>
     /// </summary>
-    /// <remarks>
-    /// &#128161; For more informartion about how to use <see cref="IRequest{TResponse}"/>, 
-    /// kindly see <see href="${DOC_BASE_URL}/References/Crucible.Mediator.Commands.ICommand.html">the documentation</see>.
-    /// </remarks>
-    /// <typeparam name="TResponse">The type of response expected from the mediator.</typeparam>
+    /// <typeparam name="TResponse">The response type expected from the <c>IMediator</c>.</typeparam>
     public interface IRequest<TResponse>
     {
         // Marker interface

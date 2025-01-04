@@ -4,16 +4,20 @@ using Crucible.Mediator.Events;
 namespace Crucible.Mediator.Invocation
 {
     /// <summary>
-    /// <see cref="System.Type"/> used as a response placeholder when handling an <see cref="IEvent"/> or <see cref="ICommand"/> via a <see cref="IMediator"/>.
+    /// <para>
+    /// <see cref="System.Type"/> used as a response placeholder 
+    /// when handling a <see cref="ICommand"/> or <see cref="IEvent"/> via a <see cref="IMediator"/>.
+    /// </para>
+    /// <para>
+    /// The <see cref="NoResponse"/> type should be used when 
+    /// implementing <see cref="IInvocationMiddleware{TRequest, TResponse}"/> for
+    /// either any <see cref="ICommand"/> or <see cref="IEvent"/> contracts.
+    /// </para>
     /// </summary>
-    /// <remarks>
-    /// <list type="bullet">
-    /// <item>Allows to determine if an <see cref="IInvocationContext{TRequest, TResponse}"/> relates to an <see cref="IEvent"/> or <see cref="ICommand"/>.</item>
-    /// <item>You can use <see cref="NoResponse"/> when registering an <see cref="IInvocationMiddleware{TRequest, TResponse}"/> to handle any <see cref="IEvent"/> or <see cref="ICommand"/>.</item>
-    /// </list>
-    /// </remarks>
     /// <seealso cref="CommandResponse"/>
     /// <seealso cref="EventResponse"/>
+    /// <seealso cref="InvocationMiddleware{TRequest, TResponse}"/>
+    /// <seealso cref="IMediator"/>
     public class NoResponse
     {
         /// <summary>

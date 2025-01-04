@@ -39,9 +39,9 @@ namespace Crucible.Mediator.DependencyInjection
         /// <typeparam name="THandler">The <see cref="IRequestHandler{TRequest, TResponse}"/> or <see cref="ICommandHandler{TCommand}"/> type.</typeparam>
         /// <returns>The <see cref="MediatorDiBuilder"/> for chaining.</returns>
         public MediatorDiBuilder HandleWith<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] THandler>()
-            where THandler : class, IRequestHandler<TRequest, TResponse>
+            where THandler : class, IInvocationHandler<TRequest, TResponse>
         {
-            return _builder.AddHandler<TRequest, TResponse, IRequestHandler<TRequest, TResponse>, THandler>();
+            return _builder.AddHandler<TRequest, TResponse, IInvocationHandler<TRequest, TResponse>, THandler>();
         }
 
         /// <summary>
@@ -49,9 +49,9 @@ namespace Crucible.Mediator.DependencyInjection
         /// </summary>
         /// <param name="handler">The <see cref="IRequestHandler{TRequest, TResponse}"/> instance.</param>
         /// <returns>The <see cref="MediatorDiBuilder"/> for chaining.</returns>
-        public MediatorDiBuilder HandleWith(IRequestHandler<TRequest, TResponse> handler)
+        public MediatorDiBuilder HandleWith(IInvocationHandler<TRequest, TResponse> handler)
         {
-            return _builder.AddHandler<TRequest, TResponse, IRequestHandler<TRequest, TResponse>>(handler);
+            return _builder.AddHandler<TRequest, TResponse, IInvocationHandler<TRequest, TResponse>>(handler);
         }
     }
 }

@@ -3,15 +3,19 @@
 namespace Crucible.Mediator.Events
 {
     /// <summary>
-    /// <see cref="System.Type"/> used as a response placeholder when handling an <see cref="IEvent"/> via a <see cref="IMediator"/>.
+    /// <para>
+    /// <see cref="System.Type"/> used as a response placeholder 
+    /// when handling a <see cref="IEvent"/> via a <see cref="IMediator"/>.
+    /// </para>
+    /// <para>
+    /// The <see cref="EventResponse"/> type should be used when 
+    /// implementing <see cref="IInvocationMiddleware{TRequest, TResponse}"/> for
+    /// either all or specific <see cref="IEvent"/> contracts.
+    /// </para>
     /// </summary>
-    /// <remarks>
-    /// <list type="bullet">
-    /// <item>Allows to determine if an <see cref="IInvocationContext{TRequest, TResponse}"/> relates to an <see cref="IEvent"/>.</item>
-    /// <item>You can use <see cref="EventResponse"/> when registering an <see cref="IInvocationMiddleware{TRequest, TResponse}"/> to handle any <see cref="IEvent"/>.</item>
-    /// </list>
-    /// </remarks>
     /// <seealso cref="NoResponse"/>
+    /// <seealso cref="InvocationMiddleware{TRequest, TResponse}"/>
+    /// <seealso cref="IMediator"/>
     public class EventResponse : NoResponse
     {
         /// <summary>

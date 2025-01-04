@@ -38,7 +38,7 @@
             // to ensure the outer most handler is executed first.
             var contextType = typeof(IInvocationContext<TRequest, TResponse>);
             var middlewares = _middlewareWrappers.ToList();
-            for (int i = middlewares.Count - 1; i >= 0; i--)
+            for (var i = middlewares.Count - 1; i >= 0; i--)
             {
                 if (!middlewares[i].IsApplicable(contextType))
                 {

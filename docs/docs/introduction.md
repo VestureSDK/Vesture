@@ -48,8 +48,11 @@ sequenceDiagram
 
     participant Client as HTTP Client
 
-    box rgba(0,0,0,0.2) Web Api Application<br/>
+    box rgba(0,128,150,0.2) Changed<br/>
         participant Presentation as ASP.NET<br/>(Presentation)
+    end
+
+    box rgba(0,0,0,0.2) Unchanged<br/>
         participant Orchestration as Orchestration
         participant Integration as Integration
     end
@@ -87,9 +90,12 @@ sequenceDiagram
 sequenceDiagram
 
     actor Client as User
-
-    box rgba(0,0,0,0.2) GUI Application<br/>
+    
+    box rgba(0,128,150,0.2) Changed<br/>
         participant Presentation as GUI<br/>(Presentation)
+    end
+
+    box rgba(0,0,0,0.2) Unchanged<br/>
         participant Orchestration as Orchestration
         participant Integration as Integration
     end
@@ -129,9 +135,12 @@ sequenceDiagram
 sequenceDiagram
 
     actor Client as User or Process
-
-    box rgba(0,0,0,0.2) CLI Application<br/>
+    
+    box rgba(0,128,150,0.2) Changed<br/>
         participant Presentation as System.CommandLine<br/>(Presentation)
+    end
+
+    box rgba(0,0,0,0.2) Unchanged<br/>
         participant Orchestration as Orchestration
         participant Integration as Integration
     end

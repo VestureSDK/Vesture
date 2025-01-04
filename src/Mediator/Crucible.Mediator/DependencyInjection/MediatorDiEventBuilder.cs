@@ -43,7 +43,7 @@ namespace Crucible.Mediator.DependencyInjection
         public MediatorDiEventBuilder<TEvent> AddListener<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] THandler>()
             where THandler : class, IEventHandler<TEvent>
         {
-            _builder.AddHandler<TEvent, EventResponse, IRequestHandler<TEvent, EventResponse>, THandler>();
+            _builder.AddHandler<TEvent, EventResponse, IInvocationHandler<TEvent, EventResponse>, THandler>();
             return this;
         }
 
@@ -77,7 +77,7 @@ namespace Crucible.Mediator.DependencyInjection
         }
 
         /// <summary>
-        /// Start defining what to do with the specified <see cref="IRequestHandler{TRequest, TResponse}"/> type.
+        /// Start defining what to do with the specified <see cref="IRequest{TResponse}"/> type.
         /// </summary>
         /// <typeparam name="TRequest">The <see cref="IRequest{TResponse}"/> type.</typeparam>
         /// <typeparam name="TResponse">The expected response from the <see cref="IRequest{TResponse}"/>.</typeparam>

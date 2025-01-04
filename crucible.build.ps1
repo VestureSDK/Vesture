@@ -18,6 +18,7 @@ task Build Src-Clean, Src-Format, Src-Restore, Src-Build
 
 task Docs-Clean {
     rm -Force -Recurse ./docs/docs/Mediator/References -ErrorAction SilentlyContinue
+    rm -Force -Recurse ./docs/docs/Mediator/Advanced/References -ErrorAction SilentlyContinue
     rm -Force -Recurse ./docs/_site -ErrorAction SilentlyContinue
 }
 

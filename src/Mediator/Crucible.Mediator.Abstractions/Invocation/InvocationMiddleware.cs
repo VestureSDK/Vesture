@@ -6,22 +6,66 @@ using Crucible.Mediator.Requests;
 namespace Crucible.Mediator.Invocation
 {
     /// <summary>
-    /// Base implementation of <see cref="IInvocationMiddleware{TRequest, TResponse}"/>.
+    /// <para>
+    /// Provides a base implementation of <see cref="IInvocationMiddleware{TRequest, TResponse}"/>.
+    /// This class defines the common structure for middleware that can be used in the request, 
+    /// command, or event processing pipeline in the context of the mediator pattern.
+    /// </para>
+    /// <inheritdoc cref="IInvocationMiddleware{TRequest, TResponse}" path="/summary"/>
     /// </summary>
-    /// <typeparam name="TRequest">The <see cref="IRequest{TResponse}"/> or <see cref="ICommand"/> type.</typeparam>
-    /// <typeparam name="TResponse">The response type produced as specified in <typeparamref name="TRequest"/> or 
-    /// <see cref="NoResponse"/> for an <see cref="ICommand"/> or <see cref="IEvent"/>.</typeparam>
+    /// <remarks>
+    /// <para>
+    /// This base class allows you to define custom behavior by overriding the methods:
+    /// <list type="bullet">
+    /// <item>
+    /// <term><see cref="OnBeforeNextAsync(IInvocationContext{TRequest, TResponse}, CancellationToken)"/></term>
+    /// <description>for logic to run before the next middleware or handler is invoked.</description>
+    /// </item>
+    /// <item>
+    /// <term><see cref="OnSucessAsync(IInvocationContext{TRequest, TResponse}, CancellationToken)"/></term>
+    /// <description>for logic to run on a successful next middleware or handler invocation.</description>
+    /// </item>
+    /// <item>
+    /// <term><see cref="OnErrorAsync(IInvocationContext{TRequest, TResponse}, CancellationToken)"/></term>
+    /// <description>for logic to run when the next middleware or handler encountered an error.</description>
+    /// </item>
+    /// <item>
+    /// <term><see cref="OnAfterNextAsync(IInvocationContext{TRequest, TResponse}, CancellationToken)"/></term>
+    /// <description>for logic to run after the next middleware or handler invocation has completed. 
+    /// This replaces the <c>OnSucessAsync</c> and <c>OnErrorAsync</c> overrides.</description>
+    /// </item>
+    /// <item>
+    /// <term><see cref="ExecuteAsync(IInvocationContext{TRequest, TResponse}, Func{CancellationToken, Task}, CancellationToken)"/></term>
+    /// <description>for fully custom logic. This replaces all the other overrides.</description>
+    /// </item>
+    /// </list>
+    /// </para>
+    /// </remarks>
+    /// <typeparam name="TRequest">
+    /// The type of the request, command, or event being processed by the middleware.
+    /// </typeparam>
+    /// <typeparam name="TResponse">
+    /// The type of the response produced by the handler processing the <typeparamref name="TRequest"/>.
+    /// </typeparam>
+    /// <seealso cref="IRequest{TResponse}"/>
+    /// <seealso cref="ICommand"/>
+    /// <seealso cref="IEvent"/>
+    /// <seealso cref="IInvocationMiddleware{TRequest, TResponse}"/>
+    /// <seealso cref="IMediator"/>
     [DebuggerDisplay("{typeof(TRequest).Name} -> {typeof(TResponse).Name}")]
     public abstract class InvocationMiddleware<TRequest, TResponse> : IInvocationMiddleware<TRequest, TResponse>
     {
         /// <inheritdoc/>
         /// <remarks>
-        /// By default it will do the following:
+        /// By default, the execution sequence will:
         /// <list type="number">
-        /// <item>Call <see cref="OnBeforeNextAsync(IInvocationContext{TRequest, TResponse}, CancellationToken)"/>. Override <see cref="OnBeforeNextAsync(IInvocationContext{TRequest, TResponse}, CancellationToken)"/> to alter the behavior.</item>
-        /// <item>Then call <paramref name="next"/></item>
-        /// <item>And finally <see cref="OnAfterNextAsync(IInvocationContext{TRequest, TResponse}, CancellationToken)"/>. Override <see cref="OnAfterNextAsync(IInvocationContext{TRequest, TResponse}, CancellationToken)"/> to alter the behavior.</item>
+        /// <item>Call <see cref="OnBeforeNextAsync(IInvocationContext{TRequest, TResponse}, CancellationToken)"/> before invoking the next middleware or handler.</item>
+        /// <item>Invoke the next middleware or handler by calling <paramref name="next"/>.</item>
+        /// <item>Finally, call <see cref="OnAfterNextAsync(IInvocationContext{TRequest, TResponse}, CancellationToken)"/> after the next middleware or handler has completed.</item>
         /// </list>
+        /// You can override the methods <see cref="OnBeforeNextAsync(IInvocationContext{TRequest, TResponse}, CancellationToken)"/> 
+        /// and <see cref="OnAfterNextAsync(IInvocationContext{TRequest, TResponse}, CancellationToken)"/> to customize 
+        /// the behavior for your specific use case.
         /// </remarks>
         public virtual async Task ExecuteAsync(IInvocationContext<TRequest, TResponse> context, Func<CancellationToken, Task> next, CancellationToken cancellationToken)
         {
@@ -33,26 +77,40 @@ namespace Crucible.Mediator.Invocation
         }
 
         /// <summary>
-        /// Executes the middleware process for the related <paramref name="context"/> before calling the next <see cref="IInvocationMiddleware{TRequest, TResponse}"/> or handler.
+        /// Executes the middleware process for the related <paramref name="context"/> 
+        /// before calling the next middleware or handler.
         /// </summary>
-        /// <param name="context">The invocation context related to the <see cref="IRequest{TResponse}"/>, <see cref="ICommand"/> or <see cref="IEvent"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/> to cancel the execution.</param>
-        /// <returns>The executing process.</returns>
+        /// <param name="context">
+        /// <inheritdoc cref="IInvocationMiddleware{TRequest, TResponse}.ExecuteAsync(IInvocationContext{TRequest, TResponse}, Func{CancellationToken, Task}, CancellationToken)" path="/param[@name='context']"/>
+        /// </param>
+        /// <param name="cancellationToken">
+        /// <inheritdoc cref="IInvocationMiddleware{TRequest, TResponse}.ExecuteAsync(IInvocationContext{TRequest, TResponse}, Func{CancellationToken, Task}, CancellationToken)" path="/param[@name='cancellationToken']"/>
+        /// </param>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation.
+        /// </returns>
         protected virtual Task OnBeforeNextAsync(IInvocationContext<TRequest, TResponse> context, CancellationToken cancellationToken)
         {
             return Task.CompletedTask;
         }
 
         /// <summary>
-        /// Executes the middleware process for the related <paramref name="context"/> after calling the next <see cref="IInvocationMiddleware{TRequest, TResponse}"/> or handler.
+        /// Executes the middleware process for the related <paramref name="context"/> 
+        /// after calling the next middleware or handler.
         /// </summary>
         /// <remarks>
-        /// By default, it checks if <see cref="IInvocationContext.HasError"/> and invokes <see cref="OnErrorAsync(IInvocationContext{TRequest, TResponse}, CancellationToken)"/>
-        /// else it invokes <see cref="OnSucessAsync(IInvocationContext{TRequest, TResponse}, CancellationToken)"/>.
+        /// By default, this method checks if the <see cref="IInvocationContext{TRequest, TResponse}"/> contains errors
+        /// (<see cref="IInvocationContext.HasError"/>). 
+        /// <list type="bullet">
+        /// <item>
+        /// If errors are present, it will call <see cref="OnErrorAsync(IInvocationContext{TRequest, TResponse}, CancellationToken)"/>.
+        /// </item>
+        /// <item>
+        /// Otherwise, it will call <see cref="OnSucessAsync(IInvocationContext{TRequest, TResponse}, CancellationToken)"/>.
+        /// </item>
+        /// </list>
         /// </remarks>
-        /// <param name="context">The invocation context related to the <see cref="IRequest{TResponse}"/>, <see cref="ICommand"/> or <see cref="IEvent"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/> to cancel the execution.</param>
-        /// <returns>The executing process.</returns>
+        /// <inheritdoc cref="OnBeforeNextAsync(IInvocationContext{TRequest, TResponse}, CancellationToken)"/>
         protected virtual Task OnAfterNextAsync(IInvocationContext<TRequest, TResponse> context, CancellationToken cancellationToken)
         {
             if (context.HasError)
@@ -66,22 +124,22 @@ namespace Crucible.Mediator.Invocation
         }
 
         /// <summary>
-        /// Executes the middleware process for the related <paramref name="context"/> after calling the next <see cref="IInvocationMiddleware{TRequest, TResponse}"/> or handler and an <see cref="Exception"/> occured.
+        /// Executes the middleware process for the related <paramref name="context"/> after calling the next 
+        /// middleware or handler and an error has occurred.
         /// </summary>
-        /// <param name="context">The invocation context related to the <see cref="IRequest{TResponse}"/>, <see cref="ICommand"/> or <see cref="IEvent"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/> to cancel the execution.</param>
-        /// <returns>The executing process.</returns>
+        /// <remarks></remarks>
+        /// <inheritdoc cref="OnAfterNextAsync(IInvocationContext{TRequest, TResponse}, CancellationToken)"/>
         protected virtual Task OnErrorAsync(IInvocationContext<TRequest, TResponse> context, CancellationToken cancellationToken)
         {
             return Task.CompletedTask;
         }
 
         /// <summary>
-        /// Executes the middleware process for the related <paramref name="context"/> after calling the next <see cref="IInvocationMiddleware{TRequest, TResponse}"/> or handler and it is successful.
+        /// Executes the middleware process for the related <paramref name="context"/> after calling the next 
+        /// middleware or handler and the operation was successful.
         /// </summary>
-        /// <param name="context">The invocation context related to the <see cref="IRequest{TResponse}"/>, <see cref="ICommand"/> or <see cref="IEvent"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/> to cancel the execution.</param>
-        /// <returns>The executing process.</returns>
+        /// <remarks></remarks>
+        /// <inheritdoc cref="OnAfterNextAsync(IInvocationContext{TRequest, TResponse}, CancellationToken)"/>
         protected virtual Task OnSucessAsync(IInvocationContext<TRequest, TResponse> context, CancellationToken cancellationToken)
         {
             return Task.CompletedTask;

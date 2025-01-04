@@ -1,34 +1,30 @@
-﻿using Crucible.Mediator.Invocation;
-
-namespace Crucible.Mediator.Requests
+﻿namespace Crucible.Mediator.Invocation
 {
     /// <summary>
     /// <para>
-    /// A <see cref="IRequestHandler{TRequest, TResponse}"/> is responsible for the actual 
-    /// logic of processing a specific <see cref="IRequest{TResponse}"/> contract.
+    /// An <see cref="IInvocationHandler{TRequest, TResponse}"/> is responsible for the actual 
+    /// logic of processing a specific contract.
     /// </para>
     /// <para>
-    /// When an <see cref="IRequest{TResponse}"/> contract is sent to the mediator, the mediator 
-    /// routes it to the appropriate <see cref="IRequestHandler{TRequest, TResponse}"/>, which then 
-    /// processes the request and returns a <typeparamref name="TResponse"/>.
-    /// It helps decouple request processing logic from the core application logic, enabling 
-    /// cleaner, more modular code.
+    /// When a contract is sent to the mediator, the mediator routes it to the appropriate handler, 
+    /// which then processes the request and returns a <typeparamref name="TResponse"/>.
+    /// It helps decouple processing logic from the core application logic, enabling cleaner, more modular code.
     /// </para>
     /// </summary>
     /// <typeparam name="TRequest">
-    /// The <see cref="IRequest{TResponse}"/> contract type handled by this handler.
+    /// The contract type handled by this handler.
     /// </typeparam>
     /// <typeparam name="TResponse">
     /// The response type produced by processing the <typeparamref name="TRequest"/>.
     /// </typeparam>
     /// <remarks>
     /// <para>
-    /// <see cref="IRequestHandler{TRequest, TResponse}"/> should not directly depend on or invoke 
+    /// <see cref="IInvocationHandler{TRequest, TResponse}"/> should not directly depend on or invoke 
     /// <see cref="IMediator"/> for subsequent operations, as this can lead to tightly 
     /// coupled and difficult-to-maintain code.
     /// </para>
     /// <para>
-    /// Instead, a <seealso cref="RequestWorkflow{TRequest, TResponse}"/> should be used to orchestrate 
+    /// Instead, a <seealso cref="IInvocationWorkflow"/> should be used to orchestrate 
     /// the flow of operations. <see cref="IInvocationWorkflow"/> provide a higher-level abstraction for 
     /// managing complex workflows, ensuring that different handlers are executed in the 
     /// correct order while maintaining a clear separation of concerns. 
@@ -39,18 +35,16 @@ namespace Crucible.Mediator.Requests
     /// to the principles of loose coupling and maintainability.
     /// </para>
     /// </remarks>
-    /// <seealso cref="IRequest{TResponse}"/>
-    /// <seealso cref="RequestHandler{TRequest, TResponse}"/>
-    /// <seealso cref="RequestWorkflow{TRequest, TResponse}"/>
+    /// <seealso cref="IInvocationWorkflow"/>
     /// <seealso cref="IMediator"/>
-    public interface IRequestHandler<TRequest, TResponse> : IInvocationHandler<TRequest, TResponse>
+    public interface IInvocationHandler<TRequest, TResponse>
     {
         /// <summary>
-        /// Processes the specified <see cref="IRequest{TResponse}"/> contract and returns the expected 
+        /// Processes the specified <typeparamref name="TRequest"/> contract and returns the expected 
         /// <typeparamref name="TResponse"/>.
         /// </summary>
         /// <param name="request">
-        /// The <see cref="IRequest{TResponse}"/> contract instance to process.
+        /// The contract instance to process.
         /// </param>
         /// <param name="cancellationToken">
         /// A token that propagates notification that the operation should be canceled.
@@ -59,6 +53,6 @@ namespace Crucible.Mediator.Requests
         /// A <see cref="Task{TResult}"/> representing the asynchronous operation, with 
         /// a result of type <typeparamref name="TResponse"/>.
         /// </returns>
-        new Task<TResponse> HandleAsync(TRequest request, CancellationToken cancellationToken = default);
+        Task<TResponse> HandleAsync(TRequest request, CancellationToken cancellationToken = default);
     }
 }

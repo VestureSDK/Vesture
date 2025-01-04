@@ -9,11 +9,26 @@
           ],
           "exclude": [
             "**/*.Benchmarks.csproj",
-            "**/*.Tests.csproj"
+            "**/*.Tests.csproj",
+            "**/Crucible.Mediator.csproj"
           ]
         }
       ],
       "dest": "docs/Mediator/References",
+      "namespaceLayout": "nested"
+      // "memberLayout": "separatePages",
+      // "outputFormat": "markdown"
+    },
+    {
+      "src": [
+        {
+          "src": "../src",
+          "files": [
+            "**/Crucible.Mediator.csproj"
+          ]
+        }
+      ],
+      "dest": "docs/Mediator/Advanced/References",
       "namespaceLayout": "nested"
       // "memberLayout": "separatePages",
       // "outputFormat": "markdown"
@@ -43,12 +58,15 @@
     "output": "_site",
     "template": [
       "default",
-      "modern"
+      "modern",
+      "template"
     ],
     "globalMetadata": {
-      "_appName": "crucible-docs",
-      "_appTitle": "crucible-docs",
+      "_appName": "Crucible",
+      "_appTitle": "Crucible",
       "_enableSearch": true,
+      "_appFooter": null,
+      "_disableContribution": true,
       "pdf": false
     }
   }

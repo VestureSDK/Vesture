@@ -1,32 +1,40 @@
-﻿using Crucible.Mediator.Commands;
-using Crucible.Mediator.Requests;
+﻿using Crucible.Mediator.Invocation;
 
 namespace Crucible.Mediator.Events
 {
     /// <summary>
-    /// Base implementation of <seealso cref="IEventHandler{TEvent}"/> invoked by a <see cref="IMediator"/> for an <see cref="IEvent"/>.
-    /// </summary>  
+    /// <para>
+    /// Provides a base implementation of the <see cref="IEventHandler{TEvent}"/>.
+    /// You should inherit from this class and override the <see cref="HandleAsync"/> method 
+    /// to define the logic for processing a specific <see cref="IEvent"/> contract.
+    /// </para>
+    /// </summary>
     /// <remarks>
-    /// <list type="bullet">
-    /// <item>To handle <see cref="ICommand"/> or <see cref="IRequest{TResponse}"/>, kindly see <see cref="CommandHandler{TEvent}"/> and <see cref="RequestHandler{TRequest, TResponse}"/> respectively.</item>
-    /// <item>Override <see cref="HandleAsync(TEvent, CancellationToken)"/> to implement the <see cref="IEventHandler{TCommand}"/> logic.</item>
-    /// </list>
+    /// <inheritdoc cref="IEventHandler{TEvent}" path="/summary"/>
+    /// <inheritdoc cref="IEventHandler{TEvent}" path="/remarks"/>
     /// </remarks>
-    /// <typeparam name="TEvent">The <see cref="IEvent"/> type.</typeparam>
+    /// <inheritdoc cref="IEventHandler{TEvent}"/>
+    /// <seealso cref="IEvent"/>
+    /// <seealso cref="IEventHandler{TEvent}"/>
+    /// <seealso cref="EventWorkflow{TEvent}"/>
     /// <seealso cref="IMediator"/>
-    /// <seealso cref="CommandHandler{TCommand}"/>
-    /// <seealso cref="RequestHandler{TRequest, TResponse}"/>
-    /// <inheritdoc cref="IEvent" path="/example"/>
     public abstract class EventHandler<TEvent> : IEventHandler<TEvent>
     {
         /// <summary>
-        /// Handles the <see cref="IEvent"/>.
+        /// Processes the specified <see cref="IEvent"/> contract.
         /// </summary>
-        /// <param name="event">The <see cref="IEvent"/> to handle.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/> to cancel the execution.</param>
+        /// <param name="event">
+        /// The <see cref="IEvent"/> contract instance to process.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// <inheritdoc cref="IInvocationHandler{TRequest, TResponse}.HandleAsync(TRequest, CancellationToken)" path="/param[@name='cancellationToken']"/>
+        /// </param>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation.
+        /// </returns>
         public abstract Task HandleAsync(TEvent @event, CancellationToken cancellationToken);
 
-        async Task<EventResponse> IRequestHandler<TEvent, EventResponse>.HandleAsync(TEvent request, CancellationToken cancellationToken)
+        async Task<EventResponse> IInvocationHandler<TEvent, EventResponse>.HandleAsync(TEvent request, CancellationToken cancellationToken)
         {
             await HandleAsync(request, cancellationToken).ConfigureAwait(false);
             return default!;

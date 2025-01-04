@@ -3,15 +3,19 @@
 namespace Crucible.Mediator.Commands
 {
     /// <summary>
-    /// <see cref="System.Type"/> used as a response placeholder when handling a <see cref="ICommand"/> via a <see cref="IMediator"/>.
+    /// <para>
+    /// <see cref="System.Type"/> used as a response placeholder 
+    /// when handling a <see cref="ICommand"/> via a <see cref="IMediator"/>.
+    /// </para>
+    /// <para>
+    /// The <see cref="CommandResponse"/> type should be used when 
+    /// implementing <see cref="IInvocationMiddleware{TRequest, TResponse}"/> for
+    /// either all or specific <see cref="ICommand"/> contracts.
+    /// </para>
     /// </summary>
-    /// <remarks>
-    /// <list type="bullet">
-    /// <item>Allows to determine if an <see cref="IInvocationContext{TRequest, TResponse}"/> relates to a <see cref="ICommand"/>.</item>
-    /// <item>You can use <see cref="CommandResponse"/> when registering an <see cref="IInvocationMiddleware{TRequest, TResponse}"/> to handle any <see cref="ICommand"/>.</item>
-    /// </list>
-    /// </remarks>
     /// <seealso cref="NoResponse"/>
+    /// <seealso cref="InvocationMiddleware{TRequest, TResponse}"/>
+    /// <seealso cref="IMediator"/>
     public class CommandResponse : NoResponse
     {
         /// <summary>

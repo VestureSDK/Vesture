@@ -1,32 +1,41 @@
-﻿using Crucible.Mediator.Events;
+﻿using Crucible.Mediator.Invocation;
 using Crucible.Mediator.Requests;
 
 namespace Crucible.Mediator.Commands
 {
     /// <summary>
-    /// Base implementation of <see cref="ICommandHandler{TCommand}"/> invoked by a <see cref="IMediator"/> for a <see cref="ICommand"/>.
+    /// <para>
+    /// Provides a base implementation of the <see cref="ICommandHandler{TCommand}"/>.
+    /// You should inherit from this class and override the <see cref="HandleAsync"/> method 
+    /// to define the logic for processing a specific <see cref="ICommand"/> contract.
+    /// </para>
     /// </summary>
     /// <remarks>
-    /// <list type="bullet">
-    /// <item>To handle <see cref="IEvent"/> or <see cref="IRequest{TResponse}"/>, kindly see <see cref="EventHandler{TEvent}"/> and <see cref="RequestHandler{TRequest, TResponse}"/> respectively.</item>
-    /// <item>Override <see cref="HandleAsync(TCommand, CancellationToken)"/> to implement the <see cref="ICommandHandler{TCommand}"/> logic.</item>
-    /// </list>
+    /// <inheritdoc cref="ICommandHandler{TCommand}" path="/summary"/>
+    /// <inheritdoc cref="ICommandHandler{TCommand}" path="/remarks"/>
     /// </remarks>
-    /// <typeparam name="TCommand">The <see cref="ICommand"/> type.</typeparam>
+    /// <inheritdoc cref="ICommandHandler{TCommand}"/>
+    /// <seealso cref="ICommand"/>
+    /// <seealso cref="ICommandHandler{TCommand}"/>
+    /// <seealso cref="CommandWorkflow{TCommand}"/>
     /// <seealso cref="IMediator"/>
-    /// <seealso cref="EventHandler{TEvent}"/>
-    /// <seealso cref="RequestHandler{TRequest, TResponse}"/>
-    /// <inheritdoc cref="ICommand" path="/example"/>
     public abstract class CommandHandler<TCommand> : ICommandHandler<TCommand>
     {
         /// <summary>
-        /// Handles the <see cref="ICommand"/>.
+        /// Processes the specified <see cref="ICommand"/> contract.
         /// </summary>
-        /// <param name="command">The <see cref="ICommand"/> to handle.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/> to cancel the execution.</param>
+        /// <param name="command">
+        /// The <see cref="ICommand"/> contract instance to process.
+        /// </param>
+        /// <param name="cancellationToken">
+        /// <inheritdoc cref="IRequestHandler{TRequest, TResponse}.HandleAsync(TRequest, CancellationToken)" path="/param[@name='cancellationToken']"/>
+        /// </param>
+        /// <returns>
+        /// A <see cref="Task"/> representing the asynchronous operation.
+        /// </returns>
         public abstract Task HandleAsync(TCommand command, CancellationToken cancellationToken);
 
-        async Task<CommandResponse> IRequestHandler<TCommand, CommandResponse>.HandleAsync(TCommand request, CancellationToken cancellationToken)
+        async Task<CommandResponse> IInvocationHandler<TCommand, CommandResponse>.HandleAsync(TCommand request, CancellationToken cancellationToken)
         {
             await HandleAsync(request, cancellationToken).ConfigureAwait(false);
             return default!;

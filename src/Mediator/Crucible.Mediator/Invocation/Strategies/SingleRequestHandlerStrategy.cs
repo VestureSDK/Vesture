@@ -10,13 +10,13 @@ namespace Crucible.Mediator.Invocation.Strategies
     /// <typeparam name="TResponse"></typeparam>
     public class SingleRequestHandlerStrategy<TRequest, TResponse> : RequestHandlerStrategy<TRequest, TResponse>
     {
-        private readonly IInvocationComponentAccessor<IRequestHandler<TRequest, TResponse>> _handlerAccessor;
+        private readonly IInvocationComponentAccessor<IInvocationHandler<TRequest, TResponse>> _handlerAccessor;
 
         /// <summary>
         /// Initializes a new <see cref="SingleRequestHandlerStrategy{TRequest, TResponse}"/> instance.
         /// </summary>
-        /// <param name="handler">The underlying <see cref="IRequestHandler{TRequest, TResponse}"/> instance.</param>
-        public SingleRequestHandlerStrategy(IInvocationComponentAccessor<IRequestHandler<TRequest, TResponse>> handlerAccessor)
+        /// <param name="handler">The underlying <see cref="IInvocationHandler{TRequest, TResponse}"/> instance.</param>
+        public SingleRequestHandlerStrategy(IInvocationComponentAccessor<IInvocationHandler<TRequest, TResponse>> handlerAccessor)
         {
             _handlerAccessor = handlerAccessor;
         }

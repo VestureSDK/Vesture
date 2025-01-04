@@ -6,7 +6,7 @@
   href: setup-command.md
 - name: Publish an Event
   href: setup-event.md
-- name: Orchestrate with Sagas
-  href: setup-saga.md
+- name: Orchestrate with Workflows
+  href: setup-workflow.md
 - name: Add a Middleware
   href: setup-middleware.md

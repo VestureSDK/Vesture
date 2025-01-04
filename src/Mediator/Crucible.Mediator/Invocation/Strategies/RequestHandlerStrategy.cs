@@ -16,7 +16,7 @@ namespace Crucible.Mediator.Invocation.Strategies
         /// <param name="context"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        protected async Task ExecuteHandlerAsync(IRequestHandler<TRequest, TResponse> handler, IInvocationContext<TRequest, TResponse> context, CancellationToken cancellationToken = default)
+        protected async Task ExecuteHandlerAsync(IInvocationHandler<TRequest, TResponse> handler, IInvocationContext<TRequest, TResponse> context, CancellationToken cancellationToken = default)
         {
             try
             {

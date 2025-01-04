@@ -114,7 +114,7 @@ namespace Crucible.Mediator.DependencyInjection
                 Services.AddTransient<InvocationMiddlewareWrapper>(sp =>
                 {
                     var accessor = sp.GetRequiredService<IInvocationComponentAccessor<TMiddleware>>();
-                    return new InvocationMiddlewareWrapper<TRequest, TResponse>(order ?? InvocationMiddlewareOrder.Default, accessor);
+                    return new InvocationMiddlewareWrapper<TRequest, TResponse>(order ?? 0, accessor);
                 });
             }
 
@@ -122,13 +122,13 @@ namespace Crucible.Mediator.DependencyInjection
         }
 
         internal MediatorDiBuilder AddHandler<TRequest, TResponse, THandlerService>(THandlerService handler)
-            where THandlerService : class, IRequestHandler<TRequest, TResponse>
+            where THandlerService : class, IInvocationHandler<TRequest, TResponse>
         {
-            if (handler is ISaga saga)
+            if (handler is IInvocationWorkflow workflow)
             {
                 Services.AddSingleton((sp) =>
                 {
-                    saga.Mediator = sp.GetRequiredService<IMediator>();
+                    PostInitializeWorkflow(sp, workflow);
                     return handler;
                 });
             }
@@ -137,7 +137,7 @@ namespace Crucible.Mediator.DependencyInjection
                 Services.AddSingleton(handler);
             }
 
-            Services.AddSingleton<IInvocationComponentAccessor<IRequestHandler<TRequest, TResponse>>>(new SingletonInvocationComponentAccessor<THandlerService>(handler));
+            Services.AddSingleton<IInvocationComponentAccessor<IInvocationHandler<TRequest, TResponse>>>(new SingletonInvocationComponentAccessor<THandlerService>(handler));
             Services.TryAddKeyedSingleton<InvocationPipeline<TResponse>, InvocationPipeline<TRequest, TResponse>>(typeof(TRequest));
             TryAddDefaultRequestHandlerStrategy<TRequest, TResponse>();
 
@@ -145,17 +145,16 @@ namespace Crucible.Mediator.DependencyInjection
         }
 
         internal MediatorDiBuilder AddHandler<TRequest, TResponse, THandlerService, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] THandlerImplementation>()
-            where THandlerService : class, IRequestHandler<TRequest, TResponse>
+            where THandlerService : class, IInvocationHandler<TRequest, TResponse>
             where THandlerImplementation : class, THandlerService
         {
-            if (typeof(THandlerImplementation).IsAssignableTo(typeof(ISaga)))
+            if (typeof(THandlerImplementation).IsAssignableTo(typeof(IInvocationWorkflow)))
             {
                 Services.TryAddTransient<THandlerImplementation>();
                 Services.AddTransient<THandlerService>((sp) =>
                 {
                     var implementation = sp.GetRequiredService<THandlerImplementation>();
-                    var saga = (ISaga)implementation;
-                    saga.Mediator = sp.GetRequiredService<IMediator>();
+                    PostInitializeWorkflow(sp, (IInvocationWorkflow)implementation);
                     return implementation;
                 });
             }
@@ -164,11 +163,16 @@ namespace Crucible.Mediator.DependencyInjection
                 Services.AddTransient<THandlerService, THandlerImplementation>();
             }
 
-            Services.AddSingleton<IInvocationComponentAccessor<IRequestHandler<TRequest, TResponse>>>((sp) => new InvocationComponentAccessor<THandlerService>(() => sp.GetRequiredService<THandlerService>()));
+            Services.AddSingleton<IInvocationComponentAccessor<IInvocationHandler<TRequest, TResponse>>>((sp) => new InvocationComponentAccessor<THandlerService>(() => sp.GetRequiredService<THandlerService>()));
             Services.TryAddKeyedSingleton<InvocationPipeline<TResponse>, InvocationPipeline<TRequest, TResponse>>(typeof(TRequest));
             TryAddDefaultRequestHandlerStrategy<TRequest, TResponse>();
 
             return this;
+        }
+
+        internal static void PostInitializeWorkflow(IServiceProvider serviceProvider, IInvocationWorkflow workflow)
+        {
+            workflow.Mediator = serviceProvider.GetRequiredService<IMediator>();
         }
 
         internal MediatorDiBuilder TryAddDefaultRequestHandlerStrategy<TRequest, TResponse>()

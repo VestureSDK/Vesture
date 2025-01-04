@@ -48,6 +48,11 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "docs", "..\docs\", "{3BBCA7
 		SlnRelativePath = "..\docs\"
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{06DC1520-BEE9-4068-8194-051E95FC31CF}"
+	ProjectSection(SolutionItems) = preProject
+		..\crucible.build.ps1 = ..\crucible.build.ps1
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

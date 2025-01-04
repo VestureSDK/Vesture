@@ -1,23 +1,45 @@
-﻿using Crucible.Mediator.Requests;
+﻿using Crucible.Mediator.Invocation;
 
 namespace Crucible.Mediator.Commands
 {
     /// <summary>
-    /// Defines an handler invoked by a <see cref="IMediator"/> for a <see cref="ICommand"/> (as specified by <typeparamref name="TCommand"/>).
+    /// <para>
+    /// A <see cref="ICommandHandler{TCommand}"/> is responsible for the actual 
+    /// logic of processing a specific <see cref="ICommand"/> contract.
+    /// </para>
+    /// <para>
+    /// When an <see cref="ICommand"/> contract is sent to the mediator, the mediator 
+    /// routes it to the appropriate handler, which then processes the command.
+    /// It helps decouple command processing logic from the core application logic, enabling 
+    /// cleaner, more modular code.
+    /// </para>
     /// </summary>
+    /// <typeparam name="TCommand">
+    /// The <see cref="ICommand"/> contract type handled by this handler.
+    /// </typeparam>
     /// <remarks>
-    /// <list type="bullet">
-    /// <item><see cref="ICommandHandler{TCommand}"/> is a <see cref="IRequestHandler{TRequest, TResponse}"/> with <see cref="CommandResponse"/> as <c>TResponse</c> implying no response is expected.</item>
-    /// <item>You should inherit from <see cref="CommandHandler{TCommand}"/> to implement a <see cref="ICommandHandler{TCommand}"/>.</item>
-    /// </list>
+    /// <para>
+    /// <see cref="ICommandHandler{TCommand}"/> should not directly depend on or invoke 
+    /// <see cref="IMediator"/> for subsequent operations, as this can lead to tightly 
+    /// coupled and difficult-to-maintain code.
+    /// </para>
+    /// <para>
+    /// Instead, a <seealso cref="CommandWorkflow{TCommand}"/> should be used to orchestrate 
+    /// the flow of operations. <see cref="IInvocationWorkflow"/> provide a higher-level abstraction for 
+    /// managing complex workflows, ensuring that different handlers are executed in the 
+    /// correct order while maintaining a clear separation of concerns. 
+    /// </para>
+    /// <para>
+    /// By using workflows, you ensure that each handler remains focused on its individual 
+    /// responsibility, leaving orchestration and sequencing to the workflows, thus adhering 
+    /// to the principles of loose coupling and maintainability.
+    /// </para>
     /// </remarks>
-    /// <typeparam name="TCommand">The <see cref="ICommand"/> type.</typeparam>
     /// <seealso cref="ICommand"/>
     /// <seealso cref="CommandHandler{TCommand}"/>
-    /// <seealso cref="IRequestHandler{TRequest, TResponse}"/>
+    /// <seealso cref="CommandWorkflow{TCommand}"/>
     /// <seealso cref="IMediator"/>
-    /// <inheritdoc cref="ICommand" path="/example"/>
-    public interface ICommandHandler<TCommand> : IRequestHandler<TCommand, CommandResponse>
+    public interface ICommandHandler<TCommand> : IInvocationHandler<TCommand, CommandResponse>
     {
     }
 }

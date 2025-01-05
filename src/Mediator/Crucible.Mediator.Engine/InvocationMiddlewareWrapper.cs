@@ -1,7 +1,7 @@
-﻿using Crucible.Mediator.Invocation.Accessors;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Crucible.Mediator.Engine.Accessors;
+using Crucible.Mediator.Invocation;
 
-namespace Crucible.Mediator.Invocation
+namespace Crucible.Mediator.Engine
 {
     /// <summary>
     /// Defines a base <see cref="InvocationMiddlewareWrapper"/> for registration in the <see cref="IServiceCollection"/>

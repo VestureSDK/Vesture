@@ -9,15 +9,15 @@ namespace Crucible.Mediator.DependencyInjection
     /// <summary>
     /// Builder to configure the <see cref="IInvocationMiddleware{TInvocationRequest, TInvocationResponse}"/> in the <see cref="IMediator"/> instance.
     /// </summary>
-    public class MediatorDiInvocationBuilder<TInvocationRequest, TInvocationResponse>
+    public class MediatorInvocationBuilder<TInvocationRequest, TInvocationResponse>
     {
-        private readonly MediatorDiBuilder _builder;
+        private readonly MediatorBuilder _builder;
 
         /// <summary>
-        /// Initializes a new <see cref="MediatorDiInvocationBuilder{TInvocationRequest, TInvocationResponse}"/> instance.
+        /// Initializes a new <see cref="MediatorInvocationBuilder{TInvocationRequest, TInvocationResponse}"/> instance.
         /// </summary>
-        /// <param name="builder">The <see cref="MediatorDiBuilder"/> instance.</param>
-        public MediatorDiInvocationBuilder(MediatorDiBuilder builder)
+        /// <param name="builder">The <see cref="MediatorBuilder"/> instance.</param>
+        public MediatorInvocationBuilder(MediatorBuilder builder)
         {
             _builder = builder;
         }
@@ -26,8 +26,8 @@ namespace Crucible.Mediator.DependencyInjection
         /// Adds a <see cref="IInvocationMiddleware{TInvocationRequest, TInvocationResponse}"/> to the execution piepline.
         /// </summary>
         /// <typeparam name="TMiddleware">The <see cref="IInvocationMiddleware{TInvocationRequest, TInvocationResponse}"/> type.</typeparam>
-        /// <returns>The <see cref="MediatorDiInvocationBuilder{TInvocationRequest, TInvocationResponse}"/> for chaining.</returns>
-        public MediatorDiInvocationBuilder<TInvocationRequest, TInvocationResponse> AddMiddleware<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TMiddleware>(int? order = null)
+        /// <returns>The <see cref="MediatorInvocationBuilder{TInvocationRequest, TInvocationResponse}"/> for chaining.</returns>
+        public MediatorInvocationBuilder<TInvocationRequest, TInvocationResponse> AddMiddleware<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TMiddleware>(int? order = null)
             where TMiddleware : class, IInvocationMiddleware<TInvocationRequest, TInvocationResponse>
         {
             _builder.AddMiddleware<TInvocationRequest, TInvocationResponse, TMiddleware>(order);
@@ -39,10 +39,10 @@ namespace Crucible.Mediator.DependencyInjection
         /// </summary>
         /// <typeparam name="TRequest">The <see cref="IRequest{TResponse}"/> type.</typeparam>
         /// <typeparam name="TResponse">The expected response from the <see cref="IRequest{TResponse}"/>.</typeparam>
-        /// <returns>The <see cref="MediatorDiRequestBuilder{TRequest, TResponse}"/> for chaining.</returns>
-        public MediatorDiInvocationBuilder<TRequest, TResponse> Invocation<TRequest, TResponse>()
+        /// <returns>The <see cref="MediatorRequestBuilder{TRequest, TResponse}"/> for chaining.</returns>
+        public MediatorInvocationBuilder<TRequest, TResponse> Invocation<TRequest, TResponse>()
         {
-            return new MediatorDiInvocationBuilder<TRequest, TResponse>(_builder);
+            return new MediatorInvocationBuilder<TRequest, TResponse>(_builder);
         }
 
         /// <summary>
@@ -50,18 +50,18 @@ namespace Crucible.Mediator.DependencyInjection
         /// </summary>
         /// <typeparam name="TRequest">The <see cref="IRequest{TResponse}"/> type.</typeparam>
         /// <typeparam name="TResponse">The expected response from the <see cref="IRequest{TResponse}"/>.</typeparam>
-        /// <returns>The <see cref="MediatorDiRequestBuilder{TRequest, TResponse}"/> for chaining.</returns>
-        public MediatorDiRequestBuilder<TRequest, TResponse> Request<TRequest, TResponse>()
+        /// <returns>The <see cref="MediatorRequestBuilder{TRequest, TResponse}"/> for chaining.</returns>
+        public MediatorRequestBuilder<TRequest, TResponse> Request<TRequest, TResponse>()
         {
-            return new MediatorDiRequestBuilder<TRequest, TResponse>(_builder);
+            return new MediatorRequestBuilder<TRequest, TResponse>(_builder);
         }
 
         /// <summary>
         /// Start defining what to do with the specified <see cref="ICommand"/> type.
         /// </summary>
         /// <typeparam name="TRequest">The <see cref="ICommand"/> type.</typeparam>
-        /// <returns>The <see cref="MediatorDiRequestBuilder{TRequest, CommandResponse}"/> for chaining.</returns>
-        public MediatorDiRequestBuilder<TRequest, CommandResponse> Command<TRequest>()
+        /// <returns>The <see cref="MediatorRequestBuilder{TRequest, CommandResponse}"/> for chaining.</returns>
+        public MediatorRequestBuilder<TRequest, CommandResponse> Command<TRequest>()
         {
             return Request<TRequest, CommandResponse>();
         }
@@ -70,10 +70,10 @@ namespace Crucible.Mediator.DependencyInjection
         /// Start defining what to do with the specified <see cref="IEvent"/> type.
         /// </summary>
         /// <typeparam name="TEvent">The <see cref="IEvent"/> type.</typeparam>
-        /// <returns>The <see cref="MediatorDiEventBuilder{TEvent}"/> for chaining.</returns>
-        public MediatorDiEventBuilder<TEvent> Event<TEvent>()
+        /// <returns>The <see cref="MediatorEventBuilder{TEvent}"/> for chaining.</returns>
+        public MediatorEventBuilder<TEvent> Event<TEvent>()
         {
-            return new MediatorDiEventBuilder<TEvent>(_builder);
+            return new MediatorEventBuilder<TEvent>(_builder);
         }
 
     }

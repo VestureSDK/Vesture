@@ -28,30 +28,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crucible.Mediator.Tests", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crucible.Mediator.Abstractions.Tests", "Mediator\Tests\Crucible.Mediator.Abstractions.Tests\Crucible.Mediator.Abstractions.Tests.csproj", "{530C2E25-D0C3-429F-9DEC-28B198CA6E25}"
 EndProject
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "docs", "..\docs\", "{3BBCA713-D2F0-49AC-A612-378BA418F666}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.VirtualPath = "/localhost_55088"
-		Debug.AspNetCompiler.PhysicalPath = "..\docs\"
-		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_55088\"
-		Debug.AspNetCompiler.Updateable = "true"
-		Debug.AspNetCompiler.ForceOverwrite = "true"
-		Debug.AspNetCompiler.FixedNames = "false"
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.VirtualPath = "/localhost_55088"
-		Release.AspNetCompiler.PhysicalPath = "..\docs\"
-		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_55088\"
-		Release.AspNetCompiler.Updateable = "true"
-		Release.AspNetCompiler.ForceOverwrite = "true"
-		Release.AspNetCompiler.FixedNames = "false"
-		Release.AspNetCompiler.Debug = "False"
-		VWDPort = "55088"
-		SlnRelativePath = "..\docs\"
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{06DC1520-BEE9-4068-8194-051E95FC31CF}"
-	ProjectSection(SolutionItems) = preProject
-		..\crucible.build.ps1 = ..\crucible.build.ps1
-	EndProjectSection
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crucible.Mediator.Engine", "Mediator\Crucible.Mediator.Engine\Crucible.Mediator.Engine.csproj", "{7910BADB-7272-48B7-BE81-76AF9D4E3C9D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -83,10 +60,10 @@ Global
 		{530C2E25-D0C3-429F-9DEC-28B198CA6E25}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{530C2E25-D0C3-429F-9DEC-28B198CA6E25}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{530C2E25-D0C3-429F-9DEC-28B198CA6E25}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3BBCA713-D2F0-49AC-A612-378BA418F666}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3BBCA713-D2F0-49AC-A612-378BA418F666}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3BBCA713-D2F0-49AC-A612-378BA418F666}.Release|Any CPU.ActiveCfg = Debug|Any CPU
-		{3BBCA713-D2F0-49AC-A612-378BA418F666}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{7910BADB-7272-48B7-BE81-76AF9D4E3C9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7910BADB-7272-48B7-BE81-76AF9D4E3C9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7910BADB-7272-48B7-BE81-76AF9D4E3C9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7910BADB-7272-48B7-BE81-76AF9D4E3C9D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -100,5 +77,6 @@ Global
 		{4D7B02EA-A8E5-47D6-BD84-0CF32F979E7B} = {146F4C6B-FB82-4B97-B48F-1E01ADE73A36}
 		{51840F4B-6D81-4FA5-B10C-2DD7646699BB} = {B35B5E68-D79E-4A2F-8ED3-032A6137CF00}
 		{530C2E25-D0C3-429F-9DEC-28B198CA6E25} = {B35B5E68-D79E-4A2F-8ED3-032A6137CF00}
+		{7910BADB-7272-48B7-BE81-76AF9D4E3C9D} = {9F7579D3-C2A6-4953-B173-194950BA77C8}
 	EndGlobalSection
 EndGlobal

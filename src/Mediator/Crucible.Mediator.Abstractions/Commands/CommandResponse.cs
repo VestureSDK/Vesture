@@ -19,6 +19,7 @@ namespace Crucible.Mediator.Commands
     /// <seealso cref="IMediator"/>
     public class CommandResponse : NoResponse
     {
+        /// <exclude />
         /// <summary>
         /// The <see cref="System.Type"/> of <see cref="CommandResponse"/>.
         /// This field is for ease of access and avoid typing <c>typeof(CommandResponse)</c> in multiple places.

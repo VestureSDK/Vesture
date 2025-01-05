@@ -1,9 +1,8 @@
 ﻿using Crucible.Mediator.Commands;
 using Crucible.Mediator.Events;
 using Crucible.Mediator.Requests;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace Crucible.Mediator.Invocation
+namespace Crucible.Mediator.Engine
 {
     /// <summary>
     /// Default implementation of <see cref="IInvocationPipelineProvider"/>.
@@ -17,21 +16,29 @@ namespace Crucible.Mediator.Invocation
         /// <summary>
         /// Initializes a new <see cref="InvocationPipelineProvider"/> instance.
         /// </summary>
-        /// <param name="serviceProvider">The <see cref="IServiceProvider"/> instance.</param>
-        public InvocationPipelineProvider(IServiceProvider serviceProvider)
+        /// <param name="pipelines">The <see cref="IServiceProvider"/> instance.</param>
+        public InvocationPipelineProvider(IDictionary<(Type request, Type response), InvocationPipeline> pipelines)
         {
-            ServiceProvider = serviceProvider;
+            Pipelines = pipelines;
         }
 
         /// <summary>
         /// The <see cref="IServiceProvider"/> instance.
         /// </summary>
-        protected IServiceProvider ServiceProvider { get; }
+        protected IDictionary<(Type request, Type response), InvocationPipeline> Pipelines { get; }
 
         /// <inheritdoc/>
         public virtual InvocationPipeline<TResponse> GetInvocationPipeline<TResponse>(object request)
         {
-            return ServiceProvider.GetRequiredKeyedService<InvocationPipeline<TResponse>>(request.GetType());
+            var requestType = request.GetType();
+            if (Pipelines.TryGetValue((requestType, typeof(TResponse)), out var p) && p is InvocationPipeline<TResponse> pipeline)
+            {
+                return pipeline;
+            }
+            else
+            {
+                throw new KeyNotFoundException("Service not found");
+            }
         }
     }
 }

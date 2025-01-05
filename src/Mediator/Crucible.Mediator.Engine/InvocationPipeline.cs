@@ -1,17 +1,23 @@
 ﻿using System.Diagnostics;
 using Crucible.Mediator.Commands;
+using Crucible.Mediator.Engine.Strategies;
 using Crucible.Mediator.Events;
-using Crucible.Mediator.Invocation.Strategies;
+using Crucible.Mediator.Invocation;
 using Crucible.Mediator.Requests;
 
-namespace Crucible.Mediator.Invocation
+namespace Crucible.Mediator.Engine
 {
+    public abstract class InvocationPipeline
+    {
+
+    }
+
     /// <summary>
     /// Defines an invocation pipeline to execute a <see cref="IRequest{TResponse}"/>, <see cref="ICommand"/> or <see cref="IEvent"/>.
     /// </summary>
     /// <typeparam name="TResponse">The expected response from the <see cref="IRequest{TResponse}"/>, <see cref="ICommand"/> or <see cref="IEvent"/>.</typeparam>
     [DebuggerDisplay("??? -> {typeof(TResponse).Name}")]
-    public abstract class InvocationPipeline<TResponse>
+    public abstract class InvocationPipeline<TResponse> : InvocationPipeline
     {
         /// <summary>
         /// Executes the specified <paramref name="request"/> and returns the <see cref="IInvocationContext{TResponse}"/> containing
@@ -68,7 +74,7 @@ namespace Crucible.Mediator.Invocation
             return context;
         }
 
-        private Lazy<Func<IInvocationContext<TRequest, TResponse>, CancellationToken, Task>> _chainOfResponsibility;
+        private readonly Lazy<Func<IInvocationContext<TRequest, TResponse>, CancellationToken, Task>> _chainOfResponsibility;
 
         private Func<IInvocationContext<TRequest, TResponse>, CancellationToken, Task> CreateChainOfresponsibility()
         {

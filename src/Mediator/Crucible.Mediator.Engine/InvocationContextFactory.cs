@@ -1,6 +1,7 @@
 ﻿using Crucible.Mediator.Events;
+using Crucible.Mediator.Invocation;
 
-namespace Crucible.Mediator.Invocation
+namespace Crucible.Mediator.Engine
 {
     /// <summary>
     /// Default implementation of <see cref="IInvocationContextFactory"/>.

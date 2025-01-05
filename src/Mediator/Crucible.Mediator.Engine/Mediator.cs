@@ -3,7 +3,7 @@ using Crucible.Mediator.Events;
 using Crucible.Mediator.Invocation;
 using Crucible.Mediator.Requests;
 
-namespace Crucible.Mediator
+namespace Crucible.Mediator.Engine
 {
     /// <summary>
     /// Default implementation of <see cref="IMediator"/>.

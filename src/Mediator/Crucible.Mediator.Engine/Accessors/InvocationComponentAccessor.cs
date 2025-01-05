@@ -1,4 +1,4 @@
-﻿namespace Crucible.Mediator.Invocation.Accessors
+﻿namespace Crucible.Mediator.Engine.Accessors
 {
     public interface IInvocationComponentAccessor<out TComponent>
     {

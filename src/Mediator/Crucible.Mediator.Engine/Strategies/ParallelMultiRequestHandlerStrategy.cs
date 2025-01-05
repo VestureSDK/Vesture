@@ -1,7 +1,8 @@
-﻿using Crucible.Mediator.Invocation.Accessors;
+﻿using Crucible.Mediator.Engine.Accessors;
+using Crucible.Mediator.Invocation;
 using Crucible.Mediator.Requests;
 
-namespace Crucible.Mediator.Invocation.Strategies
+namespace Crucible.Mediator.Engine.Strategies
 {
     /// <summary>
     /// <see cref="IRequestHandlerStrategy{TRequest, TResponse}"/> executing multiple <see cref="IInvocationHandler{TRequest, TResponse}"/> in parallel.

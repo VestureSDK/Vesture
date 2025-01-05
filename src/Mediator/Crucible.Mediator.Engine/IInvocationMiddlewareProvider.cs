@@ -1,4 +1,6 @@
-﻿namespace Crucible.Mediator.Invocation
+﻿using Crucible.Mediator.Invocation;
+
+namespace Crucible.Mediator.Engine
 {
     /// <summary>
     /// Defines an <see cref="IInvocationMiddleware{TRequest, TResponse}"/> provider.

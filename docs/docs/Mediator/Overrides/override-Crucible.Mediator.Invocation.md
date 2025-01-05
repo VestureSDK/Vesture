@@ -3,6 +3,10 @@ uid: Crucible.Mediator.Invocation
 summary: *content
 ---
 
+[!INCLUDE [example](../../Fragments/advanced-usage-label.md)]
+
+---
+
 The namespace <xref:Crucible.Mediator.Invocation> includes classes and interfaces
 to extend the mediator pipeline via <xref:Crucible.Mediator.Invocation.InvocationMiddleware`2>.
 

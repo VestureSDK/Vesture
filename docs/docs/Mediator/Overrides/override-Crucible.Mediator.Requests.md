@@ -3,6 +3,10 @@ uid: Crucible.Mediator.Requests
 summary: *content
 ---
 
+[!INCLUDE [example](../../Fragments/basic-usage-label.md)]
+
+---
+
 The namespace <xref:Crucible.Mediator.Requests> includes classes and interfaces
 to handle the mediator request use case with <xref:Crucible.Mediator.Requests.IRequest`1> 
 as contract and <xref:Crucible.Mediator.Requests.RequestHandler`2> as handler.

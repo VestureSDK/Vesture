@@ -1,5 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
+using Crucible.Mediator.Engine;
 using Crucible.Mediator.Invocation;
 using Crucible.Mediator.Requests;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Crucible.Mediator.Benchmarks
 {
     [SimpleJob(RuntimeMoniker.Net90)]
+    [SimpleJob(RuntimeMoniker.NativeAot90)]
     public class RequestResponsePatternBenchmark
     {
         private IMediator _mediator;

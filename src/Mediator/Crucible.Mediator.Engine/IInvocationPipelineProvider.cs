@@ -2,7 +2,7 @@
 using Crucible.Mediator.Events;
 using Crucible.Mediator.Requests;
 
-namespace Crucible.Mediator.Invocation
+namespace Crucible.Mediator.Engine
 {
     /// <summary>
     /// Defines a <see cref="InvocationPipeline{TResponse}"/> provider for a <see cref="IRequest{TResponse}"/>, <see cref="ICommand"/> or <see cref="IEvent"/>.

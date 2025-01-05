@@ -44,7 +44,7 @@ namespace Crucible.Mediator.Requests
     /// <seealso cref="RequestWorkflow{TRequest, TResponse}"/>
     /// <seealso cref="IMediator"/>
     public interface IRequestHandler<TRequest, TResponse> : IInvocationHandler<TRequest, TResponse>
-        where TRequest: IRequest<TResponse>
+        where TRequest : IRequest<TResponse>
     {
 
     }

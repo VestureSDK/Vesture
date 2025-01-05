@@ -1,6 +1,6 @@
-﻿using Crucible.Mediator.Requests;
+﻿using Crucible.Mediator.Invocation;
 
-namespace Crucible.Mediator.Invocation.Strategies
+namespace Crucible.Mediator.Engine.Strategies
 {
     /// <summary>
     /// Base implementation of <see cref="IRequestHandlerStrategy{TRequest, TResponse}"/>

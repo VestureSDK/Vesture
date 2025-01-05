@@ -42,7 +42,7 @@ namespace Crucible.Mediator
         /// <typeparam name="TResponse">
         /// The response type produced by processing the specified unmarked contract.
         /// </typeparam>
-        /// <param name="request">
+        /// <param name="contract">
         /// The unmarked contract instance to process.
         /// </param>
         /// <param name="cancellationToken">
@@ -52,7 +52,7 @@ namespace Crucible.Mediator
         /// A <see cref="Task{TResult}"/> representing the asynchronous operation, with 
         /// a result of type <typeparamref name="TResponse"/>.
         /// </returns>
-        Task<TResponse> HandleAsync<TResponse>(object request, CancellationToken cancellationToken = default);
+        Task<TResponse> HandleAsync<TResponse>(object contract, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Processes the specified unmarked contract and returns 
@@ -65,7 +65,7 @@ namespace Crucible.Mediator
         /// <typeparamref name="TResponse"/> or any <see cref="Exception"/> that might have occurred.
         /// </returns>
         /// <inheritdoc cref="HandleAsync{TResponse}(Object, CancellationToken)"/>
-        Task<IInvocationContext<TResponse>> HandleAndCaptureAsync<TResponse>(object request, CancellationToken cancellationToken = default);
+        Task<IInvocationContext<TResponse>> HandleAndCaptureAsync<TResponse>(object contract, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Processes the specified <see cref="IRequest{TResponse}"/> contract and returns the expected 

@@ -3,6 +3,10 @@ uid: Crucible.Mediator.Events
 summary: *content
 ---
 
+[!INCLUDE [example](../../Fragments/basic-usage-label.md)]
+
+---
+
 The namespace <xref:Crucible.Mediator.Events> includes classes and interfaces
 to handle the mediator event use case with <xref:Crucible.Mediator.Events.IEvent> 
 as contract and <xref:Crucible.Mediator.Events.EventHandler`1> as handler.

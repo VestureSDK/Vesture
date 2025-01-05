@@ -1,0 +1,1 @@
+&#x2B50; **Basic Usage** | *To implement core functionalities*

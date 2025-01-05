@@ -22,6 +22,7 @@ namespace Crucible.Mediator.Invocation
     /// <seealso cref="IMediator"/>
     public class NoResponse
     {
+        /// <exclude />
         /// <summary>
         /// The <see cref="System.Type"/> of <see cref="NoResponse"/>.
         /// This field is for ease of access and avoid typing <c>typeof(NoResponse)</c> in multiple places.

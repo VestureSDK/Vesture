@@ -1,9 +1,11 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Frozen;
+using System.Diagnostics.CodeAnalysis;
 using Crucible.Mediator.Commands;
+using Crucible.Mediator.Engine;
+using Crucible.Mediator.Engine.Accessors;
+using Crucible.Mediator.Engine.Strategies;
 using Crucible.Mediator.Events;
 using Crucible.Mediator.Invocation;
-using Crucible.Mediator.Invocation.Accessors;
-using Crucible.Mediator.Invocation.Strategies;
 using Crucible.Mediator.Requests;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -13,16 +15,18 @@ namespace Crucible.Mediator.DependencyInjection
     /// <summary>
     /// Builder to configure the <see cref="IMediator"/> in the <see cref="IServiceCollection"/> instance.
     /// </summary>
-    public class MediatorDiBuilder
+    public class MediatorBuilder
     {
         private readonly MediatorConfiguration _configuration = new();
 
+        private readonly HashSet<(Type request, Type response)> _registeredContracts = [];
+
         /// <summary>
-        /// Initializes a new <see cref="MediatorDiBuilder"/> instance.
+        /// Initializes a new <see cref="MediatorBuilder"/> instance.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/> instance.</param>
         /// <param name="setup">The <see cref="MediatorConfiguration"/> setup.</param>
-        public MediatorDiBuilder(IServiceCollection services, Action<MediatorConfiguration>? setup = null)
+        public MediatorBuilder(IServiceCollection services, Action<MediatorConfiguration>? setup = null)
         {
             Services = services;
             ConfigureInternal(setup);
@@ -33,15 +37,26 @@ namespace Crucible.Mediator.DependencyInjection
         /// </summary>
         public IServiceCollection Services { get; }
 
-        private MediatorDiBuilder ConfigureInternal(Action<MediatorConfiguration>? setup)
+        private MediatorBuilder ConfigureInternal(Action<MediatorConfiguration>? setup)
         {
             setup?.Invoke(_configuration);
 
-            Services.TryAddSingleton<IMediator, Mediator>();
+            Services.TryAddSingleton<IMediator, Mediator.Engine.Mediator>();
             Services.TryAddSingleton<IInvocationPipelineProvider, InvocationPipelineProvider>();
             Services.TryAddSingleton<IInvocationMiddlewareProvider, InvocationMiddlewareProvider>();
             Services.TryAddSingleton<IInvocationContextFactory, InvocationContextFactory>();
-            Services.TryAddSingleton<IRequestHandlerStrategyProvider, RequestHandlerStrategyProvider>();
+            Services.TryAddSingleton<IDictionary<(Type request, Type response), InvocationPipeline>>((sp) =>
+            {
+                var pipelines = new Dictionary<(Type request, Type response), InvocationPipeline>();
+
+                foreach (var (request, response) in _registeredContracts)
+                {
+                    var pipeline = sp.GetRequiredKeyedService<InvocationPipeline>(request);
+                    pipelines.TryAdd((request, response), pipeline);
+                }
+
+                return pipelines.ToFrozenDictionary();
+            });
 
             return this;
         }
@@ -50,8 +65,8 @@ namespace Crucible.Mediator.DependencyInjection
         /// Configure the <see cref="IMediator"/>.
         /// </summary>
         /// <param name="setup">The <see cref="MediatorConfiguration"/> setup.</param>
-        /// <returns>The <see cref="MediatorDiBuilder"/> for chaining.</returns>
-        public MediatorDiBuilder Configure(Action<MediatorConfiguration> setup)
+        /// <returns>The <see cref="MediatorBuilder"/> for chaining.</returns>
+        public MediatorBuilder Configure(Action<MediatorConfiguration> setup)
         {
             return ConfigureInternal(setup);
         }
@@ -61,18 +76,18 @@ namespace Crucible.Mediator.DependencyInjection
         /// </summary>
         /// <typeparam name="TRequest">The <see cref="IRequest{TResponse}"/> type.</typeparam>
         /// <typeparam name="TResponse">The expected response from the <see cref="IRequest{TResponse}"/>.</typeparam>
-        /// <returns>The <see cref="MediatorDiRequestBuilder{TRequest, TResponse}"/> for chaining.</returns>
-        public MediatorDiRequestBuilder<TRequest, TResponse> Request<TRequest, TResponse>()
+        /// <returns>The <see cref="MediatorRequestBuilder{TRequest, TResponse}"/> for chaining.</returns>
+        public MediatorRequestBuilder<TRequest, TResponse> Request<TRequest, TResponse>()
         {
-            return new MediatorDiRequestBuilder<TRequest, TResponse>(this);
+            return new MediatorRequestBuilder<TRequest, TResponse>(this);
         }
 
         /// <summary>
         /// Start defining what to do with the specified <see cref="ICommand"/> type.
         /// </summary>
         /// <typeparam name="TRequest">The <see cref="ICommand"/> type.</typeparam>
-        /// <returns>The <see cref="MediatorDiRequestBuilder{TRequest, CommandResponse}"/> for chaining.</returns>
-        public MediatorDiRequestBuilder<TRequest, CommandResponse> Command<TRequest>()
+        /// <returns>The <see cref="MediatorRequestBuilder{TRequest, CommandResponse}"/> for chaining.</returns>
+        public MediatorRequestBuilder<TRequest, CommandResponse> Command<TRequest>()
         {
             return Request<TRequest, CommandResponse>();
         }
@@ -81,10 +96,10 @@ namespace Crucible.Mediator.DependencyInjection
         /// Start defining what to do with the specified <see cref="IEvent"/> type.
         /// </summary>
         /// <typeparam name="TEvent">The <see cref="IEvent"/> type.</typeparam>
-        /// <returns>The <see cref="MediatorDiEventBuilder{TEvent}"/> for chaining.</returns>
-        public MediatorDiEventBuilder<TEvent> Event<TEvent>()
+        /// <returns>The <see cref="MediatorEventBuilder{TEvent}"/> for chaining.</returns>
+        public MediatorEventBuilder<TEvent> Event<TEvent>()
         {
-            return new MediatorDiEventBuilder<TEvent>(this);
+            return new MediatorEventBuilder<TEvent>(this);
         }
 
         /// <summary>
@@ -92,13 +107,13 @@ namespace Crucible.Mediator.DependencyInjection
         /// </summary>
         /// <typeparam name="TRequest">The <see cref="IRequest{TResponse}"/> type.</typeparam>
         /// <typeparam name="TResponse">The expected response from the <see cref="IRequest{TResponse}"/>.</typeparam>
-        /// <returns>The <see cref="MediatorDiRequestBuilder{TRequest, TResponse}"/> for chaining.</returns>
-        public MediatorDiInvocationBuilder<TRequest, TResponse> Invocation<TRequest, TResponse>()
+        /// <returns>The <see cref="MediatorRequestBuilder{TRequest, TResponse}"/> for chaining.</returns>
+        public MediatorInvocationBuilder<TRequest, TResponse> Invocation<TRequest, TResponse>()
         {
-            return new MediatorDiInvocationBuilder<TRequest, TResponse>(this);
+            return new MediatorInvocationBuilder<TRequest, TResponse>(this);
         }
 
-        internal MediatorDiBuilder AddMiddleware<TRequest, TResponse, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TMiddleware>(int? order = null)
+        internal MediatorBuilder AddMiddleware<TRequest, TResponse, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TMiddleware>(int? order = null)
             where TMiddleware : class, IInvocationMiddleware<TRequest, TResponse>
         {
             if (!Services.Any(sd => sd.ServiceType == typeof(TMiddleware)))
@@ -121,7 +136,7 @@ namespace Crucible.Mediator.DependencyInjection
             return this;
         }
 
-        internal MediatorDiBuilder AddHandler<TRequest, TResponse, THandlerService>(THandlerService handler)
+        internal MediatorBuilder AddHandler<TRequest, TResponse, THandlerService>(THandlerService handler)
             where THandlerService : class, IInvocationHandler<TRequest, TResponse>
         {
             if (handler is IInvocationWorkflow workflow)
@@ -138,13 +153,14 @@ namespace Crucible.Mediator.DependencyInjection
             }
 
             Services.AddSingleton<IInvocationComponentAccessor<IInvocationHandler<TRequest, TResponse>>>(new SingletonInvocationComponentAccessor<THandlerService>(handler));
-            Services.TryAddKeyedSingleton<InvocationPipeline<TResponse>, InvocationPipeline<TRequest, TResponse>>(typeof(TRequest));
+            _registeredContracts.Add((typeof(TRequest), typeof(TResponse)));
+            Services.TryAddKeyedSingleton<InvocationPipeline, InvocationPipeline<TRequest, TResponse>>(typeof(TRequest));
             TryAddDefaultRequestHandlerStrategy<TRequest, TResponse>();
 
             return this;
         }
 
-        internal MediatorDiBuilder AddHandler<TRequest, TResponse, THandlerService, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] THandlerImplementation>()
+        internal MediatorBuilder AddHandler<TRequest, TResponse, THandlerService, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] THandlerImplementation>()
             where THandlerService : class, IInvocationHandler<TRequest, TResponse>
             where THandlerImplementation : class, THandlerService
         {
@@ -164,7 +180,8 @@ namespace Crucible.Mediator.DependencyInjection
             }
 
             Services.AddSingleton<IInvocationComponentAccessor<IInvocationHandler<TRequest, TResponse>>>((sp) => new InvocationComponentAccessor<THandlerService>(() => sp.GetRequiredService<THandlerService>()));
-            Services.TryAddKeyedSingleton<InvocationPipeline<TResponse>, InvocationPipeline<TRequest, TResponse>>(typeof(TRequest));
+            _registeredContracts.Add((typeof(TRequest), typeof(TResponse)));
+            Services.TryAddKeyedSingleton<InvocationPipeline, InvocationPipeline<TRequest, TResponse>>(typeof(TRequest));
             TryAddDefaultRequestHandlerStrategy<TRequest, TResponse>();
 
             return this;
@@ -175,7 +192,7 @@ namespace Crucible.Mediator.DependencyInjection
             workflow.Mediator = serviceProvider.GetRequiredService<IMediator>();
         }
 
-        internal MediatorDiBuilder TryAddDefaultRequestHandlerStrategy<TRequest, TResponse>()
+        internal MediatorBuilder TryAddDefaultRequestHandlerStrategy<TRequest, TResponse>()
         {
             if (typeof(TResponse) == EventResponse.Type)
             {
@@ -189,7 +206,7 @@ namespace Crucible.Mediator.DependencyInjection
             return this;
         }
 
-        internal MediatorDiBuilder AddHandlerStrategy<TRequest, TResponse, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TStrategy>()
+        internal MediatorBuilder AddHandlerStrategy<TRequest, TResponse, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TStrategy>()
             where TStrategy : class, IRequestHandlerStrategy<TRequest, TResponse>
         {
             Services.AddSingleton<IRequestHandlerStrategy<TRequest, TResponse>, TStrategy>();

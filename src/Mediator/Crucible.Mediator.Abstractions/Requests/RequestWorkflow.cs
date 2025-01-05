@@ -34,7 +34,7 @@ namespace Crucible.Mediator.Requests
 
         private IMediator WorkflowMediator
         {
-            get => _workflowMediator ?? throw new EntryPointNotFoundException("The Workflow mediator has not yet been initialized"); 
+            get => _workflowMediator ?? throw new EntryPointNotFoundException("The Workflow mediator has not yet been initialized");
             set => _workflowMediator = value;
         }
 

@@ -1,8 +1,9 @@
 ﻿using Crucible.Mediator.Commands;
 using Crucible.Mediator.Events;
+using Crucible.Mediator.Invocation;
 using Crucible.Mediator.Requests;
 
-namespace Crucible.Mediator.Invocation
+namespace Crucible.Mediator.Engine
 {
     /// <summary>
     /// Defines a <see cref="IInvocationContext"/> factory.

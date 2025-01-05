@@ -19,7 +19,7 @@
     /// <seealso cref="RequestWorkflow{TRequest, TResponse}"/>
     /// <seealso cref="IMediator"/>
     public abstract class RequestHandler<TRequest, TResponse> : IRequestHandler<TRequest, TResponse>
-        where TRequest: IRequest<TResponse>
+        where TRequest : IRequest<TResponse>
     {
         /// <summary>
         /// Processes the specified <see cref="IRequest{TResponse}"/> contract and returns the expected 

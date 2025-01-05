@@ -19,6 +19,7 @@ namespace Crucible.Mediator.Events
     /// <seealso cref="IMediator"/>
     public class EventResponse : NoResponse
     {
+        /// <exclude />
         /// <summary>
         /// The <see cref="System.Type"/> of <see cref="EventResponse"/>.
         /// This field is for ease of access and avoid typing <c>typeof(EventResponse)</c> in multiple places.

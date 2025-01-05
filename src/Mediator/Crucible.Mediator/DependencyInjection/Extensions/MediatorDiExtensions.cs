@@ -16,11 +16,11 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/> instance.</param>
         /// <param name="setup">The <see cref="MediatorConfiguration"/> setup.</param>
-        /// <returns>The <see cref="MediatorDiBuilder"/> for further configuration.</returns>
-        public static MediatorDiBuilder AddMediator(this IServiceCollection services, Action<MediatorConfiguration>? setup = null)
+        /// <returns>The <see cref="MediatorBuilder"/> for further configuration.</returns>
+        public static MediatorBuilder AddMediator(this IServiceCollection services, Action<MediatorConfiguration>? setup = null)
         {
             // Returns the builder for chaining
-            return new MediatorDiBuilder(services, setup);
+            return new MediatorBuilder(services, setup);
         }
     }
 }

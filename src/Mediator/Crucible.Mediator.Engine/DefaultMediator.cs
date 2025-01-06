@@ -1,42 +1,40 @@
-﻿using Crucible.Mediator.Commands;
+﻿using System.Collections.Frozen;
+using Crucible.Mediator.Commands;
+using Crucible.Mediator.Engine.Pipeline;
 using Crucible.Mediator.Events;
 using Crucible.Mediator.Invocation;
 using Crucible.Mediator.Requests;
 
 namespace Crucible.Mediator.Engine
 {
-    /// <summary>
-    /// Default implementation of <see cref="IMediator"/>.
-    /// </summary>
-    /// <remarks>
-    /// It uses <see cref="ICommandInvoker"/>, <see cref="IRequestExecutor"/> and <see cref="IEventPublisher"/> under the hood.
-    /// </remarks>
-    public class Mediator : IMediator
+    public class DefaultMediator : IMediator
     {
-        private readonly IInvocationPipelineProvider _pipelineProvider;
+        private readonly Lazy<IDictionary<(Type request, Type response), IInvocationPipeline>> _invocationPipelines;
 
-        /// <summary>
-        /// Initializes a new <see cref="Mediator"/> instance.
-        /// </summary>
-        /// <param name="pipelineProvider">The <see cref="IInvocationPipelineProvider"/> instance.</param>
-        public Mediator(IInvocationPipelineProvider pipelineProvider)
+        public DefaultMediator(IEnumerable<IInvocationPipeline> invocationPipelines)
         {
-            _pipelineProvider = pipelineProvider;
+            _invocationPipelines = new Lazy<IDictionary<(Type request, Type response), IInvocationPipeline>>(() => CreateInvocationPipelineCache(invocationPipelines));
+        }
+
+        private IInvocationPipeline<TResponse> GetInvocationPipeline<TResponse>(object request)
+        {
+            var requestType = request.GetType();
+            var responseType = typeof(TResponse);
+
+            return (IInvocationPipeline<TResponse>)_invocationPipelines.Value[(requestType, responseType)];
         }
 
         /// <inheritdoc/>
         public Task<IInvocationContext<TResponse>> HandleAndCaptureAsync<TResponse>(object request, CancellationToken cancellationToken = default)
         {
-            var pipeline = _pipelineProvider.GetInvocationPipeline<TResponse>(request);
-            return pipeline.ExecuteAndCaptureAsync(request, cancellationToken);
+            var pipeline = GetInvocationPipeline<TResponse>(request);
+            return pipeline.HandleAsync(request, cancellationToken);
         }
 
         /// <inheritdoc/>
         public async Task<TResponse> HandleAsync<TResponse>(object request, CancellationToken cancellationToken = default)
         {
-            var pipeline = _pipelineProvider.GetInvocationPipeline<TResponse>(request);
-            var context = await pipeline.ExecuteAndCaptureAsync(request, cancellationToken).ConfigureAwait(false);
-
+            var context = await HandleAndCaptureAsync<TResponse>(request, cancellationToken).ConfigureAwait(false);
             return ThrowIfContextHasErrorOrReturnResponse(context);
         }
 
@@ -74,6 +72,16 @@ namespace Crucible.Mediator.Engine
         public Task PublishAsync(IEvent @event, CancellationToken cancellationToken = default)
         {
             return HandleAsync<EventResponse>(@event, cancellationToken);
+        }
+
+        private static FrozenDictionary<(Type request, Type response), IInvocationPipeline> CreateInvocationPipelineCache(IEnumerable<IInvocationPipeline> invocationPipelines)
+        {
+            var dict = new Dictionary<(Type request, Type response), IInvocationPipeline>();
+            foreach (var invocationPipeline in invocationPipelines)
+            {
+                dict.TryAdd((invocationPipeline.Request, invocationPipeline.Response), invocationPipeline);
+            }
+            return dict.ToFrozenDictionary();
         }
 
         private static void ThrowIfContextHasError(IInvocationContext context)

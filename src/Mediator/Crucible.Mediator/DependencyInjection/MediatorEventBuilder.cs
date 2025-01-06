@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Crucible.Mediator.Commands;
-using Crucible.Mediator.Engine.Strategies;
+using Crucible.Mediator.Engine.Invocation.Strategies;
 using Crucible.Mediator.Events;
 using Crucible.Mediator.Invocation;
 using Crucible.Mediator.Requests;
@@ -53,7 +53,7 @@ namespace Crucible.Mediator.DependencyInjection
         /// <returns>The <see cref="MediatorBuilder"/> for chaining.</returns>
         public MediatorEventBuilder<TEvent> PublishInParallel()
         {
-            return WithPublishStrategy<ParallelMultiRequestHandlerStrategy<TEvent, EventResponse>>();
+            return WithPublishStrategy<ParallelHandlersStrategy<TEvent, EventResponse>>();
         }
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace Crucible.Mediator.DependencyInjection
         /// <returns>The <see cref="MediatorBuilder"/> for chaining.</returns>
         public MediatorEventBuilder<TEvent> PublishSequentially()
         {
-            return WithPublishStrategy<SequentialMultiRequestHandlerStrategy<TEvent, EventResponse>>();
+            return WithPublishStrategy<SequentialHandlersStrategy<TEvent, EventResponse>>();
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace Crucible.Mediator.DependencyInjection
         /// </summary>
         /// <returns>The <see cref="MediatorBuilder"/> for chaining.</returns>
         public MediatorEventBuilder<TEvent> WithPublishStrategy<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TStrategy>()
-            where TStrategy : class, IRequestHandlerStrategy<TEvent, EventResponse>
+            where TStrategy : class, IInvocationHandlerStrategy<TEvent, EventResponse>
         {
             _builder.AddHandlerStrategy<TEvent, EventResponse, TStrategy>();
             return this;

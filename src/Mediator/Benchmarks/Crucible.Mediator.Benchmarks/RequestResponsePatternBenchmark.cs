@@ -1,6 +1,6 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
-using Crucible.Mediator.Engine;
+using Crucible.Mediator.Engine.Pipeline.Context;
 using Crucible.Mediator.Invocation;
 using Crucible.Mediator.Requests;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Crucible.Mediator.Benchmarks
 {
     [SimpleJob(RuntimeMoniker.Net90)]
-    [SimpleJob(RuntimeMoniker.NativeAot90)]
+    // [SimpleJob(RuntimeMoniker.NativeAot90)]
     public class RequestResponsePatternBenchmark
     {
         private IMediator _mediator;
@@ -112,7 +112,7 @@ namespace Crucible.Mediator.Benchmarks
         {
             public TResponse A<TResponse>(IRequest<TResponse> request)
             {
-                IInvocationContext<SampleRequest, TResponse> exec = new InvocationContext<SampleRequest, TResponse>((SampleRequest)request);
+                IInvocationContext<SampleRequest, TResponse> exec = new DefaultInvocationContext<SampleRequest, TResponse>((SampleRequest)request);
                 var response = new SampleResponse();
                 if (response is TResponse r)
                 {

@@ -3,7 +3,7 @@ using Crucible.Mediator.Events;
 using Crucible.Mediator.Invocation;
 using Crucible.Mediator.Requests;
 
-namespace Crucible.Mediator.Engine
+namespace Crucible.Mediator.Engine.Pipeline.Context
 {
     /// <summary>
     /// Defines a <see cref="IInvocationContext"/> factory.

@@ -4,19 +4,19 @@ using Crucible.Mediator.Events;
 using Crucible.Mediator.Invocation;
 using Crucible.Mediator.Requests;
 
-namespace Crucible.Mediator.Engine
+namespace Crucible.Mediator.Engine.Pipeline.Context
 {
     /// <summary>
     /// Default implementation of <see cref="IInvocationContext"/>.
     /// </summary>
     [DebuggerDisplay("{RequestType.Name} -> {ResponseType.Name}")]
-    public abstract class InvocationContext : IInvocationContext
+    public abstract class DefaultInvocationContext : IInvocationContext
     {
         /// <summary>
-        /// Initializes a new <see cref="InvocationContext"/> instance.
+        /// Initializes a new <see cref="DefaultInvocationContext"/> instance.
         /// </summary>
         /// <param name="request">The <see cref="IRequest{TResponse}"/>, <see cref="ICommand"/> or <see cref="IEvent"/> instance.</param>
-        public InvocationContext(object request)
+        public DefaultInvocationContext(object request)
         {
             Request = request;
         }
@@ -94,10 +94,10 @@ namespace Crucible.Mediator.Engine
     /// <typeparam name="TRequest">The <see cref="IRequest{TResponse}"/>, <see cref="ICommand"/> or <see cref="IEvent"/> type.</typeparam>
     /// <typeparam name="TResponse">The response type produced as specified in <typeparamref name="TRequest"/>.</typeparam>
     [DebuggerDisplay("{typeof(TRequest).Name} -> {typeof(TResponse).Name}")]
-    public class InvocationContext<TRequest, TResponse> : InvocationContext, IInvocationContext<TRequest, TResponse>, IInvocationContext<TResponse>
+    public class DefaultInvocationContext<TRequest, TResponse> : DefaultInvocationContext, IInvocationContext<TRequest, TResponse>, IInvocationContext<TResponse>
     {
         /// <inheritdoc/>
-        public InvocationContext(TRequest request)
+        public DefaultInvocationContext(TRequest request)
             : base(request!) { }
 
         /// <inheritdoc/>

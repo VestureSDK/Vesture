@@ -1,14 +1,14 @@
-﻿namespace Crucible.Mediator.Engine.Resolvers
+﻿namespace Crucible.Mediator.Engine.Pipeline.Components.Resolvers
 {
     public class TransientInvocationComponentResolver<TComponent> : InvocationComponentResolver<TComponent>
     {
         private readonly Func<TComponent> _componentFactory;
 
-        protected override TComponent Component => _componentFactory.Invoke();
-
         public TransientInvocationComponentResolver(Func<TComponent> componentFactory)
         {
             _componentFactory = componentFactory;
         }
+
+        protected override TComponent GetComponent() => _componentFactory.Invoke();
     }
 }

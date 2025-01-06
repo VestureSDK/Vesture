@@ -1,9 +1,11 @@
-﻿using System.Collections.Frozen;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using Crucible.Mediator.Commands;
-using Crucible.Mediator.Engine;
-using Crucible.Mediator.Engine.Accessors;
-using Crucible.Mediator.Engine.Strategies;
+using Crucible.Mediator.Engine.Invocation;
+using Crucible.Mediator.Engine.Invocation.Strategies;
+using Crucible.Mediator.Engine.Pipeline;
+using Crucible.Mediator.Engine.Pipeline.Components;
+using Crucible.Mediator.Engine.Pipeline.Components.Resolvers;
+using Crucible.Mediator.Engine.Pipeline.Context;
 using Crucible.Mediator.Events;
 using Crucible.Mediator.Invocation;
 using Crucible.Mediator.Requests;
@@ -41,22 +43,14 @@ namespace Crucible.Mediator.DependencyInjection
         {
             setup?.Invoke(_configuration);
 
-            Services.TryAddSingleton<IMediator, Mediator.Engine.Mediator>();
-            Services.TryAddSingleton<IInvocationPipelineProvider, InvocationPipelineProvider>();
-            Services.TryAddSingleton<IInvocationMiddlewareProvider, InvocationMiddlewareProvider>();
-            Services.TryAddSingleton<IInvocationContextFactory, InvocationContextFactory>();
-            Services.TryAddSingleton<IDictionary<(Type request, Type response), InvocationPipeline>>((sp) =>
-            {
-                var pipelines = new Dictionary<(Type request, Type response), InvocationPipeline>();
+            Services.TryAddSingleton<IPreHandlerMiddleware>(CatchUnhandledExceptionMiddleware.Instance);
+            Services.TryAddSingleton<IInvocationComponentResolver<IPreHandlerMiddleware>, InstanceInvocationComponentResolver<IPreHandlerMiddleware>>();
 
-                foreach (var (request, response) in _registeredContracts)
-                {
-                    var pipeline = sp.GetRequiredKeyedService<InvocationPipeline>(request);
-                    pipelines.TryAdd((request, response), pipeline);
-                }
+            Services.TryAddSingleton<IPreInvocationPipelineMiddleware>(CatchUnhandledExceptionMiddleware.Instance);
+            Services.TryAddSingleton<IInvocationComponentResolver<IPreInvocationPipelineMiddleware>, InstanceInvocationComponentResolver<IPreInvocationPipelineMiddleware>>();
 
-                return pipelines.ToFrozenDictionary();
-            });
+            Services.TryAddSingleton<IMediator, Mediator.Engine.DefaultMediator>();
+            Services.TryAddSingleton<IInvocationContextFactory, DefaultInvocationContextFactory>();
 
             return this;
         }
@@ -120,16 +114,16 @@ namespace Crucible.Mediator.DependencyInjection
             {
                 Services.AddSingleton<TMiddleware>();
 
-                Services.AddSingleton<IInvocationComponentAccessor<TMiddleware>>(sp =>
+                Services.AddSingleton<IInvocationComponentResolver<TMiddleware>>(sp =>
                 {
                     var lazy = new Lazy<TMiddleware>(() => sp.GetRequiredService<TMiddleware>());
-                    return new LazyInvocationComponentAccessor<TMiddleware>(lazy);
+                    return new SingletonInvocationComponentResolver<TMiddleware>(lazy);
                 });
 
-                Services.AddTransient<InvocationMiddlewareWrapper>(sp =>
+                Services.AddTransient<IMiddlewareInvocationPipelineItem>(sp =>
                 {
-                    var accessor = sp.GetRequiredService<IInvocationComponentAccessor<TMiddleware>>();
-                    return new InvocationMiddlewareWrapper<TRequest, TResponse>(order ?? 0, accessor);
+                    var accessor = sp.GetRequiredService<IInvocationComponentResolver<TMiddleware>>();
+                    return new MiddlewareInvocationPipelineItem<TRequest, TResponse>(order ?? 0, accessor);
                 });
             }
 
@@ -152,9 +146,9 @@ namespace Crucible.Mediator.DependencyInjection
                 Services.AddSingleton(handler);
             }
 
-            Services.AddSingleton<IInvocationComponentAccessor<IInvocationHandler<TRequest, TResponse>>>(new SingletonInvocationComponentAccessor<THandlerService>(handler));
+            Services.AddSingleton<IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>>>(new InstanceInvocationComponentResolver<THandlerService>(handler));
             _registeredContracts.Add((typeof(TRequest), typeof(TResponse)));
-            Services.TryAddKeyedSingleton<InvocationPipeline, InvocationPipeline<TRequest, TResponse>>(typeof(TRequest));
+            Services.AddSingleton<IInvocationPipeline, DefaultInvocationPipeline<TRequest, TResponse>>();
             TryAddDefaultRequestHandlerStrategy<TRequest, TResponse>();
 
             return this;
@@ -179,9 +173,9 @@ namespace Crucible.Mediator.DependencyInjection
                 Services.AddTransient<THandlerService, THandlerImplementation>();
             }
 
-            Services.AddSingleton<IInvocationComponentAccessor<IInvocationHandler<TRequest, TResponse>>>((sp) => new InvocationComponentAccessor<THandlerService>(() => sp.GetRequiredService<THandlerService>()));
+            Services.AddSingleton<IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>>>((sp) => new TransientInvocationComponentResolver<THandlerService>(() => sp.GetRequiredService<THandlerService>()));
             _registeredContracts.Add((typeof(TRequest), typeof(TResponse)));
-            Services.TryAddKeyedSingleton<InvocationPipeline, InvocationPipeline<TRequest, TResponse>>(typeof(TRequest));
+            Services.AddSingleton<IInvocationPipeline, DefaultInvocationPipeline<TRequest, TResponse>>();
             TryAddDefaultRequestHandlerStrategy<TRequest, TResponse>();
 
             return this;
@@ -196,20 +190,20 @@ namespace Crucible.Mediator.DependencyInjection
         {
             if (typeof(TResponse) == EventResponse.Type)
             {
-                Services.TryAddSingleton<IRequestHandlerStrategy<TRequest, TResponse>, ParallelMultiRequestHandlerStrategy<TRequest, TResponse>>();
+                Services.TryAddSingleton<IInvocationHandlerStrategy<TRequest, TResponse>, ParallelHandlersStrategy<TRequest, TResponse>>();
             }
             else
             {
-                Services.TryAddSingleton<IRequestHandlerStrategy<TRequest, TResponse>, SingleRequestHandlerStrategy<TRequest, TResponse>>();
+                Services.TryAddSingleton<IInvocationHandlerStrategy<TRequest, TResponse>, DefaultHandlerStrategy<TRequest, TResponse>>();
             }
 
             return this;
         }
 
         internal MediatorBuilder AddHandlerStrategy<TRequest, TResponse, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TStrategy>()
-            where TStrategy : class, IRequestHandlerStrategy<TRequest, TResponse>
+            where TStrategy : class, IInvocationHandlerStrategy<TRequest, TResponse>
         {
-            Services.AddSingleton<IRequestHandlerStrategy<TRequest, TResponse>, TStrategy>();
+            Services.AddSingleton<IInvocationHandlerStrategy<TRequest, TResponse>, TStrategy>();
             return this;
         }
     }

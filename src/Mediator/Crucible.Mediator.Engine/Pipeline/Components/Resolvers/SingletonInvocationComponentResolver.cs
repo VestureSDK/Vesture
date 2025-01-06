@@ -1,14 +1,14 @@
-﻿namespace Crucible.Mediator.Engine.Resolvers
+﻿namespace Crucible.Mediator.Engine.Pipeline.Components.Resolvers
 {
     public class SingletonInvocationComponentResolver<TComponent> : InvocationComponentResolver<TComponent>
     {
         private readonly Lazy<TComponent> _componentInitializer;
 
-        protected override TComponent Component => _componentInitializer.Value;
-
         public SingletonInvocationComponentResolver(Lazy<TComponent> componentInitializer)
         {
             _componentInitializer = componentInitializer;
         }
+
+        protected override TComponent GetComponent() => _componentInitializer.Value;
     }
 }

@@ -1,7 +1,7 @@
 ﻿using Crucible.Mediator.Engine.Pipeline.Components.Resolvers;
 using Crucible.Mediator.Invocation;
 
-namespace Crucible.Mediator.Engine.Invocation.Strategies
+namespace Crucible.Mediator.Engine.Pipeline.Invocation.Strategies
 {
     public class ParallelHandlersStrategy<TRequest, TResponse> : IInvocationHandlerStrategy<TRequest, TResponse>
     {
@@ -12,9 +12,9 @@ namespace Crucible.Mediator.Engine.Invocation.Strategies
             _resolvers = resolvers;
         }
 
-        public Task HandleAsync(IInvocationContext<TRequest, TResponse> context, Func<IInvocationContext<TRequest, TResponse>, CancellationToken, Task> next, CancellationToken cancellationToken)
+        public Task HandleAsync(IInvocationContext<TRequest, TResponse> context, Func<CancellationToken, Task> next, CancellationToken cancellationToken)
         {
-            var tasks = _resolvers.Select(resolver => DefaultHandlerStrategy<TRequest, TResponse>.InvokeHandlerAsync(resolver, context, cancellationToken));
+            var tasks = _resolvers.Select(resolver => SingleHandlerStrategy<TRequest, TResponse>.InvokeHandlerAsync(resolver, context, cancellationToken));
             return Task.WhenAll(tasks);
         }
     }

@@ -1,6 +1,6 @@
 ﻿namespace Crucible.Mediator.Engine.Pipeline.Components.Resolvers
 {
-    public class InstanceInvocationComponentResolver<TComponent> : InvocationComponentResolver<TComponent>
+    public class InstanceInvocationComponentResolver<TComponent> : IInvocationComponentResolver<TComponent>
     {
         private readonly TComponent _component;
 
@@ -9,6 +9,6 @@
             _component = component;
         }
 
-        protected override TComponent GetComponent() => _component;
+        public TComponent ResolveComponent() => _component;
     }
 }

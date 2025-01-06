@@ -1,11 +1,11 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Crucible.Mediator.Commands;
-using Crucible.Mediator.Engine.Invocation;
-using Crucible.Mediator.Engine.Invocation.Strategies;
 using Crucible.Mediator.Engine.Pipeline;
 using Crucible.Mediator.Engine.Pipeline.Components;
 using Crucible.Mediator.Engine.Pipeline.Components.Resolvers;
 using Crucible.Mediator.Engine.Pipeline.Context;
+using Crucible.Mediator.Engine.Pipeline.Invocation;
+using Crucible.Mediator.Engine.Pipeline.Invocation.Strategies;
 using Crucible.Mediator.Events;
 using Crucible.Mediator.Invocation;
 using Crucible.Mediator.Requests;
@@ -209,7 +209,7 @@ namespace Crucible.Mediator.DependencyInjection
             }
             else
             {
-                Services.TryAddSingleton<IInvocationHandlerStrategy<TRequest, TResponse>, DefaultHandlerStrategy<TRequest, TResponse>>();
+                Services.TryAddSingleton<IInvocationHandlerStrategy<TRequest, TResponse>, SingleHandlerStrategy<TRequest, TResponse>>();
             }
 
             return this;

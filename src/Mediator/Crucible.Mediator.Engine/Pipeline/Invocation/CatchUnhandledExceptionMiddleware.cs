@@ -1,7 +1,6 @@
-﻿using Crucible.Mediator.Engine.Pipeline;
-using Crucible.Mediator.Invocation;
+﻿using Crucible.Mediator.Invocation;
 
-namespace Crucible.Mediator.Engine.Invocation
+namespace Crucible.Mediator.Engine.Pipeline.Invocation
 {
     public class CatchUnhandledExceptionMiddleware : IPreInvocationPipelineMiddleware, IPreHandlerMiddleware
     {

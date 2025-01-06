@@ -3,7 +3,7 @@ using Crucible.Mediator.Invocation;
 
 namespace Crucible.Mediator.Engine.Pipeline.Components
 {
-    public class MiddlewareInvocationPipelineItem<TRequest, TResponse> : IMiddlewareInvocationPipelineItem, IInvocationPipelineItem<TRequest, TResponse>
+    public class MiddlewareInvocationPipelineItem<TRequest, TResponse> : IMiddlewareInvocationPipelineItem, IInvocationMiddleware<TRequest, TResponse>
     {
         private readonly static Type _matchingInvocationContextType = typeof(IInvocationContext<TRequest, TResponse>);
 
@@ -17,18 +17,18 @@ namespace Crucible.Mediator.Engine.Pipeline.Components
             _resolver = resolver;
         }
 
-        public Task HandleAsync(IInvocationContext<TRequest, TResponse> context, Func<IInvocationContext<TRequest, TResponse>, CancellationToken, Task> next, CancellationToken cancellationToken)
+        public bool IsApplicable(Type contextType)
+        {
+            return _matchingInvocationContextType.IsAssignableFrom(contextType);
+        }
+
+        public Task HandleAsync(IInvocationContext<TRequest, TResponse> context, Func<CancellationToken, Task> next, CancellationToken cancellationToken)
         {
             var middleware = _resolver.ResolveComponent();
             return middleware.HandleAsync(
                 context,
-                (ct) => next.Invoke(context, ct),
+                next,
                 cancellationToken);
-        }
-
-        public bool IsApplicable(Type contextType)
-        {
-            return _matchingInvocationContextType.IsAssignableFrom(contextType);
         }
     }
 }

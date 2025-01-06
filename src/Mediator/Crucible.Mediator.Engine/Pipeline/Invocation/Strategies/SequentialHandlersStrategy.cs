@@ -1,7 +1,7 @@
 ﻿using Crucible.Mediator.Engine.Pipeline.Components.Resolvers;
 using Crucible.Mediator.Invocation;
 
-namespace Crucible.Mediator.Engine.Invocation.Strategies
+namespace Crucible.Mediator.Engine.Pipeline.Invocation.Strategies
 {
     public class SequentialHandlersStrategy<TRequest, TResponse> : IInvocationHandlerStrategy<TRequest, TResponse>
     {
@@ -12,11 +12,11 @@ namespace Crucible.Mediator.Engine.Invocation.Strategies
             _resolvers = resolvers;
         }
 
-        public async Task HandleAsync(IInvocationContext<TRequest, TResponse> context, Func<IInvocationContext<TRequest, TResponse>, CancellationToken, Task> next, CancellationToken cancellationToken)
+        public async Task HandleAsync(IInvocationContext<TRequest, TResponse> context, Func<CancellationToken, Task> next, CancellationToken cancellationToken)
         {
             foreach (var resolver in _resolvers)
             {
-                await DefaultHandlerStrategy<TRequest, TResponse>.InvokeHandlerAsync(resolver, context, cancellationToken);
+                await SingleHandlerStrategy<TRequest, TResponse>.InvokeHandlerAsync(resolver, context, cancellationToken);
             }
         }
     }

@@ -1,7 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
-using Crucible.Mediator.Engine.Pipeline.Context;
-using Crucible.Mediator.Invocation;
 using Crucible.Mediator.Requests;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,7 +13,6 @@ namespace Crucible.Mediator.Benchmarks
         private MediatR.IMediator _mediatr;
         private SampleHandler _handler;
         private SampleRequest _request;
-        private OtherTest otherTest = new OtherTest();
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
         private ServiceProvider _serviceProvider;
@@ -32,7 +29,7 @@ namespace Crucible.Mediator.Benchmarks
             // serviceCollection.AddSingleton<SampleHandler>();
 
             // MediatR
-            // serviceCollection.AddMediatR(c => c.RegisterServicesFromAssemblyContaining<RequestResponsePatternBenchmark>());
+            serviceCollection.AddMediatR(c => c.RegisterServicesFromAssemblyContaining<RequestResponsePatternBenchmark>());
 
             // Crucible
             serviceCollection.AddMediator()
@@ -41,19 +38,19 @@ namespace Crucible.Mediator.Benchmarks
 
             _serviceProvider = serviceCollection.BuildServiceProvider();
             _mediator = _serviceProvider.GetRequiredService<IMediator>();
-            // _mediatr = _serviceProvider.GetRequiredService<MediatR.IMediator>();
+            _mediatr = _serviceProvider.GetRequiredService<MediatR.IMediator>();
 
             // test = new Test(_serviceProvider);
 
             Crucible().GetAwaiter().GetResult();
-            // MediatR().GetAwaiter().GetResult();
+            MediatR().GetAwaiter().GetResult();
         }
 
-        //[Benchmark(Baseline = true)]
-        //public Task Vanilla()
-        //{
-        //    return _handler.Handle(_request);
-        //}
+        [Benchmark]
+        public Task Vanilla()
+        {
+            return _handler.Handle(_request);
+        }
 
         [Benchmark]
         public Task Crucible()
@@ -73,19 +70,21 @@ namespace Crucible.Mediator.Benchmarks
         //    return new ValueTask(test.ExecuteAsync(_request));
         //}
 
-        //[Benchmark(Baseline = true)]
-        //public Task MediatR()
-        //{
-        //    return _mediatr.Send(_request);
-        //}
+        [Benchmark(Baseline = true)]
+        public Task MediatR()
+        {
+            return _mediatr.Send(_request);
+        }
 
         public class SampleRequest : IRequest<SampleResponse>, MediatR.IRequest<SampleResponse>
         {
+            private readonly static TimeSpan WaitTime = TimeSpan.FromMilliseconds(100);
+
             public string? Value { get; set; }
 
             internal static async Task<SampleResponse> GetResponseAsync(SampleRequest request, CancellationToken cancellationToken = default)
             {
-                await Task.CompletedTask.ConfigureAwait(false);
+                await Task.Delay(WaitTime).ConfigureAwait(false);
                 return new SampleResponse { Value = request.Value };
             }
         }
@@ -105,27 +104,6 @@ namespace Crucible.Mediator.Benchmarks
             public override Task<SampleResponse> HandleAsync(SampleRequest request, CancellationToken cancellationToken)
             {
                 return SampleRequest.GetResponseAsync(request, cancellationToken);
-            }
-        }
-
-        public class OtherTest
-        {
-            public TResponse A<TResponse>(IRequest<TResponse> request)
-            {
-                IInvocationContext<SampleRequest, TResponse> exec = new DefaultInvocationContext<SampleRequest, TResponse>((SampleRequest)request);
-                var response = new SampleResponse();
-                if (response is TResponse r)
-                {
-                    return r;
-                }
-                else
-                {
-                    return default!;
-                }
-
-
-                exec.SetResponse(response);
-                return exec.Response!;
             }
         }
     }

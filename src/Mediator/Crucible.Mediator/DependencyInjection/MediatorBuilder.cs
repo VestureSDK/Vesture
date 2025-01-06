@@ -107,19 +107,34 @@ namespace Crucible.Mediator.DependencyInjection
             return new MediatorInvocationBuilder<TRequest, TResponse>(this);
         }
 
+        internal MediatorBuilder AddMiddleware<TRequest, TResponse, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TMiddleware>(TMiddleware middleware, int? order = null)
+            where TMiddleware : class, IInvocationMiddleware<TRequest, TResponse>
+        {
+            if (!Services.Any(sd => sd.ServiceType == typeof(TMiddleware)))
+            {
+                Services.AddSingleton<TMiddleware>(middleware);
+                Services.AddSingleton<IInvocationComponentResolver<TMiddleware>>(new InstanceInvocationComponentResolver<TMiddleware>(middleware));
+                Services.AddTransient<IMiddlewareInvocationPipelineItem>(sp =>
+                {
+                    var accessor = sp.GetRequiredService<IInvocationComponentResolver<TMiddleware>>();
+                    return new MiddlewareInvocationPipelineItem<TRequest, TResponse>(order ?? 0, accessor);
+                });
+            }
+
+            return this;
+        }
+
         internal MediatorBuilder AddMiddleware<TRequest, TResponse, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TMiddleware>(int? order = null)
             where TMiddleware : class, IInvocationMiddleware<TRequest, TResponse>
         {
             if (!Services.Any(sd => sd.ServiceType == typeof(TMiddleware)))
             {
                 Services.AddSingleton<TMiddleware>();
-
                 Services.AddSingleton<IInvocationComponentResolver<TMiddleware>>(sp =>
                 {
                     var lazy = new Lazy<TMiddleware>(() => sp.GetRequiredService<TMiddleware>());
                     return new SingletonInvocationComponentResolver<TMiddleware>(lazy);
                 });
-
                 Services.AddTransient<IMiddlewareInvocationPipelineItem>(sp =>
                 {
                     var accessor = sp.GetRequiredService<IInvocationComponentResolver<TMiddleware>>();

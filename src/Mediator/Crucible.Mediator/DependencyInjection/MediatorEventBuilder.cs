@@ -36,14 +36,38 @@ namespace Crucible.Mediator.DependencyInjection
         }
 
         /// <summary>
+        /// Adds a <see cref="IInvocationMiddleware{TEvent, EventResponse}"/> to the execution piepline.
+        /// </summary>
+        /// <typeparam name="TMiddleware">The <see cref="IInvocationMiddleware{TEvent, EventResponse}"/> type.</typeparam>
+        /// <returns>The <see cref="MediatorEventBuilder{TEvent}"/> for chaining.</returns>
+        public MediatorEventBuilder<TEvent> AddMiddleware<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TMiddleware>(TMiddleware middleware, int? order = null)
+            where TMiddleware : class, IInvocationMiddleware<TEvent, EventResponse>
+        {
+            _builder.AddMiddleware<TEvent, EventResponse, TMiddleware>(middleware, order);
+            return this;
+        }
+
+        /// <summary>
         /// Defines the <see cref="IEventHandler{TEvent}"/> associated with the <see cref="IEvent"/> type.
         /// </summary>
         /// <typeparam name="THandler">The <see cref="IEventHandler{TEvent}"/> type.</typeparam>
         /// <returns>The <see cref="MediatorBuilder"/> for chaining.</returns>
-        public MediatorEventBuilder<TEvent> AddListener<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] THandler>()
+        public MediatorEventBuilder<TEvent> HandleWith<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] THandler>()
             where THandler : class, IEventHandler<TEvent>
         {
             _builder.AddHandler<TEvent, EventResponse, IInvocationHandler<TEvent, EventResponse>, THandler>();
+            return this;
+        }
+
+        /// <summary>
+        /// Defines the <see cref="IEventHandler{TEvent}"/> associated with the <see cref="IEvent"/> type.
+        /// </summary>
+        /// <typeparam name="THandler">The <see cref="IEventHandler{TEvent}"/> type.</typeparam>
+        /// <returns>The <see cref="MediatorBuilder"/> for chaining.</returns>
+        public MediatorEventBuilder<TEvent> HandleWith<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] THandler>(THandler handler)
+            where THandler : class, IEventHandler<TEvent>
+        {
+            _builder.AddHandler<TEvent, EventResponse, THandler>(handler);
             return this;
         }
 

@@ -34,6 +34,18 @@ namespace Crucible.Mediator.DependencyInjection
         }
 
         /// <summary>
+        /// Adds a <see cref="IInvocationMiddleware{TRequest, TResponse}"/> to the execution piepline.
+        /// </summary>
+        /// <typeparam name="TMiddleware">The <see cref="IInvocationMiddleware{TRequest, TResponse}"/> type.</typeparam>
+        /// <returns>The <see cref="MediatorRequestBuilder{TRequest, TResponse}"/> for chaining.</returns>
+        public MediatorRequestBuilder<TRequest, TResponse> AddMiddleware<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TMiddleware>(TMiddleware middleware, int? order = null)
+            where TMiddleware : class, IInvocationMiddleware<TRequest, TResponse>
+        {
+            _builder.AddMiddleware<TRequest, TResponse, TMiddleware>(middleware, order);
+            return this;
+        }
+
+        /// <summary>
         /// Defines the <see cref="IRequestHandler{TRequest, TResponse}"/> or <see cref="ICommandHandler{TCommand}"/> associated with the <see cref="IRequest{TResponse}"/> or <see cref="ICommand"/> type.
         /// </summary>
         /// <typeparam name="THandler">The <see cref="IRequestHandler{TRequest, TResponse}"/> or <see cref="ICommandHandler{TCommand}"/> type.</typeparam>

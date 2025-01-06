@@ -13,12 +13,12 @@ namespace Crucible.Mediator.Engine.Invocation.Strategies
             _resolver = resolver;
         }
 
-        public Task HandleAsync(IInvocationContext<TRequest, TResponse> context, Func<IInvocationContext<TRequest, TResponse>, CancellationToken, Task> next, CancellationToken cancellationToken)
+        public Task HandleAsync(IInvocationContext<TRequest, TResponse> context, Func<IInvocationContext<TRequest, TResponse>, CancellationToken, Task> _, CancellationToken cancellationToken)
         {
             return InvokeHandlerAsync(_resolver, context, cancellationToken);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static async Task InvokeHandlerAsync(IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>> resolver, IInvocationContext<TRequest, TResponse> context, CancellationToken cancellationToken)
         {
             var handler = resolver.ResolveComponent();

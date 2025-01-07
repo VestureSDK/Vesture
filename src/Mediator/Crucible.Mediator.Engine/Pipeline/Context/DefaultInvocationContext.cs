@@ -1,23 +1,24 @@
 ﻿using System.Diagnostics;
-using Crucible.Mediator.Commands;
-using Crucible.Mediator.Events;
 using Crucible.Mediator.Invocation;
-using Crucible.Mediator.Requests;
 
 namespace Crucible.Mediator.Engine.Pipeline.Context
 {
+    /// <exclude />
     /// <summary>
-    /// Default implementation of <see cref="IInvocationContext"/>.
+    /// The <see cref="DefaultInvocationContext"/> provides a default implementation of <see cref="IInvocationContext"/>.
     /// </summary>
+    /// <inheritdoc cref="IInvocationContext{TRequest, TResponse}"/>
     [DebuggerDisplay("{RequestType.Name} -> {ResponseType.Name}")]
     public abstract class DefaultInvocationContext : IInvocationContext
     {
         /// <summary>
         /// Initializes a new <see cref="DefaultInvocationContext"/> instance.
         /// </summary>
-        /// <param name="request">The <see cref="IRequest{TResponse}"/>, <see cref="ICommand"/> or <see cref="IEvent"/> instance.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="request"/> is <see langword="null" />.</exception>
         public DefaultInvocationContext(object request)
         {
+            ArgumentNullException.ThrowIfNull(request, nameof(request));
+
             Request = request;
         }
 
@@ -89,14 +90,16 @@ namespace Crucible.Mediator.Engine.Pipeline.Context
     }
 
     /// <summary>
-    /// Default implementation of <see cref="IInvocationContext{TResponse}"/> and <see cref="IInvocationContext{TRequest, TResponse}"/>.
+    /// The <see cref="DefaultInvocationContext{TRequest, TResponse}"/> provides a default implementation of <see cref="IInvocationContext"/>.
     /// </summary>
-    /// <typeparam name="TRequest">The <see cref="IRequest{TResponse}"/>, <see cref="ICommand"/> or <see cref="IEvent"/> type.</typeparam>
-    /// <typeparam name="TResponse">The response type produced as specified in <typeparamref name="TRequest"/>.</typeparam>
+    /// <inheritdoc cref="IInvocationContext{TRequest, TResponse}"/>
     [DebuggerDisplay("{typeof(TRequest).Name} -> {typeof(TResponse).Name}")]
     public class DefaultInvocationContext<TRequest, TResponse> : DefaultInvocationContext, IInvocationContext<TRequest, TResponse>, IInvocationContext<TResponse>
     {
-        /// <inheritdoc/>
+        /// <summary>
+        /// Initializes a new <see cref="DefaultInvocationContext{TRequest, TResponse}"/> instance.
+        /// </summary>
+        /// <exception cref="ArgumentNullException"><paramref name="request"/> is <see langword="null" />.</exception>
         public DefaultInvocationContext(TRequest request)
             : base(request!) { }
 

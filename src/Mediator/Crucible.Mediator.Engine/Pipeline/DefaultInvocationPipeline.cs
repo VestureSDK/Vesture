@@ -1,24 +1,59 @@
-﻿using Crucible.Mediator.Engine.Pipeline.Components;
-using Crucible.Mediator.Engine.Pipeline.Components.Resolvers;
-using Crucible.Mediator.Engine.Pipeline.Context;
-using Crucible.Mediator.Engine.Pipeline.Invocation;
-using Crucible.Mediator.Engine.Pipeline.Invocation.Strategies;
+﻿using Crucible.Mediator.Engine.Pipeline.Context;
+using Crucible.Mediator.Engine.Pipeline.Internal;
+using Crucible.Mediator.Engine.Pipeline.Resolvers;
+using Crucible.Mediator.Engine.Pipeline.Strategies;
 using Crucible.Mediator.Invocation;
 
 namespace Crucible.Mediator.Engine.Pipeline
 {
+    /// <summary>
+    /// <para>
+    /// The <see cref="DefaultInvocationPipeline{TRequest, TResponse}"/> provides a default implementation of <see cref="IInvocationPipeline{TResponse}"/>.
+    /// </para>
+    /// <para>
+    /// An <see cref="IInvocationPipeline{TResponse}"/> represents the orchestrated sequence of execution 
+    /// that processes a specific contract through a series of <see cref="IInvocationMiddleware{TRequest, TResponse}"/> 
+    /// and ultimately reaches an <see cref="IInvocationHandler{TRequest, TResponse}"/>.
+    /// </para> 
+    /// </summary>
+    /// <typeparam name="TRequest">The type of contract handled by this pipeline.</typeparam>
+    /// <typeparam name="TResponse"><inheritdoc cref="IInvocationPipeline{TResponse}" path="/typeparam[@name='TResponse']"/></typeparam>
+    /// <inheritdoc cref="IInvocationPipeline{TResponse}"/>
     public class DefaultInvocationPipeline<TRequest, TResponse> : IInvocationPipeline<TResponse>
     {
         private readonly IInvocationContextFactory _contextFactory;
+
         private readonly IInvocationComponentResolver<IPreInvocationPipelineMiddleware> _preInvocationPipelineMiddlewareResolver;
+
         private readonly IEnumerable<IMiddlewareInvocationPipelineItem> _middlewares;
+
         private readonly IInvocationComponentResolver<IPreHandlerMiddleware> _preHandlerMiddlewareResolver;
+
         private readonly IInvocationHandlerStrategy<TRequest, TResponse> _handler;
 
+        /// <inheritdoc />
         public Type Request { get; } = typeof(TRequest);
 
+        /// <inheritdoc />
         public Type Response { get; } = typeof(TResponse);
 
+        /// <summary>
+        /// Initializes a new <see cref="DefaultInvocationPipeline{TRequest, TResponse}"/> instance.
+        /// </summary>
+        /// <param name="contextFactory">The <see cref="IInvocationContextFactory"/> instance.</param>
+        /// <param name="preInvocationPipelineMiddlewareResolver">The <see cref="IInvocationComponentResolver{TComponent}"/> of <see cref="IPreInvocationPipelineMiddleware"/> instance.</param>
+        /// <param name="middlewares">The <see cref="IMiddlewareInvocationPipelineItem"/> instances.</param>
+        /// <param name="preHandlerMiddlewareResolver">The <see cref="IInvocationComponentResolver{TComponent}"/> of <see cref="IPreHandlerMiddleware"/> instance.</param>
+        /// <param name="handler">The <see cref="IInvocationHandlerStrategy{TRequest, TResponse}"/> instance.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <list type="bullet">
+        /// <item><paramref name="contextFactory"/> is <see langword="null" />.</item>
+        /// <item><paramref name="preInvocationPipelineMiddlewareResolver"/> is <see langword="null" />.</item>
+        /// <item><paramref name="middlewares"/> is <see langword="null" />.</item>
+        /// <item><paramref name="preHandlerMiddlewareResolver"/> is <see langword="null" />.</item>
+        /// <item><paramref name="handler"/> is <see langword="null" />.</item>
+        /// </list>
+        /// </exception>
         public DefaultInvocationPipeline(
             IInvocationContextFactory contextFactory,
             IInvocationComponentResolver<IPreInvocationPipelineMiddleware> preInvocationPipelineMiddlewareResolver,
@@ -26,6 +61,12 @@ namespace Crucible.Mediator.Engine.Pipeline
             IInvocationComponentResolver<IPreHandlerMiddleware> preHandlerMiddlewareResolver,
             IInvocationHandlerStrategy<TRequest, TResponse> handler)
         {
+            ArgumentNullException.ThrowIfNull(contextFactory, nameof(contextFactory));
+            ArgumentNullException.ThrowIfNull(preInvocationPipelineMiddlewareResolver, nameof(preInvocationPipelineMiddlewareResolver));
+            ArgumentNullException.ThrowIfNull(middlewares, nameof(middlewares));
+            ArgumentNullException.ThrowIfNull(preHandlerMiddlewareResolver, nameof(preHandlerMiddlewareResolver));
+            ArgumentNullException.ThrowIfNull(handler, nameof(handler));
+
             _contextFactory = contextFactory;
             _preInvocationPipelineMiddlewareResolver = preInvocationPipelineMiddlewareResolver;
             _middlewares = middlewares;
@@ -77,6 +118,7 @@ namespace Crucible.Mediator.Engine.Pipeline
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 
+        /// <inheritdoc />
         public async Task<IInvocationContext<TResponse>> HandleAsync(object request, CancellationToken cancellationToken)
         {
             var context = _contextFactory.CreateContextForRequest<TRequest, TResponse>((TRequest)request);

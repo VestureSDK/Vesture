@@ -38,19 +38,19 @@ namespace Crucible.Mediator.Events
 
         /// <exclude />
         /// <inheritdoc cref="IMediator.ExecuteAndCaptureAsync{TResponse}(IRequest{TResponse}, CancellationToken)"/>
-        public Task<IInvocationContext<TResponse>> ExecuteAndCaptureAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default) => WorkflowMediator.ExecuteAndCaptureAsync(request, cancellationToken);
+        public Task<IInvocationContext<TSubResponse>> ExecuteAndCaptureAsync<TSubResponse>(IRequest<TSubResponse> request, CancellationToken cancellationToken = default) => WorkflowMediator.ExecuteAndCaptureAsync(request, cancellationToken);
 
         /// <exclude />
         /// <inheritdoc cref="IMediator.ExecuteAsync{TResponse}(IRequest{TResponse}, CancellationToken)"/>
-        public Task<TResponse> ExecuteAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default) => WorkflowMediator.ExecuteAsync(request, cancellationToken);
+        public Task<TSubResponse> ExecuteAsync<TSubResponse>(IRequest<TSubResponse> request, CancellationToken cancellationToken = default) => WorkflowMediator.ExecuteAsync(request, cancellationToken);
 
         /// <exclude />
         /// <inheritdoc cref="IMediator.HandleAndCaptureAsync{TResponse}(object, CancellationToken)"/>
-        public Task<IInvocationContext<TResponse>> HandleAndCaptureAsync<TResponse>(object request, CancellationToken cancellationToken = default) => WorkflowMediator.HandleAndCaptureAsync<TResponse>(request, cancellationToken);
+        public Task<IInvocationContext<TSubResponse>> HandleAndCaptureAsync<TSubResponse>(object request, CancellationToken cancellationToken = default) => WorkflowMediator.HandleAndCaptureAsync<TSubResponse>(request, cancellationToken);
 
         /// <exclude />
         /// <inheritdoc cref="IMediator.HandleAsync{TResponse}(object, CancellationToken)"/>
-        public Task<TResponse> HandleAsync<TResponse>(object request, CancellationToken cancellationToken = default) => WorkflowMediator.HandleAsync<TResponse>(request, cancellationToken);
+        public Task<TSubResponse> HandleAsync<TSubResponse>(object request, CancellationToken cancellationToken = default) => WorkflowMediator.HandleAsync<TSubResponse>(request, cancellationToken);
 
         /// <exclude />
         /// <inheritdoc cref="IMediator.InvokeAndCaptureAsync(ICommand, CancellationToken)"/>

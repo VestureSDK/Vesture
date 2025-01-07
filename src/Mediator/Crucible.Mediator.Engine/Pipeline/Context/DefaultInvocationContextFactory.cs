@@ -4,7 +4,9 @@ using Crucible.Mediator.Invocation;
 namespace Crucible.Mediator.Engine.Pipeline.Context
 {
     /// <summary>
-    /// Default implementation of <see cref="IInvocationContextFactory"/>.
+    /// The <see cref="DefaultInvocationContextFactory"/> provides 
+    /// a default implementation of <see cref="IInvocationContextFactory"/> creating
+    /// a <see cref="DefaultInvocationContext{TRequest, TResponse}"/>.
     /// </summary>
     public class DefaultInvocationContextFactory : IInvocationContextFactory
     {

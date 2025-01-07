@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Crucible.Mediator.Commands;
-using Crucible.Mediator.Engine.Pipeline.Invocation.Strategies;
+using Crucible.Mediator.Engine.Pipeline.Strategies;
 using Crucible.Mediator.Events;
 using Crucible.Mediator.Invocation;
 using Crucible.Mediator.Requests;

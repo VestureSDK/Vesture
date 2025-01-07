@@ -24,7 +24,7 @@ namespace Crucible.Mediator.Engine.Pipeline
     /// and ultimately reaches an <see cref="IInvocationHandler{TRequest, TResponse}"/>.
     /// </para>
     /// <para>
-    /// An invocation pipeline is a core component in the mediator pattern that enhances 
+    /// Invocation pipelines are a core component in the mediator pattern that enhances 
     /// modularity and separation of concerns by encapsulating cross-cutting logic such as logging, 
     /// validation, authorization, and more within middlewares.
     /// </para>

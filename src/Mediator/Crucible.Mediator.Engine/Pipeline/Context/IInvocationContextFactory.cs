@@ -6,7 +6,7 @@ using Crucible.Mediator.Requests;
 namespace Crucible.Mediator.Engine.Pipeline.Context
 {
     /// <summary>
-    /// Defines a <see cref="IInvocationContext"/> factory.
+    /// Defines a factory to create <see cref="IInvocationContext"/> for an <see cref="IInvocationPipeline{TResponse}"/>.
     /// </summary>
     public interface IInvocationContextFactory
     {

@@ -1,4 +1,6 @@
-﻿namespace Crucible.Mediator.Invocation
+﻿#pragma warning disable IDE0130 // Namespace does not match folder structure
+namespace Crucible.Mediator.Invocation
+#pragma warning restore IDE0130 // Namespace does not match folder structure
 {
     /// <summary>
     /// Defines extension and helpers methods related to <see cref="IInvocationContext"/>.
@@ -32,7 +34,7 @@
         /// <returns>Returns the <paramref name="context"/> for chaining.</returns>
         /// <exception cref="Exception" name="invocation-exception">Any <see cref="Exception"/> that occurred during the invocation pipeline and recorded in the <see cref="IInvocationContext"/>.</exception>
         public static TContext ThrowIfHasError<TContext>(this TContext context)
-            where TContext: IInvocationContext
+            where TContext : IInvocationContext
         {
             if (context.HasError)
             {

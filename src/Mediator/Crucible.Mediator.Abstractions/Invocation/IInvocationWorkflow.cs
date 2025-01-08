@@ -1,9 +1,6 @@
-﻿using System.Runtime.CompilerServices;
-using Crucible.Mediator.Commands;
+﻿using Crucible.Mediator.Commands;
 using Crucible.Mediator.Events;
 using Crucible.Mediator.Requests;
-
-[assembly: InternalsVisibleTo("Crucible.Mediator.DependencyInjection")]
 
 namespace Crucible.Mediator.Invocation
 {
@@ -43,7 +40,10 @@ namespace Crucible.Mediator.Invocation
     /// <seealso cref="IMediator"/>
     public interface IInvocationWorkflow
     {
-        internal IMediator Mediator { set; }
+#pragma warning disable RS0016 // Add public types and members to the declared API
+        /// <exclude />
+        public IMediator Mediator { set; }
+#pragma warning restore RS0016 // Add public types and members to the declared API
 
         /// <inheritdoc cref="IMediator.ExecuteAndCaptureAsync{TResponse}(IRequest{TResponse}, CancellationToken)"/>
         Task<IInvocationContext<TResponse>> ExecuteAndCaptureAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default);

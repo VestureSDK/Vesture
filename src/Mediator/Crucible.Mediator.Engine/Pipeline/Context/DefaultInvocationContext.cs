@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics;
+using Crucible.Mediator.Commands;
+using Crucible.Mediator.Events;
 using Crucible.Mediator.Invocation;
 
 namespace Crucible.Mediator.Engine.Pipeline.Context
@@ -20,6 +22,11 @@ namespace Crucible.Mediator.Engine.Pipeline.Context
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
             Request = request;
+
+            IsEvent = ResponseType == EventResponse.Type;
+            IsCommand = ResponseType == CommandResponse.Type;
+            IsRequest = !(IsEvent || IsCommand);
+            HasResponseType = IsRequest;
         }
 
         /// <inheritdoc/>
@@ -35,10 +42,16 @@ namespace Crucible.Mediator.Engine.Pipeline.Context
         public object Request { get; }
 
         /// <inheritdoc/>
-        public bool IsEvent { get; set; }
+        public bool IsEvent { get; }
 
         /// <inheritdoc/>
-        public bool HasResponseType => ResponseType.IsAssignableTo(NoResponse.Type);
+        public bool IsCommand { get; }
+
+        /// <inheritdoc/>
+        public bool IsRequest { get; }
+
+        /// <inheritdoc/>
+        public bool HasResponseType { get; }
 
         /// <inheritdoc/>
         public abstract Type ResponseType { get; }
@@ -52,13 +65,20 @@ namespace Crucible.Mediator.Engine.Pipeline.Context
         /// <inheritdoc/>
         public void SetError(Exception? error)
         {
-            if (Error is null || error is null)
+            Error = error;
+        }
+
+        /// <inheritdoc/>
+        public void AddError(Exception error)
+        {
+            if (Error is null)
             {
-                Error = error;
+                SetError(error);
             }
             else
             {
                 var errors = AggregateErrors(Error);
+                errors.Add(error);
                 Error = new AggregateException(errors);
             }
         }

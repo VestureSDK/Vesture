@@ -1,5 +1,4 @@
-﻿using Crucible.Mediator.Events;
-using Crucible.Mediator.Invocation;
+﻿using Crucible.Mediator.Invocation;
 
 namespace Crucible.Mediator.Engine.Pipeline.Context
 {
@@ -14,10 +13,7 @@ namespace Crucible.Mediator.Engine.Pipeline.Context
         public IInvocationContext<TRequest, TResponse> CreateContextForRequest<TRequest, TResponse>(object request)
         {
             var typedRequest = (TRequest)request;
-            return new DefaultInvocationContext<TRequest, TResponse>(typedRequest)
-            {
-                IsEvent = typeof(TResponse) == EventResponse.Type,
-            };
+            return new DefaultInvocationContext<TRequest, TResponse>(typedRequest);
         }
     }
 }

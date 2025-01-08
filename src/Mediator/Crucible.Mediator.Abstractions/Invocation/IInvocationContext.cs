@@ -26,9 +26,19 @@ namespace Crucible.Mediator.Invocation
         object Request { get; }
 
         /// <summary>
-        /// Indicates whether the <see cref="Request"/> is an instance of <see cref="IEvent"/>.
+        /// Indicates whether the <see cref="Request"/> corresponds to an <see cref="IEvent"/>.
         /// </summary>
         bool IsEvent { get; }
+
+        /// <summary>
+        /// Indicates whether the <see cref="Request"/> corresponds to a <see cref="ICommand"/>.
+        /// </summary>
+        bool IsCommand { get; }
+
+        /// <summary>
+        /// Indicates whether the <see cref="Request"/> corresponds to a <see cref="IRequest{TResponse}"/>.
+        /// </summary>
+        bool IsRequest { get; }
 
         /// <summary>
         /// Indicates whether a <see cref="ResponseType"/> is available for the current request.
@@ -79,6 +89,13 @@ namespace Crucible.Mediator.Invocation
         /// </summary>
         /// <param name="error">The exception to set.</param>
         void SetError(Exception? error);
+
+        /// <summary>
+        /// Records an <see cref="Exception"/> that occurred during the processing of the <see cref="Request"/>
+        /// and aggregates it with the other <see cref="Exception"/> recorded previously.
+        /// </summary>
+        /// <param name="error">The exception to add.</param>
+        void AddError(Exception error);
     }
 
     /// <typeparam name="TResponse">The response type as expected by the <see cref="IInvocationContext.Request"/>.</typeparam>

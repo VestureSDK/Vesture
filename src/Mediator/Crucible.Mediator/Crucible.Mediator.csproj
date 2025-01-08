@@ -1,12 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<ProjectReference Include="..\Crucible.Mediator.Abstractions\Crucible.Mediator.Abstractions.csproj" />
+		<ProjectReference Include="..\Crucible.Mediator.DependencyInjection\Crucible.Mediator.DependencyInjection.csproj" />
 		<ProjectReference Include="..\Crucible.Mediator.Engine\Crucible.Mediator.Engine.csproj" />
 	</ItemGroup>
 

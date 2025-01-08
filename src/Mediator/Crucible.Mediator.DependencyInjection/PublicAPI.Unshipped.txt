@@ -1,0 +1,40 @@
+﻿#nullable enable
+Crucible.Mediator.DependencyInjection.MediatorBuilder
+Crucible.Mediator.DependencyInjection.MediatorBuilder.Command<TRequest>() -> Crucible.Mediator.DependencyInjection.MediatorRequestBuilder<TRequest, Crucible.Mediator.Commands.CommandResponse!>!
+Crucible.Mediator.DependencyInjection.MediatorBuilder.Configure(System.Action<Crucible.Mediator.DependencyInjection.MediatorConfiguration!>! setup) -> Crucible.Mediator.DependencyInjection.MediatorBuilder!
+Crucible.Mediator.DependencyInjection.MediatorBuilder.Event<TEvent>() -> Crucible.Mediator.DependencyInjection.MediatorEventBuilder<TEvent>!
+Crucible.Mediator.DependencyInjection.MediatorBuilder.Invocation<TRequest, TResponse>() -> Crucible.Mediator.DependencyInjection.MediatorInvocationBuilder<TRequest, TResponse>!
+Crucible.Mediator.DependencyInjection.MediatorBuilder.MediatorBuilder(Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Crucible.Mediator.DependencyInjection.MediatorConfiguration!>? setup = null) -> void
+Crucible.Mediator.DependencyInjection.MediatorBuilder.Request<TRequest, TResponse>() -> Crucible.Mediator.DependencyInjection.MediatorRequestBuilder<TRequest, TResponse>!
+Crucible.Mediator.DependencyInjection.MediatorBuilder.Services.get -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+Crucible.Mediator.DependencyInjection.MediatorConfiguration
+Crucible.Mediator.DependencyInjection.MediatorConfiguration.Debug.get -> bool
+Crucible.Mediator.DependencyInjection.MediatorConfiguration.Debug.set -> void
+Crucible.Mediator.DependencyInjection.MediatorConfiguration.MediatorConfiguration() -> void
+Crucible.Mediator.DependencyInjection.MediatorEventBuilder<TEvent>
+Crucible.Mediator.DependencyInjection.MediatorEventBuilder<TEvent>.AddMiddleware<TMiddleware>(int? order = null) -> Crucible.Mediator.DependencyInjection.MediatorEventBuilder<TEvent>!
+Crucible.Mediator.DependencyInjection.MediatorEventBuilder<TEvent>.AddMiddleware<TMiddleware>(TMiddleware! middleware, int? order = null) -> Crucible.Mediator.DependencyInjection.MediatorEventBuilder<TEvent>!
+Crucible.Mediator.DependencyInjection.MediatorEventBuilder<TEvent>.Command<TRequest>() -> Crucible.Mediator.DependencyInjection.MediatorRequestBuilder<TRequest, Crucible.Mediator.Commands.CommandResponse!>!
+Crucible.Mediator.DependencyInjection.MediatorEventBuilder<TEvent>.HandleWith<THandler>() -> Crucible.Mediator.DependencyInjection.MediatorEventBuilder<TEvent>!
+Crucible.Mediator.DependencyInjection.MediatorEventBuilder<TEvent>.HandleWith<THandler>(THandler! handler) -> Crucible.Mediator.DependencyInjection.MediatorEventBuilder<TEvent>!
+Crucible.Mediator.DependencyInjection.MediatorEventBuilder<TEvent>.MediatorEventBuilder(Crucible.Mediator.DependencyInjection.MediatorBuilder! builder) -> void
+Crucible.Mediator.DependencyInjection.MediatorEventBuilder<TEvent>.PublishInParallel() -> Crucible.Mediator.DependencyInjection.MediatorEventBuilder<TEvent>!
+Crucible.Mediator.DependencyInjection.MediatorEventBuilder<TEvent>.PublishSequentially() -> Crucible.Mediator.DependencyInjection.MediatorEventBuilder<TEvent>!
+Crucible.Mediator.DependencyInjection.MediatorEventBuilder<TEvent>.Request<TRequest, TResponse>() -> Crucible.Mediator.DependencyInjection.MediatorRequestBuilder<TRequest, TResponse>!
+Crucible.Mediator.DependencyInjection.MediatorEventBuilder<TEvent>.WithPublishStrategy<TStrategy>() -> Crucible.Mediator.DependencyInjection.MediatorEventBuilder<TEvent>!
+Crucible.Mediator.DependencyInjection.MediatorInvocationBuilder<TInvocationRequest, TInvocationResponse>
+Crucible.Mediator.DependencyInjection.MediatorInvocationBuilder<TInvocationRequest, TInvocationResponse>.AddMiddleware<TMiddleware>(int? order = null) -> Crucible.Mediator.DependencyInjection.MediatorInvocationBuilder<TInvocationRequest, TInvocationResponse>!
+Crucible.Mediator.DependencyInjection.MediatorInvocationBuilder<TInvocationRequest, TInvocationResponse>.AddMiddleware<TMiddleware>(TMiddleware! middleware, int? order = null) -> Crucible.Mediator.DependencyInjection.MediatorInvocationBuilder<TInvocationRequest, TInvocationResponse>!
+Crucible.Mediator.DependencyInjection.MediatorInvocationBuilder<TInvocationRequest, TInvocationResponse>.Command<TRequest>() -> Crucible.Mediator.DependencyInjection.MediatorRequestBuilder<TRequest, Crucible.Mediator.Commands.CommandResponse!>!
+Crucible.Mediator.DependencyInjection.MediatorInvocationBuilder<TInvocationRequest, TInvocationResponse>.Event<TEvent>() -> Crucible.Mediator.DependencyInjection.MediatorEventBuilder<TEvent>!
+Crucible.Mediator.DependencyInjection.MediatorInvocationBuilder<TInvocationRequest, TInvocationResponse>.Invocation<TRequest, TResponse>() -> Crucible.Mediator.DependencyInjection.MediatorInvocationBuilder<TRequest, TResponse>!
+Crucible.Mediator.DependencyInjection.MediatorInvocationBuilder<TInvocationRequest, TInvocationResponse>.MediatorInvocationBuilder(Crucible.Mediator.DependencyInjection.MediatorBuilder! builder) -> void
+Crucible.Mediator.DependencyInjection.MediatorInvocationBuilder<TInvocationRequest, TInvocationResponse>.Request<TRequest, TResponse>() -> Crucible.Mediator.DependencyInjection.MediatorRequestBuilder<TRequest, TResponse>!
+Crucible.Mediator.DependencyInjection.MediatorRequestBuilder<TRequest, TResponse>
+Crucible.Mediator.DependencyInjection.MediatorRequestBuilder<TRequest, TResponse>.AddMiddleware<TMiddleware>(int? order = null) -> Crucible.Mediator.DependencyInjection.MediatorRequestBuilder<TRequest, TResponse>!
+Crucible.Mediator.DependencyInjection.MediatorRequestBuilder<TRequest, TResponse>.AddMiddleware<TMiddleware>(TMiddleware! middleware, int? order = null) -> Crucible.Mediator.DependencyInjection.MediatorRequestBuilder<TRequest, TResponse>!
+Crucible.Mediator.DependencyInjection.MediatorRequestBuilder<TRequest, TResponse>.HandleWith(Crucible.Mediator.Invocation.IInvocationHandler<TRequest, TResponse>! handler) -> Crucible.Mediator.DependencyInjection.MediatorBuilder!
+Crucible.Mediator.DependencyInjection.MediatorRequestBuilder<TRequest, TResponse>.HandleWith<THandler>() -> Crucible.Mediator.DependencyInjection.MediatorBuilder!
+Crucible.Mediator.DependencyInjection.MediatorRequestBuilder<TRequest, TResponse>.MediatorRequestBuilder(Crucible.Mediator.DependencyInjection.MediatorBuilder! builder) -> void
+Microsoft.Extensions.DependencyInjection.MediatorDiExtensions
+static Microsoft.Extensions.DependencyInjection.MediatorDiExtensions.AddMediator(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Crucible.Mediator.DependencyInjection.MediatorConfiguration!>? setup = null) -> Crucible.Mediator.DependencyInjection.MediatorBuilder!

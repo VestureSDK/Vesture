@@ -3,7 +3,7 @@ using Crucible.Mediator.Commands;
 using Crucible.Mediator.Events;
 using Crucible.Mediator.Requests;
 
-[assembly: InternalsVisibleTo("Crucible.Mediator")]
+[assembly: InternalsVisibleTo("Crucible.Mediator.DependencyInjection")]
 
 namespace Crucible.Mediator.Invocation
 {

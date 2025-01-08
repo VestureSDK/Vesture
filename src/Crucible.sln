@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crucible.Mediator.Abstracti
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crucible.Mediator.Engine", "Mediator\Crucible.Mediator.Engine\Crucible.Mediator.Engine.csproj", "{7910BADB-7272-48B7-BE81-76AF9D4E3C9D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crucible.Mediator.DependencyInjection", "Mediator\Crucible.Mediator.DependencyInjection\Crucible.Mediator.DependencyInjection.csproj", "{16F916DA-6BE2-491E-B924-C87B42736828}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,6 +67,10 @@ Global
 		{7910BADB-7272-48B7-BE81-76AF9D4E3C9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7910BADB-7272-48B7-BE81-76AF9D4E3C9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7910BADB-7272-48B7-BE81-76AF9D4E3C9D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16F916DA-6BE2-491E-B924-C87B42736828}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16F916DA-6BE2-491E-B924-C87B42736828}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16F916DA-6BE2-491E-B924-C87B42736828}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16F916DA-6BE2-491E-B924-C87B42736828}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -79,5 +85,6 @@ Global
 		{51840F4B-6D81-4FA5-B10C-2DD7646699BB} = {B35B5E68-D79E-4A2F-8ED3-032A6137CF00}
 		{530C2E25-D0C3-429F-9DEC-28B198CA6E25} = {B35B5E68-D79E-4A2F-8ED3-032A6137CF00}
 		{7910BADB-7272-48B7-BE81-76AF9D4E3C9D} = {9F7579D3-C2A6-4953-B173-194950BA77C8}
+		{16F916DA-6BE2-491E-B924-C87B42736828} = {9F7579D3-C2A6-4953-B173-194950BA77C8}
 	EndGlobalSection
 EndGlobal

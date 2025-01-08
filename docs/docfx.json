@@ -9,8 +9,7 @@
           ],
           "exclude": [
             "**/*.Benchmarks.csproj",
-            "**/*.Tests.csproj",
-            "**/Crucible.Mediator.csproj"
+            "**/*.Tests.csproj"
           ]
         }
       ],

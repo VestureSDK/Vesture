@@ -1,5 +1,6 @@
 ﻿using Crucible.Mediator;
 using Crucible.Mediator.DependencyInjection;
+using Crucible.Mediator.Engine.DependencyInjection;
 
 #pragma warning disable IDE0130 // Namespace does not match folder structure
 namespace Microsoft.Extensions.DependencyInjection
@@ -16,11 +17,11 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/> instance.</param>
         /// <param name="setup">The <see cref="MediatorConfiguration"/> setup.</param>
-        /// <returns>The <see cref="MediatorBuilder"/> for further configuration.</returns>
-        public static MediatorBuilder AddMediator(this IServiceCollection services, Action<MediatorConfiguration>? setup = null)
+        /// <returns>The <see cref="RootMediatorBuilder"/> for further configuration.</returns>
+        public static RootMediatorBuilder AddMediator(this IServiceCollection services)
         {
             // Returns the builder for chaining
-            return new MediatorBuilder(services, setup);
+            return new RootMediatorBuilder(new MSDIDependencyInjectionRegistrar(services));
         }
     }
 }

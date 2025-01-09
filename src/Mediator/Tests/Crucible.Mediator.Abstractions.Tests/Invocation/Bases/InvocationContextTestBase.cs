@@ -1,7 +1,259 @@
-﻿using Crucible.Mediator.Invocation;
+﻿using Crucible.Mediator.Commands;
+using Crucible.Mediator.Events;
+using Crucible.Mediator.Invocation;
 
 namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
 {
+    public abstract class InvocationContextTestBase_Event<TRequest, TContext>
+        : InvocationContextTestBase<TRequest, EventResponse, TContext>
+        where TContext : IInvocationContext<TRequest, EventResponse>
+    {
+        protected InvocationContextTestBase_Event(TRequest defaultRequest)
+            : base(defaultRequest) { }
+
+        [Test]
+        public void IsEvent_IsTrue()
+        {
+            // Arrange
+            // No arrange required
+
+            // Act
+            var isEvent = InvocationContext.IsEvent;
+
+            // Assert
+            Assert.That(isEvent, Is.True, message: $"{nameof(IInvocationContext<TRequest, EventResponse>.IsEvent)} should be {true}");
+        }
+
+        [Test]
+        public void IsCommand_IsFalse()
+        {
+            // Arrange
+            // No arrange required
+
+            // Act
+            var isCommand = InvocationContext.IsCommand;
+
+            // Assert
+            Assert.That(isCommand, Is.False, message: $"{nameof(IInvocationContext<TRequest, EventResponse>.IsCommand)} should be {false}");
+        }
+
+        [Test]
+        public void IsRequest_IsFalse()
+        {
+            // Arrange
+            // No arrange required
+
+            // Act
+            var isRequest = InvocationContext.IsRequest;
+
+            // Assert
+            Assert.That(isRequest, Is.False, message: $"{nameof(IInvocationContext<TRequest, EventResponse>.IsRequest)} should be {false}");
+        }
+
+        [Test]
+        public void HasResponseType_IsFalse()
+        {
+            // Arrange
+            // No arrange required
+
+            // Act
+            var hasResponseType = InvocationContext.HasResponseType;
+
+            // Assert
+            Assert.That(hasResponseType, Is.False, message: $"{nameof(IInvocationContext<TRequest, EventResponse>.HasResponseType)} should be {false}");
+        }
+    }
+
+    public abstract class InvocationContextTestBase_Command<TRequest, TContext>
+        : InvocationContextTestBase<TRequest, CommandResponse, TContext>
+        where TContext : IInvocationContext<TRequest, CommandResponse>
+    {
+        protected InvocationContextTestBase_Command(TRequest defaultRequest)
+            : base(defaultRequest) { }
+
+        [Test]
+        public void IsEvent_IsFalse()
+        {
+            // Arrange
+            // No arrange required
+
+            // Act
+            var isEvent = InvocationContext.IsEvent;
+
+            // Assert
+            Assert.That(isEvent, Is.False, message: $"{nameof(IInvocationContext<TRequest, CommandResponse>.IsEvent)} should be {false}");
+        }
+
+        [Test]
+        public void IsCommand_IsTrue()
+        {
+            // Arrange
+            // No arrange required
+
+            // Act
+            var isCommand = InvocationContext.IsCommand;
+
+            // Assert
+            Assert.That(isCommand, Is.True, message: $"{nameof(IInvocationContext<TRequest, CommandResponse>.IsCommand)} should be {true}");
+        }
+
+        [Test]
+        public void IsRequest_IsFalse()
+        {
+            // Arrange
+            // No arrange required
+
+            // Act
+            var isRequest = InvocationContext.IsRequest;
+
+            // Assert
+            Assert.That(isRequest, Is.False, message: $"{nameof(IInvocationContext<TRequest, CommandResponse>.IsRequest)} should be {false}");
+        }
+
+        [Test]
+        public void HasResponseType_IsFalse()
+        {
+            // Arrange
+            // No arrange required
+
+            // Act
+            var hasResponseType = InvocationContext.HasResponseType;
+
+            // Assert
+            Assert.That(hasResponseType, Is.False, message: $"{nameof(IInvocationContext<TRequest, CommandResponse>.HasResponseType)} should be {false}");
+        }
+    }
+
+    public abstract class InvocationContextTestBase_Request<TRequest, TResponse, TContext>
+        : InvocationContextTestBase<TRequest, TResponse, TContext>
+        where TContext : IInvocationContext<TRequest, TResponse>
+    {
+        protected InvocationContextTestBase_Request(TRequest defaultRequest)
+            : base(defaultRequest) { }
+
+        protected abstract TResponse CreateResponse();
+
+        [Test]
+        public void IsEvent_IsFalse()
+        {
+            // Arrange
+            // No arrange required
+
+            // Act
+            var isEvent = InvocationContext.IsEvent;
+
+            // Assert
+            Assert.That(isEvent, Is.False, message: $"{nameof(IInvocationContext<TRequest, TResponse>.IsEvent)} should be {false}");
+        }
+
+        [Test]
+        public void IsCommand_IsFalse()
+        {
+            // Arrange
+            // No arrange required
+
+            // Act
+            var isCommand = InvocationContext.IsCommand;
+
+            // Assert
+            Assert.That(isCommand, Is.False, message: $"{nameof(IInvocationContext<TRequest, TResponse>.IsCommand)} should be {false}");
+        }
+
+        [Test]
+        public void IsRequest_IsTrue()
+        {
+            // Arrange
+            // No arrange required
+
+            // Act
+            var isRequest = InvocationContext.IsRequest;
+
+            // Assert
+            Assert.That(isRequest, Is.True, message: $"{nameof(IInvocationContext<TRequest, TResponse>.IsRequest)} should be {true}");
+        }
+
+        [Test]
+        public void HasResponseType_IsTrue()
+        {
+            // Arrange
+            // No arrange required
+
+            // Act
+            var hasResponseType = InvocationContext.HasResponseType;
+
+            // Assert
+            Assert.That(hasResponseType, Is.True, message: $"{nameof(IInvocationContext<TRequest, TResponse>.HasResponseType)} should be {true}");
+        }
+
+        [Test]
+        public void HasResponse_IsFalse_WhenNoResponseSet()
+        {
+            // Arrange
+            // No arrange required
+
+            // Act
+            var hasResponse = InvocationContext.HasResponse;
+
+            // Assert
+            Assert.That(hasResponse, Is.False, message: $"{nameof(IInvocationContext<TRequest, TResponse>.HasResponse)} should be {false} when no response is set");
+        }
+
+        [Test]
+        public void HasResponse_IsTrue_WhenResponseSet()
+        {
+            // Arrange
+            InvocationContext.SetResponse(CreateResponse());
+
+            // Act
+            var hasResponse = InvocationContext.HasResponse;
+
+            // Assert
+            Assert.That(hasResponse, Is.True, message: $"{nameof(IInvocationContext<TRequest, TResponse>.HasResponse)} should be {true} when a response is set");
+        }
+
+        [Test]
+        public void SetResponse_Response_IsTheOneSet_WhenNoResponseSetBefore()
+        {
+            // Arrange
+            var sampleResponse = CreateResponse();
+
+            // Act
+            InvocationContext.SetResponse(sampleResponse);
+
+            // Assert
+            Assert.That(InvocationContext.Response, Is.SameAs(sampleResponse), message: $"{nameof(IInvocationContext<TRequest, TResponse>.Response)} should be same as response set with {nameof(IInvocationContext<TRequest, TResponse>.SetResponse)} when no response set.");
+        }
+
+        [Test]
+        public void SetResponse_Response_IsTheLastOneSet_WhenSettingMultipleResponses()
+        {
+            // Arrange
+            var firstSampleResponse = CreateResponse();
+            InvocationContext.SetResponse(firstSampleResponse);
+
+            var lastSampleResponse = CreateResponse();
+
+            // Act
+            InvocationContext.SetResponse(lastSampleResponse);
+
+            // Assert
+            Assert.That(InvocationContext.Response, Is.SameAs(lastSampleResponse), message: $"{nameof(IInvocationContext<TRequest, TResponse>.Response)} should be same as the last response set with {nameof(IInvocationContext<TRequest, TResponse>.SetResponse)} when multiple response set.");
+        }
+
+        [Test]
+        public void SetResponse_Response_IsUnset_WhenSettingNullResponse()
+        {
+            // Arrange
+            InvocationContext.SetResponse(new object());
+
+            // Act
+            InvocationContext.SetResponse(null);
+
+            // Assert
+            Assert.That(InvocationContext.Response, Is.Null, message: $"{nameof(IInvocationContext<TRequest, TResponse>.Response)} should be null when calling {nameof(IInvocationContext<TRequest, TResponse>.SetResponse)} with null.");
+        }
+    }
+
     public abstract class InvocationContextTestBase<TRequest, TResponse, TContext>
         where TContext: IInvocationContext<TRequest, TResponse>
     {
@@ -44,7 +296,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
             // No arrange required
 
             // Act
-            var request = InvocationContext.Request;
+            var request = ((IInvocationContext)InvocationContext).Request;
 
             // Assert
 #pragma warning disable NUnit2020 // Incompatible types for SameAs constraint

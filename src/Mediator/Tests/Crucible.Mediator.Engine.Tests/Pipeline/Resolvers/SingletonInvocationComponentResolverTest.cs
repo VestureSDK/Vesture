@@ -5,7 +5,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Resolvers
 {
     public class SingletonInvocationComponentResolverTest : InvocationComponentResolverTestBase<object, SingletonInvocationComponentResolver<object>>
     {
-        public object SingletonInstance { get; set; }
+        public object SingletonInstance { get; set; } = new object();
 
         protected override SingletonInvocationComponentResolver<object> CreateResolver() => new(SingletonInstance);
 
@@ -13,7 +13,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Resolvers
         public void ResolveComponent_IsSingletonInstance()
         {
             // Arrange
-            SingletonInstance = new object();
+            // No arrange required
 
             // Act
             var component = Resolver.ResolveComponent();

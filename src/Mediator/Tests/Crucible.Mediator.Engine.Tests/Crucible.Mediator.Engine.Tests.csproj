@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Crucible.Mediator.Engine\Crucible.Mediator.Engine.csproj" />
+    <ProjectReference Include="..\Crucible.Mediator.Abstractions.Tests\Crucible.Mediator.Abstractions.Tests.csproj" />
   </ItemGroup>
 
   <ItemGroup>

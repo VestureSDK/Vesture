@@ -1,4 +1,7 @@
-﻿using Crucible.Mediator.Abstractions.Tests.Invocation.Bases;
+﻿using Crucible.Mediator.Abstractions.Tests.Commands;
+using Crucible.Mediator.Abstractions.Tests.Events;
+using Crucible.Mediator.Abstractions.Tests.Invocation.Bases;
+using Crucible.Mediator.Abstractions.Tests.Requests;
 using Crucible.Mediator.Commands;
 using Crucible.Mediator.Engine.Pipeline.Context;
 using Crucible.Mediator.Events;
@@ -6,33 +9,33 @@ using Crucible.Mediator.Events;
 namespace Crucible.Mediator.Engine.Tests.Pipeline.Context
 {
     public class DefaultInvocationContextTest_Event
-        : InvocationContextTestBase_Event<object, DefaultInvocationContext<object, EventResponse>>
+        : InvocationContextTestBase_Event<MockEvent, DefaultInvocationContext<MockEvent, EventResponse>>
     {
         public DefaultInvocationContextTest_Event()
-            : base(new object()) { }
+            : base(new ()) { }
 
-        protected override DefaultInvocationContext<object, EventResponse> CreateInvocationContext(object request) => new(Request);
+        protected override DefaultInvocationContext<MockEvent, EventResponse> CreateInvocationContext(MockEvent @event) => new(@event);
 
     }
 
     public class DefaultInvocationContextTest_Command
-        : InvocationContextTestBase_Command<object, DefaultInvocationContext<object, CommandResponse>>
+        : InvocationContextTestBase_Command<MockCommand, DefaultInvocationContext<MockCommand, CommandResponse>>
     {
         public DefaultInvocationContextTest_Command()
-            : base(new object()) { }
+            : base(new ()) { }
 
-        protected override DefaultInvocationContext<object, CommandResponse> CreateInvocationContext(object request) => new(Request);
+        protected override DefaultInvocationContext<MockCommand, CommandResponse> CreateInvocationContext(MockCommand command) => new(command);
 
     }
 
     public class DefaultInvocationContextTest_Request 
-        : InvocationContextTestBase_Request<object, object, DefaultInvocationContext<object, object>>
+        : InvocationContextTestBase_Request<MockRequest, MockResponse, DefaultInvocationContext<MockRequest, MockResponse>>
     {
         public DefaultInvocationContextTest_Request()
-        : base(new object()) { }
+        : base(new ()) { }
 
-        protected override DefaultInvocationContext<object, object> CreateInvocationContext(object request) => new(Request);
+        protected override DefaultInvocationContext<MockRequest, MockResponse> CreateInvocationContext(MockRequest request) => new(request);
         
-        protected override object CreateResponse() => new object();
+        protected override MockResponse CreateResponse() => new ();
     }
 }

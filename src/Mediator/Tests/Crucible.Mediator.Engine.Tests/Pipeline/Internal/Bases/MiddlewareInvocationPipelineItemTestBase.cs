@@ -1,14 +1,17 @@
-﻿using Crucible.Mediator.Commands;
+﻿using Crucible.Mediator.Abstractions.Tests.Commands;
+using Crucible.Mediator.Abstractions.Tests.Events;
+using Crucible.Mediator.Abstractions.Tests.Invocation.Mocks;
+using Crucible.Mediator.Abstractions.Tests.Requests;
+using Crucible.Mediator.Commands;
 using Crucible.Mediator.Engine.Pipeline.Internal;
 using Crucible.Mediator.Events;
 using Crucible.Mediator.Invocation;
-using Crucible.Mediator.Requests;
 using Any = object;
 
 namespace Crucible.Mediator.Engine.Tests.Pipeline.Internal.Bases
 {
-    public abstract class MiddlewareInvocationPipelineItemTestBase<TRequest, TResponse, TMiddlewareItem>
-        where TMiddlewareItem : IMiddlewareInvocationPipelineItem<TRequest, TResponse>
+    public abstract class MiddlewareInvocationPipelineItemTestBase<TMiddlewareItem>
+        where TMiddlewareItem : IMiddlewareInvocationPipelineItem
     {
         protected int Order { get; set; }
 
@@ -40,607 +43,142 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Internal.Bases
             var actualOrder = MiddlewareItem.Order;
 
             // Assert
-            Assert.That(actualOrder, Is.EqualTo(expectedOrder), message: "Actual order should be equalt to provided ctor order");
+            Assert.That(actualOrder, Is.EqualTo(expectedOrder), message: "Actual order should be equal to provided ctor order");
         }
 
-        [Test]
-        public void IsApplicable_IsTrue_ForSampleRequest_WhenMiddlewareIsAnyAny()
+        [Theory]
+        // IRequest<TResponse>
+        [CustomTestCase</*Contract:*/ MockRequest, MockResponse, /*Middleware:*/ Any, Any>()]
+        [CustomTestCase</*Contract:*/ MockRequest, MockResponse, /*Middleware:*/ MockRequest, Any>()]
+        [CustomTestCase</*Contract:*/ MockRequest, MockResponse, /*Middleware:*/ Any, MockResponse>()]
+        [CustomTestCase</*Contract:*/ MockRequest, MockResponse, /*Middleware:*/ MockRequest, MockResponse>()]
+        // ICommand
+        [CustomTestCase</*Contract:*/ MockCommand, CommandResponse, /*Middleware:*/ Any, Any>()]
+        [CustomTestCase</*Contract:*/ MockCommand, CommandResponse, /*Middleware:*/ MockCommand, Any>()]
+        [CustomTestCase</*Contract:*/ MockCommand, CommandResponse, /*Middleware:*/ Any, CommandResponse>()]
+        [CustomTestCase</*Contract:*/ MockCommand, CommandResponse, /*Middleware:*/ Any, NoResponse>()]
+        [CustomTestCase</*Contract:*/ MockCommand, CommandResponse, /*Middleware:*/ MockCommand, CommandResponse>()]
+        [CustomTestCase</*Contract:*/ MockCommand, CommandResponse, /*Middleware:*/ MockCommand, NoResponse>()]
+        // IEvent
+        [CustomTestCase</*Contract:*/ MockEvent, EventResponse, /*Middleware:*/ Any, Any>()]
+        [CustomTestCase</*Contract:*/ MockEvent, EventResponse, /*Middleware:*/ MockEvent, Any>()]
+        [CustomTestCase</*Contract:*/ MockEvent, EventResponse, /*Middleware:*/ Any, EventResponse>()]
+        [CustomTestCase</*Contract:*/ MockEvent, EventResponse, /*Middleware:*/ Any, NoResponse>()]
+        [CustomTestCase</*Contract:*/ MockEvent, EventResponse, /*Middleware:*/ MockEvent, EventResponse>()]
+        [CustomTestCase</*Contract:*/ MockEvent, EventResponse, /*Middleware:*/ MockEvent, NoResponse>()]
+        // Unmarked (IRequest<TResponse>)
+        [CustomTestCase</*Contract:*/ MockUnmarked, MockUnmarked, /*Middleware:*/ Any, Any>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, MockUnmarked, /*Middleware:*/ MockUnmarked, Any>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, MockUnmarked, /*Middleware:*/ Any, MockUnmarked>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, MockUnmarked, /*Middleware:*/ MockUnmarked, MockUnmarked>()]
+        // Unmarked (ICommand)
+        [CustomTestCase</*Contract:*/ MockUnmarked, CommandResponse, /*Middleware:*/ Any, Any>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, CommandResponse, /*Middleware:*/ MockUnmarked, Any>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, CommandResponse, /*Middleware:*/ Any, CommandResponse>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, CommandResponse, /*Middleware:*/ Any, NoResponse>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, CommandResponse, /*Middleware:*/ MockUnmarked, CommandResponse>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, CommandResponse, /*Middleware:*/ MockUnmarked, NoResponse>()]
+        // Unmarked (IEvent)
+        [CustomTestCase</*Contract:*/ MockUnmarked, EventResponse, /*Middleware:*/ Any, Any>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, EventResponse, /*Middleware:*/ MockUnmarked, Any>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, EventResponse, /*Middleware:*/ Any, EventResponse>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, EventResponse, /*Middleware:*/ Any, NoResponse>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, EventResponse, /*Middleware:*/ MockUnmarked, EventResponse>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, EventResponse, /*Middleware:*/ MockUnmarked, NoResponse>()]
+        // Unmarked (Special NoResponse)
+        [CustomTestCase</*Contract:*/ MockUnmarked, NoResponse, /*Middleware:*/ Any, Any>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, NoResponse, /*Middleware:*/ MockUnmarked, Any>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, NoResponse, /*Middleware:*/ Any, NoResponse>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, NoResponse, /*Middleware:*/ MockUnmarked, NoResponse>()]
+        public void IsApplicable_IsTrue_WhenMiddlewareSignatureMacthesOrLowerLevelThanContracts
+            <TContractRequest, TContractResponse, TMiddlewareRequest, TMiddlewareResponse>()
         {
             // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<Any, Any>();
-            var contextType = typeof(IInvocationContext<SampleRequest, SampleResponse>);
+            var middlewareItem = CreateItemForMiddlewareSignature<TMiddlewareRequest, TMiddlewareResponse>();
+            var contextType = typeof(IInvocationContext<TContractRequest, TContractResponse>);
 
             // Act
             var isApplicable = middlewareItem.IsApplicable(contextType);
 
             // Asser
-            Assert.That(isApplicable, Is.True, message: "Should be applicable for contract (SampleRequest -> SampleResponse)");
+            Assert.That(isApplicable, Is.True, message: $"Middleware ({typeof(TMiddlewareRequest).Name} -> {typeof(TMiddlewareResponse).Name}) should be applicable for contract ({typeof(TContractRequest).Name} -> {typeof(TContractResponse).Name})");
         }
 
-        [Test]
-        public void IsApplicable_IsTrue_ForSampleRequest_WhenMiddlewareIsSampleRequestAny()
+        [Theory]
+        // IRequest<TResponse>
+        [CustomTestCase</*Contract:*/ MockRequest, MockResponse, /*Middleware:*/ Any, Other>()]
+        [CustomTestCase</*Contract:*/ MockRequest, MockResponse, /*Middleware:*/ Other, Any>()]
+        [CustomTestCase</*Contract:*/ MockRequest, MockResponse, /*Middleware:*/ MockRequest, Other>()]
+        [CustomTestCase</*Contract:*/ MockRequest, MockResponse, /*Middleware:*/ Other, MockResponse>()]
+        [CustomTestCase</*Contract:*/ MockRequest, MockResponse, /*Middleware:*/ Other, CommandResponse>()]
+        [CustomTestCase</*Contract:*/ MockRequest, MockResponse, /*Middleware:*/ Other, EventResponse>()]
+        [CustomTestCase</*Contract:*/ MockRequest, MockResponse, /*Middleware:*/ Other, NoResponse>()]
+        [CustomTestCase</*Contract:*/ MockRequest, MockResponse, /*Middleware:*/ Other, Other>()]
+        // ICommand
+        [CustomTestCase</*Contract:*/ MockCommand, CommandResponse, /*Middleware:*/ Any, Other>()]
+        [CustomTestCase</*Contract:*/ MockCommand, CommandResponse, /*Middleware:*/ Other, Any>()]
+        [CustomTestCase</*Contract:*/ MockCommand, CommandResponse, /*Middleware:*/ Other, Other>()]
+        [CustomTestCase</*Contract:*/ MockCommand, CommandResponse, /*Middleware:*/ MockCommand, Other>()]
+        [CustomTestCase</*Contract:*/ MockCommand, CommandResponse, /*Middleware:*/ Other, CommandResponse>()]
+        [CustomTestCase</*Contract:*/ MockCommand, CommandResponse, /*Middleware:*/ Other, EventResponse>()]
+        [CustomTestCase</*Contract:*/ MockCommand, CommandResponse, /*Middleware:*/ Other, NoResponse>()]
+        // IEvent
+        [CustomTestCase</*Contract:*/ MockEvent, EventResponse, /*Middleware:*/ Any, Other>()]
+        [CustomTestCase</*Contract:*/ MockEvent, EventResponse, /*Middleware:*/ Other, Any>()]
+        [CustomTestCase</*Contract:*/ MockEvent, EventResponse, /*Middleware:*/ Other, Other>()]
+        [CustomTestCase</*Contract:*/ MockEvent, EventResponse, /*Middleware:*/ MockEvent, Other>()]
+        [CustomTestCase</*Contract:*/ MockEvent, EventResponse, /*Middleware:*/ Other, CommandResponse>()]
+        [CustomTestCase</*Contract:*/ MockEvent, EventResponse, /*Middleware:*/ Other, EventResponse>()]
+        [CustomTestCase</*Contract:*/ MockEvent, EventResponse, /*Middleware:*/ Other, NoResponse>()]
+        // Unmarked (IRequest<TResponse>)
+        [CustomTestCase</*Contract:*/ MockUnmarked, MockUnmarked, /*Middleware:*/ Any, Other>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, MockUnmarked, /*Middleware:*/ Other, Any>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, MockUnmarked, /*Middleware:*/ MockUnmarked, Other>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, MockUnmarked, /*Middleware:*/ Other, MockUnmarked>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, MockUnmarked, /*Middleware:*/ Other, CommandResponse>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, MockUnmarked, /*Middleware:*/ Other, EventResponse>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, MockUnmarked, /*Middleware:*/ Other, NoResponse>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, MockUnmarked, /*Middleware:*/ Other, Other>()]
+        // Unmarked (ICommand)
+        [CustomTestCase</*Contract:*/ MockUnmarked, CommandResponse, /*Middleware:*/ Any, Other>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, CommandResponse, /*Middleware:*/ Other, Any>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, CommandResponse, /*Middleware:*/ Other, Other>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, CommandResponse, /*Middleware:*/ MockUnmarked, Other>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, CommandResponse, /*Middleware:*/ Other, CommandResponse>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, CommandResponse, /*Middleware:*/ Other, EventResponse>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, CommandResponse, /*Middleware:*/ Other, NoResponse>()]
+        // Unmarked (IEvent)
+        [CustomTestCase</*Contract:*/ MockUnmarked, EventResponse, /*Middleware:*/ Any, Other>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, EventResponse, /*Middleware:*/ Other, Any>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, EventResponse, /*Middleware:*/ Other, Other>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, EventResponse, /*Middleware:*/ MockUnmarked, Other>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, EventResponse, /*Middleware:*/ Other, CommandResponse>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, EventResponse, /*Middleware:*/ Other, EventResponse>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, EventResponse, /*Middleware:*/ Other, NoResponse>()]
+        // Unmarked (Special NoResponse)
+        [CustomTestCase</*Contract:*/ MockUnmarked, NoResponse, /*Middleware:*/ Any, Other>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, NoResponse, /*Middleware:*/ Other, Any>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, NoResponse, /*Middleware:*/ Other, Other>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, NoResponse, /*Middleware:*/ MockUnmarked, Other>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, NoResponse, /*Middleware:*/ Other, CommandResponse>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, NoResponse, /*Middleware:*/ Other, EventResponse>()]
+        [CustomTestCase</*Contract:*/ MockUnmarked, NoResponse, /*Middleware:*/ Other, NoResponse>()]
+        public void IsApplicable_IsFalse_WhenMiddlewareSignatureDoesNotMatchOrGreaterLevelThanContracts
+            <TContractRequest, TContractResponse, TMiddlewareRequest, TMiddlewareResponse>()
         {
             // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<SampleRequest, Any>();
-            var contextType = typeof(IInvocationContext<SampleRequest, SampleResponse>);
+            var middlewareItem = CreateItemForMiddlewareSignature<TMiddlewareRequest, TMiddlewareResponse>();
+            var contextType = typeof(IInvocationContext<TContractRequest, TContractResponse>);
 
             // Act
             var isApplicable = middlewareItem.IsApplicable(contextType);
 
             // Asser
-            Assert.That(isApplicable, Is.True, message: "Should be applicable for contract (SampleRequest -> SampleResponse)");
-        }
-
-        [Test]
-        public void IsApplicable_IsTrue_ForSampleRequest_WhenMiddlewareIsAnySampleResponse()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<Any, SampleResponse>();
-            var contextType = typeof(IInvocationContext<SampleRequest, SampleResponse>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.True, message: "Should be applicable for contract (SampleRequest -> SampleResponse)");
-        }
-
-        [Test]
-        public void IsApplicable_IsTrue_ForSampleRequest_WhenMiddlewareIsSampleRequestSampleResponse()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<SampleRequest, SampleResponse>();
-            var contextType = typeof(IInvocationContext<SampleRequest, SampleResponse>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.True, message: "Should be applicable for contract (SampleRequest -> SampleResponse)");
-        }
-
-        [Test]
-        public void IsApplicable_IsTrue_ForSampleCommand_WhenMiddlewareIsAnyAny()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<Any, Any>();
-            var contextType = typeof(IInvocationContext<SampleCommand, CommandResponse>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.True, message: "Should be applicable for contract (SampleCommand -> CommandResponse)");
-        }
-
-        [Test]
-        public void IsApplicable_IsTrue_ForSampleCommand_WhenMiddlewareIsSampleCommandAny()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<SampleCommand, Any>();
-            var contextType = typeof(IInvocationContext<SampleCommand, CommandResponse>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.True, message: "Should be applicable for contract (SampleCommand -> CommandResponse)");
-        }
-
-        [Test]
-        public void IsApplicable_IsTrue_ForSampleCommand_WhenMiddlewareIsAnyCommandResponse()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<Any, CommandResponse>();
-            var contextType = typeof(IInvocationContext<SampleCommand, CommandResponse>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.True, message: "Should be applicable for contract (SampleCommand -> CommandResponse)");
-        }
-
-        [Test]
-        public void IsApplicable_IsTrue_ForSampleCommand_WhenMiddlewareIsAnyNoResponse()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<Any, NoResponse>();
-            var contextType = typeof(IInvocationContext<SampleCommand, CommandResponse>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.True, message: "Should be applicable for contract (SampleCommand -> CommandResponse)");
-        }
-
-        [Test]
-        public void IsApplicable_IsTrue_ForSampleCommand_WhenMiddlewareIsSampleCommandCommandResponse()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<SampleCommand, CommandResponse>();
-            var contextType = typeof(IInvocationContext<SampleCommand, CommandResponse>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.True, message: "Should be applicable for contract (SampleCommand -> CommandResponse)");
-        }
-
-        [Test]
-        public void IsApplicable_IsTrue_ForSampleCommand_WhenMiddlewareIsSampleCommandNoResponse()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<SampleCommand, NoResponse>();
-            var contextType = typeof(IInvocationContext<SampleCommand, CommandResponse>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.True, message: "Should be applicable for contract (SampleCommand -> CommandResponse)");
-        }
-
-        [Test]
-        public void IsApplicable_IsTrue_ForSampleEvent_WhenMiddlewareIsAnyAny()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<Any, Any>();
-            var contextType = typeof(IInvocationContext<SampleEvent, EventResponse>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.True, message: "Should be applicable for contract (SampleEvent -> EventResponse)");
-        }
-
-        [Test]
-        public void IsApplicable_IsTrue_ForSampleEvent_WhenMiddlewareIsSampleEventAny()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<SampleEvent, Any>();
-            var contextType = typeof(IInvocationContext<SampleEvent, EventResponse>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.True, message: "Should be applicable for contract (SampleEvent -> EventResponse)");
-        }
-
-        [Test]
-        public void IsApplicable_IsTrue_ForSampleEvent_WhenMiddlewareIsAnyEventResponse()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<Any, EventResponse>();
-            var contextType = typeof(IInvocationContext<SampleEvent, EventResponse>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.True, message: "Should be applicable for contract (SampleEvent -> EventResponse)");
-        }
-
-        [Test]
-        public void IsApplicable_IsTrue_ForSampleEvent_WhenMiddlewareIsAnyNoResponse()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<Any, NoResponse>();
-            var contextType = typeof(IInvocationContext<SampleEvent, EventResponse>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.True, message: "Should be applicable for contract (SampleEvent -> EventResponse)");
-        }
-
-        [Test]
-        public void IsApplicable_IsTrue_ForSampleEvent_WhenMiddlewareIsSampleEventEventResponse()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<SampleEvent, EventResponse>();
-            var contextType = typeof(IInvocationContext<SampleEvent, EventResponse>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.True, message: "Should be applicable for contract (SampleEvent -> EventResponse)");
-        }
-
-        [Test]
-        public void IsApplicable_IsTrue_ForSampleEvent_WhenMiddlewareIsSampleEventNoResponse()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<SampleEvent, NoResponse>();
-            var contextType = typeof(IInvocationContext<SampleEvent, EventResponse>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.True, message: "Should be applicable for contract (SampleEvent -> EventResponse)");
-        }
-
-        [Test]
-        public void IsApplicable_IsTrue_ForSampleUnmarkedAndSampleUnmarked_WhenMiddlewareIsAnyAny()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<Any, Any>();
-            var contextType = typeof(IInvocationContext<SampleUnmarked, SampleUnmarked>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.True, message: "Should be applicable for contract (SampleUnmarked -> SampleUnmarked)");
-        }
-
-        [Test]
-        public void IsApplicable_IsTrue_ForSampleUnmarkedAndSampleUnmarked_WhenMiddlewareIsSampleUnmarkedAny()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<SampleUnmarked, Any>();
-            var contextType = typeof(IInvocationContext<SampleUnmarked, SampleUnmarked>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.True, message: "Should be applicable for contract (SampleUnmarked -> SampleUnmarked)");
-        }
-
-        [Test]
-        public void IsApplicable_IsTrue_ForSampleUnmarkedAndSampleUnmarked_WhenMiddlewareIsAnySampleUnmarked()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<Any, SampleUnmarked>();
-            var contextType = typeof(IInvocationContext<SampleUnmarked, SampleUnmarked>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.True, message: "Should be applicable for contract (SampleUnmarked -> SampleUnmarked)");
-        }
-
-        [Test]
-        public void IsApplicable_IsTrue_ForSampleUnmarkedAndSampleUnmarked_WhenMiddlewareIsSampleUnmarkedSampleUnmarked()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<SampleUnmarked, SampleUnmarked>();
-            var contextType = typeof(IInvocationContext<SampleUnmarked, SampleUnmarked>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.True, message: "Should be applicable for contract (SampleUnmarked -> SampleUnmarked)");
-        }
-
-        [Test]
-        public void IsApplicable_IsTrue_ForSampleUnmarkedAndCommandResponse_WhenMiddlewareIsAnyAny()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<Any, Any>();
-            var contextType = typeof(IInvocationContext<SampleUnmarked, CommandResponse>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.True, message: "Should be applicable for contract (SampleUnmarked -> CommandResponse)");
-        }
-
-        [Test]
-        public void IsApplicable_IsTrue_ForSampleUnmarkedAndCommandResponse_WhenMiddlewareIsSampleUnmarkedAny()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<SampleUnmarked, Any>();
-            var contextType = typeof(IInvocationContext<SampleUnmarked, CommandResponse>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.True, message: "Should be applicable for contract (SampleUnmarked -> CommandResponse)");
-        }
-
-        [Test]
-        public void IsApplicable_IsTrue_ForSampleUnmarkedAndCommandResponse_WhenMiddlewareIsAnyCommandResponse()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<Any, CommandResponse>();
-            var contextType = typeof(IInvocationContext<SampleUnmarked, CommandResponse>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.True, message: "Should be applicable for contract (SampleUnmarked -> CommandResponse)");
-        }
-
-        [Test]
-        public void IsApplicable_IsTrue_ForSampleUnmarkedAndCommandResponse_WhenMiddlewareIsAnyNoResponse()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<Any, NoResponse>();
-            var contextType = typeof(IInvocationContext<SampleUnmarked, CommandResponse>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.True, message: "Should be applicable for contract (SampleUnmarked -> CommandResponse)");
-        }
-
-        [Test]
-        public void IsApplicable_IsTrue_ForSampleUnmarkedAndCommandResponse_WhenMiddlewareIsSampleUnmarkedCommandResponse()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<SampleUnmarked, CommandResponse>();
-            var contextType = typeof(IInvocationContext<SampleUnmarked, CommandResponse>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.True, message: "Should be applicable for contract (SampleUnmarked -> CommandResponse)");
-        }
-
-        [Test]
-        public void IsApplicable_IsTrue_ForSampleUnmarkedAndCommandResponse_WhenMiddlewareIsSampleUnmarkedNoResponse()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<SampleUnmarked, NoResponse>();
-            var contextType = typeof(IInvocationContext<SampleUnmarked, CommandResponse>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.True, message: "Should be applicable for contract (SampleUnmarked -> CommandResponse)");
-        }
-
-        [Test]
-        public void IsApplicable_IsTrue_ForSampleUnmarkedAndEventResponse_WhenMiddlewareIsAnyAny()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<Any, Any>();
-            var contextType = typeof(IInvocationContext<SampleUnmarked, EventResponse>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.True, message: "Should be applicable for contract (SampleUnmarked -> EventResponse)");
-        }
-
-        [Test]
-        public void IsApplicable_IsTrue_ForSampleUnmarkedAndEventResponse_WhenMiddlewareIsSampleUnmarkedAny()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<SampleUnmarked, Any>();
-            var contextType = typeof(IInvocationContext<SampleUnmarked, EventResponse>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.True, message: "Should be applicable for contract (SampleUnmarked -> EventResponse)");
-        }
-
-        [Test]
-        public void IsApplicable_IsTrue_ForSampleUnmarkedAndEventResponse_WhenMiddlewareIsAnyEventResponse()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<Any, EventResponse>();
-            var contextType = typeof(IInvocationContext<SampleUnmarked, EventResponse>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.True, message: "Should be applicable for contract (SampleUnmarked -> EventResponse)");
-        }
-
-        [Test]
-        public void IsApplicable_IsTrue_ForSampleUnmarkedAndEventResponse_WhenMiddlewareIsAnyNoResponse()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<Any, NoResponse>();
-            var contextType = typeof(IInvocationContext<SampleUnmarked, EventResponse>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.True, message: "Should be applicable for contract (SampleUnmarked -> EventResponse)");
-        }
-
-        [Test]
-        public void IsApplicable_IsTrue_ForSampleUnmarkedAndEventResponse_WhenMiddlewareIsSampleUnmarkedEventResponse()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<SampleUnmarked, EventResponse>();
-            var contextType = typeof(IInvocationContext<SampleUnmarked, EventResponse>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.True, message: "Should be applicable for contract (SampleUnmarked -> EventResponse)");
-        }
-
-        [Test]
-        public void IsApplicable_IsTrue_ForSampleUnmarkedAndEventResponse_WhenMiddlewareIsSampleUnmarkedNoResponse()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<SampleUnmarked, NoResponse>();
-            var contextType = typeof(IInvocationContext<SampleUnmarked, EventResponse>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.True, message: "Should be applicable for contract (SampleUnmarked -> EventResponse)");
-        }
-
-        [Test]
-        public void IsApplicable_IsTrue_ForSampleUnmarkedAndNoResponse_WhenMiddlewareIsAnyAny()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<Any, Any>();
-            var contextType = typeof(IInvocationContext<SampleUnmarked, NoResponse>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.True, message: "Should be applicable for contract (SampleUnmarked -> NoResponse)");
-        }
-
-        [Test]
-        public void IsApplicable_IsTrue_ForSampleUnmarkedAndNoResponse_WhenMiddlewareIsSampleUnmarkedAny()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<SampleUnmarked, Any>();
-            var contextType = typeof(IInvocationContext<SampleUnmarked, NoResponse>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.True, message: "Should be applicable for contract (SampleUnmarked -> NoResponse)");
-        }
-
-        [Test]
-        public void IsApplicable_IsTrue_ForSampleUnmarkedAndNoResponse_WhenMiddlewareIsAnyNoResponse()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<Any, NoResponse>();
-            var contextType = typeof(IInvocationContext<SampleUnmarked, NoResponse>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.True, message: "Should be applicable for contract (SampleUnmarked -> NoResponse)");
-        }
-
-        [Test]
-        public void IsApplicable_IsTrue_ForSampleUnmarkedAndNoResponse_WhenMiddlewareIsSampleUnmarkedNoResponse()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<SampleUnmarked, NoResponse>();
-            var contextType = typeof(IInvocationContext<SampleUnmarked, NoResponse>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.True, message: "Should be applicable for contract (SampleUnmarked -> NoResponse)");
-        }
-
-        [Test]
-        public void IsApplicable_IsFalse_WhenMiddlewareIsSampleUnmarkedAny()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<SampleUnmarked, Any>();
-            var contextType = typeof(IInvocationContext<Any, Any>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.False, message: "Should not be applicable for contract (any -> any)");
-        }
-
-        [Test]
-        public void IsApplicable_IsFalse_WhenMiddlewareIsAnySampleUnmarked()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<Any, SampleUnmarked>();
-            var contextType = typeof(IInvocationContext<Any, Any>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.False, message: "Should not be applicable for contract (any -> any)");
-        }
-
-        [Test]
-        public void IsApplicable_IsFalse_WhenMiddlewareIsSampleUnmarkedSampleUnmarked()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<SampleUnmarked, SampleUnmarked>();
-            var contextType = typeof(IInvocationContext<Any, Any>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.False, message: "Should not be applicable for contract (any -> any)");
-        }
-
-        [Test]
-        public void IsApplicable_IsFalse_WhenMiddlewareIsAnyCommandResponse()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<Any, CommandResponse>();
-            var contextType = typeof(IInvocationContext<Any, Any>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.False, message: "Should not be applicable for contract (any -> any)");
-        }
-
-        [Test]
-        public void IsApplicable_IsFalse_WhenMiddlewareIsAnyEventResponse()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<Any, EventResponse>();
-            var contextType = typeof(IInvocationContext<Any, Any>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.False, message: "Should not be applicable for contract (any -> any)");
-        }
-
-        [Test]
-        public void IsApplicable_IsFalse_WhenMiddlewareIsAnyNoResponse()
-        {
-            // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<Any, NoResponse>();
-            var contextType = typeof(IInvocationContext<Any, Any>);
-
-            // Act
-            var isApplicable = middlewareItem.IsApplicable(contextType);
-
-            // Asser
-            Assert.That(isApplicable, Is.False, message: "Should not be applicable for contract (any -> any)");
+            Assert.That(isApplicable, Is.False, message: $"Middleware ({typeof(TMiddlewareRequest).Name} -> {typeof(TMiddlewareResponse).Name}) should NOT be applicable for contract ({typeof(TContractRequest).Name} -> {typeof(TContractResponse).Name})");
         }
 
         protected abstract IMiddlewareInvocationPipelineItem CreateItemForMiddlewareSignature<TMiddlewareRequest, TMiddlewareResponse>();
-
-        public class SampleUnmarked { }
-
-        public class SampleResponse { }
-
-        public class SampleRequest : IRequest<SampleResponse> { }
-
-        public class SampleEvent : IEvent { }
-
-        public class SampleCommand : IEvent { }
     }
+
+    public class Other { }
 }

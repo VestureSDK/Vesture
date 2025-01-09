@@ -1,0 +1,146 @@
+﻿using Crucible.Mediator.Abstractions.Tests.Invocation.Mocks;
+using Crucible.Mediator.Engine.Pipeline.Resolvers;
+using Crucible.Mediator.Engine.Pipeline.Strategies;
+using Crucible.Mediator.Engine.Tests.Pipeline.Resolvers.Mocks;
+using Crucible.Mediator.Engine.Tests.Pipeline.Strategies.Bases;
+using Crucible.Mediator.Invocation;
+using Moq;
+
+namespace Crucible.Mediator.Engine.Tests.Pipeline.Strategies
+{
+    public class SequentialHandlersStrategyTest : InvocationHandlerStrategyTestBase<MockContract, MockContract, SequentialHandlersStrategy<MockContract, MockContract>>
+    {
+        protected MockInvocationHandler<MockContract, MockContract> HandlerA { get; } = new();
+
+        protected MockInvocationComponentResolver<IInvocationHandler<MockContract, MockContract>> ResolverA { get; }
+
+        protected MockInvocationHandler<MockContract, MockContract> HandlerB { get; } = new();
+
+        protected MockInvocationComponentResolver<IInvocationHandler<MockContract, MockContract>> ResolverB { get; }
+
+        protected IEnumerable<IInvocationComponentResolver<IInvocationHandler<MockContract, MockContract>>> Resolvers => [ResolverA, ResolverB];
+
+        public SequentialHandlersStrategyTest()
+            : base(new())
+        {
+            ResolverA = new(HandlerA);
+            ResolverB = new(HandlerB);
+        }
+
+        protected override SequentialHandlersStrategy<MockContract, MockContract> CreateStrategy() => new (Resolvers);
+
+        [Test]
+        public void Ctor_HandlersAreNotResolved()
+        {
+            // Arrange
+            // No arrange required
+
+            // Act
+            _ = Strategy;
+
+            // Assert
+            ResolverA.Mock.Verify(m => m.ResolveComponent(), Times.Never, failMessage: "ResolveComponent should not be called outside of HandleAsync");
+            ResolverB.Mock.Verify(m => m.ResolveComponent(), Times.Never, failMessage: "ResolveComponent should not be called outside of HandleAsync");
+        }
+
+        [Theory]
+        [TestCase(1, Description = "Call HandleAsync once")]
+        [TestCase(5, Description = "Call HandleAsync multiple times")]
+        public async Task HandleAsync_ResolvesTheHandlersFromTheResolversEverytime(int iterationCount)
+        {
+            // Arrange
+            // No arrange required
+
+            // Act
+            for (var i = 0; i < iterationCount; i++)
+            {
+                await Strategy.HandleAsync(InvocationContext, Next, CancellationToken);
+            }
+
+            // Assert
+            ResolverA.Mock.Verify(m => m.ResolveComponent(), Times.Exactly(iterationCount), failMessage: "ResolveComponent should be called everytime HandleAsync is invoked");
+            ResolverB.Mock.Verify(m => m.ResolveComponent(), Times.Exactly(iterationCount), failMessage: "ResolveComponent should be called everytime HandleAsync is invoked");
+        }
+
+        [Test]
+        public async Task HandleAsync_ResolvedHandlersAreInvoked()
+        {
+            // Arrange
+            // No arrange required
+
+            // Act
+            await Strategy.HandleAsync(InvocationContext, Next, CancellationToken);
+
+            // Assert
+            HandlerA.Mock.Verify(m => m.HandleAsync(It.IsAny<MockContract>(), It.IsAny<CancellationToken>()), Times.Once, failMessage: "HandleAsync should called resolved handler");
+            HandlerB.Mock.Verify(m => m.HandleAsync(It.IsAny<MockContract>(), It.IsAny<CancellationToken>()), Times.Once, failMessage: "HandleAsync should called resolved handler");
+        }
+
+        [Test]
+        public async Task HandleAsync_OnlyFirstHandlerIsInvoked_WhenTheFirstHandlerFails()
+        {
+            // Arrange
+            HandlerA.Mock.Setup(m => m.HandleAsync(It.IsAny<MockContract>(), It.IsAny<CancellationToken>())).ThrowsAsync(new Exception("sample exception"));
+
+            // Act
+            try { await Strategy.HandleAsync(InvocationContext, Next, CancellationToken); } catch { }
+
+            // Assert
+            HandlerB.Mock.Verify(m => m.HandleAsync(It.IsAny<MockContract>(), It.IsAny<CancellationToken>()), Times.Never, failMessage: "HandleAsync should called resolved handler");
+        }
+
+        [Test]
+        public async Task HandleAsync_OnlyFirstHandlerIsResolved_WhenTheFirstHandlerFails()
+        {
+            // Arrange
+            HandlerA.Mock.Setup(m => m.HandleAsync(It.IsAny<MockContract>(), It.IsAny<CancellationToken>())).ThrowsAsync(new Exception("sample exception"));
+
+            // Act
+            try { await Strategy.HandleAsync(InvocationContext, Next, CancellationToken); } catch { }
+
+            // Assert
+            ResolverB.Mock.Verify(m => m.ResolveComponent(), Times.Never, failMessage: "ResolveComponent should be called everytime HandleAsync is invoked");
+        }
+
+        [Test]
+        public async Task HandleAsync_HandlersAreInvokedInSequence()
+        {
+            // Arrange
+            var handlerAInvoked = false;
+            var taskCompletionSourceA = new TaskCompletionSource<MockContract>();
+            HandlerA.Mock.Setup(m => m.HandleAsync(It.IsAny<MockContract>(), It.IsAny<CancellationToken>()))
+                .Returns(() =>
+                {
+                    handlerAInvoked = true;
+                    return taskCompletionSourceA.Task;
+                });
+
+            var handlerBInvoked = false;
+            var taskCompletionSourceB = new TaskCompletionSource<MockContract>();
+            HandlerB.Mock.Setup(m => m.HandleAsync(It.IsAny<MockContract>(), It.IsAny<CancellationToken>()))
+                .Returns(() =>
+                {
+                    handlerBInvoked = true;
+                    return taskCompletionSourceB.Task;
+                });
+
+            // Act
+            var task = Strategy.HandleAsync(InvocationContext, Next, CancellationToken);
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.That(handlerAInvoked, Is.True);
+                Assert.That(handlerBInvoked, Is.False);
+            });
+
+            taskCompletionSourceA.SetResult(new());
+
+            Assert.That(handlerBInvoked, Is.True);
+
+            // Cleanup
+            taskCompletionSourceB.SetResult(new());
+            await task;
+        }
+    }
+}

@@ -9,6 +9,15 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Mocks
 
         private IInvocationMiddleware<TRequest, TResponse> _inner => Mock.Object;
 
+        public MockInvocationMiddleware()
+        {
+            Mock.Setup(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
+                .Returns<IInvocationContext<TRequest, TResponse>, Func<CancellationToken, Task>, CancellationToken>((context, next, cancellationtoken) =>
+                {
+                    return next(cancellationtoken);
+                });
+        }
+
         public Task HandleAsync(IInvocationContext<TRequest, TResponse> context, Func<CancellationToken, Task> next, CancellationToken cancellationToken) => _inner.HandleAsync(context, next, cancellationToken);
     }
 }

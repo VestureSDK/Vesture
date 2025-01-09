@@ -1,4 +1,5 @@
 ﻿using Crucible.Mediator.Engine.Pipeline.Resolvers;
+using Crucible.Mediator.Invocation;
 using Moq;
 
 namespace Crucible.Mediator.Engine.Tests.Pipeline.Resolvers.Mocks
@@ -8,6 +9,16 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Resolvers.Mocks
         public Mock<IInvocationComponentResolver<TComponent>> Mock { get; } = new Mock<IInvocationComponentResolver<TComponent>>();
 
         private IInvocationComponentResolver<TComponent> _inner => Mock.Object;
+
+        public MockInvocationComponentResolver()
+        {
+
+        }
+
+        public MockInvocationComponentResolver(TComponent component)
+        {
+            Mock.Setup(m => m.ResolveComponent()).Returns(component);
+        }
 
         public TComponent ResolveComponent() => _inner.ResolveComponent();
     }

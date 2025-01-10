@@ -12,6 +12,15 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Mocks
         private IInvocationContext _inner => Mock.Object;
 
         public MockInvocationContext(TRequest request)
+            : this()
+        {
+
+#pragma warning disable CS8601 // Possible null reference assignment.
+            Request = request;
+#pragma warning restore CS8601 // Possible null reference assignment.
+        }
+
+        public MockInvocationContext()
         {
             Mock.Setup(m => m.SetResponse(It.IsAny<object>())).Callback<object>(response => Response = response);
             Mock.Setup(m => m.SetError(It.IsAny<Exception>())).Callback<Exception>(error => Error = error);
@@ -28,10 +37,6 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Mocks
                     Error = new AggregateException(errors);
                 }
             });
-
-#pragma warning disable CS8601 // Possible null reference assignment.
-            Request = request;
-#pragma warning restore CS8601 // Possible null reference assignment.
 
             RequestType = typeof(TRequest);
             ResponseType = typeof(TResponse);

@@ -4,14 +4,14 @@ namespace Crucible.Mediator.Engine.Pipeline.Internal
 {
     /// <summary>
     /// The <see cref="DefaultPrePipelineAndHandlerMiddleware"/> is an implementation of
-    /// <see cref="IPreInvocationPipelineMiddleware"/> and <see cref="IPreHandlerMiddleware"/>
+    /// <see cref="IPrePipelineMiddleware"/> and <see cref="IPreHandlerMiddleware"/>
     /// wrapping the next item in the <see cref="IInvocationPipeline{TResponse}"/> in
     /// a <c>try { } catch</c> and capturing the <see cref="Exception"/> that occured in
     /// the <see cref="IInvocationContext{TResponse}"/>.
     /// </summary>
-    /// <seealso cref="IPreInvocationPipelineMiddleware"/>
+    /// <seealso cref="IPrePipelineMiddleware"/>
     /// <seealso cref="IPreHandlerMiddleware"/>
-    public class DefaultPrePipelineAndHandlerMiddleware : IPreInvocationPipelineMiddleware, IPreHandlerMiddleware
+    public class DefaultPrePipelineAndHandlerMiddleware : IPrePipelineMiddleware, IPreHandlerMiddleware
     {
         /// <exclude />
         public static readonly DefaultPrePipelineAndHandlerMiddleware Instance = new();

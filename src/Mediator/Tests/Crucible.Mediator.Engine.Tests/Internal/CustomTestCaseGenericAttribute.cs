@@ -18,23 +18,17 @@ namespace NUnit.Framework
 
         IEnumerable<TestMethod> ITestBuilder.BuildFrom(IMethodInfo method, Test? suite)
         {
-            File.WriteAllLines("C:/test/debug-nunit/my-debug-log.txt", ["BuildFrom"]);
-
             if (!method.IsGenericMethodDefinition)
             {
-                File.WriteAllLines("C:/test/debug-nunit/my-debug-log.txt", ["!method.IsGenericMethodDefinition"]);
                 return base.BuildFrom(method, suite);
             }
 
             if (TypeArguments == null || TypeArguments.Length != method.GetGenericArguments().Length)
             {
-                File.WriteAllLines("C:/test/debug-nunit/my-debug-log.txt", ["TypeArguments == null || TypeArguments.Length != method.GetGenericArguments().Length"]);
                 var parms = new TestCaseParameters { RunState = RunState.NotRunnable };
                 parms.Properties.Set(PropertyNames.SkipReason, $"{nameof(TypeArguments)} should have {method.GetGenericArguments().Length} elements");
                 return [new NUnitTestCaseBuilder().BuildTestMethod(method, suite, parms)];
             }
-
-            File.WriteAllLines("C:/test/debug-nunit/my-debug-log.txt", ["method.MakeGenericMethod(TypeArguments);"]);
 
             var genMethod = method.MakeGenericMethod(TypeArguments);
             return base.BuildFrom(genMethod, suite);

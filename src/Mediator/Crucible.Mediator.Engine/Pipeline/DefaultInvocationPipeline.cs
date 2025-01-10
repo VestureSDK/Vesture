@@ -23,7 +23,7 @@ namespace Crucible.Mediator.Engine.Pipeline
     {
         private readonly IInvocationContextFactory _contextFactory;
 
-        private readonly IInvocationComponentResolver<IPreInvocationPipelineMiddleware> _preInvocationPipelineMiddlewareResolver;
+        private readonly IInvocationComponentResolver<IPrePipelineMiddleware> _preInvocationPipelineMiddlewareResolver;
 
         private readonly IEnumerable<IMiddlewareInvocationPipelineItem> _middlewares;
 
@@ -41,37 +41,37 @@ namespace Crucible.Mediator.Engine.Pipeline
         /// Initializes a new <see cref="DefaultInvocationPipeline{TRequest, TResponse}"/> instance.
         /// </summary>
         /// <param name="contextFactory">The <see cref="IInvocationContextFactory"/> instance.</param>
-        /// <param name="preInvocationPipelineMiddlewareResolver">The <see cref="IInvocationComponentResolver{TComponent}"/> of <see cref="IPreInvocationPipelineMiddleware"/> instance.</param>
+        /// <param name="preInvocationPipelineMiddlewareResolver">The <see cref="IInvocationComponentResolver{TComponent}"/> of <see cref="IPrePipelineMiddleware"/> instance.</param>
         /// <param name="middlewares">The <see cref="IMiddlewareInvocationPipelineItem"/> instances.</param>
         /// <param name="preHandlerMiddlewareResolver">The <see cref="IInvocationComponentResolver{TComponent}"/> of <see cref="IPreHandlerMiddleware"/> instance.</param>
-        /// <param name="handler">The <see cref="IInvocationHandlerStrategy{TRequest, TResponse}"/> instance.</param>
+        /// <param name="handlerStrategy">The <see cref="IInvocationHandlerStrategy{TRequest, TResponse}"/> instance.</param>
         /// <exception cref="ArgumentNullException">
         /// <list type="bullet">
         /// <item><paramref name="contextFactory"/> is <see langword="null" />.</item>
         /// <item><paramref name="preInvocationPipelineMiddlewareResolver"/> is <see langword="null" />.</item>
         /// <item><paramref name="middlewares"/> is <see langword="null" />.</item>
         /// <item><paramref name="preHandlerMiddlewareResolver"/> is <see langword="null" />.</item>
-        /// <item><paramref name="handler"/> is <see langword="null" />.</item>
+        /// <item><paramref name="handlerStrategy"/> is <see langword="null" />.</item>
         /// </list>
         /// </exception>
         public DefaultInvocationPipeline(
             IInvocationContextFactory contextFactory,
-            IInvocationComponentResolver<IPreInvocationPipelineMiddleware> preInvocationPipelineMiddlewareResolver,
+            IInvocationComponentResolver<IPrePipelineMiddleware> preInvocationPipelineMiddlewareResolver,
             IEnumerable<IMiddlewareInvocationPipelineItem> middlewares,
             IInvocationComponentResolver<IPreHandlerMiddleware> preHandlerMiddlewareResolver,
-            IInvocationHandlerStrategy<TRequest, TResponse> handler)
+            IInvocationHandlerStrategy<TRequest, TResponse> handlerStrategy)
         {
             ArgumentNullException.ThrowIfNull(contextFactory, nameof(contextFactory));
             ArgumentNullException.ThrowIfNull(preInvocationPipelineMiddlewareResolver, nameof(preInvocationPipelineMiddlewareResolver));
             ArgumentNullException.ThrowIfNull(middlewares, nameof(middlewares));
             ArgumentNullException.ThrowIfNull(preHandlerMiddlewareResolver, nameof(preHandlerMiddlewareResolver));
-            ArgumentNullException.ThrowIfNull(handler, nameof(handler));
+            ArgumentNullException.ThrowIfNull(handlerStrategy, nameof(handlerStrategy));
 
             _contextFactory = contextFactory;
             _preInvocationPipelineMiddlewareResolver = preInvocationPipelineMiddlewareResolver;
             _middlewares = middlewares;
             _preHandlerMiddlewareResolver = preHandlerMiddlewareResolver;
-            _handler = handler;
+            _handler = handlerStrategy;
             _chainOfResponsibility = new Lazy<Func<IInvocationContext<TRequest, TResponse>, CancellationToken, Task>>(CreateChainOfresponsibility);
         }
 
@@ -121,7 +121,7 @@ namespace Crucible.Mediator.Engine.Pipeline
         /// <inheritdoc />
         public async Task<IInvocationContext<TResponse>> HandleAsync(object request, CancellationToken cancellationToken)
         {
-            var context = _contextFactory.CreateContextForRequest<TRequest, TResponse>((TRequest)request);
+            var context = _contextFactory.CreateContextForRequest<TRequest, TResponse>(request);
             await _chainOfResponsibility.Value.Invoke(context, cancellationToken);
             return context;
         }

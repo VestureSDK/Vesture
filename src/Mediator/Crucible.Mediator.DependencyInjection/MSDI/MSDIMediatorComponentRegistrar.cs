@@ -40,8 +40,8 @@ namespace Crucible.Mediator.DependencyInjection.MSDI
             _services.TryAddSingleton<IPreHandlerMiddleware>(DefaultPrePipelineAndHandlerMiddleware.Instance);
             _services.TryAddSingleton<IInvocationComponentResolver<IPreHandlerMiddleware>, SingletonInvocationComponentResolver<IPreHandlerMiddleware>>();
 
-            _services.TryAddSingleton<IPreInvocationPipelineMiddleware>(DefaultPrePipelineAndHandlerMiddleware.Instance);
-            _services.TryAddSingleton<IInvocationComponentResolver<IPreInvocationPipelineMiddleware>, SingletonInvocationComponentResolver<IPreInvocationPipelineMiddleware>>();
+            _services.TryAddSingleton<IPrePipelineMiddleware>(DefaultPrePipelineAndHandlerMiddleware.Instance);
+            _services.TryAddSingleton<IInvocationComponentResolver<IPrePipelineMiddleware>, SingletonInvocationComponentResolver<IPrePipelineMiddleware>>();
 
             _services.TryAddSingleton<IMediator, Engine.DefaultMediator>();
             _services.TryAddSingleton<IInvocationContextFactory, DefaultInvocationContextFactory>();

@@ -10,21 +10,25 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Strategies
 {
     public class ParallelHandlersStrategyTest : InvocationHandlerStrategyTestBase<MockContract, MockContract, ParallelHandlersStrategy<MockContract, MockContract>>
     {
-        protected MockInvocationHandler<MockContract, MockContract> HandlerA { get; } = new();
+        protected MockInvocationHandler<MockContract, MockContract> HandlerA { get; }
 
         protected MockInvocationComponentResolver<IInvocationHandler<MockContract, MockContract>> ResolverA { get; }
 
-        protected MockInvocationHandler<MockContract, MockContract> HandlerB { get; } = new();
+        protected MockInvocationHandler<MockContract, MockContract> HandlerB { get; }
 
         protected MockInvocationComponentResolver<IInvocationHandler<MockContract, MockContract>> ResolverB { get; }
 
-        protected IEnumerable<IInvocationComponentResolver<IInvocationHandler<MockContract, MockContract>>> Resolvers => [ResolverA, ResolverB];
+        protected ICollection<IInvocationComponentResolver<IInvocationHandler<MockContract, MockContract>>> Resolvers { get; }
 
         public ParallelHandlersStrategyTest()
-            : base(new())
+            : base(new(), new())
         {
+            HandlerA = new(Response);
+            HandlerB = new(Response);
+
             ResolverA = new(HandlerA);
             ResolverB = new(HandlerB);
+            Resolvers = [ResolverA, ResolverB];
         }
 
         protected override ParallelHandlersStrategy<MockContract, MockContract> CreateStrategy() => new (Resolvers);

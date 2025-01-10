@@ -9,13 +9,14 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Strategies
 {
     public class SingleHandlerStrategyTest : InvocationHandlerStrategyTestBase<MockContract, MockContract, SingleHandlerStrategy<MockContract, MockContract>>
     {
-        protected MockInvocationHandler<MockContract, MockContract> Handler { get; } = new();
+        protected MockInvocationHandler<MockContract, MockContract> Handler { get; }
 
         protected MockInvocationComponentResolver<IInvocationHandler<MockContract, MockContract>> Resolver { get; }
 
         public SingleHandlerStrategyTest()
-            : base(new())
+            : base(new(), new())
         {
+            Handler = new(Response);
             Resolver = new(Handler);
         }
 

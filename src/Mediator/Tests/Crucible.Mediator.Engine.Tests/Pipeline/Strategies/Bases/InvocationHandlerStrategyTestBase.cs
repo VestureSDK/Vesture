@@ -16,8 +16,11 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Strategies.Bases
 
         protected Func<CancellationToken, Task> Next { get; set; } = (ct) => Task.CompletedTask;
 
-        protected InvocationHandlerStrategyTestBase(TRequest defaultRequest)
+        protected TResponse Response { get; set; }
+
+        protected InvocationHandlerStrategyTestBase(TRequest defaultRequest, TResponse defaultResponse)
         {
+            Response = defaultResponse;
             InvocationContext = new(defaultRequest);
 
 #pragma warning disable IL2091 // Target generic argument does not satisfy 'DynamicallyAccessedMembersAttribute' in target method or type. The generic parameter of the source method or type does not have matching annotations.
@@ -58,6 +61,19 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Strategies.Bases
 
             // Assert
             Assert.Pass();
+        }
+
+        [Test]
+        public async Task HandleAsync_ContextHasResponse()
+        {
+            // Arrange
+            // No arrange required
+
+            // Act
+            await Strategy.HandleAsync(InvocationContext, Next!, CancellationToken);
+
+            // Assert
+            Assert.That(InvocationContext.Response, Is.EqualTo(Response));
         }
     }
 }

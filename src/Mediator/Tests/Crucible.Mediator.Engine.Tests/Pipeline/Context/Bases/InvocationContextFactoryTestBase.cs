@@ -33,13 +33,14 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Context.Bases
         [CustomTestCase<MockUnmarked, CommandResponse>()]
         [CustomTestCase<MockUnmarked, EventResponse>()]
         [CustomTestCase<MockUnmarked, NoResponse>()]
-        public void CreateContextForRequest_ReturnedContext_IsNotNull<TContractRequest, TContractResponse>()
+        public virtual void CreateContextForRequest_ReturnedContext_IsNotNull<TContractRequest, TContractResponse>()
+            where TContractRequest : new()
         {
             // Arrange
-            var request = new MockContract();
+            var request = new TContractRequest();
 
             // Act
-            var context = Factory.CreateContextForRequest<MockContract, MockContract>(request);
+            var context = Factory.CreateContextForRequest<TContractRequest, TContractResponse>(request);
 
             // Assert
             Assert.That(context, Is.Not.Null, message: $"Created context should not be null");

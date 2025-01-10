@@ -1,5 +1,4 @@
 ﻿using Crucible.Mediator.Engine.Pipeline.Resolvers;
-using Crucible.Mediator.Invocation;
 using Moq;
 
 namespace Crucible.Mediator.Engine.Tests.Pipeline.Resolvers.Mocks

@@ -4,14 +4,16 @@ using Crucible.Mediator.Abstractions.Tests.Invocation.Mocks;
 using Crucible.Mediator.Abstractions.Tests.Requests;
 using Crucible.Mediator.Commands;
 using Crucible.Mediator.Engine.Pipeline.Internal;
+using Crucible.Mediator.Engine.Tests.Pipeline.Resolvers.Mocks;
 using Crucible.Mediator.Events;
 using Crucible.Mediator.Invocation;
+using Moq;
 using Any = object;
 
 namespace Crucible.Mediator.Engine.Tests.Pipeline.Internal.Bases
 {
-    public abstract class MiddlewareInvocationPipelineItemTestBase<TMiddlewareItem>
-        where TMiddlewareItem : IMiddlewareInvocationPipelineItem
+    public abstract class MiddlewareInvocationPipelineItemTestBase<TRequest, TResponse, TMiddlewareItem>
+        where TMiddlewareItem : IMiddlewareInvocationPipelineItem<TRequest, TResponse>
     {
         protected int Order { get; set; }
 
@@ -19,8 +21,21 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Internal.Bases
 
         protected TMiddlewareItem MiddlewareItem => MiddlewareItemInitializer.Value;
 
-        public MiddlewareInvocationPipelineItemTestBase()
+        protected MockInvocationContext<TRequest, TResponse> InvocationContext { get; }
+
+        protected MockInvocationMiddleware<TRequest, TResponse> InvocationMiddleware { get; } = new();
+
+        protected MockInvocationComponentResolver<IInvocationMiddleware<TRequest, TResponse>> InvocationComponentResolver { get; } = new();
+
+        protected Func<CancellationToken, Task> Next { get; set; } = (ct) => Task.CompletedTask;
+
+        protected CancellationToken CancellationToken { get; set; } = CancellationToken.None;
+
+        public MiddlewareInvocationPipelineItemTestBase(TRequest defaultRequest)
         {
+            InvocationContext = new(defaultRequest);
+
+            InvocationComponentResolver = new(InvocationMiddleware);
 #pragma warning disable IL2091 // Target generic argument does not satisfy 'DynamicallyAccessedMembersAttribute' in target method or type. The generic parameter of the source method or type does not have matching annotations.
             MiddlewareItemInitializer = new Lazy<TMiddlewareItem>(() => CreateMiddlewareItem(Order));
 #pragma warning restore IL2091 // Target generic argument does not satisfy 'DynamicallyAccessedMembersAttribute' in target method or type. The generic parameter of the source method or type does not have matching annotations.
@@ -175,6 +190,70 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Internal.Bases
 
             // Asser
             Assert.That(isApplicable, Is.False, message: $"Middleware ({typeof(TMiddlewareRequest).Name} -> {typeof(TMiddlewareResponse).Name}) should NOT be applicable for contract ({typeof(TContractRequest).Name} -> {typeof(TContractResponse).Name})");
+        }
+
+        [Theory]
+        [CustomTestCase</*Contract:*/ MockContract, MockContract>(Description = "Applicable contract")]
+        [CustomTestCase</*Contract:*/ MockUnmarked, MockUnmarked>(Description = "Unapplicable contract")]
+        public void IsApplicable_DoesNotResolveComponent_WhenIsApplicableReturnsTrue<TContractRequest, TContractResponse>()
+        {
+            // Arrange
+            var contextType = typeof(IInvocationContext<TContractRequest, TContractResponse>);
+
+            // Act
+            var isApplicable = MiddlewareItem.IsApplicable(contextType);
+
+            // Assert
+            InvocationComponentResolver.Mock.Verify(m => m.ResolveComponent(), Times.Never, failMessage: "ResolveComponent should not be called outside of HandleAsync");
+        }
+
+        [Theory]
+        [TestCase(1, Description = "Call HandleAsync once")]
+        [TestCase(5, Description = "Call HandleAsync multiple times")]
+        public async Task HandleAsync_ResolvesTheComponentFromTheResolverEverytime(int iterationCount)
+        {
+            // Arrange
+            // No arrange required
+
+            // Act
+            for (var i = 0; i < iterationCount; i++)
+            {
+                await MiddlewareItem.HandleAsync(InvocationContext, Next, CancellationToken);
+            }
+
+            // Assert
+            InvocationComponentResolver.Mock.Verify(m => m.ResolveComponent(), Times.Exactly(iterationCount), failMessage: "ResolveComponent should not be called everytime HandleAsync is invoked");
+        }
+
+        [Test]
+        public async Task HandleAsync_ResolvedMiddlewareIsInvoked()
+        {
+            // Arrange
+            // No arrange required
+
+            // Act
+            await MiddlewareItem.HandleAsync(InvocationContext, Next, CancellationToken);
+
+            // Assert
+            InvocationMiddleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Once, failMessage: "HandleAsync should called resolved middleware");
+        }
+
+        [Test]
+        public async Task HandleAsync_NextItemInChainIsInvoked()
+        {
+            // Arrange
+            var nextExecuted = false;
+            Next = (ct) =>
+            {
+                nextExecuted = true;
+                return Task.CompletedTask;
+            };
+
+            // Act
+            await MiddlewareItem.HandleAsync(InvocationContext, Next, CancellationToken);
+
+            // Assert
+            Assert.That(nextExecuted, Is.True, message: "Next item in the chain should be called");
         }
 
         protected abstract IMiddlewareInvocationPipelineItem CreateItemForMiddlewareSignature<TMiddlewareRequest, TMiddlewareResponse>();

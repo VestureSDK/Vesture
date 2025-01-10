@@ -255,7 +255,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
     }
 
     public abstract class InvocationContextTestBase<TRequest, TResponse, TContext>
-        where TContext: IInvocationContext<TRequest, TResponse>
+        where TContext : IInvocationContext<TRequest, TResponse>
     {
         protected TRequest Request { get; set; }
 

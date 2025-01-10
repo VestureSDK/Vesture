@@ -23,7 +23,7 @@ namespace Crucible.Mediator.Engine.Pipeline.Internal
         /// <returns><see langword="true"/> if applicable; otherwise <see langword="false"/>.</returns>
         bool IsApplicable(Type contextType);
     }
-    
+
     /// <inheritdoc cref="IMiddlewareInvocationPipelineItem"/>
     /// <inheritdoc cref="IInvocationMiddleware{TRequest, TResponse}"/>
     /// <seealso cref="IInvocationMiddleware{TRequest, TResponse}"/>

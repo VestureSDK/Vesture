@@ -1,9 +1,9 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Crucible.Mediator.DependencyInjection.MSDI;
 using Crucible.Mediator.Engine.Pipeline;
 using Crucible.Mediator.Engine.Pipeline.Internal;
 using Crucible.Mediator.Engine.Pipeline.Strategies;
 using Crucible.Mediator.Invocation;
-using Crucible.Mediator.DependencyInjection.MSDI;
 
 namespace Crucible.Mediator.DependencyInjection
 {

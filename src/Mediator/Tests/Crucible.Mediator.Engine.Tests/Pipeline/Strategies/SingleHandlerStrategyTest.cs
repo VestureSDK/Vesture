@@ -20,7 +20,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Strategies
             Resolver = new(Handler);
         }
 
-        protected override SingleHandlerStrategy<MockContract, MockContract> CreateStrategy() => new (Resolver);
+        protected override SingleHandlerStrategy<MockContract, MockContract> CreateStrategy() => new(Resolver);
 
         [Test]
         public void Ctor_HandlerIsNotResolved()

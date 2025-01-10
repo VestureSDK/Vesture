@@ -42,11 +42,14 @@ Crucible.Mediator.IMediator.InvokeAsync(Crucible.Mediator.Commands.ICommand! com
 Crucible.Mediator.IMediator.PublishAndCaptureAsync(Crucible.Mediator.Events.IEvent! event, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Crucible.Mediator.Invocation.IInvocationContext!>!
 Crucible.Mediator.IMediator.PublishAsync(Crucible.Mediator.Events.IEvent! event, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Crucible.Mediator.Invocation.IInvocationContext
+Crucible.Mediator.Invocation.IInvocationContext.AddError(System.Exception! error) -> void
 Crucible.Mediator.Invocation.IInvocationContext.Error.get -> System.Exception?
 Crucible.Mediator.Invocation.IInvocationContext.HasError.get -> bool
 Crucible.Mediator.Invocation.IInvocationContext.HasResponse.get -> bool
 Crucible.Mediator.Invocation.IInvocationContext.HasResponseType.get -> bool
+Crucible.Mediator.Invocation.IInvocationContext.IsCommand.get -> bool
 Crucible.Mediator.Invocation.IInvocationContext.IsEvent.get -> bool
+Crucible.Mediator.Invocation.IInvocationContext.IsRequest.get -> bool
 Crucible.Mediator.Invocation.IInvocationContext.IsSuccess.get -> bool
 Crucible.Mediator.Invocation.IInvocationContext.Request.get -> object!
 Crucible.Mediator.Invocation.IInvocationContext.RequestType.get -> System.Type!

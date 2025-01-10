@@ -42,7 +42,8 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Mocks
         {
             Mock
                 .Setup(m => m.HandleAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()))
-                .Returns<object, CancellationToken>(async (request, cancellationToken) => {
+                .Returns<object, CancellationToken>(async (request, cancellationToken) =>
+                {
                     var context = contextFactory.CreateContextForRequest<TRequest, TResponse>(request);
                     var _chainOfResponsibility = CreateChainOfresponsibility(
                         preInvocationPipelineMiddlewareResolver,

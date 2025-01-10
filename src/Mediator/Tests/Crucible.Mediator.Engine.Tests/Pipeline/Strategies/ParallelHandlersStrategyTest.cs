@@ -31,7 +31,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Strategies
             Resolvers = [ResolverA, ResolverB];
         }
 
-        protected override ParallelHandlersStrategy<MockContract, MockContract> CreateStrategy() => new (Resolvers);
+        protected override ParallelHandlersStrategy<MockContract, MockContract> CreateStrategy() => new(Resolvers);
 
         [Test]
         public void Ctor_HandlersAreNotResolved()
@@ -130,7 +130,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Strategies
 
             // Act
             var task = Strategy.HandleAsync(InvocationContext, Next, CancellationToken);
-            
+
             // Assert
             Assert.Multiple(() =>
             {

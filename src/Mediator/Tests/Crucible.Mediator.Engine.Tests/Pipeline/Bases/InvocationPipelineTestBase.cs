@@ -12,7 +12,7 @@ using Moq;
 namespace Crucible.Mediator.Engine.Tests.Pipeline.Bases
 {
     public abstract class InvocationPipelineTestBase<TRequest, TResponse, TPipeline>
-        where TPipeline: IInvocationPipeline<TResponse>
+        where TPipeline : IInvocationPipeline<TResponse>
     {
         protected Lazy<TPipeline> PipelineInitializer { get; }
 

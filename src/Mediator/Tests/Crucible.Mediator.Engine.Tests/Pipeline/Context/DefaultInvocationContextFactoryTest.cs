@@ -5,6 +5,6 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Context
 {
     public class DefaultInvocationContextFactoryTest : InvocationContextFactoryTestBase<DefaultInvocationContextFactory>
     {
-        protected override DefaultInvocationContextFactory CreateFactory() => new ();
+        protected override DefaultInvocationContextFactory CreateFactory() => new();
     }
 }

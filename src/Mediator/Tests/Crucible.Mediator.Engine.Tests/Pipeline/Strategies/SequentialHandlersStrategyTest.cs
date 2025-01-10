@@ -31,7 +31,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Strategies
             Resolvers = [ResolverA, ResolverB];
         }
 
-        protected override SequentialHandlersStrategy<MockContract, MockContract> CreateStrategy() => new (Resolvers);
+        protected override SequentialHandlersStrategy<MockContract, MockContract> CreateStrategy() => new(Resolvers);
 
         [Test]
         public void Ctor_HandlersAreNotResolved()

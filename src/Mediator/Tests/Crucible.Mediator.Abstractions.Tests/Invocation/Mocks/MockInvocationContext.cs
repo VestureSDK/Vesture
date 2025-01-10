@@ -83,7 +83,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Mocks
                 }
             }
         }
-        
+
         public Type RequestType
         {
             get => _inner.RequestType;
@@ -101,7 +101,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Mocks
             get => _inner.IsCommand;
             set => Mock.SetupGet(m => m.IsCommand).Returns(value);
         }
-        
+
         public bool IsRequest
         {
             get => _inner.IsRequest;

@@ -56,7 +56,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Bases
             // no arrange required
 
             // Act
-            var request = Pipeline.Request;
+            var request = Pipeline.RequestType;
 
             // Assert
             Assert.That(request, Is.EqualTo(typeof(TRequest)));
@@ -69,7 +69,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Bases
             // no arrange required
 
             // Act
-            var response = Pipeline.Response;
+            var response = Pipeline.ResponseType;
 
             // Assert
             Assert.That(response, Is.EqualTo(typeof(TResponse)));

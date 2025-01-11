@@ -10,27 +10,40 @@ using Moq;
 
 namespace Crucible.Mediator.Engine.Tests.Pipeline.Mocks
 {
-    public class MockInvocationPipeline<TRequest, TResponse> : IInvocationPipeline<TResponse>
+    public abstract class MockInvocationPipeline : IInvocationPipeline
+    {
+        public abstract Type RequestType { get; set; }
+
+        public abstract Type ResponseType { get; set; }
+
+        public abstract IPrePipelineMiddleware PrePipelineMiddleware { get; set; }
+
+        public abstract IPreHandlerMiddleware PreHandlerMiddleware { get; set; }
+
+        public abstract ICollection<IMiddlewareInvocationPipelineItem> Middlewares { get; set; }
+    }
+
+    public class MockInvocationPipeline<TRequest, TResponse> : MockInvocationPipeline, IInvocationPipeline<TResponse>
     {
         public Mock<IInvocationPipeline<TResponse>> Mock { get; } = new();
 
-        public Type Request
+        public override Type RequestType
         {
-            get => _inner.Request;
-            set => Mock.SetupGet(m => m.Request).Returns(value);
+            get => _inner.RequestType;
+            set => Mock.SetupGet(m => m.RequestType).Returns(value);
         }
 
-        public Type Response
+        public override Type ResponseType
         {
-            get => _inner.Response;
-            set => Mock.SetupGet(m => m.Response).Returns(value);
+            get => _inner.ResponseType;
+            set => Mock.SetupGet(m => m.ResponseType).Returns(value);
         }
 
         private IInvocationPipeline<TResponse> _inner => Mock.Object;
 
         private TRequest _request;
 
-        public TRequest RequestC
+        public TRequest Request
         {
             get => _request;
             set
@@ -42,13 +55,13 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Mocks
 
         private TResponse _response;
 
-        public TResponse ResponseC
+        public TResponse Response
         {
             get => _response;
             set
             {
                 _response = value;
-                _managedHandler.Response = value!;
+                _managedHandlerStrategy.Response = value!;
             }
         }
 
@@ -80,7 +93,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Mocks
 
         private IPrePipelineMiddleware? _prePipelineMiddleware;
 
-        public IPrePipelineMiddleware PrePipelineMiddleware
+        public override IPrePipelineMiddleware PrePipelineMiddleware
         {
             get => _prePipelineMiddleware ?? _managedPrePipelineMiddleware;
             set => _prePipelineMiddleware = value;
@@ -90,7 +103,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Mocks
 
         private IPreHandlerMiddleware? _preHandlerMiddleware;
 
-        public IPreHandlerMiddleware PreHandlerMiddleware
+        public override IPreHandlerMiddleware PreHandlerMiddleware
         {
             get => _preHandlerMiddleware ?? _managedPreHandlerMiddleware;
             set => _preHandlerMiddleware = value;
@@ -98,20 +111,28 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Mocks
 
         private ICollection<IMiddlewareInvocationPipelineItem> _middlewares = [];
 
-        public ICollection<IMiddlewareInvocationPipelineItem> Middlewares 
+        public override ICollection<IMiddlewareInvocationPipelineItem> Middlewares 
         {
             get => _middlewares;
             set => _middlewares = value ?? [];
         }
 
-        private readonly MockInvocationHandler<TRequest, TResponse> _managedHandler;
-
-        private IInvocationHandler<TRequest, TResponse>? _handler;
-
         public IInvocationHandler<TRequest, TResponse> Handler
         {
-            get => _handler ?? _managedHandler;
-            set => _handler = value;
+            get => _managedHandlerStrategy.Handler;
+            set => _managedHandlerStrategy.Handler = value;
+        }
+
+        public IInvocationHandler<TRequest, TResponse> OtherHandler
+        {
+            get => _managedHandlerStrategy.OtherHandler;
+            set => _managedHandlerStrategy.OtherHandler = value;
+        }
+
+        public ICollection<IInvocationHandler<TRequest, TResponse>> Handlers
+        {
+            get => _managedHandlerStrategy.Handlers;
+            set => _managedHandlerStrategy.Handlers = value;
         }
 
         private readonly MockInvocationHandlerStrategy<TRequest, TResponse> _managedHandlerStrategy;
@@ -142,18 +163,13 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Mocks
             _managedPrePipelineMiddleware = new();
             _managedPreHandlerMiddleware = new();
 
-            _managedHandler = new()
-            {
-                Response = _response,
-            };
-
             _managedHandlerStrategy = new()
             {
-                Handler = _managedHandler
+                Response = Response
             };
 
-            Request = typeof(TRequest);
-            Response = typeof(TResponse);
+            RequestType = typeof(TRequest);
+            ResponseType = typeof(TResponse);
 
             Mock
                 .Setup(m => m.HandleAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()))

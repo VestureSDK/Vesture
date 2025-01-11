@@ -11,26 +11,75 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Strategies.Mocks
 
         private IInvocationHandlerStrategy<TRequest, TResponse> _inner => Mock.Object;
 
-        private readonly MockInvocationHandler<TRequest, TResponse> _managedHandler;
+        private TResponse _response = default!;
+
+        public TResponse Response { 
+            get => _response;
+            set
+            {
+                _response = value;
+                ManagedHandler.Response = value;
+                ManagedOtherHandler.Response = value;
+            }
+        }
+
+        public MockInvocationHandler<TRequest, TResponse> ManagedHandler { get; }
 
         private IInvocationHandler<TRequest, TResponse>? _handler;
 
-        public IInvocationHandler<TRequest, TResponse> Handler 
+        public IInvocationHandler<TRequest, TResponse> Handler
+        {
+            get => _handler ?? ManagedHandler;
+            set
+            {
+                _handler = value;
+                _managedHandlers[1] = value ?? ManagedOtherHandler;
+            }
+        }
+
+        public MockInvocationHandler<TRequest, TResponse> ManagedOtherHandler { get; }
+
+        private IInvocationHandler<TRequest, TResponse>? _otherHandler;
+
+        public IInvocationHandler<TRequest, TResponse> OtherHandler
+        {
+            get => _otherHandler ?? ManagedOtherHandler;
+            set
+            {
+                _otherHandler = value;
+                _managedHandlers[0] = value ?? ManagedOtherHandler;
+            }
+        }
+
+        private List<IInvocationHandler<TRequest, TResponse>> _managedHandlers;
+
+        private ICollection<IInvocationHandler<TRequest, TResponse>>? _handlers;
+
+        public ICollection<IInvocationHandler<TRequest, TResponse>> Handlers 
         { 
-            get => _handler ?? _managedHandler; 
-            set => _handler = value;
+            get => _handlers ?? _managedHandlers;
+            set
+            {
+                _handlers = value;
+                _managedHandlers = value?.ToList() ?? [OtherHandler, Handler];
+            }
         }
 
         public MockInvocationHandlerStrategy()
         {
-            _managedHandler = new MockInvocationHandler<TRequest, TResponse>();
-            
+            ManagedHandler = new MockInvocationHandler<TRequest, TResponse>();
+            ManagedOtherHandler = new MockInvocationHandler<TRequest, TResponse>();
+            _managedHandlers = [ManagedOtherHandler, ManagedHandler];
+
             Mock
                 .Setup(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
                 .Returns<IInvocationContext<TRequest, TResponse>, Func<CancellationToken, Task>, CancellationToken>(async (ctx, next, ct) =>
                 {
-                    var response = await Handler.HandleAsync(ctx.Request, ct);
-                    ctx.SetResponse(response);
+                    foreach (var handler in Handlers)
+                    {
+                        var response = await handler.HandleAsync(ctx.Request, ct);
+                        ctx.SetResponse(response);
+                    }
                 });
         }
 

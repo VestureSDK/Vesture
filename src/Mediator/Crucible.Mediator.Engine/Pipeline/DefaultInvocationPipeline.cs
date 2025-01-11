@@ -32,10 +32,10 @@ namespace Crucible.Mediator.Engine.Pipeline
         private readonly IInvocationHandlerStrategy<TRequest, TResponse> _handler;
 
         /// <inheritdoc />
-        public Type Request { get; } = typeof(TRequest);
+        public Type RequestType { get; } = typeof(TRequest);
 
         /// <inheritdoc />
-        public Type Response { get; } = typeof(TResponse);
+        public Type ResponseType { get; } = typeof(TResponse);
 
         /// <summary>
         /// Initializes a new <see cref="DefaultInvocationPipeline{TRequest, TResponse}"/> instance.

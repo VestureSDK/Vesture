@@ -153,7 +153,7 @@ namespace Crucible.Mediator.Engine
             var dict = new Dictionary<(Type request, Type response), IInvocationPipeline>();
             foreach (var invocationPipeline in invocationPipelines)
             {
-                dict[(invocationPipeline.Request, invocationPipeline.Response)] = invocationPipeline;
+                dict[(invocationPipeline.RequestType, invocationPipeline.ResponseType)] = invocationPipeline;
             }
 
             return dict.ToFrozenDictionary();

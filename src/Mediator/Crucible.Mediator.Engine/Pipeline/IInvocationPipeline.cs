@@ -9,12 +9,12 @@ namespace Crucible.Mediator.Engine.Pipeline
         /// <summary>
         /// Gets the <see cref="Type"/> of the contract being processed by this pipeline.
         /// </summary>
-        Type Request { get; }
+        Type RequestType { get; }
 
         /// <summary>
         /// Gets the <see cref="Type"/> of the response produced by this pipeline.
         /// </summary>
-        Type Response { get; }
+        Type ResponseType { get; }
     }
 
     /// <summary>

@@ -8,7 +8,7 @@ namespace Crucible.Mediator.Requests
     /// <para>
     /// The <see cref="RequestWorkflow{TRequest, TResponse}"/> provides a base implementation of the <see cref="IInvocationWorkflow"/>.
     /// You should inherit from this class and override the 
-    /// <see cref="RequestHandler{TRequest, TResponse}.HandleAsync(TRequest, CancellationToken)"/> method 
+    /// <see cref="CommandHandler{TRequest, TResponse}.HandleAsync(TRequest, CancellationToken)"/> method 
     /// to manage and coordinate the flow of multiple operations across different handlers for a 
     /// specific <see cref="IRequest{TResponse}"/> contract and producing a <typeparamref name="TResponse"/> 
     /// result, as expected by the corresponding <typeparamref name="TRequest"/>.
@@ -24,10 +24,10 @@ namespace Crucible.Mediator.Requests
     /// The response type produced by processing the <typeparamref name="TRequest"/>.
     /// </typeparam>
     /// <seealso cref="IRequest{TResponse}"/>
-    /// <seealso cref="RequestHandler{TRequest, TResponse}"/>
+    /// <seealso cref="CommandHandler{TRequest, TResponse}"/>
     /// <seealso cref="IInvocationWorkflow"/>
     /// <seealso cref="IWorkflowMediator"/>
-    public abstract class RequestWorkflow<TRequest, TResponse> : RequestHandler<TRequest, TResponse>, IInvocationWorkflow
+    public abstract class RequestWorkflow<TRequest, TResponse> : CommandHandler<TRequest, TResponse>, IInvocationWorkflow
         where TRequest : IRequest<TResponse>
     {
         private IWorkflowMediator? _workflowMediator;

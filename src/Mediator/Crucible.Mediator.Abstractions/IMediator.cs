@@ -28,7 +28,7 @@ namespace Crucible.Mediator
     /// </para>
     /// </summary>
     /// <seealso cref="IRequest{TResponse}"/>
-    /// <seealso cref="RequestHandler{TRequest, TResponse}"/>
+    /// <seealso cref="CommandHandler{TRequest, TResponse}"/>
     /// <seealso cref="ICommand"/>
     /// <seealso cref="CommandHandler{TCommand}"/>
     /// <seealso cref="IEvent"/>

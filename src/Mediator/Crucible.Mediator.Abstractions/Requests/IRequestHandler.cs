@@ -40,7 +40,7 @@ namespace Crucible.Mediator.Requests
     /// </para>
     /// </remarks>
     /// <seealso cref="IRequest{TResponse}"/>
-    /// <seealso cref="RequestHandler{TRequest, TResponse}"/>
+    /// <seealso cref="CommandHandler{TRequest, TResponse}"/>
     /// <seealso cref="RequestWorkflow{TRequest, TResponse}"/>
     /// <seealso cref="IMediator"/>
     public interface IRequestHandler<TRequest, TResponse> : IInvocationHandler<TRequest, TResponse>

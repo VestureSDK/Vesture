@@ -2,7 +2,7 @@
 {
     /// <summary>
     /// <para>
-    /// The <see cref="RequestHandler{TRequest, TResponse}"/> provides a base implementation of the <see cref="IRequestHandler{TRequest, TResponse}"/>.
+    /// The <see cref="CommandHandler{TRequest, TResponse}"/> provides a base implementation of the <see cref="IRequestHandler{TRequest, TResponse}"/>.
     /// You should inherit from this class and override the <see cref="HandleAsync"/> method 
     /// to define the logic for processing a specific <see cref="IRequest{TResponse}"/> contract
     /// and producing a <typeparamref name="TResponse"/> result, as expected by the corresponding 
@@ -18,7 +18,7 @@
     /// <seealso cref="IRequestHandler{TRequest, TResponse}"/>
     /// <seealso cref="RequestWorkflow{TRequest, TResponse}"/>
     /// <seealso cref="IMediator"/>
-    public abstract class RequestHandler<TRequest, TResponse> : IRequestHandler<TRequest, TResponse>
+    public abstract class CommandHandler<TRequest, TResponse> : IRequestHandler<TRequest, TResponse>
         where TRequest : IRequest<TResponse>
     {
         /// <summary>

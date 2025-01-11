@@ -37,7 +37,7 @@ namespace Crucible.Mediator.Engine
     /// <seealso cref="IRequest{TResponse}"/>
     /// <seealso cref="ICommand"/>
     /// <seealso cref="IEvent"/>
-    /// <seealso cref="RequestHandler{TRequest, TResponse}"/>
+    /// <seealso cref="CommandHandler{TRequest, TResponse}"/>
     /// <seealso cref="CommandHandler{TCommand}"/>
     /// <seealso cref="Crucible.Mediator.Events.EventHandler{TEvent}"/>
     /// <seealso cref="InvocationMiddleware{TRequest, TResponse}"/>

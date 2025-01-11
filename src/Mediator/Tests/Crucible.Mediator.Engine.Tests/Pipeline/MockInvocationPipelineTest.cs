@@ -9,11 +9,13 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline
         public MockInvocationPipelineTest()
             : base(new()) { }
 
-        protected override MockInvocationPipeline<MockContract, MockContract> CreatePipeline() => new(
-            ContextFactory,
-            PrePipelineMiddlewareResolver,
-            MiddlewareInvocationPipelineItems,
-            PreHandlerMiddlewareResolver,
-            HandlerStrategy);
+        protected override MockInvocationPipeline<MockContract, MockContract> CreatePipeline() => new ()
+        {
+            ContextFactory = ContextFactory,
+            PrePipelineMiddlewareResolver = PrePipelineMiddlewareResolver,
+            Middlewares = MiddlewareInvocationPipelineItems,
+            PreHandlerMiddlewareResolver = PreHandlerMiddlewareResolver,
+            HandlerStrategy = HandlerStrategy
+        };
     }
 }

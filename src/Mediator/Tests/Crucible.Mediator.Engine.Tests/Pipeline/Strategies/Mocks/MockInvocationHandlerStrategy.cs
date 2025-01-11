@@ -1,4 +1,5 @@
-﻿using Crucible.Mediator.Engine.Pipeline.Resolvers;
+﻿using Crucible.Mediator.Abstractions.Tests.Invocation.Mocks;
+using Crucible.Mediator.Engine.Pipeline.Resolvers;
 using Crucible.Mediator.Engine.Pipeline.Strategies;
 using Crucible.Mediator.Engine.Tests.Pipeline.Resolvers.Mocks;
 using Crucible.Mediator.Invocation;
@@ -12,22 +13,42 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Strategies.Mocks
 
         private IInvocationHandlerStrategy<TRequest, TResponse> _inner => Mock.Object;
 
-        public MockInvocationHandlerStrategy() { }
+        private readonly MockInvocationHandler<TRequest, TResponse> _managedHandler;
 
-        public MockInvocationHandlerStrategy(IInvocationHandler<TRequest, TResponse> handler)
-            : this(new MockInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>>(handler))
-        {
+        private IInvocationHandler<TRequest, TResponse>? _handler;
 
+        public IInvocationHandler<TRequest, TResponse> Handler 
+        { 
+            get => _handler ?? _managedHandler; 
+            set {
+                _handler = value;
+                _managedResolver.Component = value ?? _managedHandler;
+            }
         }
 
-        public MockInvocationHandlerStrategy(IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>> resolver)
-            : this()
+        private readonly MockInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>> _managedResolver;
+
+        private IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>>? _resolver;
+
+        public IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>> Resolver 
+        { 
+            get => _resolver ?? _managedResolver;
+            set => _resolver = value;
+        }
+
+        public MockInvocationHandlerStrategy()
         {
+            _managedHandler = new MockInvocationHandler<TRequest, TResponse>();
+            _managedResolver = new MockInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>>
+            {
+                Component = _managedHandler
+            };
+
             Mock
                 .Setup(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
                 .Returns<IInvocationContext<TRequest, TResponse>, Func<CancellationToken, Task>, CancellationToken>(async (ctx, next, ct) =>
                 {
-                    var handler = resolver.ResolveComponent();
+                    var handler = Resolver!.ResolveComponent();
                     var response = await handler.HandleAsync(ctx.Request, ct);
                     ctx.SetResponse(response);
                 });

@@ -21,7 +21,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Strategies.Bases
         protected InvocationHandlerStrategyTestBase(TRequest defaultRequest, TResponse defaultResponse)
         {
             Response = defaultResponse;
-            InvocationContext = new(defaultRequest);
+            InvocationContext = new() { Request = defaultRequest! };
 
 #pragma warning disable IL2091 // Target generic argument does not satisfy 'DynamicallyAccessedMembersAttribute' in target method or type. The generic parameter of the source method or type does not have matching annotations.
             StrategyInitializer = new Lazy<TStrategy>(() => CreateStrategy());

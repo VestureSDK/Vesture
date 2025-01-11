@@ -11,7 +11,10 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation
         public MockInvocationContextTest_Event()
             : base(new()) { }
 
-        protected override MockInvocationContext<object, EventResponse> CreateInvocationContext(object request) => new(Request);
+        protected override MockInvocationContext<object, EventResponse> CreateInvocationContext(object request) => new()
+        {
+            Request = Request
+        };
     }
 
     public class MockInvocationContextTest_Command :
@@ -20,7 +23,10 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation
         public MockInvocationContextTest_Command()
             : base(new()) { }
 
-        protected override MockInvocationContext<object, CommandResponse> CreateInvocationContext(object request) => new(Request);
+        protected override MockInvocationContext<object, CommandResponse> CreateInvocationContext(object request) => new()
+        {
+            Request = Request
+        };
     }
 
     public class MockInvocationContextTest_Request :
@@ -31,6 +37,9 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation
 
         protected override object CreateResponse() => new();
 
-        protected override MockInvocationContext<object, object> CreateInvocationContext(object request) => new(Request);
+        protected override MockInvocationContext<object, object> CreateInvocationContext(object request) => new()
+        {
+            Request = Request
+        };
     }
 }

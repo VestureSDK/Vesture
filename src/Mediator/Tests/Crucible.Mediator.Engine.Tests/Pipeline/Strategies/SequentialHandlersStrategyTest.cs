@@ -23,11 +23,11 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Strategies
         public SequentialHandlersStrategyTest()
             : base(new(), new())
         {
-            HandlerA = new(Response);
-            HandlerB = new(Response);
+            HandlerA = new() { Response  = Response };
+            HandlerB = new() { Response = Response };
 
-            ResolverA = new(HandlerA);
-            ResolverB = new(HandlerB);
+            ResolverA = new() { Component = HandlerA };
+            ResolverB = new() { Component = HandlerB };
             Resolvers = [ResolverA, ResolverB];
         }
 

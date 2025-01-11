@@ -12,7 +12,10 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Internal
         public MockMiddlewareInvocationPipelineItemTest()
             : base(new()) { }
 
-        protected override MockMiddlewareInvocationPipelineItem<MockContract, MockContract> CreateMiddlewareItem(int order) => new MockMiddlewareInvocationPipelineItem<MockContract, MockContract>(InvocationComponentResolver) { Order = order };
+        protected override MockMiddlewareInvocationPipelineItem<MockContract, MockContract> CreateMiddlewareItem(int order) => new () { 
+            Order = order,
+            Resolver = InvocationComponentResolver,
+        };
 
         protected override IMiddlewareInvocationPipelineItem CreateItemForMiddlewareSignature<TRequest, TResponse>()
         {

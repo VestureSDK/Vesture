@@ -1,7 +1,7 @@
-﻿using Crucible.Mediator.Abstractions.Tests.Commands;
-using Crucible.Mediator.Abstractions.Tests.Events;
+﻿using Crucible.Mediator.Abstractions.Tests.Commands.Mocks;
+using Crucible.Mediator.Abstractions.Tests.Events.Mocks;
 using Crucible.Mediator.Abstractions.Tests.Invocation.Mocks;
-using Crucible.Mediator.Abstractions.Tests.Requests;
+using Crucible.Mediator.Abstractions.Tests.Requests.Mocks;
 using Crucible.Mediator.Commands;
 using Crucible.Mediator.Engine.Pipeline.Context;
 using Crucible.Mediator.Events;

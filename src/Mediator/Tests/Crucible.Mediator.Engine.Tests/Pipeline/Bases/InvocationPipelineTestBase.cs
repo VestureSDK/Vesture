@@ -8,6 +8,7 @@ using Crucible.Mediator.Engine.Tests.Pipeline.Resolvers.Mocks;
 using Crucible.Mediator.Engine.Tests.Pipeline.Strategies.Mocks;
 using Crucible.Mediator.Invocation;
 using Moq;
+using Any = object;
 
 namespace Crucible.Mediator.Engine.Tests.Pipeline.Bases
 {
@@ -38,17 +39,15 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Bases
 
         protected MockInvocationHandlerStrategy<TRequest, TResponse> HandlerStrategy { get; }
 
-        protected MockInvocationHandler<TRequest, TResponse> Handler { get; } = new();
-
         protected InvocationPipelineTestBase(TRequest defaultRequest)
         {
             Request = defaultRequest;
-            Context = new(Request);
-            ContextFactory = new(Context);
-            HandlerStrategy = new(Handler);
+            Context = new() { Request = Request! };
+            ContextFactory = new() { Context = Context };
+            HandlerStrategy = new();
 
-            PrePipelineMiddlewareResolver = new(PrePipelineMiddleware);
-            PreHandlerMiddlewareResolver = new(PreHandlerMiddleware);
+            PrePipelineMiddlewareResolver = new() { Component = PrePipelineMiddleware };
+            PreHandlerMiddlewareResolver = new() { Component = PreHandlerMiddleware };
 
 #pragma warning disable IL2091 // Target generic argument does not satisfy 'DynamicallyAccessedMembersAttribute' in target method or type. The generic parameter of the source method or type does not have matching annotations.
             PipelineInitializer = new Lazy<TPipeline>(() => CreatePipeline());
@@ -84,7 +83,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Bases
         }
 
         [Test]
-        public async Task HandleAsync_HandlerIsInvoked()
+        public async Task HandleAsync_HandlerStrategyIsInvoked()
         {
             // Arrange
             // no arrange required
@@ -93,27 +92,151 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Bases
             await Pipeline.HandleAsync(Request!, CancellationToken);
 
             // Assert
-            Handler.Mock.Verify(m => m.HandleAsync(It.IsAny<TRequest>(), It.IsAny<CancellationToken>()), Times.Once);
+            HandlerStrategy.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Test]
+        public async Task HandleAsync_MiddlewareIsInvoked()
+        {
+            // Arrange
+            var middleware = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>();
+            MiddlewareInvocationPipelineItems.Add(middleware);
+
+            // Act
+            await Pipeline.HandleAsync(Request!, CancellationToken);
+
+            // Assert
+            middleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Test]
+        public async Task HandleAsync_PrePipelineMiddlewareIsInvoked()
+        {
+            // Arrange
+            // no arrange required
+
+            // Act
+            await Pipeline.HandleAsync(Request!, CancellationToken);
+
+            // Assert
+            PrePipelineMiddleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<Any, Any>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Test]
+        public async Task HandleAsync_PreHandlerMiddlewareIsInvoked()
+        {
+            // Arrange
+            // no arrange required
+
+            // Act
+            await Pipeline.HandleAsync(Request!, CancellationToken);
+
+            // Assert
+            PreHandlerMiddleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<Any, Any>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Test]
+        public async Task HandleAsync_ComponentsAreInvokedInSequence()
+        {
+            // Arrange
+            var prePipelineMiddlewareTaskCompletionSource = new TaskCompletionSource();
+            SetupMiddlewareWithTaskCompletionSource(PrePipelineMiddleware, prePipelineMiddlewareTaskCompletionSource);
+
+            var middlewareTaskCompletionSource = new TaskCompletionSource();
+            var middleware = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>();
+            SetupMiddlewareItemWithTaskCompletionSource(middleware, middlewareTaskCompletionSource);
+            MiddlewareInvocationPipelineItems.Add(middleware);
+
+            var preHandlerMiddlewareTaskCompletionSource = new TaskCompletionSource();
+            SetupMiddlewareWithTaskCompletionSource(PreHandlerMiddleware, preHandlerMiddlewareTaskCompletionSource);
+
+            var handlerStrategyTaskCompletionSource = new TaskCompletionSource();
+            SetupHandlerStrategyWithTaskCompletionSource(HandlerStrategy, handlerStrategyTaskCompletionSource);
+
+            // Act / Assert
+            var task = Pipeline.HandleAsync(Request!, CancellationToken);
+
+            PrePipelineMiddleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<Any, Any>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Once);
+            middleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Never);
+            PreHandlerMiddleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<Any, Any>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Never);
+            HandlerStrategy.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Never);
+
+            prePipelineMiddlewareTaskCompletionSource.SetResult();
+
+            PrePipelineMiddleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<Any, Any>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Once);
+            middleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Once);
+            PreHandlerMiddleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<Any, Any>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Never);
+            HandlerStrategy.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Never);
+
+            middlewareTaskCompletionSource.SetResult();
+
+            PrePipelineMiddleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<Any, Any>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Once);
+            middleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Once);
+            PreHandlerMiddleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<Any, Any>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Once);
+            HandlerStrategy.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Never);
+
+            preHandlerMiddlewareTaskCompletionSource.SetResult();
+
+            PrePipelineMiddleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<Any, Any>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Once);
+            middleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Once);
+            PreHandlerMiddleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<Any, Any>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Once);
+            HandlerStrategy.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Once);
+
+            handlerStrategyTaskCompletionSource.SetResult();
+
+            // Cleanup
+            await task;
+
+            void SetupHandlerStrategyWithTaskCompletionSource<TReq, TRes>(MockInvocationHandlerStrategy<TReq, TRes> middleware, TaskCompletionSource source)
+            {
+                middleware.Mock
+                    .Setup(m => m.HandleAsync(It.IsAny<IInvocationContext<TReq, TRes>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
+                    .Returns<IInvocationContext<TReq, TRes>, Func<CancellationToken, Task>, CancellationToken>(async (ctx, next, ct) =>
+                    {
+                        await source.Task;
+                    });
+            }
+
+            void SetupMiddlewareItemWithTaskCompletionSource<TReq, TRes>(MockMiddlewareInvocationPipelineItem<TReq, TRes> middleware, TaskCompletionSource source)
+            {
+                middleware.Mock
+                    .Setup(m => m.HandleAsync(It.IsAny<IInvocationContext<TReq, TRes>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
+                    .Returns<IInvocationContext<TReq, TRes>, Func<CancellationToken, Task>, CancellationToken>(async (ctx, next, ct) =>
+                    {
+                        await source.Task;
+                        await next(ct);
+                    });
+            }
+
+            void SetupMiddlewareWithTaskCompletionSource<TReq, TRes>(MockInvocationMiddleware<TReq, TRes> middleware, TaskCompletionSource source)
+            {
+                middleware.Mock
+                    .Setup(m => m.HandleAsync(It.IsAny<IInvocationContext<TReq, TRes>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
+                    .Returns<IInvocationContext<TReq, TRes>, Func<CancellationToken, Task>, CancellationToken>(async (ctx, next, ct) =>
+                    {
+                        await source.Task;
+                        await next(ct);
+                    });
+            }
         }
 
         [Theory]
         [TestCase(1, Description = "One middleware")]
         [TestCase(5, Description = "Multiple middlewares")]
-        public async Task HandleAsync_HandlerIsInvoked_WhenMiddlewaresAreRegistered(int middlewareCount)
+        public async Task HandleAsync_HandlerStrategyIsInvoked_WhenMiddlewaresAreRegistered(int middlewareCount)
         {
             // Arrange
             for (var i = 0; i < middlewareCount; i++)
             {
-                var middleware = new MockInvocationMiddleware<TRequest, TResponse>();
-                var item = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>(middleware);
-                MiddlewareInvocationPipelineItems.Add(item);
+                var middleware = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>();
+                MiddlewareInvocationPipelineItems.Add(middleware);
             }
 
             // Act
             await Pipeline.HandleAsync(Request!, CancellationToken);
 
             // Assert
-            Handler.Mock.Verify(m => m.HandleAsync(It.IsAny<TRequest>(), It.IsAny<CancellationToken>()), Times.Once);
+            HandlerStrategy.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Theory]
@@ -122,35 +245,15 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Bases
             [Values(Int32.MinValue, -123, 0, 123, Int32.MaxValue)] int orderB)
         {
             // Arrange
-            var middlewaresExecuted = new List<MockInvocationMiddleware<TRequest, TResponse>>();
+            var middlewaresExecuted = new List<MockMiddlewareInvocationPipelineItem<TRequest, TResponse>>();
 
-            var middlewareA = new MockInvocationMiddleware<TRequest, TResponse>();
-            middlewareA.Mock
-                .Setup(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
-                .Returns<IInvocationContext<TRequest, TResponse>, Func<CancellationToken, Task>, CancellationToken>((context, next, cancellationtoken) =>
-                {
-                    middlewaresExecuted.Add(middlewareA);
-                    return next(cancellationtoken);
-                });
-            var itemA = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>(middlewareA)
-            {
-                Order = orderA,
-            };
-            MiddlewareInvocationPipelineItems.Add(itemA);
+            var middlewareA = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>() { Order = orderA, };
+            AddMiddlewareToExecutionListOnHandleAsyncInvoked(middlewareA);
+            MiddlewareInvocationPipelineItems.Add(middlewareA);
 
-            var middlewareB = new MockInvocationMiddleware<TRequest, TResponse>();
-            middlewareB.Mock
-                .Setup(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
-                .Returns<IInvocationContext<TRequest, TResponse>, Func<CancellationToken, Task>, CancellationToken>((context, next, cancellationtoken) =>
-                {
-                    middlewaresExecuted.Add(middlewareB);
-                    return next(cancellationtoken);
-                });
-            var itemB = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>(middlewareB)
-            {
-                Order = orderB,
-            };
-            MiddlewareInvocationPipelineItems.Add(itemB);
+            var middlewareB = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>() { Order = orderB, };
+            AddMiddlewareToExecutionListOnHandleAsyncInvoked(middlewareB);
+            MiddlewareInvocationPipelineItems.Add(middlewareB);
 
             var middlewareAExpectedIndex = orderA <= orderB ? 0 : 1;
             var middlewareBExpectedIndex = middlewareAExpectedIndex == 1 ? 0 : 1;
@@ -164,30 +267,25 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Bases
                 Assert.That(middlewaresExecuted[middlewareAExpectedIndex], Is.EqualTo(middlewareA));
                 Assert.That(middlewaresExecuted[middlewareBExpectedIndex], Is.EqualTo(middlewareB));
             });
-        }
 
-        [Test]
-        public async Task HandleAsync_MiddlewareIsInvoked()
-        {
-            // Arrange
-            var middleware = new MockInvocationMiddleware<TRequest, TResponse>();
-            var item = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>(middleware);
-            MiddlewareInvocationPipelineItems.Add(item);
-
-            // Act
-            await Pipeline.HandleAsync(Request!, CancellationToken);
-
-            // Assert
-            middleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Once);
+            void AddMiddlewareToExecutionListOnHandleAsyncInvoked(MockMiddlewareInvocationPipelineItem<TRequest, TResponse> middleware)
+            {
+                middleware.Mock
+                .Setup(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
+                .Returns<IInvocationContext<TRequest, TResponse>, Func<CancellationToken, Task>, CancellationToken>((context, next, cancellationtoken) =>
+                {
+                    middlewaresExecuted.Add(middleware);
+                    return next(cancellationtoken);
+                });
+            }
         }
 
         [Test]
         public async Task HandleAsync_NotApplicableMiddlewareIsNotInvoked()
         {
             // Arrange
-            var middleware = new MockInvocationMiddleware<Unrelated, Unrelated>();
-            var item = new MockMiddlewareInvocationPipelineItem<Unrelated, Unrelated>(middleware);
-            MiddlewareInvocationPipelineItems.Add(item);
+            var middleware = new MockMiddlewareInvocationPipelineItem<Unrelated, Unrelated>();
+            MiddlewareInvocationPipelineItems.Add(middleware);
 
             // Act
             await Pipeline.HandleAsync(Request!, CancellationToken);
@@ -197,10 +295,10 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Bases
         }
 
         [Test]
-        public void HandleAsync_DoesNotThrow_WhenHandlerThrows()
+        public void HandleAsync_DoesNotThrow_WhenHandlerStrategyThrows()
         {
             // Arrange
-            Handler.Mock.Setup(m => m.HandleAsync(It.IsAny<TRequest>(), It.IsAny<CancellationToken>()))
+            HandlerStrategy.Mock.Setup(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new Exception("sample exception"));
 
             // Act / Assert
@@ -211,9 +309,8 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Bases
         public void HandleAsync_DoesNotThrow_WhenMiddlewareThrows()
         {
             // Arrange
-            var middleware = new MockInvocationMiddleware<TRequest, TResponse>();
-            var item = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>(middleware);
-            MiddlewareInvocationPipelineItems.Add(item);
+            var middleware = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>();
+            MiddlewareInvocationPipelineItems.Add(middleware);
 
             middleware.Mock.Setup(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new Exception("sample exception"));

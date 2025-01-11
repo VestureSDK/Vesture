@@ -1,4 +1,5 @@
-﻿using Crucible.Mediator.Engine.Pipeline.Internal;
+﻿using Crucible.Mediator.Abstractions.Tests.Invocation.Mocks;
+using Crucible.Mediator.Engine.Pipeline.Internal;
 using Crucible.Mediator.Engine.Pipeline.Resolvers;
 using Crucible.Mediator.Engine.Tests.Pipeline.Resolvers.Mocks;
 using Crucible.Mediator.Invocation;
@@ -12,22 +13,42 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Internal.Mocks
 
         private IMiddlewareInvocationPipelineItem<TRequest, TResponse> _inner => Mock.Object;
 
-        public MockMiddlewareInvocationPipelineItem()
+        private readonly MockInvocationMiddleware<TRequest, TResponse> _managedMiddleware;
+
+        private IInvocationMiddleware<TRequest, TResponse>? _middleware;
+
+        public IInvocationMiddleware<TRequest, TResponse> Middleware
         {
-            Mock.Setup(m => m.IsApplicable(It.IsAny<Type>()))
-                .Returns<Type>(t => typeof(IInvocationContext<TRequest, TResponse>).IsAssignableFrom(t));
+            get => _middleware ?? _managedMiddleware;
+            set
+            {
+                _middleware = value;
+                _managedResolver.Component = value ?? _managedMiddleware;
+            }
         }
 
-        public MockMiddlewareInvocationPipelineItem(IInvocationMiddleware<TRequest, TResponse> middleware)
-            : this(new MockInvocationComponentResolver<IInvocationMiddleware<TRequest, TResponse>>(middleware)) { }
+        private readonly MockInvocationComponentResolver<IInvocationMiddleware<TRequest, TResponse>> _managedResolver;
 
-        public MockMiddlewareInvocationPipelineItem(IInvocationComponentResolver<IInvocationMiddleware<TRequest, TResponse>> resolver)
-            : this()
+        private IInvocationComponentResolver<IInvocationMiddleware<TRequest, TResponse>>? _resolver;
+
+        public IInvocationComponentResolver<IInvocationMiddleware<TRequest, TResponse>> Resolver
         {
+            get => _resolver ?? _managedResolver;
+            set => _resolver = value;
+        }
+
+        public MockMiddlewareInvocationPipelineItem()
+        {
+            _managedMiddleware = new();
+            _managedResolver = new() { Component = _managedMiddleware };
+
+            Mock.Setup(m => m.IsApplicable(It.IsAny<Type>()))
+                .Returns<Type>(t => typeof(IInvocationContext<TRequest, TResponse>).IsAssignableFrom(t));
+
             Mock.Setup(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
                 .Returns<IInvocationContext<TRequest, TResponse>, Func<CancellationToken, Task>, CancellationToken>((ctx, next, ct) =>
                 {
-                    var middleware = resolver.ResolveComponent();
+                    var middleware = Resolver.ResolveComponent();
                     return middleware.HandleAsync(ctx, next, ct);
                 });
         }

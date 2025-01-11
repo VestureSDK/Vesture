@@ -9,14 +9,11 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Resolvers.Mocks
 
         private IInvocationComponentResolver<TComponent> _inner => Mock.Object;
 
+        public TComponent Component { get; set; } = default!;
+
         public MockInvocationComponentResolver()
         {
-
-        }
-
-        public MockInvocationComponentResolver(TComponent component)
-        {
-            Mock.Setup(m => m.ResolveComponent()).Returns(component);
+            Mock.Setup(m => m.ResolveComponent()).Returns(() => Component);
         }
 
         public TComponent ResolveComponent() => _inner.ResolveComponent();

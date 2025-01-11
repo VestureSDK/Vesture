@@ -1,8 +1,12 @@
-﻿using Crucible.Mediator.Engine.Pipeline;
+﻿using Crucible.Mediator.Abstractions.Tests.Invocation.Mocks;
+using Crucible.Mediator.Engine.Pipeline;
 using Crucible.Mediator.Engine.Pipeline.Context;
 using Crucible.Mediator.Engine.Pipeline.Internal;
 using Crucible.Mediator.Engine.Pipeline.Resolvers;
 using Crucible.Mediator.Engine.Pipeline.Strategies;
+using Crucible.Mediator.Engine.Tests.Pipeline.Context.Mocks;
+using Crucible.Mediator.Engine.Tests.Pipeline.Resolvers.Mocks;
+using Crucible.Mediator.Engine.Tests.Pipeline.Strategies.Mocks;
 using Crucible.Mediator.Invocation;
 using Moq;
 
@@ -26,46 +30,209 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Mocks
 
         private IInvocationPipeline<TResponse> _inner => Mock.Object;
 
-        public MockInvocationPipeline()
+        private TRequest _request;
+
+        public TRequest RequestC
         {
-            Request = typeof(TRequest);
-            Response = typeof(TResponse);
+            get => _request;
+            set
+            {
+                _request = value;
+                _managedContext.Request = value!;
+            }
         }
 
-        public MockInvocationPipeline(
-            IInvocationContextFactory contextFactory,
-            IInvocationComponentResolver<IPrePipelineMiddleware> preInvocationPipelineMiddlewareResolver,
-            IEnumerable<IMiddlewareInvocationPipelineItem> middlewares,
-            IInvocationComponentResolver<IPreHandlerMiddleware> preHandlerMiddlewareResolver,
-            IInvocationHandlerStrategy<TRequest, TResponse> handlerStrategy)
-            : this()
+        private TResponse _response;
+
+        public TResponse ResponseC
         {
+            get => _response;
+            set
+            {
+                _response = value;
+                _managedHandler.Response = value!;
+            }
+        }
+
+        private readonly MockInvocationContext<TRequest, TResponse> _managedContext;
+
+        private IInvocationContext<TRequest, TResponse>? _context;
+
+        public IInvocationContext<TRequest, TResponse> Context
+        {
+            get => _context ?? _managedContext;
+            set
+            {
+                _context = value;
+                _managedContextFactory.Context = value;
+            }
+        }
+
+        private readonly MockInvocationContextFactory<TRequest, TResponse> _managedContextFactory;
+
+        private IInvocationContextFactory? _contextFactory;
+
+        public IInvocationContextFactory ContextFactory
+        {
+            get => _contextFactory ?? _managedContextFactory;
+            set => _contextFactory = value;
+        }
+
+        private readonly MockPrePipelineMiddleware _managedPrePipelineMiddleware;
+
+        private IPrePipelineMiddleware? _prePipelineMiddleware;
+
+        public IPrePipelineMiddleware PrePipelineMiddleware
+        {
+            get => _prePipelineMiddleware ?? _managedPrePipelineMiddleware;
+            set
+            {
+                _prePipelineMiddleware = value;
+                _managedPrePipelineMiddlewareResolver.Component = value ?? _managedPrePipelineMiddleware;
+            }
+        }
+
+        private readonly MockInvocationComponentResolver<IPrePipelineMiddleware> _managedPrePipelineMiddlewareResolver;
+
+        private IInvocationComponentResolver<IPrePipelineMiddleware>? _prePipelineMiddlewareResolver;
+
+        public IInvocationComponentResolver<IPrePipelineMiddleware> PrePipelineMiddlewareResolver
+        {
+            get => _prePipelineMiddlewareResolver ?? _managedPrePipelineMiddlewareResolver;
+            set => _prePipelineMiddlewareResolver = value;
+        }
+
+        private readonly MockPreHandlerMiddleware _managedPreHandlerMiddleware;
+
+        private IPreHandlerMiddleware? _preHandlerMiddleware;
+
+        public IPreHandlerMiddleware PreHandlerMiddleware
+        {
+            get => _preHandlerMiddleware ?? _managedPreHandlerMiddleware;
+            set
+            {
+                _preHandlerMiddleware = value;
+                _managedPreHandlerMiddlewareResolver.Component = value ?? _managedPreHandlerMiddleware;
+            }
+        }
+
+        private readonly MockInvocationComponentResolver<IPreHandlerMiddleware> _managedPreHandlerMiddlewareResolver;
+
+        private IInvocationComponentResolver<IPreHandlerMiddleware>? _preHandlerMiddlewareResolver;
+
+        public IInvocationComponentResolver<IPreHandlerMiddleware> PreHandlerMiddlewareResolver
+        {
+            get => _preHandlerMiddlewareResolver ?? _managedPreHandlerMiddlewareResolver;
+            set => _preHandlerMiddlewareResolver = value;
+        }
+
+        private ICollection<IMiddlewareInvocationPipelineItem> _middlewares = [];
+
+        public ICollection<IMiddlewareInvocationPipelineItem> Middlewares 
+        {
+            get => _middlewares;
+            set => _middlewares = value ?? [];
+        }
+
+        private readonly MockInvocationHandler<TRequest, TResponse> _managedHandler;
+
+        private IInvocationHandler<TRequest, TResponse>? _handler;
+
+        public IInvocationHandler<TRequest, TResponse> Handler
+        {
+            get => _handler ?? _managedHandler;
+            set
+            {
+                _handler = value;
+                _managedHandlerResolver.Component = value ?? _managedHandler;
+            }
+        }
+
+        private readonly MockInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>> _managedHandlerResolver;
+
+        private IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>>? _handlerResolver;
+
+        public IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>> HandlerResolver
+        {
+            get => _handlerResolver ?? _managedHandlerResolver;
+            set
+            {
+                _handlerResolver = value;
+                _managedHandlerStrategy.Resolver = value ?? _managedHandlerResolver;
+            }
+        }
+
+        private readonly MockInvocationHandlerStrategy<TRequest, TResponse> _managedHandlerStrategy;
+
+        private IInvocationHandlerStrategy<TRequest, TResponse>? _handlerStrategy;
+
+        public IInvocationHandlerStrategy<TRequest, TResponse> HandlerStrategy
+        {
+            get => _handlerStrategy ?? _managedHandlerStrategy;
+            set => _handlerStrategy = value;
+        }
+
+        public MockInvocationPipeline()
+        {
+            _request = default!;
+            _response = default!;
+
+            _managedContext = new()
+            {
+                Request = _request,
+            };
+
+            _managedContextFactory = new()
+            {
+                Context = _managedContext,
+            };
+
+            _managedPrePipelineMiddleware = new();
+            _managedPrePipelineMiddlewareResolver = new()
+            {
+                Component = _managedPrePipelineMiddleware
+            };
+
+            _managedPreHandlerMiddleware = new();
+            _managedPreHandlerMiddlewareResolver = new()
+            {
+                Component = _managedPreHandlerMiddleware
+            };
+
+            _managedHandler = new()
+            {
+                Response = _response,
+            };
+            _managedHandlerResolver = new()
+            {
+                Component = _managedHandler
+            };
+
+            _managedHandlerStrategy = new()
+            {
+                Resolver = _managedHandlerResolver
+            };
+
+            Request = typeof(TRequest);
+            Response = typeof(TResponse);
+
             Mock
                 .Setup(m => m.HandleAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()))
                 .Returns<object, CancellationToken>(async (request, cancellationToken) =>
                 {
-                    var context = contextFactory.CreateContextForRequest<TRequest, TResponse>(request);
-                    var _chainOfResponsibility = CreateChainOfresponsibility(
-                        preInvocationPipelineMiddlewareResolver,
-                        middlewares,
-                        preHandlerMiddlewareResolver,
-                        handlerStrategy
-                    );
-                    await _chainOfResponsibility.Invoke(context, cancellationToken);
+                    var context = ContextFactory.CreateContextForRequest<TRequest, TResponse>(request);
+                    var chainOfResponsibility = CreateMockChainOfresponsibility();
+                    await chainOfResponsibility.Invoke(context, cancellationToken);
                     return context;
                 });
         }
 
-        private Func<IInvocationContext<TRequest, TResponse>, CancellationToken, Task> CreateChainOfresponsibility(
-            IInvocationComponentResolver<IPrePipelineMiddleware> preInvocationPipelineMiddlewareResolver,
-            IEnumerable<IMiddlewareInvocationPipelineItem> _middlewares,
-            IInvocationComponentResolver<IPreHandlerMiddleware> preHandlerMiddlewareResolver,
-            IInvocationHandlerStrategy<TRequest, TResponse> handlerStrategy)
+        public Func<IInvocationContext<TRequest, TResponse>, CancellationToken, Task> CreateMockChainOfresponsibility()
         {
             var middlewares = new List<IInvocationMiddleware<TRequest, TResponse>>();
 
             var contextType = typeof(IInvocationContext<TRequest, TResponse>);
-            foreach (var middleware in _middlewares.OrderBy(m => m.Order))
+            foreach (var middleware in Middlewares.OrderBy(m => m.Order))
             {
                 if (middleware.IsApplicable(contextType))
                 {
@@ -75,7 +242,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Mocks
 
             Func<IInvocationContext<TRequest, TResponse>, CancellationToken, Task> chain = (ctx, ct) =>
             {
-                var preHandlerMiddleware = preHandlerMiddlewareResolver.ResolveComponent();
+                var preHandlerMiddleware = PreHandlerMiddlewareResolver.ResolveComponent();
                 return preHandlerMiddleware.HandleAsync((IInvocationContext<object, object>)ctx, (t) => handler(ctx, t), ct);
             };
 
@@ -90,14 +257,14 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Mocks
             var next = chain;
             chain = (ctx, ct) =>
             {
-                var preHandlerMiddleware = preInvocationPipelineMiddlewareResolver.ResolveComponent();
+                var preHandlerMiddleware = PrePipelineMiddlewareResolver.ResolveComponent();
                 return preHandlerMiddleware.HandleAsync((IInvocationContext<object, object>)ctx, (t) => next.Invoke(ctx, t), ct);
             };
 
             return chain!;
 
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-            Task handler(IInvocationContext<TRequest, TResponse> ctx, CancellationToken ct) => handlerStrategy.HandleAsync(ctx, null, ct);
+            Task handler(IInvocationContext<TRequest, TResponse> ctx, CancellationToken ct) => HandlerStrategy.HandleAsync(ctx, null, ct);
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 

@@ -16,8 +16,8 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Strategies
         public SingleHandlerStrategyTest()
             : base(new(), new())
         {
-            Handler = new(Response);
-            Resolver = new(Handler);
+            Handler = new() { Response = Response };
+            Resolver = new() { Component = Handler };
         }
 
         protected override SingleHandlerStrategy<MockContract, MockContract> CreateStrategy() => new(Resolver);

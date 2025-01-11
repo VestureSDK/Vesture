@@ -18,7 +18,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
 
         public InvocationMiddlewareTestBase(TRequest defaultRequest)
         {
-            InvocationContext = new(defaultRequest);
+            InvocationContext = new() { Request = defaultRequest! };
 
 #pragma warning disable IL2091 // Target generic argument does not satisfy 'DynamicallyAccessedMembersAttribute' in target method or type. The generic parameter of the source method or type does not have matching annotations.
             MiddlewareInitializer = new Lazy<TMiddleware>(() => CreateMiddleware());

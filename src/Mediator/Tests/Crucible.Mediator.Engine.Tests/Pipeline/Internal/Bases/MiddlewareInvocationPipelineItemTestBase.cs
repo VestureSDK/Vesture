@@ -1,7 +1,7 @@
-﻿using Crucible.Mediator.Abstractions.Tests.Commands;
-using Crucible.Mediator.Abstractions.Tests.Events;
+﻿using Crucible.Mediator.Abstractions.Tests.Commands.Mocks;
+using Crucible.Mediator.Abstractions.Tests.Events.Mocks;
 using Crucible.Mediator.Abstractions.Tests.Invocation.Mocks;
-using Crucible.Mediator.Abstractions.Tests.Requests;
+using Crucible.Mediator.Abstractions.Tests.Requests.Mocks;
 using Crucible.Mediator.Commands;
 using Crucible.Mediator.Engine.Pipeline.Internal;
 using Crucible.Mediator.Engine.Tests.Pipeline.Resolvers.Mocks;
@@ -33,9 +33,9 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Internal.Bases
 
         public MiddlewareInvocationPipelineItemTestBase(TRequest defaultRequest)
         {
-            InvocationContext = new(defaultRequest);
+            InvocationContext = new() { Request = defaultRequest! };
+            InvocationComponentResolver = new() { Component = InvocationMiddleware };
 
-            InvocationComponentResolver = new(InvocationMiddleware);
 #pragma warning disable IL2091 // Target generic argument does not satisfy 'DynamicallyAccessedMembersAttribute' in target method or type. The generic parameter of the source method or type does not have matching annotations.
             MiddlewareItemInitializer = new Lazy<TMiddlewareItem>(() => CreateMiddlewareItem(Order));
 #pragma warning restore IL2091 // Target generic argument does not satisfy 'DynamicallyAccessedMembersAttribute' in target method or type. The generic parameter of the source method or type does not have matching annotations.

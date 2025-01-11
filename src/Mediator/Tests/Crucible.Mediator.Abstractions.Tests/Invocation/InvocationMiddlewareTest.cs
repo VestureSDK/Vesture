@@ -16,13 +16,107 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation
         protected override SampleInvocationMiddleware CreateMiddleware() => new(LifeCycle.Object);
 
         [Test]
-        public async Task HandleAsync_InvokesOnBeforeNextAsync_BeforeCallingNext()
+        public async Task HandleAsync_InnerInvokes_AreInSequence()
         {
             // Arrange
+            var entersOnBeforeNextAsyncTaskCompletionSource = new TaskCompletionSource();
+            LifeCycle.Setup(m => m.InnerEntersOnBeforeNextAsync(It.IsAny<IInvocationContext<MockContract, MockContract>>(), It.IsAny<CancellationToken>()))
+                .Returns(async () => await entersOnBeforeNextAsyncTaskCompletionSource.Task);
+
+            var entersOnAfterNextAsyncTaskCompletionSource = new TaskCompletionSource();
+            LifeCycle.Setup(m => m.InnerEntersOnAfterNextAsync(It.IsAny<IInvocationContext<MockContract, MockContract>>(), It.IsAny<CancellationToken>()))
+                .Returns(async () => await entersOnAfterNextAsyncTaskCompletionSource.Task);
+
+            var nextAsyncTaskCompletionSource = new TaskCompletionSource();
+            var nextExecuted = false;
+            Next = (ct) =>
+            {
+                nextExecuted = true;
+                return nextAsyncTaskCompletionSource.Task;
+            };
+
+            // Act / Assert
+            var task = Middleware.HandleAsync(InvocationContext, Next, CancellationToken);
+
+            LifeCycle.Verify(m => m.InnerEntersOnBeforeNextAsync(It.IsAny<IInvocationContext<MockContract, MockContract>>(), It.IsAny<CancellationToken>()), Times.Once);
+            Assert.That(nextExecuted, Is.False);
+            LifeCycle.Verify(m => m.InnerEntersOnAfterNextAsync(It.IsAny<IInvocationContext<MockContract, MockContract>>(), It.IsAny<CancellationToken>()), Times.Never);
+
+            entersOnBeforeNextAsyncTaskCompletionSource.SetResult();
+
+            LifeCycle.Verify(m => m.InnerEntersOnBeforeNextAsync(It.IsAny<IInvocationContext<MockContract, MockContract>>(), It.IsAny<CancellationToken>()), Times.Once);
+            Assert.That(nextExecuted, Is.True);
+            LifeCycle.Verify(m => m.InnerEntersOnAfterNextAsync(It.IsAny<IInvocationContext<MockContract, MockContract>>(), It.IsAny<CancellationToken>()), Times.Never);
+
+            nextAsyncTaskCompletionSource.SetResult();
+
+            LifeCycle.Verify(m => m.InnerEntersOnBeforeNextAsync(It.IsAny<IInvocationContext<MockContract, MockContract>>(), It.IsAny<CancellationToken>()), Times.Once);
+            Assert.That(nextExecuted, Is.True);
+            LifeCycle.Verify(m => m.InnerEntersOnAfterNextAsync(It.IsAny<IInvocationContext<MockContract, MockContract>>(), It.IsAny<CancellationToken>()), Times.Once);
+
+            // Cleanup
+            entersOnAfterNextAsyncTaskCompletionSource.SetResult();
+            await task;
+        }
+
+        [Test]
+        public async Task HandleAsync_OnErrorAsync_IsInvokedWhenContextHasError()
+        {
+            // Arrange
+            Next = (ct) =>
+            {
+                InvocationContext.SetError(new Exception("sample error"));
+                return Task.CompletedTask;
+            };
 
             // Act
+            await Middleware.HandleAsync(InvocationContext, Next, CancellationToken);
 
             // Assert
+            LifeCycle.Verify(m => m.InnerEntersOnErrorAsync(It.IsAny<IInvocationContext<MockContract, MockContract>>(), It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Test]
+        public async Task HandleAsync_OnErrorAsync_IsNotInvokedWhenContextIsValid()
+        {
+            // Arrange
+            // No arrange required
+
+            // Act
+            await Middleware.HandleAsync(InvocationContext, Next, CancellationToken);
+
+            // Assert
+            LifeCycle.Verify(m => m.InnerEntersOnErrorAsync(It.IsAny<IInvocationContext<MockContract, MockContract>>(), It.IsAny<CancellationToken>()), Times.Never);
+        }
+
+        [Test]
+        public async Task HandleAsync_OnSuccessAsync_IsInvokedWhenContextIsValid()
+        {
+            // Arrange
+            // No arrange required
+
+            // Act
+            await Middleware.HandleAsync(InvocationContext, Next, CancellationToken);
+
+            // Assert
+            LifeCycle.Verify(m => m.InnerEntersOnSucessAsync(It.IsAny<IInvocationContext<MockContract, MockContract>>(), It.IsAny<CancellationToken>()), Times.Once);
+        }
+
+        [Test]
+        public async Task HandleAsync_OnSuccessAsync_IsNotInvokedWhenContextHasError()
+        {
+            // Arrange
+            Next = (ct) =>
+            {
+                InvocationContext.SetError(new Exception("sample error"));
+                return Task.CompletedTask;
+            };
+
+            // Act
+            await Middleware.HandleAsync(InvocationContext, Next, CancellationToken);
+
+            // Assert
+            LifeCycle.Verify(m => m.InnerEntersOnSucessAsync(It.IsAny<IInvocationContext<MockContract, MockContract>>(), It.IsAny<CancellationToken>()), Times.Never);
         }
 
         public interface IInvocationMiddlewareLifeCycle

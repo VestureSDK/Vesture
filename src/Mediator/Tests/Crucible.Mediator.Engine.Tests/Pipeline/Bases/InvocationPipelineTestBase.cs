@@ -41,9 +41,11 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Bases
 
         protected InvocationPipelineTestBase(TRequest defaultRequest)
         {
+
             Request = defaultRequest;
             Context = new() { Request = Request! };
             ContextFactory = new() { Context = Context };
+
             HandlerStrategy = new();
 
             PrePipelineMiddlewareResolver = new() { Component = PrePipelineMiddleware };

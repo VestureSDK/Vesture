@@ -1,10 +1,11 @@
 ﻿using Crucible.Mediator.Abstractions.Tests.Invocation.Bases;
 using Crucible.Mediator.Abstractions.Tests.Invocation.Mocks;
 using Crucible.Mediator.Engine.Pipeline;
+using Moq;
 
 namespace Crucible.Mediator.Engine.Tests.Pipeline.Bases
 {
-    public abstract class PrePipelineMiddlewareTestBase<TMiddleware> : InvocationMiddlewareTestBase<MockContract, MockContract, TMiddleware>
+    public abstract class PrePipelineMiddlewareTestBase<TMiddleware> : InvocationMiddlewareConformanceTestBase<MockContract, MockContract, TMiddleware>
         where TMiddleware : IPrePipelineMiddleware
     {
         public PrePipelineMiddlewareTestBase()
@@ -15,7 +16,8 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Bases
         {
             // Arrange
             var error = new Exception("sample exception");
-            Next = (ct) => throw error;
+            Next.Mock.Setup(m => m(It.IsAny<CancellationToken>()))
+                .ThrowsAsync(error);
 
             // Act
             await Middleware.HandleAsync(InvocationContext, Next, CancellationToken);

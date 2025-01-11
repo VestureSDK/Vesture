@@ -22,50 +22,18 @@ namespace Crucible.Mediator.Events
     /// <seealso cref="IEvent"/>
     /// <seealso cref="EventHandler{TEvent}"/>
     /// <seealso cref="IInvocationWorkflow"/>
-    /// <seealso cref="IMediator"/>
+    /// <seealso cref="IWorkflowMediator"/>
     public abstract class EventWorkflow<TEvent> : EventHandler<TEvent>, IInvocationWorkflow
         where TEvent : IEvent
     {
-        private IMediator? _workflowMediator;
+        private IWorkflowMediator? _workflowMediator;
 
-        private IMediator WorkflowMediator
+        private IWorkflowMediator WorkflowMediator
         {
             get => _workflowMediator ?? throw new EntryPointNotFoundException("The Workflow mediator has not yet been initialized");
             set => _workflowMediator = value;
         }
 
-        IMediator IInvocationWorkflow.Mediator { set => WorkflowMediator = value; }
-
-        /// <exclude />
-        /// <inheritdoc cref="IMediator.ExecuteAndCaptureAsync{TResponse}(IRequest{TResponse}, CancellationToken)"/>
-        public Task<IInvocationContext<TSubResponse>> ExecuteAndCaptureAsync<TSubResponse>(IRequest<TSubResponse> request, CancellationToken cancellationToken = default) => WorkflowMediator.ExecuteAndCaptureAsync(request, cancellationToken);
-
-        /// <exclude />
-        /// <inheritdoc cref="IMediator.ExecuteAsync{TResponse}(IRequest{TResponse}, CancellationToken)"/>
-        public Task<TSubResponse> ExecuteAsync<TSubResponse>(IRequest<TSubResponse> request, CancellationToken cancellationToken = default) => WorkflowMediator.ExecuteAsync(request, cancellationToken);
-
-        /// <exclude />
-        /// <inheritdoc cref="IMediator.HandleAndCaptureAsync{TResponse}(object, CancellationToken)"/>
-        public Task<IInvocationContext<TSubResponse>> HandleAndCaptureAsync<TSubResponse>(object request, CancellationToken cancellationToken = default) => WorkflowMediator.HandleAndCaptureAsync<TSubResponse>(request, cancellationToken);
-
-        /// <exclude />
-        /// <inheritdoc cref="IMediator.HandleAsync{TResponse}(object, CancellationToken)"/>
-        public Task<TSubResponse> HandleAsync<TSubResponse>(object request, CancellationToken cancellationToken = default) => WorkflowMediator.HandleAsync<TSubResponse>(request, cancellationToken);
-
-        /// <exclude />
-        /// <inheritdoc cref="IMediator.InvokeAndCaptureAsync(ICommand, CancellationToken)"/>
-        public Task<IInvocationContext> InvokeAndCaptureAsync(ICommand command, CancellationToken cancellationToken = default) => WorkflowMediator.InvokeAndCaptureAsync(command, cancellationToken);
-
-        /// <exclude />
-        /// <inheritdoc cref="IMediator.InvokeAsync(ICommand, CancellationToken)"/>
-        public Task InvokeAsync(ICommand command, CancellationToken cancellationToken = default) => WorkflowMediator.InvokeAsync(command, cancellationToken);
-
-        /// <exclude />
-        /// <inheritdoc cref="IMediator.PublishAndCaptureAsync(IEvent, CancellationToken)"/>
-        public Task<IInvocationContext> PublishAndCaptureAsync(IEvent @event, CancellationToken cancellationToken = default) => WorkflowMediator.PublishAndCaptureAsync(@event, cancellationToken);
-
-        /// <exclude />
-        /// <inheritdoc cref="IMediator.PublishAsync(IEvent, CancellationToken)"/>
-        public Task PublishAsync(IEvent @event, CancellationToken cancellationToken = default) => WorkflowMediator.PublishAsync(@event, cancellationToken);
+        IWorkflowMediator IInvocationWorkflow.Mediator { set => WorkflowMediator = value; }
     }
 }

@@ -43,7 +43,9 @@ namespace Crucible.Mediator.DependencyInjection.MSDI
             _services.TryAddSingleton<IPrePipelineMiddleware>(DefaultPrePipelineAndHandlerMiddleware.Instance);
             _services.TryAddSingleton<IInvocationComponentResolver<IPrePipelineMiddleware>, SingletonInvocationComponentResolver<IPrePipelineMiddleware>>();
 
-            _services.TryAddSingleton<IMediator, Engine.DefaultMediator>();
+            _services.TryAddSingleton<Engine.DefaultMediator>();
+            _services.TryAddSingleton<IMediator>(sp => sp.GetRequiredService<Engine.DefaultMediator>());
+            _services.TryAddSingleton<IWorkflowMediator>(sp => sp.GetRequiredService<Engine.DefaultMediator>());
             _services.TryAddSingleton<IInvocationContextFactory, DefaultInvocationContextFactory>();
         }
 
@@ -196,7 +198,7 @@ namespace Crucible.Mediator.DependencyInjection.MSDI
 
         private static void PostInitializeWorkflow(IServiceProvider serviceProvider, IInvocationWorkflow workflow)
         {
-            workflow.Mediator = serviceProvider.GetRequiredService<IMediator>();
+            workflow.Mediator = serviceProvider.GetRequiredService<IWorkflowMediator>();
         }
     }
 }

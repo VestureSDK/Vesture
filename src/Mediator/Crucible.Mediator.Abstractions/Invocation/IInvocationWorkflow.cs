@@ -42,31 +42,7 @@ namespace Crucible.Mediator.Invocation
     {
 #pragma warning disable RS0016 // Add public types and members to the declared API
         /// <exclude />
-        public IMediator Mediator { set; }
+        public IWorkflowMediator Mediator { set; }
 #pragma warning restore RS0016 // Add public types and members to the declared API
-
-        /// <inheritdoc cref="IMediator.ExecuteAndCaptureAsync{TResponse}(IRequest{TResponse}, CancellationToken)"/>
-        Task<IInvocationContext<TResponse>> ExecuteAndCaptureAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default);
-
-        /// <inheritdoc cref="IMediator.ExecuteAsync{TResponse}(IRequest{TResponse}, CancellationToken)"/>
-        Task<TResponse> ExecuteAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default);
-
-        /// <inheritdoc cref="IMediator.HandleAndCaptureAsync{TResponse}(object, CancellationToken)"/>
-        Task<IInvocationContext<TResponse>> HandleAndCaptureAsync<TResponse>(object request, CancellationToken cancellationToken = default);
-
-        /// <inheritdoc cref="IMediator.HandleAsync{TResponse}(object, CancellationToken)"/>
-        Task<TResponse> HandleAsync<TResponse>(object request, CancellationToken cancellationToken = default);
-
-        /// <inheritdoc cref="IMediator.InvokeAndCaptureAsync(ICommand, CancellationToken)"/>
-        Task<IInvocationContext> InvokeAndCaptureAsync(ICommand command, CancellationToken cancellationToken = default);
-
-        /// <inheritdoc cref="IMediator.InvokeAsync(ICommand, CancellationToken)"/>
-        Task InvokeAsync(ICommand command, CancellationToken cancellationToken = default);
-
-        /// <inheritdoc cref="IMediator.PublishAndCaptureAsync(IEvent, CancellationToken)"/>
-        Task<IInvocationContext> PublishAndCaptureAsync(IEvent @event, CancellationToken cancellationToken = default);
-
-        /// <inheritdoc cref="IMediator.PublishAsync(IEvent, CancellationToken)"/>
-        Task PublishAsync(IEvent @event, CancellationToken cancellationToken = default);
     }
 }

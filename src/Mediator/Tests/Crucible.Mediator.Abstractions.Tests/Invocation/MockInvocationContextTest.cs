@@ -1,45 +1,26 @@
-﻿using Crucible.Mediator.Abstractions.Tests.Invocation.Bases;
+﻿using Crucible.Mediator.Abstractions.Tests.Internal;
+using Crucible.Mediator.Abstractions.Tests.Invocation.Bases;
 using Crucible.Mediator.Abstractions.Tests.Invocation.Mocks;
-using Crucible.Mediator.Commands;
-using Crucible.Mediator.Events;
+using Crucible.Mediator.Invocation;
 
 namespace Crucible.Mediator.Abstractions.Tests.Invocation
 {
-    public class MockInvocationContextTest_Event :
-        InvocationContextTestBase_Event<object, MockInvocationContext<object, EventResponse>>
+    [MockTest]
+    public class MockInvocationContextTest : InvocationContextConformanceTestBase
     {
-        public MockInvocationContextTest_Event()
-            : base(new()) { }
-
-        protected override MockInvocationContext<object, EventResponse> CreateInvocationContext(object request) => new()
+        protected override IInvocationContext<TRequest, TResponse> CreateInvocationContext<TRequest, TResponse>(TRequest request)
         {
-            Request = Request
-        };
-    }
+            return new MockInvocationContext<TRequest, TResponse>
+            {
+                Request = request!,
+            };
+        }
 
-    public class MockInvocationContextTest_Command :
-        InvocationContextTestBase_Command<object, MockInvocationContext<object, CommandResponse>>
-    {
-        public MockInvocationContextTest_Command()
-            : base(new()) { }
-
-        protected override MockInvocationContext<object, CommandResponse> CreateInvocationContext(object request) => new()
+        [Test]
+        [Category("Implementation")]
+        public void Test()
         {
-            Request = Request
-        };
-    }
 
-    public class MockInvocationContextTest_Request :
-        InvocationContextTestBase_Request<object, object, MockInvocationContext<object, object>>
-    {
-        public MockInvocationContextTest_Request()
-            : base(new()) { }
-
-        protected override object CreateResponse() => new();
-
-        protected override MockInvocationContext<object, object> CreateInvocationContext(object request) => new()
-        {
-            Request = Request
-        };
+        }
     }
 }

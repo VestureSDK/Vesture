@@ -1,4 +1,5 @@
-﻿using Crucible.Mediator.Abstractions.Tests.Invocation.Bases;
+﻿using Crucible.Mediator.Abstractions.Tests.Internal;
+using Crucible.Mediator.Abstractions.Tests.Invocation.Bases;
 using Crucible.Mediator.Abstractions.Tests.Invocation.Mocks;
 using Crucible.Mediator.Invocation;
 using Moq;
@@ -6,7 +7,8 @@ using static Crucible.Mediator.Abstractions.Tests.Invocation.InvocationMiddlewar
 
 namespace Crucible.Mediator.Abstractions.Tests.Invocation
 {
-    public class InvocationMiddlewareTest : InvocationMiddlewareTestBase<MockContract, MockContract, SampleInvocationMiddleware>
+    [SampleTest]
+    public class InvocationMiddlewareTest : InvocationMiddlewareConformanceTestBase<MockContract, MockContract, SampleInvocationMiddleware>
     {
         protected Mock<IInvocationMiddlewareLifeCycle> LifeCycle { get; } = new();
 
@@ -28,30 +30,25 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation
                 .Returns(async () => await entersOnAfterNextAsyncTaskCompletionSource.Task);
 
             var nextAsyncTaskCompletionSource = new TaskCompletionSource();
-            var nextExecuted = false;
-            Next = (ct) =>
-            {
-                nextExecuted = true;
-                return nextAsyncTaskCompletionSource.Task;
-            };
+            Next.ReturnTask = nextAsyncTaskCompletionSource.Task;
 
             // Act / Assert
             var task = Middleware.HandleAsync(InvocationContext, Next, CancellationToken);
 
             LifeCycle.Verify(m => m.InnerEntersOnBeforeNextAsync(It.IsAny<IInvocationContext<MockContract, MockContract>>(), It.IsAny<CancellationToken>()), Times.Once);
-            Assert.That(nextExecuted, Is.False);
+            Next.Mock.Verify(m => m(It.IsAny<CancellationToken>()), Times.Never);
             LifeCycle.Verify(m => m.InnerEntersOnAfterNextAsync(It.IsAny<IInvocationContext<MockContract, MockContract>>(), It.IsAny<CancellationToken>()), Times.Never);
 
             entersOnBeforeNextAsyncTaskCompletionSource.SetResult();
 
             LifeCycle.Verify(m => m.InnerEntersOnBeforeNextAsync(It.IsAny<IInvocationContext<MockContract, MockContract>>(), It.IsAny<CancellationToken>()), Times.Once);
-            Assert.That(nextExecuted, Is.True);
+            Next.Mock.Verify(m => m(It.IsAny<CancellationToken>()), Times.Once);
             LifeCycle.Verify(m => m.InnerEntersOnAfterNextAsync(It.IsAny<IInvocationContext<MockContract, MockContract>>(), It.IsAny<CancellationToken>()), Times.Never);
 
             nextAsyncTaskCompletionSource.SetResult();
 
             LifeCycle.Verify(m => m.InnerEntersOnBeforeNextAsync(It.IsAny<IInvocationContext<MockContract, MockContract>>(), It.IsAny<CancellationToken>()), Times.Once);
-            Assert.That(nextExecuted, Is.True);
+            Next.Mock.Verify(m => m(It.IsAny<CancellationToken>()), Times.Once);
             LifeCycle.Verify(m => m.InnerEntersOnAfterNextAsync(It.IsAny<IInvocationContext<MockContract, MockContract>>(), It.IsAny<CancellationToken>()), Times.Once);
 
             // Cleanup
@@ -63,11 +60,12 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation
         public async Task HandleAsync_OnErrorAsync_IsInvokedWhenContextHasError()
         {
             // Arrange
-            Next = (ct) =>
-            {
-                InvocationContext.SetError(new Exception("sample error"));
-                return Task.CompletedTask;
-            };
+            Next.Mock.Setup(m => m(It.IsAny<CancellationToken>()))
+                .Returns<CancellationToken>((ct) =>
+                {
+                    InvocationContext.SetError(new Exception("sample error"));
+                    return Task.CompletedTask;
+                });
 
             // Act
             await Middleware.HandleAsync(InvocationContext, Next, CancellationToken);
@@ -106,11 +104,12 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation
         public async Task HandleAsync_OnSuccessAsync_IsNotInvokedWhenContextHasError()
         {
             // Arrange
-            Next = (ct) =>
-            {
-                InvocationContext.SetError(new Exception("sample error"));
-                return Task.CompletedTask;
-            };
+            Next.Mock.Setup(m => m(It.IsAny<CancellationToken>()))
+                .Returns<CancellationToken>((ct) =>
+                {
+                    InvocationContext.SetError(new Exception("sample error"));
+                    return Task.CompletedTask;
+                });
 
             // Act
             await Middleware.HandleAsync(InvocationContext, Next, CancellationToken);

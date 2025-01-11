@@ -25,7 +25,7 @@ namespace Crucible.Mediator.Engine.Pipeline.Context
 
             IsEvent = ResponseType == EventResponse.Type;
             IsCommand = ResponseType == CommandResponse.Type;
-            IsRequest = !(IsEvent || IsCommand);
+            IsRequest = !(IsEvent || IsCommand || ResponseType == NoResponse.Type);
             HasResponseType = IsRequest;
         }
 

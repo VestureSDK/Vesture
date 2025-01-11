@@ -1,9 +1,11 @@
-﻿using Crucible.Mediator.Abstractions.Tests.Invocation.Mocks;
+﻿using Crucible.Mediator.Abstractions.Tests.Internal;
+using Crucible.Mediator.Abstractions.Tests.Invocation.Mocks;
 using Crucible.Mediator.Invocation;
+using Moq;
 
 namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
 {
-    public abstract class InvocationMiddlewareTestBase<TRequest, TResponse, TMiddleware>
+    public abstract class InvocationMiddlewareConformanceTestBase<TRequest, TResponse, TMiddleware>
         where TMiddleware : IInvocationMiddleware<TRequest, TResponse>
     {
         protected Lazy<TMiddleware> MiddlewareInitializer { get; }
@@ -12,11 +14,11 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
 
         protected MockInvocationContext<TRequest, TResponse> InvocationContext { get; }
 
-        protected Func<CancellationToken, Task> Next { get; set; } = (ct) => Task.CompletedTask;
+        protected MockNext Next { get; } = new MockNext();
 
         protected CancellationToken CancellationToken { get; set; } = CancellationToken.None;
 
-        public InvocationMiddlewareTestBase(TRequest defaultRequest)
+        public InvocationMiddlewareConformanceTestBase(TRequest defaultRequest)
         {
             InvocationContext = new() { Request = defaultRequest! };
 
@@ -28,21 +30,17 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
         protected abstract TMiddleware CreateMiddleware();
 
         [Test]
-        public async Task HandleAsync_CallsNextItemInTheChain()
+        [ConformanceTest]
+        public virtual async Task HandleAsync_CallsNextItemInTheChain()
         {
             // Arrange
-            var nextExecuted = false;
-            Next = (ct) =>
-            {
-                nextExecuted = true;
-                return Task.CompletedTask;
-            };
+            // No arrange required
 
             // Act
             await Middleware.HandleAsync(InvocationContext, Next, CancellationToken);
 
             // Assert
-            Assert.That(nextExecuted, Is.True, message: "Next item in the chain should be called");
+            Next.Mock.Verify(m => m(It.IsAny<CancellationToken>()), Times.Once);
         }
     }
 }

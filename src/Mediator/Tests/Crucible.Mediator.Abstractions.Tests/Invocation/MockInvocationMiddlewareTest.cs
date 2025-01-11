@@ -1,9 +1,11 @@
-﻿using Crucible.Mediator.Abstractions.Tests.Invocation.Bases;
+﻿using Crucible.Mediator.Abstractions.Tests.Internal;
+using Crucible.Mediator.Abstractions.Tests.Invocation.Bases;
 using Crucible.Mediator.Abstractions.Tests.Invocation.Mocks;
 
 namespace Crucible.Mediator.Abstractions.Tests.Invocation
 {
-    public class MockInvocationMiddlewareTest : InvocationMiddlewareTestBase<MockContract, MockContract, MockInvocationMiddleware<MockContract, MockContract>>
+    [MockTest]
+    public class MockInvocationMiddlewareTest : InvocationMiddlewareConformanceTestBase<MockContract, MockContract, MockInvocationMiddleware<MockContract, MockContract>>
     {
         public MockInvocationMiddlewareTest()
             : base(new()) { }

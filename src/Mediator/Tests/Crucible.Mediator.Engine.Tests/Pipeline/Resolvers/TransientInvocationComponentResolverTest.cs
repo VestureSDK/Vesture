@@ -1,16 +1,25 @@
-﻿using Crucible.Mediator.Engine.Pipeline.Resolvers;
+﻿using Crucible.Mediator.Abstractions.Tests.Internal;
+using Crucible.Mediator.Engine.Pipeline.Resolvers;
 using Crucible.Mediator.Engine.Tests.Pipeline.Resolvers.Bases;
+using Moq;
 
 namespace Crucible.Mediator.Engine.Tests.Pipeline.Resolvers
 {
-    public class TransientInvocationComponentResolverTest : InvocationComponentResolverTestBase<object, TransientInvocationComponentResolver<object>>
+    [ImplementationTest]
+    public class TransientInvocationComponentResolverTest : InvocationComponentResolverConformanceTestBase<object, TransientInvocationComponentResolver<object>>
     {
-        public Func<object> Factory { get; set; } = () => new object();
+        public Mock<Func<object>> Factory { get; }
 
-        protected override TransientInvocationComponentResolver<object> CreateResolver() => new(Factory);
+        public TransientInvocationComponentResolverTest()
+        {
+            Factory = new();
+            Factory.Setup(m => m()).Returns(() => new object());
+        }
+
+        protected override TransientInvocationComponentResolver<object> CreateInvocationComponentResolver() => new(Factory.Object);
 
         [Test]
-        public void ResolveComponent_AreNotTheSameWithStraightFactory()
+        public void ResolveComponent_AreNotTheSame_WithStraightFactory()
         {
             // Arrange
             // no arrange required
@@ -20,41 +29,40 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Resolvers
             var component2 = Resolver.ResolveComponent();
 
             // Assert
-            Assert.That(component1, Is.Not.SameAs(component2), message: "Component resolved should not be the same");
+            Assert.That(component1, Is.Not.SameAs(component2));
         }
 
         [Test]
-        public void ResolveComponent_AreTheSameEverytime()
+        public void ResolveComponent_AreTheSameEverytime_WithSingletonFactory()
         {
             // Arrange
             var component = new object();
-            Factory = () => component;
+            Factory.Setup(m => m()).Returns(component);
 
             // Act
             var component1 = Resolver.ResolveComponent();
             var component2 = Resolver.ResolveComponent();
 
             // Assert
-            Assert.That(component1, Is.SameAs(component2), message: "Component resolved should be the same");
+            Assert.That(component1, Is.SameAs(component2));
         }
 
-        [Test]
-        public void ResolveComponent_FactoryIsCalledEverytime()
+        [Theory]
+        [TestCase(2)]
+        [TestCase(10)]
+        public void ResolveComponent_FactoryIsCalledEverytime(int iterationCount)
         {
             // Arrange
-            var factoryExecutionCount = 0;
-            Factory = () =>
-            {
-                factoryExecutionCount++;
-                return new object();
-            };
+            // No arrange required
 
             // Act
-            _ = Resolver.ResolveComponent();
-            _ = Resolver.ResolveComponent();
+            for (var i = 0; i < iterationCount; i++)
+            {
+                _ = Resolver.ResolveComponent();
+            }
 
             // Assert
-            Assert.That(factoryExecutionCount, Is.EqualTo(2), message: "Factory should be invoked every time");
+            Factory.Verify(m => m(), Times.Exactly(iterationCount));
         }
     }
 }

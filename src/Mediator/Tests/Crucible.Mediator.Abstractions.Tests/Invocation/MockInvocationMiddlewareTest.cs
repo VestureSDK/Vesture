@@ -10,6 +10,6 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation
         public MockInvocationMiddlewareTest()
             : base(new()) { }
 
-        protected override MockInvocationMiddleware<MockContract, MockContract> CreateMiddleware() => new MockInvocationMiddleware<MockContract, MockContract>();
+        protected override MockInvocationMiddleware<MockContract, MockContract> CreateInvocationMiddleware() => new MockInvocationMiddleware<MockContract, MockContract>();
     }
 }

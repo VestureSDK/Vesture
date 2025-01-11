@@ -1,23 +1,27 @@
-﻿using Crucible.Mediator.Engine.Pipeline.Resolvers;
+﻿using Crucible.Mediator.Abstractions.Tests.Internal;
+using Crucible.Mediator.Engine.Pipeline.Resolvers;
 using Crucible.Mediator.Engine.Tests.Pipeline.Resolvers.Bases;
+using Moq;
 
 namespace Crucible.Mediator.Engine.Tests.Pipeline.Resolvers
 {
-    public class DeferredSingletonInvocationComponentResolverTest : InvocationComponentResolverTestBase<object, DeferredSingletonInvocationComponentResolver<object>>
+    [ImplementationTest]
+    public class DeferredSingletonInvocationComponentResolverTest : InvocationComponentResolverConformanceTestBase<object, DeferredSingletonInvocationComponentResolver<object>>
     {
         public object SingletonInstance { get; set; } = new object();
 
-        public Func<object> Factory { get; set; }
+        public Mock<Func<object>> Factory { get; set; }
 
         public Lazy<object> Lazy { get; set; }
 
         public DeferredSingletonInvocationComponentResolverTest()
         {
-            Factory = () => SingletonInstance;
-            Lazy = new Lazy<object>(() => Factory());
+            Factory = new();
+            Factory.Setup(m => m()).Returns(() => SingletonInstance);
+            Lazy = new Lazy<object>(() => Factory.Object());
         }
 
-        protected override DeferredSingletonInvocationComponentResolver<object> CreateResolver() => new(Lazy);
+        protected override DeferredSingletonInvocationComponentResolver<object> CreateInvocationComponentResolver() => new(Lazy);
 
         [Test]
         public void ResolveComponent_IsSingletonInstance()
@@ -29,26 +33,25 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Resolvers
             var component = Resolver.ResolveComponent();
 
             // Assert
-            Assert.That(component, Is.SameAs(SingletonInstance), message: "Component resolved should be the singleton instance provided");
+            Assert.That(component, Is.SameAs(SingletonInstance));
         }
 
-        [Test]
-        public void ResolveComponent_PassesThroughTheFactoryOnlyOnce()
+        [Theory]
+        [TestCase(2)]
+        [TestCase(10)]
+        public void ResolveComponent_PassesThroughTheFactoryOnlyOnce(int iterationCount)
         {
             // Arrange
-            var factoryExecutionCount = 0;
-            Factory = () =>
-            {
-                factoryExecutionCount++;
-                return SingletonInstance;
-            };
+            // No arrange required
 
             // Act
-            _ = Resolver.ResolveComponent();
-            _ = Resolver.ResolveComponent();
+            for (var i = 0; i < iterationCount; i++)
+            {
+                _ = Resolver.ResolveComponent();
+            }
 
             // Assert
-            Assert.That(factoryExecutionCount, Is.EqualTo(1), message: "Component resolved should be the same singleton instance provided and factory called only once");
+            Factory.Verify(m => m(), Times.Once);
         }
     }
 }

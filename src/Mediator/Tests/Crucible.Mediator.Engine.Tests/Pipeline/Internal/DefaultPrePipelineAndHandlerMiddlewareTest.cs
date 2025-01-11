@@ -1,15 +1,18 @@
-﻿using Crucible.Mediator.Engine.Pipeline.Internal;
+﻿using Crucible.Mediator.Abstractions.Tests.Internal;
+using Crucible.Mediator.Engine.Pipeline.Internal;
 using Crucible.Mediator.Engine.Tests.Pipeline.Bases;
 
 namespace Crucible.Mediator.Engine.Tests.Pipeline.Internal
 {
-    public class DefaultPrePipelineAndHandlerMiddlewareTest_PreHandler : PreHandlerMiddlewareTestBase<DefaultPrePipelineAndHandlerMiddleware>
+    [ImplementationTest]
+    public class DefaultPrePipelineAndHandlerMiddlewareTest_PreHandler : PreHandlerMiddlewareConformanceTestBase<DefaultPrePipelineAndHandlerMiddleware>
     {
-        protected override DefaultPrePipelineAndHandlerMiddleware CreateMiddleware() => new();
+        protected override DefaultPrePipelineAndHandlerMiddleware CreateInvocationMiddleware() => new();
     }
 
-    public class DefaultPrePipelineAndHandlerMiddlewareTest_PrePipeline : PrePipelineMiddlewareTestBase<DefaultPrePipelineAndHandlerMiddleware>
+    [ImplementationTest]
+    public class DefaultPrePipelineAndHandlerMiddlewareTest_PrePipeline : PrePipelineMiddlewareConformanceTestBase<DefaultPrePipelineAndHandlerMiddleware>
     {
-        protected override DefaultPrePipelineAndHandlerMiddleware CreateMiddleware() => new();
+        protected override DefaultPrePipelineAndHandlerMiddleware CreateInvocationMiddleware() => new();
     }
 }

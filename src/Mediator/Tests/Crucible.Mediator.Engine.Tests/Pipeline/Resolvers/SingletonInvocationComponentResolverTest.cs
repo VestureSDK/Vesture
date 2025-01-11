@@ -1,13 +1,15 @@
-﻿using Crucible.Mediator.Engine.Pipeline.Resolvers;
+﻿using Crucible.Mediator.Abstractions.Tests.Internal;
+using Crucible.Mediator.Engine.Pipeline.Resolvers;
 using Crucible.Mediator.Engine.Tests.Pipeline.Resolvers.Bases;
 
 namespace Crucible.Mediator.Engine.Tests.Pipeline.Resolvers
 {
-    public class SingletonInvocationComponentResolverTest : InvocationComponentResolverTestBase<object, SingletonInvocationComponentResolver<object>>
+    [ImplementationTest]
+    public class SingletonInvocationComponentResolverTest : InvocationComponentResolverConformanceTestBase<object, SingletonInvocationComponentResolver<object>>
     {
         public object SingletonInstance { get; set; } = new object();
 
-        protected override SingletonInvocationComponentResolver<object> CreateResolver() => new(SingletonInstance);
+        protected override SingletonInvocationComponentResolver<object> CreateInvocationComponentResolver() => new(SingletonInstance);
 
         [Test]
         public void ResolveComponent_IsSingletonInstance()
@@ -19,7 +21,21 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Resolvers
             var component = Resolver.ResolveComponent();
 
             // Assert
-            Assert.That(component, Is.SameAs(SingletonInstance), message: "Component resolved should be the singleton instance provided");
+            Assert.That(component, Is.SameAs(SingletonInstance));
+        }
+
+        [Test]
+        public void ResolveComponent_AreTheSameEverytime()
+        {
+            // Arrange
+            // No arrange required
+
+            // Act
+            var component1 = Resolver.ResolveComponent();
+            var component2 = Resolver.ResolveComponent();
+
+            // Assert
+            Assert.That(component1, Is.SameAs(component2));
         }
     }
 }

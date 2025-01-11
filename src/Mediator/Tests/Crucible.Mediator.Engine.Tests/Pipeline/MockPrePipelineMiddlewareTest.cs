@@ -1,10 +1,12 @@
-﻿using Crucible.Mediator.Engine.Tests.Pipeline.Bases;
+﻿using Crucible.Mediator.Abstractions.Tests.Internal;
+using Crucible.Mediator.Engine.Tests.Pipeline.Bases;
 using Crucible.Mediator.Engine.Tests.Pipeline.Mocks;
 
 namespace Crucible.Mediator.Engine.Tests.Pipeline
 {
-    public class MockPrePipelineMiddlewareTest : PrePipelineMiddlewareTestBase<MockPrePipelineMiddleware>
+    [MockTest]
+    public class MockPrePipelineMiddlewareTest : PrePipelineMiddlewareConformanceTestBase<MockPrePipelineMiddleware>
     {
-        protected override MockPrePipelineMiddleware CreateMiddleware() => new();
+        protected override MockPrePipelineMiddleware CreateInvocationMiddleware() => new();
     }
 }

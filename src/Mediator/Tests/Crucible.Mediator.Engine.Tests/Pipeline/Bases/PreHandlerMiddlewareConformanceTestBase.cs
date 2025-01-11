@@ -1,17 +1,19 @@
-﻿using Crucible.Mediator.Abstractions.Tests.Invocation.Bases;
+﻿using Crucible.Mediator.Abstractions.Tests.Internal;
+using Crucible.Mediator.Abstractions.Tests.Invocation.Bases;
 using Crucible.Mediator.Abstractions.Tests.Invocation.Mocks;
 using Crucible.Mediator.Engine.Pipeline;
 using Moq;
 
 namespace Crucible.Mediator.Engine.Tests.Pipeline.Bases
 {
-    public abstract class PreHandlerMiddlewareTestBase<TMiddleware> : InvocationMiddlewareConformanceTestBase<MockContract, MockContract, TMiddleware>
+    public abstract class PreHandlerMiddlewareConformanceTestBase<TMiddleware> : InvocationMiddlewareConformanceTestBase<MockContract, MockContract, TMiddleware>
         where TMiddleware : IPreHandlerMiddleware
     {
-        public PreHandlerMiddlewareTestBase()
+        public PreHandlerMiddlewareConformanceTestBase()
             : base(new()) { }
 
         [Test]
+        [ConformanceTest]
         public async Task HandleAsync_AbsorbAndCaptureException()
         {
             // Arrange
@@ -20,10 +22,10 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Bases
                 .ThrowsAsync(error);
 
             // Act
-            await Middleware.HandleAsync(InvocationContext, Next, CancellationToken);
+            await Middleware.HandleAsync(Context, Next, CancellationToken);
 
             // Assert
-            Assert.That(InvocationContext.Error, Is.SameAs(error), message: "Error should be absorbed and added to context");
+            Assert.That(Context.Error, Is.SameAs(error), message: "Error should be absorbed and added to context");
         }
     }
 }

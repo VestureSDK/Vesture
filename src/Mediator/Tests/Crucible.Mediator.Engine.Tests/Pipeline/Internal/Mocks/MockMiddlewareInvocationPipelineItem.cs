@@ -1,7 +1,5 @@
 ﻿using Crucible.Mediator.Abstractions.Tests.Invocation.Mocks;
 using Crucible.Mediator.Engine.Pipeline.Internal;
-using Crucible.Mediator.Engine.Pipeline.Resolvers;
-using Crucible.Mediator.Engine.Tests.Pipeline.Resolvers.Mocks;
 using Crucible.Mediator.Invocation;
 using Moq;
 
@@ -23,24 +21,12 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Internal.Mocks
             set
             {
                 _middleware = value;
-                _managedResolver.Component = value ?? _managedMiddleware;
             }
-        }
-
-        private readonly MockInvocationComponentResolver<IInvocationMiddleware<TRequest, TResponse>> _managedResolver;
-
-        private IInvocationComponentResolver<IInvocationMiddleware<TRequest, TResponse>>? _resolver;
-
-        public IInvocationComponentResolver<IInvocationMiddleware<TRequest, TResponse>> Resolver
-        {
-            get => _resolver ?? _managedResolver;
-            set => _resolver = value;
         }
 
         public MockMiddlewareInvocationPipelineItem()
         {
             _managedMiddleware = new();
-            _managedResolver = new() { Component = _managedMiddleware };
 
             Mock.Setup(m => m.IsApplicable(It.IsAny<Type>()))
                 .Returns<Type>(t => typeof(IInvocationContext<TRequest, TResponse>).IsAssignableFrom(t));
@@ -48,8 +34,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Internal.Mocks
             Mock.Setup(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
                 .Returns<IInvocationContext<TRequest, TResponse>, Func<CancellationToken, Task>, CancellationToken>((ctx, next, ct) =>
                 {
-                    var middleware = Resolver.ResolveComponent();
-                    return middleware.HandleAsync(ctx, next, ct);
+                    return Middleware.HandleAsync(ctx, next, ct);
                 });
         }
 

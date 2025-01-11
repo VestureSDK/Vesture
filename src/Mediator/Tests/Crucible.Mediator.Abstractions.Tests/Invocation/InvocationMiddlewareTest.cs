@@ -15,7 +15,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation
         public InvocationMiddlewareTest()
             : base(new()) { }
 
-        protected override SampleInvocationMiddleware CreateMiddleware() => new(LifeCycle.Object);
+        protected override SampleInvocationMiddleware CreateInvocationMiddleware() => new(LifeCycle.Object);
 
         [Test]
         public async Task HandleAsync_InnerInvokes_AreInSequence()
@@ -33,7 +33,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation
             Next.ReturnTask = nextAsyncTaskCompletionSource.Task;
 
             // Act / Assert
-            var task = Middleware.HandleAsync(InvocationContext, Next, CancellationToken);
+            var task = Middleware.HandleAsync(Context, Next, CancellationToken);
 
             LifeCycle.Verify(m => m.InnerEntersOnBeforeNextAsync(It.IsAny<IInvocationContext<MockContract, MockContract>>(), It.IsAny<CancellationToken>()), Times.Once);
             Next.Mock.Verify(m => m(It.IsAny<CancellationToken>()), Times.Never);
@@ -63,12 +63,12 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation
             Next.Mock.Setup(m => m(It.IsAny<CancellationToken>()))
                 .Returns<CancellationToken>((ct) =>
                 {
-                    InvocationContext.SetError(new Exception("sample error"));
+                    Context.SetError(new Exception("sample error"));
                     return Task.CompletedTask;
                 });
 
             // Act
-            await Middleware.HandleAsync(InvocationContext, Next, CancellationToken);
+            await Middleware.HandleAsync(Context, Next, CancellationToken);
 
             // Assert
             LifeCycle.Verify(m => m.InnerEntersOnErrorAsync(It.IsAny<IInvocationContext<MockContract, MockContract>>(), It.IsAny<CancellationToken>()), Times.Once);
@@ -81,7 +81,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation
             // No arrange required
 
             // Act
-            await Middleware.HandleAsync(InvocationContext, Next, CancellationToken);
+            await Middleware.HandleAsync(Context, Next, CancellationToken);
 
             // Assert
             LifeCycle.Verify(m => m.InnerEntersOnErrorAsync(It.IsAny<IInvocationContext<MockContract, MockContract>>(), It.IsAny<CancellationToken>()), Times.Never);
@@ -94,7 +94,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation
             // No arrange required
 
             // Act
-            await Middleware.HandleAsync(InvocationContext, Next, CancellationToken);
+            await Middleware.HandleAsync(Context, Next, CancellationToken);
 
             // Assert
             LifeCycle.Verify(m => m.InnerEntersOnSucessAsync(It.IsAny<IInvocationContext<MockContract, MockContract>>(), It.IsAny<CancellationToken>()), Times.Once);
@@ -107,12 +107,12 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation
             Next.Mock.Setup(m => m(It.IsAny<CancellationToken>()))
                 .Returns<CancellationToken>((ct) =>
                 {
-                    InvocationContext.SetError(new Exception("sample error"));
+                    Context.SetError(new Exception("sample error"));
                     return Task.CompletedTask;
                 });
 
             // Act
-            await Middleware.HandleAsync(InvocationContext, Next, CancellationToken);
+            await Middleware.HandleAsync(Context, Next, CancellationToken);
 
             // Assert
             LifeCycle.Verify(m => m.InnerEntersOnSucessAsync(It.IsAny<IInvocationContext<MockContract, MockContract>>(), It.IsAny<CancellationToken>()), Times.Never);

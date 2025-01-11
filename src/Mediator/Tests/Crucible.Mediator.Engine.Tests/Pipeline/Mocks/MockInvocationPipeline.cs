@@ -2,10 +2,8 @@
 using Crucible.Mediator.Engine.Pipeline;
 using Crucible.Mediator.Engine.Pipeline.Context;
 using Crucible.Mediator.Engine.Pipeline.Internal;
-using Crucible.Mediator.Engine.Pipeline.Resolvers;
 using Crucible.Mediator.Engine.Pipeline.Strategies;
 using Crucible.Mediator.Engine.Tests.Pipeline.Context.Mocks;
-using Crucible.Mediator.Engine.Tests.Pipeline.Resolvers.Mocks;
 using Crucible.Mediator.Engine.Tests.Pipeline.Strategies.Mocks;
 using Crucible.Mediator.Invocation;
 using Moq;
@@ -85,21 +83,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Mocks
         public IPrePipelineMiddleware PrePipelineMiddleware
         {
             get => _prePipelineMiddleware ?? _managedPrePipelineMiddleware;
-            set
-            {
-                _prePipelineMiddleware = value;
-                _managedPrePipelineMiddlewareResolver.Component = value ?? _managedPrePipelineMiddleware;
-            }
-        }
-
-        private readonly MockInvocationComponentResolver<IPrePipelineMiddleware> _managedPrePipelineMiddlewareResolver;
-
-        private IInvocationComponentResolver<IPrePipelineMiddleware>? _prePipelineMiddlewareResolver;
-
-        public IInvocationComponentResolver<IPrePipelineMiddleware> PrePipelineMiddlewareResolver
-        {
-            get => _prePipelineMiddlewareResolver ?? _managedPrePipelineMiddlewareResolver;
-            set => _prePipelineMiddlewareResolver = value;
+            set => _prePipelineMiddleware = value;
         }
 
         private readonly MockPreHandlerMiddleware _managedPreHandlerMiddleware;
@@ -109,21 +93,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Mocks
         public IPreHandlerMiddleware PreHandlerMiddleware
         {
             get => _preHandlerMiddleware ?? _managedPreHandlerMiddleware;
-            set
-            {
-                _preHandlerMiddleware = value;
-                _managedPreHandlerMiddlewareResolver.Component = value ?? _managedPreHandlerMiddleware;
-            }
-        }
-
-        private readonly MockInvocationComponentResolver<IPreHandlerMiddleware> _managedPreHandlerMiddlewareResolver;
-
-        private IInvocationComponentResolver<IPreHandlerMiddleware>? _preHandlerMiddlewareResolver;
-
-        public IInvocationComponentResolver<IPreHandlerMiddleware> PreHandlerMiddlewareResolver
-        {
-            get => _preHandlerMiddlewareResolver ?? _managedPreHandlerMiddlewareResolver;
-            set => _preHandlerMiddlewareResolver = value;
+            set => _preHandlerMiddleware = value;
         }
 
         private ICollection<IMiddlewareInvocationPipelineItem> _middlewares = [];
@@ -141,25 +111,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Mocks
         public IInvocationHandler<TRequest, TResponse> Handler
         {
             get => _handler ?? _managedHandler;
-            set
-            {
-                _handler = value;
-                _managedHandlerResolver.Component = value ?? _managedHandler;
-            }
-        }
-
-        private readonly MockInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>> _managedHandlerResolver;
-
-        private IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>>? _handlerResolver;
-
-        public IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>> HandlerResolver
-        {
-            get => _handlerResolver ?? _managedHandlerResolver;
-            set
-            {
-                _handlerResolver = value;
-                _managedHandlerStrategy.Resolver = value ?? _managedHandlerResolver;
-            }
+            set => _handler = value;
         }
 
         private readonly MockInvocationHandlerStrategy<TRequest, TResponse> _managedHandlerStrategy;
@@ -188,29 +140,16 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Mocks
             };
 
             _managedPrePipelineMiddleware = new();
-            _managedPrePipelineMiddlewareResolver = new()
-            {
-                Component = _managedPrePipelineMiddleware
-            };
-
             _managedPreHandlerMiddleware = new();
-            _managedPreHandlerMiddlewareResolver = new()
-            {
-                Component = _managedPreHandlerMiddleware
-            };
 
             _managedHandler = new()
             {
                 Response = _response,
             };
-            _managedHandlerResolver = new()
-            {
-                Component = _managedHandler
-            };
 
             _managedHandlerStrategy = new()
             {
-                Resolver = _managedHandlerResolver
+                Handler = _managedHandler
             };
 
             Request = typeof(TRequest);
@@ -242,8 +181,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Mocks
 
             Func<IInvocationContext<TRequest, TResponse>, CancellationToken, Task> chain = (ctx, ct) =>
             {
-                var preHandlerMiddleware = PreHandlerMiddlewareResolver.ResolveComponent();
-                return preHandlerMiddleware.HandleAsync((IInvocationContext<object, object>)ctx, (t) => handler(ctx, t), ct);
+                return PreHandlerMiddleware.HandleAsync((IInvocationContext<object, object>)ctx, (t) => handler(ctx, t), ct);
             };
 
             // Build the chain of responsibility and return the new root func.
@@ -257,8 +195,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Mocks
             var next = chain;
             chain = (ctx, ct) =>
             {
-                var preHandlerMiddleware = PrePipelineMiddlewareResolver.ResolveComponent();
-                return preHandlerMiddleware.HandleAsync((IInvocationContext<object, object>)ctx, (t) => next.Invoke(ctx, t), ct);
+                return PrePipelineMiddleware.HandleAsync((IInvocationContext<object, object>)ctx, (t) => next.Invoke(ctx, t), ct);
             };
 
             return chain!;

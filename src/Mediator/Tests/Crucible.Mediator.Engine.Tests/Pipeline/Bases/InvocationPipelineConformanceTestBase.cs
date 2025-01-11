@@ -4,7 +4,6 @@ using Crucible.Mediator.Engine.Pipeline.Internal;
 using Crucible.Mediator.Engine.Tests.Pipeline.Context.Mocks;
 using Crucible.Mediator.Engine.Tests.Pipeline.Internal.Mocks;
 using Crucible.Mediator.Engine.Tests.Pipeline.Mocks;
-using Crucible.Mediator.Engine.Tests.Pipeline.Resolvers.Mocks;
 using Crucible.Mediator.Engine.Tests.Pipeline.Strategies.Mocks;
 using Crucible.Mediator.Invocation;
 using Moq;
@@ -12,7 +11,7 @@ using Any = object;
 
 namespace Crucible.Mediator.Engine.Tests.Pipeline.Bases
 {
-    public abstract class InvocationPipelineTestBase<TRequest, TResponse, TPipeline>
+    public abstract class InvocationPipelineConformanceTestBase<TRequest, TResponse, TPipeline>
         where TPipeline : IInvocationPipeline<TResponse>
     {
         protected Lazy<TPipeline> PipelineInitializer { get; }
@@ -29,34 +28,26 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Bases
 
         protected MockPrePipelineMiddleware PrePipelineMiddleware { get; } = new();
 
-        protected MockInvocationComponentResolver<IPrePipelineMiddleware> PrePipelineMiddlewareResolver { get; }
-
-        protected ICollection<IMiddlewareInvocationPipelineItem> MiddlewareInvocationPipelineItems { get; } = [];
+        protected ICollection<IMiddlewareInvocationPipelineItem> MiddlewareItems { get; } = [];
 
         protected MockPreHandlerMiddleware PreHandlerMiddleware { get; } = new();
 
-        protected MockInvocationComponentResolver<IPreHandlerMiddleware> PreHandlerMiddlewareResolver { get; }
-
         protected MockInvocationHandlerStrategy<TRequest, TResponse> HandlerStrategy { get; }
 
-        protected InvocationPipelineTestBase(TRequest defaultRequest)
+        protected InvocationPipelineConformanceTestBase(TRequest defaultRequest)
         {
-
             Request = defaultRequest;
             Context = new() { Request = Request! };
             ContextFactory = new() { Context = Context };
 
             HandlerStrategy = new();
 
-            PrePipelineMiddlewareResolver = new() { Component = PrePipelineMiddleware };
-            PreHandlerMiddlewareResolver = new() { Component = PreHandlerMiddleware };
-
 #pragma warning disable IL2091 // Target generic argument does not satisfy 'DynamicallyAccessedMembersAttribute' in target method or type. The generic parameter of the source method or type does not have matching annotations.
-            PipelineInitializer = new Lazy<TPipeline>(() => CreatePipeline());
+            PipelineInitializer = new Lazy<TPipeline>(() => CreateInvocationPipeline());
 #pragma warning restore IL2091 // Target generic argument does not satisfy 'DynamicallyAccessedMembersAttribute' in target method or type. The generic parameter of the source method or type does not have matching annotations.
         }
 
-        protected abstract TPipeline CreatePipeline();
+        protected abstract TPipeline CreateInvocationPipeline();
 
         [Test]
         public void Request_IsTRequest()
@@ -102,7 +93,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Bases
         {
             // Arrange
             var middleware = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>();
-            MiddlewareInvocationPipelineItems.Add(middleware);
+            MiddlewareItems.Add(middleware);
 
             // Act
             await Pipeline.HandleAsync(Request!, CancellationToken);
@@ -147,7 +138,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Bases
             var middlewareTaskCompletionSource = new TaskCompletionSource();
             var middleware = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>();
             SetupMiddlewareItemWithTaskCompletionSource(middleware, middlewareTaskCompletionSource);
-            MiddlewareInvocationPipelineItems.Add(middleware);
+            MiddlewareItems.Add(middleware);
 
             var preHandlerMiddlewareTaskCompletionSource = new TaskCompletionSource();
             SetupMiddlewareWithTaskCompletionSource(PreHandlerMiddleware, preHandlerMiddlewareTaskCompletionSource);
@@ -231,7 +222,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Bases
             for (var i = 0; i < middlewareCount; i++)
             {
                 var middleware = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>();
-                MiddlewareInvocationPipelineItems.Add(middleware);
+                MiddlewareItems.Add(middleware);
             }
 
             // Act
@@ -251,11 +242,11 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Bases
 
             var middlewareA = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>() { Order = orderA, };
             AddMiddlewareToExecutionListOnHandleAsyncInvoked(middlewareA);
-            MiddlewareInvocationPipelineItems.Add(middlewareA);
+            MiddlewareItems.Add(middlewareA);
 
             var middlewareB = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>() { Order = orderB, };
             AddMiddlewareToExecutionListOnHandleAsyncInvoked(middlewareB);
-            MiddlewareInvocationPipelineItems.Add(middlewareB);
+            MiddlewareItems.Add(middlewareB);
 
             var middlewareAExpectedIndex = orderA <= orderB ? 0 : 1;
             var middlewareBExpectedIndex = middlewareAExpectedIndex == 1 ? 0 : 1;
@@ -287,7 +278,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Bases
         {
             // Arrange
             var middleware = new MockMiddlewareInvocationPipelineItem<Unrelated, Unrelated>();
-            MiddlewareInvocationPipelineItems.Add(middleware);
+            MiddlewareItems.Add(middleware);
 
             // Act
             await Pipeline.HandleAsync(Request!, CancellationToken);
@@ -312,7 +303,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Bases
         {
             // Arrange
             var middleware = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>();
-            MiddlewareInvocationPipelineItems.Add(middleware);
+            MiddlewareItems.Add(middleware);
 
             middleware.Mock.Setup(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new Exception("sample exception"));

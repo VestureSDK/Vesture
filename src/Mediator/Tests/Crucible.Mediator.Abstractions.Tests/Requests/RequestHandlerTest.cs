@@ -1,22 +1,26 @@
-﻿using Crucible.Mediator.Abstractions.Tests.Internal;
+﻿using Crucible.Mediator.Abstractions.Tests.Data.Annotations.Requests;
+using Crucible.Mediator.Abstractions.Tests.Internal;
 using Crucible.Mediator.Abstractions.Tests.Invocation.Bases;
-using Crucible.Mediator.Abstractions.Tests.Requests.Mocks;
 using Crucible.Mediator.Invocation;
 using Crucible.Mediator.Requests;
 using Moq;
-using static Crucible.Mediator.Abstractions.Tests.Requests.RequestHandlerTest;
 
 namespace Crucible.Mediator.Abstractions.Tests.Requests
 {
     [SampleTest]
-    public class RequestHandlerTest : InvocationHandlerConformanceTestBase<MockRequest, MockResponse, SampleRequestHandler>
+    [TestFixtureSource_RequestResponse_RequestsAttribute]
+    public class RequestHandlerTest<TRequest, TResponse> : InvocationHandlerConformanceTestBase<TRequest, TResponse, RequestHandlerTest<TRequest, TResponse>.SampleRequestHandler>
+        where TRequest : IRequest<TResponse>
     {
         protected Mock<IRequestHandlerLifeCycle> LifeCycle { get; } = new();
 
-        protected MockResponse Response { get; set; } = new();
+        protected TResponse Response { get; set; }
 
-        public RequestHandlerTest()
-            : base(new()) { }
+        public RequestHandlerTest(TRequest request, TResponse response)
+            : base(request) 
+        {
+            Response = response;
+        }
 
         protected override SampleRequestHandler CreateInvocationHandler() => new(LifeCycle.Object, Response);
 
@@ -25,13 +29,13 @@ namespace Crucible.Mediator.Abstractions.Tests.Requests
         {
             // Arrange
             var entersHandleAsyncTaskCompletionSource = new TaskCompletionSource();
-            LifeCycle.Setup(m => m.InnerEntersHandleAsync(It.IsAny<MockRequest>(), It.IsAny<CancellationToken>()))
+            LifeCycle.Setup(m => m.InnerEntersHandleAsync(It.IsAny<TRequest>(), It.IsAny<CancellationToken>()))
                 .Returns(entersHandleAsyncTaskCompletionSource.Task);
 
             // Act / Assert
-            var task = ((IInvocationHandler<MockRequest, MockResponse>)Handler).HandleAsync(Request, CancellationToken);
+            var task = ((IInvocationHandler<TRequest, TResponse>)Handler).HandleAsync(Request, CancellationToken);
 
-            LifeCycle.Verify(m => m.InnerEntersHandleAsync(It.IsAny<MockRequest>(), It.IsAny<CancellationToken>()), Times.Once);
+            LifeCycle.Verify(m => m.InnerEntersHandleAsync(It.IsAny<TRequest>(), It.IsAny<CancellationToken>()), Times.Once);
 
             // Cleanup
             entersHandleAsyncTaskCompletionSource.SetResult();
@@ -45,7 +49,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Requests
             // No arrange required
 
             // Act
-            var response = await ((IInvocationHandler<MockRequest, MockResponse>)Handler).HandleAsync(Request, CancellationToken);
+            var response = await ((IInvocationHandler<TRequest, TResponse>)Handler).HandleAsync(Request, CancellationToken);
 
             // Assert
             Assert.That(response, Is.EqualTo(Response));
@@ -53,22 +57,22 @@ namespace Crucible.Mediator.Abstractions.Tests.Requests
 
         public interface IRequestHandlerLifeCycle
         {
-            Task InnerEntersHandleAsync(MockRequest request, CancellationToken cancellationToken);
+            Task InnerEntersHandleAsync(TRequest request, CancellationToken cancellationToken);
         }
 
-        public class SampleRequestHandler : CommandHandler<MockRequest, MockResponse>
+        public class SampleRequestHandler : CommandHandler<TRequest, TResponse>
         {
             private readonly IRequestHandlerLifeCycle _lifeCycle;
 
-            private readonly MockResponse _response;
+            private readonly TResponse _response;
 
-            public SampleRequestHandler(IRequestHandlerLifeCycle lifeCycle, MockResponse response)
+            public SampleRequestHandler(IRequestHandlerLifeCycle lifeCycle, TResponse response)
             {
                 _lifeCycle = lifeCycle;
                 _response = response;
             }
 
-            public override async Task<MockResponse> HandleAsync(MockRequest request, CancellationToken cancellationToken = default)
+            public override async Task<TResponse> HandleAsync(TRequest request, CancellationToken cancellationToken = default)
             {
                 await _lifeCycle.InnerEntersHandleAsync(request, cancellationToken);
                 return _response;

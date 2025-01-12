@@ -1,20 +1,21 @@
-﻿using Crucible.Mediator.Abstractions.Tests.Events.Mocks;
+﻿using Crucible.Mediator.Abstractions.Tests.Data;
+using Crucible.Mediator.Abstractions.Tests.Data.Annotations.Events;
 using Crucible.Mediator.Abstractions.Tests.Internal;
 using Crucible.Mediator.Abstractions.Tests.Invocation.Bases;
 using Crucible.Mediator.Events;
 using Crucible.Mediator.Invocation;
 using Moq;
-using static Crucible.Mediator.Abstractions.Tests.Events.EventHandlerTest;
 
 namespace Crucible.Mediator.Abstractions.Tests.Events
 {
     [SampleTest]
-    public class EventHandlerTest : InvocationHandlerConformanceTestBase<MockEvent, EventResponse, SampleEventHandler>
+    [TestFixtureSource_Request_Events]
+    public class EventHandlerTest<TEvent> : InvocationHandlerConformanceTestBase<TEvent, EventResponse, EventHandlerTest<TEvent>.SampleEventHandler>
     {
         protected Mock<IEventHandlerLifeCycle> LifeCycle { get; } = new();
 
-        public EventHandlerTest()
-            : base(new()) { }
+        public EventHandlerTest(TEvent @event)
+            : base(@event) { }
 
         protected override SampleEventHandler CreateInvocationHandler() => new(LifeCycle.Object);
 
@@ -23,13 +24,13 @@ namespace Crucible.Mediator.Abstractions.Tests.Events
         {
             // Arrange
             var entersHandleAsyncTaskCompletionSource = new TaskCompletionSource();
-            LifeCycle.Setup(m => m.InnerEntersHandleAsync(It.IsAny<MockEvent>(), It.IsAny<CancellationToken>()))
+            LifeCycle.Setup(m => m.InnerEntersHandleAsync(It.IsAny<TEvent>(), It.IsAny<CancellationToken>()))
                 .Returns(entersHandleAsyncTaskCompletionSource.Task);
 
             // Act / Assert
-            var task = ((IInvocationHandler<MockEvent, EventResponse>)Handler).HandleAsync(Request, CancellationToken);
+            var task = ((IInvocationHandler<TEvent, EventResponse>)Handler).HandleAsync(Request, CancellationToken);
 
-            LifeCycle.Verify(m => m.InnerEntersHandleAsync(It.IsAny<MockEvent>(), It.IsAny<CancellationToken>()), Times.Once);
+            LifeCycle.Verify(m => m.InnerEntersHandleAsync(It.IsAny<TEvent>(), It.IsAny<CancellationToken>()), Times.Once);
 
             // Cleanup
             entersHandleAsyncTaskCompletionSource.SetResult();
@@ -38,10 +39,10 @@ namespace Crucible.Mediator.Abstractions.Tests.Events
 
         public interface IEventHandlerLifeCycle
         {
-            Task InnerEntersHandleAsync(MockEvent @event, CancellationToken cancellationToken);
+            Task InnerEntersHandleAsync(TEvent @event, CancellationToken cancellationToken);
         }
 
-        public class SampleEventHandler : Mediator.Events.EventHandler<MockEvent>
+        public class SampleEventHandler : Mediator.Events.EventHandler<TEvent>
         {
             private readonly IEventHandlerLifeCycle _lifeCycle;
 
@@ -50,7 +51,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Events
                 _lifeCycle = lifeCycle;
             }
 
-            public override async Task HandleAsync(MockEvent @event, CancellationToken cancellationToken = default)
+            public override async Task HandleAsync(TEvent @event, CancellationToken cancellationToken = default)
             {
                 await _lifeCycle.InnerEntersHandleAsync(@event, cancellationToken);
             }

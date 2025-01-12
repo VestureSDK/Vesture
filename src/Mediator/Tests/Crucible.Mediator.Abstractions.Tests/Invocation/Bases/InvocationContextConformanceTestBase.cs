@@ -1,4 +1,7 @@
 ﻿using Crucible.Mediator.Abstractions.Tests.Commands.Mocks;
+using Crucible.Mediator.Abstractions.Tests.Data.Annotations.Commands;
+using Crucible.Mediator.Abstractions.Tests.Data.Annotations.Events;
+using Crucible.Mediator.Abstractions.Tests.Data.Annotations.Requests;
 using Crucible.Mediator.Abstractions.Tests.Events.Mocks;
 using Crucible.Mediator.Abstractions.Tests.Internal;
 using Crucible.Mediator.Abstractions.Tests.Invocation.Mocks;
@@ -15,39 +18,32 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParamsAttribute<MockRequest, MockResponse>]
-        [TestCaseGenericNoParamsAttribute<MockEvent, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockCommand, CommandResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, MockUnmarked>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, CommandResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, NoResponse>]
+        [TestCaseSource_RequestResponse_Commands]
+        [TestCaseSource_RequestResponse_Events]
+        [TestCaseSource_RequestResponse_Requests]
+        [TestCaseSource_RequestResponse_Unmarks]
+        [TestCaseSource_RequestResponse_NoResponses]
 #pragma warning disable NUnit2020 // Incompatible types for SameAs constraint
-        public void RequestType_IsSameAsOriginalRequestType_WithPristineContext<TRequest, TResponse>()
-            where TRequest: new()
+        public void RequestType_IsSameAsOriginalRequestType_WithPristineContext<TRequest, TResponse>(TRequest request, TResponse response)
         {
             // Arrange
-            var expectedRequest = new TRequest();
-            var context = CreateInvocationContext<TRequest, TResponse>(expectedRequest);
+            var context = CreateInvocationContext<TRequest, TResponse>(request);
 
             // Act
             var requestType = context.RequestType;
 
             // Assert
-            Assert.That(requestType, Is.SameAs(expectedRequest!.GetType()));
+            Assert.That(requestType, Is.SameAs(request!.GetType()));
         }
 #pragma warning restore NUnit2020 // Incompatible types for SameAs constraint
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParamsAttribute<MockEvent, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, EventResponse>]
-        public void IsEvent_IsTrue<TRequest, TResponse>()
-            where TRequest : new()
+        [TestCaseSource_RequestResponse_Events]
+        public void IsEvent_IsTrue<TRequest, TResponse>(TRequest request, TResponse response)
         {
             // Arrange
-            var expectedRequest = new TRequest();
-            var context = CreateInvocationContext<TRequest, TResponse>(expectedRequest);
+            var context = CreateInvocationContext<TRequest, TResponse>(request);
 
             // Act
             var isEvent = context.IsEvent;
@@ -58,14 +54,14 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParamsAttribute<MockRequest, MockResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, MockUnmarked>]
-        public void IsEvent_IsFalse<TRequest, TResponse>()
-            where TRequest : new()
+        [TestCaseSource_RequestResponse_Commands]
+        [TestCaseSource_RequestResponse_Requests]
+        [TestCaseSource_RequestResponse_Unmarks]
+        [TestCaseSource_RequestResponse_NoResponses]
+        public void IsEvent_IsFalse<TRequest, TResponse>(TRequest request, TResponse response)
         {
             // Arrange
-            var expectedRequest = new TRequest();
-            var context = CreateInvocationContext<TRequest, TResponse>(expectedRequest);
+            var context = CreateInvocationContext<TRequest, TResponse>(request);
 
             // Act
             var isEvent = context.IsEvent;
@@ -76,14 +72,11 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParamsAttribute<MockCommand, CommandResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, CommandResponse>]
-        public void IsCommand_IsTrue<TRequest, TResponse>()
-            where TRequest : new()
+        [TestCaseSource_RequestResponse_Commands]
+        public void IsCommand_IsTrue<TRequest, TResponse>(TRequest request, TResponse response)
         {
             // Arrange
-            var expectedRequest = new TRequest();
-            var context = CreateInvocationContext<TRequest, TResponse>(expectedRequest);
+            var context = CreateInvocationContext<TRequest, TResponse>(request);
 
             // Act
             var isCommand = context.IsCommand;
@@ -94,17 +87,14 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParamsAttribute<MockRequest, MockResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, MockUnmarked>]
-        [TestCaseGenericNoParamsAttribute<MockEvent, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, NoResponse>]
-        public void IsCommand_IsFalse<TRequest, TResponse>()
-            where TRequest : new()
+        [TestCaseSource_RequestResponse_Events]
+        [TestCaseSource_RequestResponse_Requests]
+        [TestCaseSource_RequestResponse_Unmarks]
+        [TestCaseSource_RequestResponse_NoResponses]
+        public void IsCommand_IsFalse<TRequest, TResponse>(TRequest request, TResponse response)
         {
             // Arrange
-            var expectedRequest = new TRequest();
-            var context = CreateInvocationContext<TRequest, TResponse>(expectedRequest);
+            var context = CreateInvocationContext<TRequest, TResponse>(request);
 
             // Act
             var isCommand = context.IsCommand;
@@ -115,14 +105,12 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParamsAttribute<MockRequest, MockResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, MockUnmarked>]
-        public void IsRequest_IsTrue<TRequest, TResponse>()
-            where TRequest : new()
+        [TestCaseSource_RequestResponse_Requests]
+        [TestCaseSource_RequestResponse_Unmarks]
+        public void IsRequest_IsTrue<TRequest, TResponse>(TRequest request, TResponse response)
         {
             // Arrange
-            var expectedRequest = new TRequest();
-            var context = CreateInvocationContext<TRequest, TResponse>(expectedRequest);
+            var context = CreateInvocationContext<TRequest, TResponse>(request);
 
             // Act
             var isRequest = context.IsRequest;
@@ -133,17 +121,13 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParamsAttribute<MockCommand, CommandResponse>]
-        [TestCaseGenericNoParamsAttribute<MockEvent, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, CommandResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, NoResponse>]
-        public void IsRequest_IsFalse<TRequest, TResponse>()
-            where TRequest : new()
+        [TestCaseSource_RequestResponse_Commands]
+        [TestCaseSource_RequestResponse_Events]
+        [TestCaseSource_RequestResponse_NoResponses]
+        public void IsRequest_IsFalse<TRequest, TResponse>(TRequest request, TResponse response)
         {
             // Arrange
-            var expectedRequest = new TRequest();
-            var context = CreateInvocationContext<TRequest, TResponse>(expectedRequest);
+            var context = CreateInvocationContext<TRequest, TResponse>(request);
 
             // Act
             var isRequest = context.IsRequest;
@@ -154,14 +138,12 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParamsAttribute<MockRequest, MockResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, MockUnmarked>]
-        public void HasResponseType_IsTrue<TRequest, TResponse>()
-            where TRequest : new()
+        [TestCaseSource_RequestResponse_Requests]
+        [TestCaseSource_RequestResponse_Unmarks]
+        public void HasResponseType_IsTrue<TRequest, TResponse>(TRequest request, TResponse response)
         {
             // Arrange
-            var expectedRequest = new TRequest();
-            var context = CreateInvocationContext<TRequest, TResponse>(expectedRequest);
+            var context = CreateInvocationContext<TRequest, TResponse>(request);
 
             // Act
             var hasResponseType = context.HasResponseType;
@@ -172,17 +154,13 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParamsAttribute<MockCommand, CommandResponse>]
-        [TestCaseGenericNoParamsAttribute<MockEvent, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, CommandResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, NoResponse>]
-        public void HasResponseType_IsFalse<TRequest, TResponse>()
-            where TRequest : new()
+        [TestCaseSource_RequestResponse_Commands]
+        [TestCaseSource_RequestResponse_Events]
+        [TestCaseSource_RequestResponse_NoResponses]
+        public void HasResponseType_IsFalse<TRequest, TResponse>(TRequest request, TResponse response)
         {
             // Arrange
-            var expectedRequest = new TRequest();
-            var context = CreateInvocationContext<TRequest, TResponse>(expectedRequest);
+            var context = CreateInvocationContext<TRequest, TResponse>(request);
 
             // Act
             var hasResponseType = context.HasResponseType;
@@ -193,14 +171,12 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParamsAttribute<MockRequest, MockResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, MockUnmarked>]
-        public void HasResponse_IsFalse_WhenNoResponseSet<TRequest, TResponse>()
-            where TRequest : new()
+        [TestCaseSource_RequestResponse_Requests]
+        [TestCaseSource_RequestResponse_Unmarks]
+        public void HasResponse_IsFalse_WhenNoResponseSet<TRequest, TResponse>(TRequest request, TResponse response)
         {
             // Arrange
-            var expectedRequest = new TRequest();
-            var context = CreateInvocationContext<TRequest, TResponse>(expectedRequest);
+            var context = CreateInvocationContext<TRequest, TResponse>(request);
 
             // Act
             var hasResponse = context.HasResponse;
@@ -211,18 +187,13 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParamsAttribute<MockRequest, MockResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, MockUnmarked>]
-        public void HasResponse_IsTrue_WhenResponseSet<TRequest, TResponse>()
-            where TRequest : new()
-            where TResponse : new()
+        [TestCaseSource_RequestResponse_Requests]
+        [TestCaseSource_RequestResponse_Unmarks]
+        public void HasResponse_IsTrue_WhenResponseSet<TRequest, TResponse>(TRequest request, TResponse response)
         {
             // Arrange
-            var expectedRequest = new TRequest();
-            var context = CreateInvocationContext<TRequest, TResponse>(expectedRequest);
-
-            var expectedResponse = new TResponse();
-            context.SetResponse(expectedResponse);
+            var context = CreateInvocationContext<TRequest, TResponse>(request);
+            context.SetResponse(response);
 
             // Act
             var hasResponse = context.HasResponse;
@@ -233,39 +204,30 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParamsAttribute<MockRequest, MockResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, MockUnmarked>]
-        public void SetResponse_Response_IsTheOneSet_WhenNoResponseSetBefore<TRequest, TResponse>()
-            where TRequest : new()
-            where TResponse : new()
+        [TestCaseSource_RequestResponse_Requests]
+        [TestCaseSource_RequestResponse_Unmarks]
+        public void SetResponse_Response_IsTheOneSet_WhenNoResponseSetBefore<TRequest, TResponse>(TRequest request, TResponse response)
         {
             // Arrange
-            var expectedRequest = new TRequest();
-            var context = CreateInvocationContext<TRequest, TResponse>(expectedRequest);
-
-            var expectedResponse = new TResponse();
+            var context = CreateInvocationContext<TRequest, TResponse>(request);
 
             // Act
-            context.SetResponse(expectedResponse);
+            context.SetResponse(response);
 
             // Assert
-            Assert.That(context.Response, Is.SameAs(expectedResponse));
+            Assert.That(context.Response, Is.SameAs(response));
         }
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParamsAttribute<MockRequest, MockResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, MockUnmarked>]
-        public void SetResponse_Response_IsTheLastOneSet_WhenSettingMultipleResponses<TRequest, TResponse>()
-            where TRequest : new()
-            where TResponse : new()
+        [TestCaseSource_RequestResponse_Requests]
+        [TestCaseSource_RequestResponse_Unmarks]
+        public void SetResponse_Response_IsTheLastOneSet_WhenSettingMultipleResponses<TRequest, TResponse>(TRequest request, TResponse response)
+            where TResponse: new()
         {
             // Arrange
-            var expectedRequest = new TRequest();
-            var context = CreateInvocationContext<TRequest, TResponse>(expectedRequest);
-
-            var firstExpectedResponse = new TResponse();
-            context.SetResponse(firstExpectedResponse);
+            var context = CreateInvocationContext<TRequest, TResponse>(request);
+            context.SetResponse(response);
 
             var lastExpectedResponse = new TResponse();
 
@@ -278,18 +240,13 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParamsAttribute<MockRequest, MockResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, MockUnmarked>]
-        public void SetResponse_Response_IsUnset_WhenSettingNullResponse<TRequest, TResponse>()
-            where TRequest : new()
-            where TResponse : new()
+        [TestCaseSource_RequestResponse_Requests]
+        [TestCaseSource_RequestResponse_Unmarks]
+        public void SetResponse_Response_IsUnset_WhenSettingNullResponse<TRequest, TResponse>(TRequest request, TResponse response)
         {
             // Arrange
-            var expectedRequest = new TRequest();
-            var context = CreateInvocationContext<TRequest, TResponse>(expectedRequest);
-
-            var expectedResponse = new TResponse();
-            context.SetResponse(expectedResponse);
+            var context = CreateInvocationContext<TRequest, TResponse>(request);
+            context.SetResponse(response);
 
             // Act
             context.SetResponse(null);
@@ -300,44 +257,36 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParamsAttribute<MockRequest, MockResponse>]
-        [TestCaseGenericNoParamsAttribute<MockEvent, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockCommand, CommandResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, MockUnmarked>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, CommandResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, NoResponse>]
+        [TestCaseSource_RequestResponse_Commands]
+        [TestCaseSource_RequestResponse_Events]
+        [TestCaseSource_RequestResponse_Requests]
+        [TestCaseSource_RequestResponse_Unmarks]
+        [TestCaseSource_RequestResponse_NoResponses]
 #pragma warning disable NUnit2020 // Incompatible types for SameAs constraint
-        public void Request_IsCtorValue_WithPristineContext<TRequest, TResponse>()
-            where TRequest : new()
+        public void Request_IsCtorValue_WithPristineContext<TRequest, TResponse>(TRequest request, TResponse response)
         {
             // Arrange
-            var expectedRequest = new TRequest();
-            var context = CreateInvocationContext<TRequest, TResponse>(expectedRequest);
+            var context = CreateInvocationContext<TRequest, TResponse>(request);
 
             // Act
-            var request = ((IInvocationContext)context).Request;
+            var actualRequest = ((IInvocationContext)context).Request;
 
             // Assert
-            Assert.That(request, Is.SameAs(expectedRequest));
+            Assert.That(actualRequest, Is.SameAs(request));
         }
 #pragma warning restore NUnit2020 // Incompatible types for SameAs constraint
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParamsAttribute<MockRequest, MockResponse>]
-        [TestCaseGenericNoParamsAttribute<MockEvent, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockCommand, CommandResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, MockUnmarked>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, CommandResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, NoResponse>]
-        public void ResponseType_IsSetWithExpectedResponseType<TRequest, TResponse>()
-            where TRequest : new()
+        [TestCaseSource_RequestResponse_Commands]
+        [TestCaseSource_RequestResponse_Events]
+        [TestCaseSource_RequestResponse_Requests]
+        [TestCaseSource_RequestResponse_Unmarks]
+        [TestCaseSource_RequestResponse_NoResponses]
+        public void ResponseType_IsSetWithExpectedResponseType<TRequest, TResponse>(TRequest request, TResponse response)
         {
             // Arrange
-            var expectedRequest = new TRequest();
-            var context = CreateInvocationContext<TRequest, TResponse>(expectedRequest);
+            var context = CreateInvocationContext<TRequest, TResponse>(request);
 
             // Act
             var responseType = context.ResponseType;
@@ -348,42 +297,34 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParamsAttribute<MockRequest, MockResponse>]
-        [TestCaseGenericNoParamsAttribute<MockEvent, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockCommand, CommandResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, MockUnmarked>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, CommandResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, NoResponse>]
-        public void Response_IsNull_WithPristineContext<TRequest, TResponse>()
-            where TRequest : new()
+        [TestCaseSource_RequestResponse_Commands]
+        [TestCaseSource_RequestResponse_Events]
+        [TestCaseSource_RequestResponse_Requests]
+        [TestCaseSource_RequestResponse_Unmarks]
+        [TestCaseSource_RequestResponse_NoResponses]
+        public void Response_IsNull_WithPristineContext<TRequest, TResponse>(TRequest request, TResponse response)
         {
             // Arrange
-            var expectedRequest = new TRequest();
-            var context = CreateInvocationContext<TRequest, TResponse>(expectedRequest);
+            var context = CreateInvocationContext<TRequest, TResponse>(request);
 
             // Act
-            var response = context.Response;
+            var actualResponse = context.Response;
 
             // Assert
-            Assert.That(response, Is.Null);
+            Assert.That(actualResponse, Is.Null);
         }
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParamsAttribute<MockRequest, MockResponse>]
-        [TestCaseGenericNoParamsAttribute<MockEvent, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockCommand, CommandResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, MockUnmarked>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, CommandResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, NoResponse>]
-        public void Error_IsNull_WithPristineContext<TRequest, TResponse>()
-            where TRequest : new()
+        [TestCaseSource_RequestResponse_Commands]
+        [TestCaseSource_RequestResponse_Events]
+        [TestCaseSource_RequestResponse_Requests]
+        [TestCaseSource_RequestResponse_Unmarks]
+        [TestCaseSource_RequestResponse_NoResponses]
+        public void Error_IsNull_WithPristineContext<TRequest, TResponse>(TRequest request, TResponse response)
         {
             // Arrange
-            var expectedRequest = new TRequest();
-            var context = CreateInvocationContext<TRequest, TResponse>(expectedRequest);
+            var context = CreateInvocationContext<TRequest, TResponse>(request);
 
             // Act
             var error = context.Error;
@@ -394,19 +335,15 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParamsAttribute<MockRequest, MockResponse>]
-        [TestCaseGenericNoParamsAttribute<MockEvent, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockCommand, CommandResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, MockUnmarked>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, CommandResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, NoResponse>]
-        public void HasError_IsFalse_WhenErrorIsNull<TRequest, TResponse>()
-            where TRequest : new()
+        [TestCaseSource_RequestResponse_Commands]
+        [TestCaseSource_RequestResponse_Events]
+        [TestCaseSource_RequestResponse_Requests]
+        [TestCaseSource_RequestResponse_Unmarks]
+        [TestCaseSource_RequestResponse_NoResponses]
+        public void HasError_IsFalse_WhenErrorIsNull<TRequest, TResponse>(TRequest request, TResponse response)
         {
             // Arrange
-            var expectedRequest = new TRequest();
-            var context = CreateInvocationContext<TRequest, TResponse>(expectedRequest);
+            var context = CreateInvocationContext<TRequest, TResponse>(request);
 
             // Act
             var hasError = context.HasError;
@@ -417,19 +354,15 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParamsAttribute<MockRequest, MockResponse>]
-        [TestCaseGenericNoParamsAttribute<MockEvent, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockCommand, CommandResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, MockUnmarked>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, CommandResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, NoResponse>]
-        public void HasError_IsTrue_WhenErrorIsNotNull<TRequest, TResponse>()
-            where TRequest : new()
+        [TestCaseSource_RequestResponse_Commands]
+        [TestCaseSource_RequestResponse_Events]
+        [TestCaseSource_RequestResponse_Requests]
+        [TestCaseSource_RequestResponse_Unmarks]
+        [TestCaseSource_RequestResponse_NoResponses]
+        public void HasError_IsTrue_WhenErrorIsNotNull<TRequest, TResponse>(TRequest request, TResponse response)
         {
             // Arrange
-            var expectedRequest = new TRequest();
-            var context = CreateInvocationContext<TRequest, TResponse>(expectedRequest);
+            var context = CreateInvocationContext<TRequest, TResponse>(request);
             context.SetError(new Exception("sample exception"));
 
             // Act
@@ -441,19 +374,15 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParamsAttribute<MockRequest, MockResponse>]
-        [TestCaseGenericNoParamsAttribute<MockEvent, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockCommand, CommandResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, MockUnmarked>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, CommandResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, NoResponse>]
-        public void IsSuccess_IsTrue_WhenHasErrorIsFalse<TRequest, TResponse>()
-            where TRequest : new()
+        [TestCaseSource_RequestResponse_Commands]
+        [TestCaseSource_RequestResponse_Events]
+        [TestCaseSource_RequestResponse_Requests]
+        [TestCaseSource_RequestResponse_Unmarks]
+        [TestCaseSource_RequestResponse_NoResponses]
+        public void IsSuccess_IsTrue_WhenHasErrorIsFalse<TRequest, TResponse>(TRequest request, TResponse response)
         {
             // Arrange
-            var expectedRequest = new TRequest();
-            var context = CreateInvocationContext<TRequest, TResponse>(expectedRequest);
+            var context = CreateInvocationContext<TRequest, TResponse>(request);
 
             // Act
             var isSuccess = context.IsSuccess;
@@ -464,19 +393,15 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParamsAttribute<MockRequest, MockResponse>]
-        [TestCaseGenericNoParamsAttribute<MockEvent, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockCommand, CommandResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, MockUnmarked>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, CommandResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, NoResponse>]
-        public void IsSuccess_IsFalse_WhenHasErrorIsTrue<TRequest, TResponse>()
-            where TRequest : new()
+        [TestCaseSource_RequestResponse_Commands]
+        [TestCaseSource_RequestResponse_Events]
+        [TestCaseSource_RequestResponse_Requests]
+        [TestCaseSource_RequestResponse_Unmarks]
+        [TestCaseSource_RequestResponse_NoResponses]
+        public void IsSuccess_IsFalse_WhenHasErrorIsTrue<TRequest, TResponse>(TRequest request, TResponse response)
         {
             // Arrange
-            var expectedRequest = new TRequest();
-            var context = CreateInvocationContext<TRequest, TResponse>(expectedRequest);
+            var context = CreateInvocationContext<TRequest, TResponse>(request);
             context.SetError(new Exception("sample exception"));
 
             // Act
@@ -488,19 +413,15 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParamsAttribute<MockRequest, MockResponse>]
-        [TestCaseGenericNoParamsAttribute<MockEvent, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockCommand, CommandResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, MockUnmarked>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, CommandResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, NoResponse>]
-        public void SetError_Error_IsTheOneSet_WhenNoErrorSetBefore<TRequest, TResponse>()
-            where TRequest : new()
+        [TestCaseSource_RequestResponse_Commands]
+        [TestCaseSource_RequestResponse_Events]
+        [TestCaseSource_RequestResponse_Requests]
+        [TestCaseSource_RequestResponse_Unmarks]
+        [TestCaseSource_RequestResponse_NoResponses]
+        public void SetError_Error_IsTheOneSet_WhenNoErrorSetBefore<TRequest, TResponse>(TRequest request, TResponse response)
         {
             // Arrange
-            var expectedRequest = new TRequest();
-            var context = CreateInvocationContext<TRequest, TResponse>(expectedRequest);
+            var context = CreateInvocationContext<TRequest, TResponse>(request);
             var sampleError = new Exception("sample exception 1");
 
             // Act
@@ -512,19 +433,15 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParamsAttribute<MockRequest, MockResponse>]
-        [TestCaseGenericNoParamsAttribute<MockEvent, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockCommand, CommandResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, MockUnmarked>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, CommandResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, NoResponse>]
-        public void SetError_Error_IsTheLastOneSet_WhenSettingMultipleErrors<TRequest, TResponse>()
-            where TRequest : new()
+        [TestCaseSource_RequestResponse_Commands]
+        [TestCaseSource_RequestResponse_Events]
+        [TestCaseSource_RequestResponse_Requests]
+        [TestCaseSource_RequestResponse_Unmarks]
+        [TestCaseSource_RequestResponse_NoResponses]
+        public void SetError_Error_IsTheLastOneSet_WhenSettingMultipleErrors<TRequest, TResponse>(TRequest request, TResponse response)
         {
             // Arrange
-            var expectedRequest = new TRequest();
-            var context = CreateInvocationContext<TRequest, TResponse>(expectedRequest);
+            var context = CreateInvocationContext<TRequest, TResponse>(request);
 
             var firstSampleError = new Exception("sample exception 1");
             context.SetError(firstSampleError);
@@ -540,19 +457,15 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParamsAttribute<MockRequest, MockResponse>]
-        [TestCaseGenericNoParamsAttribute<MockEvent, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockCommand, CommandResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, MockUnmarked>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, CommandResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, NoResponse>]
-        public void SetError_Error_IsUnset_WhenSettingNullError<TRequest, TResponse>()
-            where TRequest : new()
+        [TestCaseSource_RequestResponse_Commands]
+        [TestCaseSource_RequestResponse_Events]
+        [TestCaseSource_RequestResponse_Requests]
+        [TestCaseSource_RequestResponse_Unmarks]
+        [TestCaseSource_RequestResponse_NoResponses]
+        public void SetError_Error_IsUnset_WhenSettingNullError<TRequest, TResponse>(TRequest request, TResponse response)
         {
             // Arrange
-            var expectedRequest = new TRequest();
-            var context = CreateInvocationContext<TRequest, TResponse>(expectedRequest);
+            var context = CreateInvocationContext<TRequest, TResponse>(request);
 
             context.SetError(new Exception("sample exception 1"));
 
@@ -565,19 +478,16 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParamsAttribute<MockRequest, MockResponse>]
-        [TestCaseGenericNoParamsAttribute<MockEvent, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockCommand, CommandResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, MockUnmarked>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, CommandResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, NoResponse>]
-        public void AddError_Error_IsTheOneSet_WhenNoErrorSetBefore<TRequest, TResponse>()
+        [TestCaseSource_RequestResponse_Commands]
+        [TestCaseSource_RequestResponse_Events]
+        [TestCaseSource_RequestResponse_Requests]
+        [TestCaseSource_RequestResponse_Unmarks]
+        [TestCaseSource_RequestResponse_NoResponses]
+        public void AddError_Error_IsTheOneSet_WhenNoErrorSetBefore<TRequest, TResponse>(TRequest request, TResponse response)
             where TRequest : new()
         {
             // Arrange
-            var expectedRequest = new TRequest();
-            var context = CreateInvocationContext<TRequest, TResponse>(expectedRequest);
+            var context = CreateInvocationContext<TRequest, TResponse>(request);
 
             var sampleError = new Exception("sample exception 1");
 
@@ -590,19 +500,15 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParamsAttribute<MockRequest, MockResponse>]
-        [TestCaseGenericNoParamsAttribute<MockEvent, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockCommand, CommandResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, MockUnmarked>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, CommandResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, NoResponse>]
-        public void AddError_Error_IsAggregated_WhenMultipleErrorsSet<TRequest, TResponse>()
-            where TRequest : new()
+        [TestCaseSource_RequestResponse_Commands]
+        [TestCaseSource_RequestResponse_Events]
+        [TestCaseSource_RequestResponse_Requests]
+        [TestCaseSource_RequestResponse_Unmarks]
+        [TestCaseSource_RequestResponse_NoResponses]
+        public void AddError_Error_IsAggregated_WhenMultipleErrorsSet<TRequest, TResponse>(TRequest request, TResponse response)
         {
             // Arrange
-            var expectedRequest = new TRequest();
-            var context = CreateInvocationContext<TRequest, TResponse>(expectedRequest);
+            var context = CreateInvocationContext<TRequest, TResponse>(request);
 
             var firstSampleError = new Exception("sample exception 1");
             context.SetError(firstSampleError);
@@ -618,19 +524,15 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParamsAttribute<MockRequest, MockResponse>]
-        [TestCaseGenericNoParamsAttribute<MockEvent, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockCommand, CommandResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, MockUnmarked>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, EventResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, CommandResponse>]
-        [TestCaseGenericNoParamsAttribute<MockUnmarked, NoResponse>]
-        public void AddError_AggregatedErrors_AreAllTheExceptions<TRequest, TResponse>()
-            where TRequest : new()
+        [TestCaseSource_RequestResponse_Commands]
+        [TestCaseSource_RequestResponse_Events]
+        [TestCaseSource_RequestResponse_Requests]
+        [TestCaseSource_RequestResponse_Unmarks]
+        [TestCaseSource_RequestResponse_NoResponses]
+        public void AddError_AggregatedErrors_AreAllTheExceptions<TRequest, TResponse>(TRequest request, TResponse response)
         {
             // Arrange
-            var expectedRequest = new TRequest();
-            var context = CreateInvocationContext<TRequest, TResponse>(expectedRequest);
+            var context = CreateInvocationContext<TRequest, TResponse>(request);
 
             var firstSampleError = new Exception("sample exception 1");
             var lastSampleError = new Exception("sample exception 2");

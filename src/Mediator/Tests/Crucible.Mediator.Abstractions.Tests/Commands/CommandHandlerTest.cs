@@ -1,8 +1,7 @@
-﻿using Crucible.Mediator.Abstractions.Tests.Commands.Mocks;
-using Crucible.Mediator.Abstractions.Tests.Data;
+﻿using Crucible.Mediator.Abstractions.Tests.Data;
+using Crucible.Mediator.Abstractions.Tests.Data.Annotations.Commands;
 using Crucible.Mediator.Abstractions.Tests.Internal;
 using Crucible.Mediator.Abstractions.Tests.Invocation.Bases;
-using Crucible.Mediator.Abstractions.Tests.Invocation.Mocks;
 using Crucible.Mediator.Commands;
 using Crucible.Mediator.Invocation;
 using Moq;
@@ -10,9 +9,8 @@ using Moq;
 namespace Crucible.Mediator.Abstractions.Tests.Commands
 {
     [SampleTest]
-    [TestFixtureSource(typeof(MediatorConformanceTestData), nameof(MediatorConformanceTestData.GetCommandContracts_ReqGenerics_TestData))]
+    [TestFixtureSource_Request_Commands]
     public class CommandHandlerTest<TCommand> : InvocationHandlerConformanceTestBase<TCommand, CommandResponse, CommandHandlerTest<TCommand>.SampleCommandHandler>
-        where TCommand: new()
     {
         protected Mock<ICommandHandlerLifeCycle> LifeCycle { get; } = new();
 

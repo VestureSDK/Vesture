@@ -15,12 +15,5 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation
                 Request = request!,
             };
         }
-
-        [Test]
-        [Category("Implementation")]
-        public void Test()
-        {
-
-        }
     }
 }

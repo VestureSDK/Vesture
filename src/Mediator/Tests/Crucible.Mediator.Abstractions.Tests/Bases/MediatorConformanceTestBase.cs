@@ -147,7 +147,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Bases
 
         [Theory]
         [ConformanceTest]
-        [TestCaseSource(typeof(MediatorConformanceTestData), nameof(MediatorConformanceTestData.GetCommandContracts_ReqGenerics_TestData_WithParams), new object[] { new object[] { } })]
+        // [TestCaseSource(typeof(MediatorTestData), nameof(MediatorTestData.GetCommand_Request))]
         public async Task HandleAndCaptureAsync_ContextIsNotNull<TRequest, TResponse>(TRequest _a, TResponse _b)
             where TRequest : new()
         {

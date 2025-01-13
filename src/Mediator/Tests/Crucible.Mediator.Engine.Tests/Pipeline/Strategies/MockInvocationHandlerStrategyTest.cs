@@ -1,17 +1,18 @@
-﻿using Crucible.Mediator.Abstractions.Tests.Internal;
-using Crucible.Mediator.Abstractions.Tests.Invocation.Mocks;
+﻿using Crucible.Mediator.Abstractions.Tests.Data.Annotations.Commands;
+using Crucible.Mediator.Abstractions.Tests.Internal;
 using Crucible.Mediator.Engine.Tests.Pipeline.Strategies.Bases;
 using Crucible.Mediator.Engine.Tests.Pipeline.Strategies.Mocks;
 
 namespace Crucible.Mediator.Engine.Tests.Pipeline.Strategies
 {
     [MockTest]
-    public class MockInvocationHandlerStrategyTest : MultiInvocationHandlerStrategyConformanceTestBase<MockContract, MockContract, MockInvocationHandlerStrategy<MockContract, MockContract>>
+    [TestFixtureSource_RequestResponse_All]
+    public class MockInvocationHandlerStrategyTest<TRequest, TResponse> : MultiInvocationHandlerStrategyConformanceTestBase<TRequest, TResponse, MockInvocationHandlerStrategy<TRequest, TResponse>>
     {
-        public MockInvocationHandlerStrategyTest()
-            : base(new(), new()) { }
+        public MockInvocationHandlerStrategyTest(TRequest request, TResponse response)
+            : base(request, response) { }
 
-        protected override MockInvocationHandlerStrategy<MockContract, MockContract> CreateStrategy() => new()
+        protected override MockInvocationHandlerStrategy<TRequest, TResponse> CreateStrategy() => new()
         {
             Handlers = Handlers
         };

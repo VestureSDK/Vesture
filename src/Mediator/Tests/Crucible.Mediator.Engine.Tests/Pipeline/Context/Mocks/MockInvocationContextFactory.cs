@@ -41,8 +41,8 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Context.Mocks
 
         private TContextRequest _request;
 
-        public TContextRequest Request 
-        { 
+        public TContextRequest Request
+        {
             get => _request;
             set
             {

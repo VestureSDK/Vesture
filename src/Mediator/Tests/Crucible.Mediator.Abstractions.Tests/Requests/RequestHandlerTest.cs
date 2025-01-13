@@ -8,7 +8,7 @@ using Moq;
 namespace Crucible.Mediator.Abstractions.Tests.Requests
 {
     [SampleTest]
-    [TestFixtureSource_RequestResponse_RequestsAttribute]
+    [TestFixtureSource_RequestResponse_RequestAttribute]
     public class RequestHandlerTest<TRequest, TResponse> : InvocationHandlerConformanceTestBase<TRequest, TResponse, RequestHandlerTest<TRequest, TResponse>.SampleRequestHandler>
         where TRequest : IRequest<TResponse>
     {
@@ -17,7 +17,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Requests
         protected TResponse Response { get; set; }
 
         public RequestHandlerTest(TRequest request, TResponse response)
-            : base(request) 
+            : base(request)
         {
             Response = response;
         }

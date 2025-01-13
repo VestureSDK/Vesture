@@ -1,15 +1,9 @@
-﻿using Crucible.Mediator.Abstractions.Tests.Commands.Mocks;
-using Crucible.Mediator.Abstractions.Tests.Events.Mocks;
+﻿using Crucible.Mediator.Abstractions.Tests.Data.Annotations.Invocation;
 using Crucible.Mediator.Abstractions.Tests.Internal;
 using Crucible.Mediator.Abstractions.Tests.Invocation.Mocks;
-using Crucible.Mediator.Abstractions.Tests.Requests.Mocks;
-using Crucible.Mediator.Commands;
 using Crucible.Mediator.Engine.Pipeline.Internal;
-using Crucible.Mediator.Engine.Tests.Pipeline.Resolvers.Mocks;
-using Crucible.Mediator.Events;
 using Crucible.Mediator.Invocation;
 using Moq;
-using Any = object;
 
 namespace Crucible.Mediator.Engine.Tests.Pipeline.Internal.Bases
 {
@@ -64,51 +58,10 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Internal.Bases
 
         [Theory]
         [ConformanceTest]
-        // IRequest<TResponse>
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockRequest, MockResponse, /*Middleware:*/ Any, Any>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockRequest, MockResponse, /*Middleware:*/ MockRequest, Any>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockRequest, MockResponse, /*Middleware:*/ Any, MockResponse>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockRequest, MockResponse, /*Middleware:*/ MockRequest, MockResponse>()]
-        // ICommand
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockCommand, CommandResponse, /*Middleware:*/ Any, Any>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockCommand, CommandResponse, /*Middleware:*/ MockCommand, Any>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockCommand, CommandResponse, /*Middleware:*/ Any, CommandResponse>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockCommand, CommandResponse, /*Middleware:*/ Any, NoResponse>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockCommand, CommandResponse, /*Middleware:*/ MockCommand, CommandResponse>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockCommand, CommandResponse, /*Middleware:*/ MockCommand, NoResponse>()]
-        // IEvent
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockEvent, EventResponse, /*Middleware:*/ Any, Any>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockEvent, EventResponse, /*Middleware:*/ MockEvent, Any>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockEvent, EventResponse, /*Middleware:*/ Any, EventResponse>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockEvent, EventResponse, /*Middleware:*/ Any, NoResponse>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockEvent, EventResponse, /*Middleware:*/ MockEvent, EventResponse>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockEvent, EventResponse, /*Middleware:*/ MockEvent, NoResponse>()]
-        // Unmarked (IRequest<TResponse>)
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, MockUnmarked, /*Middleware:*/ Any, Any>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, MockUnmarked, /*Middleware:*/ MockUnmarked, Any>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, MockUnmarked, /*Middleware:*/ Any, MockUnmarked>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, MockUnmarked, /*Middleware:*/ MockUnmarked, MockUnmarked>()]
-        // Unmarked (ICommand)
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, CommandResponse, /*Middleware:*/ Any, Any>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, CommandResponse, /*Middleware:*/ MockUnmarked, Any>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, CommandResponse, /*Middleware:*/ Any, CommandResponse>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, CommandResponse, /*Middleware:*/ Any, NoResponse>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, CommandResponse, /*Middleware:*/ MockUnmarked, CommandResponse>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, CommandResponse, /*Middleware:*/ MockUnmarked, NoResponse>()]
-        // Unmarked (IEvent)
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, EventResponse, /*Middleware:*/ Any, Any>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, EventResponse, /*Middleware:*/ MockUnmarked, Any>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, EventResponse, /*Middleware:*/ Any, EventResponse>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, EventResponse, /*Middleware:*/ Any, NoResponse>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, EventResponse, /*Middleware:*/ MockUnmarked, EventResponse>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, EventResponse, /*Middleware:*/ MockUnmarked, NoResponse>()]
-        // Unmarked (Special NoResponse)
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, NoResponse, /*Middleware:*/ Any, Any>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, NoResponse, /*Middleware:*/ MockUnmarked, Any>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, NoResponse, /*Middleware:*/ Any, NoResponse>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, NoResponse, /*Middleware:*/ MockUnmarked, NoResponse>()]
+        [TestCaseSource_RequestResponseMediatorRequestResponse_Applicable(isApplicable: true)]
         public void IsApplicable_IsTrue_WhenMiddlewareSignatureMacthesOrLowerLevelThanContracts
-            <TContractRequest, TContractResponse, TMiddlewareRequest, TMiddlewareResponse>()
+            <TContractRequest, TContractResponse, TMiddlewareRequest, TMiddlewareResponse>
+            (TContractRequest request, TContractResponse response, TMiddlewareRequest middlewareRequest, TMiddlewareResponse middlewareResponse)
         {
             // Arrange
             var middlewareItem = CreateItemForMiddlewareSignature<TMiddlewareRequest, TMiddlewareResponse>();
@@ -123,66 +76,10 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Internal.Bases
 
         [Theory]
         [ConformanceTest]
-        // IRequest<TResponse>
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockRequest, MockResponse, /*Middleware:*/ Any, Other>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockRequest, MockResponse, /*Middleware:*/ Other, Any>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockRequest, MockResponse, /*Middleware:*/ MockRequest, Other>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockRequest, MockResponse, /*Middleware:*/ Other, MockResponse>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockRequest, MockResponse, /*Middleware:*/ Other, CommandResponse>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockRequest, MockResponse, /*Middleware:*/ Other, EventResponse>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockRequest, MockResponse, /*Middleware:*/ Other, NoResponse>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockRequest, MockResponse, /*Middleware:*/ Other, Other>()]
-        // ICommand
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockCommand, CommandResponse, /*Middleware:*/ Any, Other>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockCommand, CommandResponse, /*Middleware:*/ Other, Any>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockCommand, CommandResponse, /*Middleware:*/ Other, Other>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockCommand, CommandResponse, /*Middleware:*/ MockCommand, Other>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockCommand, CommandResponse, /*Middleware:*/ Other, CommandResponse>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockCommand, CommandResponse, /*Middleware:*/ Other, EventResponse>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockCommand, CommandResponse, /*Middleware:*/ Other, NoResponse>()]
-        // IEvent
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockEvent, EventResponse, /*Middleware:*/ Any, Other>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockEvent, EventResponse, /*Middleware:*/ Other, Any>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockEvent, EventResponse, /*Middleware:*/ Other, Other>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockEvent, EventResponse, /*Middleware:*/ MockEvent, Other>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockEvent, EventResponse, /*Middleware:*/ Other, CommandResponse>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockEvent, EventResponse, /*Middleware:*/ Other, EventResponse>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockEvent, EventResponse, /*Middleware:*/ Other, NoResponse>()]
-        // Unmarked (IRequest<TResponse>)
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, MockUnmarked, /*Middleware:*/ Any, Other>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, MockUnmarked, /*Middleware:*/ Other, Any>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, MockUnmarked, /*Middleware:*/ MockUnmarked, Other>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, MockUnmarked, /*Middleware:*/ Other, MockUnmarked>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, MockUnmarked, /*Middleware:*/ Other, CommandResponse>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, MockUnmarked, /*Middleware:*/ Other, EventResponse>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, MockUnmarked, /*Middleware:*/ Other, NoResponse>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, MockUnmarked, /*Middleware:*/ Other, Other>()]
-        // Unmarked (ICommand)
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, CommandResponse, /*Middleware:*/ Any, Other>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, CommandResponse, /*Middleware:*/ Other, Any>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, CommandResponse, /*Middleware:*/ Other, Other>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, CommandResponse, /*Middleware:*/ MockUnmarked, Other>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, CommandResponse, /*Middleware:*/ Other, CommandResponse>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, CommandResponse, /*Middleware:*/ Other, EventResponse>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, CommandResponse, /*Middleware:*/ Other, NoResponse>()]
-        // Unmarked (IEvent)
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, EventResponse, /*Middleware:*/ Any, Other>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, EventResponse, /*Middleware:*/ Other, Any>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, EventResponse, /*Middleware:*/ Other, Other>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, EventResponse, /*Middleware:*/ MockUnmarked, Other>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, EventResponse, /*Middleware:*/ Other, CommandResponse>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, EventResponse, /*Middleware:*/ Other, EventResponse>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, EventResponse, /*Middleware:*/ Other, NoResponse>()]
-        // Unmarked (Special NoResponse)
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, NoResponse, /*Middleware:*/ Any, Other>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, NoResponse, /*Middleware:*/ Other, Any>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, NoResponse, /*Middleware:*/ Other, Other>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, NoResponse, /*Middleware:*/ MockUnmarked, Other>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, NoResponse, /*Middleware:*/ Other, CommandResponse>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, NoResponse, /*Middleware:*/ Other, EventResponse>()]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockUnmarked, NoResponse, /*Middleware:*/ Other, NoResponse>()]
+        [TestCaseSource_RequestResponseMediatorRequestResponse_Applicable(isApplicable: false)]
         public void IsApplicable_IsFalse_WhenMiddlewareSignatureDoesNotMatchOrGreaterLevelThanContracts
-            <TContractRequest, TContractResponse, TMiddlewareRequest, TMiddlewareResponse>()
+            <TContractRequest, TContractResponse, TMiddlewareRequest, TMiddlewareResponse>
+            (TContractRequest request, TContractResponse response, TMiddlewareRequest middlewareRequest, TMiddlewareResponse middlewareResponse)
         {
             // Arrange
             var middlewareItem = CreateItemForMiddlewareSignature<TMiddlewareRequest, TMiddlewareResponse>();

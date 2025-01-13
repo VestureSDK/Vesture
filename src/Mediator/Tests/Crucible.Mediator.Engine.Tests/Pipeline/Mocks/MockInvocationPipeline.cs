@@ -111,7 +111,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Mocks
 
         private ICollection<IMiddlewareInvocationPipelineItem> _middlewares = [];
 
-        public override ICollection<IMiddlewareInvocationPipelineItem> Middlewares 
+        public override ICollection<IMiddlewareInvocationPipelineItem> Middlewares
         {
             get => _middlewares;
             set => _middlewares = value ?? [];

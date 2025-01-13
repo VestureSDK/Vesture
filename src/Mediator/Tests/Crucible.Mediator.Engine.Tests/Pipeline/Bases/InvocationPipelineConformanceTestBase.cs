@@ -1,4 +1,5 @@
-﻿using Crucible.Mediator.Abstractions.Tests.Invocation.Mocks;
+﻿using Crucible.Mediator.Abstractions.Tests.Data;
+using Crucible.Mediator.Abstractions.Tests.Invocation.Mocks;
 using Crucible.Mediator.Engine.Pipeline;
 using Crucible.Mediator.Engine.Pipeline.Internal;
 using Crucible.Mediator.Engine.Tests.Pipeline.Context.Mocks;
@@ -277,14 +278,14 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Bases
         public async Task HandleAsync_NotApplicableMiddlewareIsNotInvoked()
         {
             // Arrange
-            var middleware = new MockMiddlewareInvocationPipelineItem<Unrelated, Unrelated>();
+            var middleware = new MockMiddlewareInvocationPipelineItem<MediatorTestData.Unrelated, MediatorTestData.Unrelated>();
             MiddlewareItems.Add(middleware);
 
             // Act
             await Pipeline.HandleAsync(Request!, CancellationToken);
 
             // Assert
-            middleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<Unrelated, Unrelated>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Never);
+            middleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<MediatorTestData.Unrelated, MediatorTestData.Unrelated>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [Test]
@@ -310,11 +311,6 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Bases
 
             // Act / Assert
             Assert.DoesNotThrowAsync(() => Pipeline.HandleAsync(Request!, CancellationToken));
-        }
-
-        public class Unrelated
-        {
-
         }
     }
 }

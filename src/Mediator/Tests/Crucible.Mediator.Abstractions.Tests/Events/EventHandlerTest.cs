@@ -1,5 +1,4 @@
-﻿using Crucible.Mediator.Abstractions.Tests.Data;
-using Crucible.Mediator.Abstractions.Tests.Data.Annotations.Events;
+﻿using Crucible.Mediator.Abstractions.Tests.Data.Annotations.Events;
 using Crucible.Mediator.Abstractions.Tests.Internal;
 using Crucible.Mediator.Abstractions.Tests.Invocation.Bases;
 using Crucible.Mediator.Events;
@@ -9,7 +8,7 @@ using Moq;
 namespace Crucible.Mediator.Abstractions.Tests.Events
 {
     [SampleTest]
-    [TestFixtureSource_Request_Events]
+    [TestFixtureSource_Request_Event]
     public class EventHandlerTest<TEvent> : InvocationHandlerConformanceTestBase<TEvent, EventResponse, EventHandlerTest<TEvent>.SampleEventHandler>
     {
         protected Mock<IEventHandlerLifeCycle> LifeCycle { get; } = new();

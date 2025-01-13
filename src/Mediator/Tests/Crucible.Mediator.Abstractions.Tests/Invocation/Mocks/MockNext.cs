@@ -6,14 +6,14 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Mocks
     {
         private Task _returnTask = Task.CompletedTask;
 
-        public Mock<Func<CancellationToken, Task>> Mock { get; } = new ();
+        public Mock<Func<CancellationToken, Task>> Mock { get; } = new();
 
         public Func<CancellationToken, Task> Delegate => Mock.Object;
 
-        public Task ReturnTask 
-        { 
-            get => _returnTask; 
-            set => _returnTask = value ?? Task.CompletedTask; 
+        public Task ReturnTask
+        {
+            get => _returnTask;
+            set => _returnTask = value ?? Task.CompletedTask;
         }
 
         public MockNext()

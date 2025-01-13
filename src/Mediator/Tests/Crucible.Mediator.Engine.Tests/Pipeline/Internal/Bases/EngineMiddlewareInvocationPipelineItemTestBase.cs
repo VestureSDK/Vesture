@@ -1,4 +1,4 @@
-﻿using Crucible.Mediator.Abstractions.Tests.Invocation.Mocks;
+﻿using Crucible.Mediator.Abstractions.Tests.Data.Annotations.Requests;
 using Crucible.Mediator.Engine.Pipeline.Internal;
 using Crucible.Mediator.Engine.Tests.Pipeline.Resolvers.Mocks;
 using Crucible.Mediator.Invocation;
@@ -19,9 +19,8 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Internal.Bases
         }
 
         [Theory]
-        [TestCaseGenericNoParams</*Contract:*/ MockContract, MockContract>(Description = "Applicable contract")]
-        [TestCaseGenericNoParams</*Contract:*/ MockUnmarked, MockUnmarked>(Description = "Unapplicable contract")]
-        public void IsApplicable_DoesNotResolveComponent_WhenIsApplicableReturnsTrue<TContractRequest, TContractResponse>()
+        [TestCaseSource_RequestResponse_All]
+        public void IsApplicable_DoesNotResolveComponent<TContractRequest, TContractResponse>(TContractRequest request, TContractResponse response)
         {
             // Arrange
             var contextType = typeof(IInvocationContext<TContractRequest, TContractResponse>);

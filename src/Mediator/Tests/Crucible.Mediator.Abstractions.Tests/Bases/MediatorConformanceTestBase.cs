@@ -1,10 +1,10 @@
 ﻿using Crucible.Mediator.Abstractions.Tests.Data;
+using Crucible.Mediator.Abstractions.Tests.Data.Annotations.Invocation;
+using Crucible.Mediator.Abstractions.Tests.Data.Annotations.Requests;
 using Crucible.Mediator.Abstractions.Tests.Internal;
 using Crucible.Mediator.Abstractions.Tests.Invocation.Mocks;
-using Crucible.Mediator.Abstractions.Tests.Requests.Mocks;
 using Crucible.Mediator.Invocation;
 using Moq;
-using Any = object;
 
 namespace Crucible.Mediator.Abstractions.Tests.Bases
 {
@@ -48,14 +48,11 @@ namespace Crucible.Mediator.Abstractions.Tests.Bases
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParams<MockUnmarked, MockUnmarked>(1)]
-        [TestCaseGenericNoParams<MockUnmarked, MockUnmarked>(10)]
-        public async Task HandleAndCaptureAsync_InvokesHandlers<TRequest, TResponse>(int handlerCount)
-            where TRequest : new()
+        [TestCaseSource_RequestResponse_All(1)]
+        [TestCaseSource_RequestResponse_All(10)]
+        public async Task HandleAndCaptureAsync_InvokesHandlers<TRequest, TResponse>(TRequest request, TResponse response, int handlerCount)
         {
             // Arrange
-            var request = new TRequest();
-
             for (var i = 0; i < handlerCount; i++)
             {
                 var handler = new MockInvocationHandler<TRequest, TResponse>();
@@ -74,36 +71,30 @@ namespace Crucible.Mediator.Abstractions.Tests.Bases
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParams<MockUnmarked, MockUnmarked>]
-        public async Task HandleAndCaptureAsync_DoesNotInvokeUnrelatedHandler<TRequest, TResponse>()
-            where TRequest : new()
+        [TestCaseSource_RequestResponse_All]
+        public async Task HandleAndCaptureAsync_DoesNotInvokeUnrelatedHandler<TRequest, TResponse>(TRequest request, TResponse response)
         {
             // Arrange
-            var request = new TRequest();
-
             var expectedHandler = new MockInvocationHandler<TRequest, TResponse>();
             AddHandler(expectedHandler);
 
-            var unrelatedHandler = new MockInvocationHandler<Unrelated, Unrelated>();
+            var unrelatedHandler = new MockInvocationHandler<MediatorTestData.Unrelated, MediatorTestData.Unrelated>();
             AddHandler(unrelatedHandler);
 
             // Act
             _ = await Mediator.HandleAndCaptureAsync<TResponse>(request, CancellationToken);
 
             // Assert
-            unrelatedHandler.Mock.Verify(m => m.HandleAsync(It.IsAny<Unrelated>(), It.IsAny<CancellationToken>()), Times.Never);
+            unrelatedHandler.Mock.Verify(m => m.HandleAsync(It.IsAny<MediatorTestData.Unrelated>(), It.IsAny<CancellationToken>()), Times.Never);
         }
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockRequest, MockResponse, /*Middleware:*/ Any, Any>(1)]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockRequest, MockResponse, /*Middleware:*/ Any, Any>(10)]
-        public async Task HandleAndCaptureAsync_InvokesMiddlewares<TRequest, TResponse, TMiddlewareRequest, TMiddlewareResponse>(int middlewareCount)
-            where TRequest : new()
+        [TestCaseSource_RequestResponseMediatorRequestResponse_Applicable(isApplicable: true, 1)]
+        [TestCaseSource_RequestResponseMediatorRequestResponse_Applicable(isApplicable: true, 10)]
+        public async Task HandleAndCaptureAsync_InvokesMiddlewares<TRequest, TResponse, TMiddlewareRequest, TMiddlewareResponse>(TRequest request, TResponse response, TMiddlewareRequest middlewareRequest, TMiddlewareResponse middlewareResponse, int middlewareCount)
         {
             // Arrange
-            var request = new TRequest();
-
             var handler = new MockInvocationHandler<TRequest, TResponse>();
             AddHandler(handler);
 
@@ -125,13 +116,10 @@ namespace Crucible.Mediator.Abstractions.Tests.Bases
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParamsAttribute</*Contract:*/ MockRequest, MockResponse, /*Middleware:*/ Unrelated, Unrelated>()]
-        public async Task HandleAndCaptureAsync_DoesNotInvokeUnrelatedMiddleware<TRequest, TResponse, TMiddlewareRequest, TMiddlewareResponse>()
-            where TRequest : new()
+        [TestCaseSource_RequestResponseMediatorRequestResponse_Applicable(isApplicable: false)]
+        public async Task HandleAndCaptureAsync_DoesNotInvokeUnrelatedMiddleware<TRequest, TResponse, TMiddlewareRequest, TMiddlewareResponse>(TRequest request, TResponse response, TMiddlewareRequest middlewareRequest, TMiddlewareResponse middlewareResponse)
         {
             // Arrange
-            var request = new TRequest();
-
             var handler = new MockInvocationHandler<TRequest, TResponse>();
             AddHandler(handler);
 
@@ -147,13 +135,10 @@ namespace Crucible.Mediator.Abstractions.Tests.Bases
 
         [Theory]
         [ConformanceTest]
-        // [TestCaseSource(typeof(MediatorTestData), nameof(MediatorTestData.GetCommand_Request))]
-        public async Task HandleAndCaptureAsync_ContextIsNotNull<TRequest, TResponse>(TRequest _a, TResponse _b)
-            where TRequest : new()
+        [TestCaseSource_RequestResponse_All]
+        public async Task HandleAndCaptureAsync_ContextIsNotNull<TRequest, TResponse>(TRequest request, TResponse response)
         {
             // Arrange
-            var request = new TRequest();
-
             var handler = new MockInvocationHandler<TRequest, TResponse>();
             AddHandler(handler);
 
@@ -166,18 +151,13 @@ namespace Crucible.Mediator.Abstractions.Tests.Bases
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParams<MockUnmarked, MockUnmarked>]
-        public async Task HandleAndCaptureAsync_ContextContainsExpectedResponse<TRequest, TResponse>()
-            where TRequest : new()
-            where TResponse : new()
+        [TestCaseSource_RequestResponse_All]
+        public async Task HandleAndCaptureAsync_ContextContainsExpectedResponse<TRequest, TResponse>(TRequest request, TResponse response)
         {
             // Arrange
-            var request = new TRequest();
-            var expectedResponse = new TResponse();
-
             var handler = new MockInvocationHandler<TRequest, TResponse>
             {
-                Response = expectedResponse
+                Response = response
             };
             AddHandler(handler);
 
@@ -185,18 +165,15 @@ namespace Crucible.Mediator.Abstractions.Tests.Bases
             var context = await Mediator.HandleAndCaptureAsync<TResponse>(request, CancellationToken);
 
             // Assert
-            Assert.That(context.Response, Is.SameAs(expectedResponse));
+            Assert.That(context.Response, Is.SameAs(response));
         }
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParams<MockUnmarked, MockUnmarked>]
-        public void HandleAndCaptureAsync_DoesNotThrow_WhenHandlerThrows<TRequest, TResponse>()
-            where TRequest : new()
+        [TestCaseSource_RequestResponse_All]
+        public void HandleAndCaptureAsync_DoesNotThrow_WhenHandlerThrows<TRequest, TResponse>(TRequest request, TResponse response)
         {
             // Arrange
-            var request = new TRequest();
-
             var handler = new MockInvocationHandler<TRequest, TResponse>();
             handler.Mock
                 .Setup(m => m.HandleAsync(It.IsAny<TRequest>(), It.IsAny<CancellationToken>()))
@@ -209,13 +186,10 @@ namespace Crucible.Mediator.Abstractions.Tests.Bases
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParams<MockUnmarked, MockUnmarked>]
-        public async Task HandleAndCaptureAsync_ContextHasError_WhenHandlerThrows<TRequest, TResponse>()
-            where TRequest : new()
+        [TestCaseSource_RequestResponse_All]
+        public async Task HandleAndCaptureAsync_ContextHasError_WhenHandlerThrows<TRequest, TResponse>(TRequest request, TResponse response)
         {
             // Arrange
-            var request = new TRequest();
-
             var handler = new MockInvocationHandler<TRequest, TResponse>();
             handler.Mock
                 .Setup(m => m.HandleAsync(It.IsAny<TRequest>(), It.IsAny<CancellationToken>()))
@@ -231,13 +205,10 @@ namespace Crucible.Mediator.Abstractions.Tests.Bases
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParams<MockUnmarked, MockUnmarked>]
-        public void HandleAndCaptureAsync_DoesNotThrow_WhenMiddlewareThrows<TRequest, TResponse>()
-            where TRequest : new()
+        [TestCaseSource_RequestResponse_All]
+        public void HandleAndCaptureAsync_DoesNotThrow_WhenMiddlewareThrows<TRequest, TResponse>(TRequest request, TResponse response)
         {
             // Arrange
-            var request = new TRequest();
-
             var handler = new MockInvocationHandler<TRequest, TResponse>();
             AddHandler(handler);
 
@@ -253,13 +224,10 @@ namespace Crucible.Mediator.Abstractions.Tests.Bases
 
         [Theory]
         [ConformanceTest]
-        [TestCaseGenericNoParams<MockUnmarked, MockUnmarked>]
-        public async Task HandleAndCaptureAsync_ContextHasError_WhenMiddlewareThrows<TRequest, TResponse>()
-            where TRequest : new()
+        [TestCaseSource_RequestResponse_All]
+        public async Task HandleAndCaptureAsync_ContextHasError_WhenMiddlewareThrows<TRequest, TResponse>(TRequest request, TResponse response)
         {
             // Arrange
-            var request = new TRequest();
-
             var handler = new MockInvocationHandler<TRequest, TResponse>();
             AddHandler(handler);
 
@@ -274,22 +242,6 @@ namespace Crucible.Mediator.Abstractions.Tests.Bases
 
             // Assert
             Assert.That(context.HasError, Is.True);
-        }
-    }
-
-    public class Unrelated
-    {
-
-    }
-
-    public class TestData
-    {
-        public static object[] GetData()
-        {
-            var r = new object[2];
-            r[0] = new object[] { new MockUnmarked(), new MockUnmarked() };
-            r[1] = new object[] { new MockRequest(), new MockUnmarked() };
-            return r;
         }
     }
 }

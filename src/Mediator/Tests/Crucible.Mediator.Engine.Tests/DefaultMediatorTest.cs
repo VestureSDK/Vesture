@@ -41,7 +41,7 @@ namespace Crucible.Mediator.Engine.Tests
             var pipeline = GetOrCreatePipeline<TRequest, TResponse>();
             pipeline.Handlers.Add(handler);
         }
-        
+
         protected override void RegisterMiddleware<TRequest, TResponse>(IInvocationMiddleware<TRequest, TResponse> middleware)
         {
             var item = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>()

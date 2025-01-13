@@ -1,9 +1,9 @@
 ﻿namespace Crucible.Mediator.Abstractions.Tests.Data.Annotations.Requests
 {
-    public class TestFixtureSource_RequestResponse_RequestsAttribute : TestFixtureSourceAttribute
+    public class TestFixtureSource_RequestResponse_RequestAttribute : TestFixtureSourceAttribute
     {
-        public TestFixtureSource_RequestResponse_RequestsAttribute()
-            : base(typeof(TestFixtureSource_RequestResponse_RequestsAttribute), nameof(TestData)) { }
+        public TestFixtureSource_RequestResponse_RequestAttribute()
+            : base(typeof(TestFixtureSource_RequestResponse_RequestAttribute), nameof(TestData)) { }
 
         public static IEnumerable<TestFixtureData> TestData => MediatorTestData
             .Get_RequestResponse_Request()

@@ -13,7 +13,8 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Strategies.Mocks
 
         private TResponse _response = default!;
 
-        public TResponse Response { 
+        public TResponse Response
+        {
             get => _response;
             set
             {
@@ -55,8 +56,8 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Strategies.Mocks
 
         private ICollection<IInvocationHandler<TRequest, TResponse>>? _handlers;
 
-        public ICollection<IInvocationHandler<TRequest, TResponse>> Handlers 
-        { 
+        public ICollection<IInvocationHandler<TRequest, TResponse>> Handlers
+        {
             get => _handlers ?? _managedHandlers;
             set
             {

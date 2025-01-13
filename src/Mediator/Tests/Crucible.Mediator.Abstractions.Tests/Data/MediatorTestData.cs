@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Crucible.Mediator.Abstractions.Tests.Commands.Mocks;
+﻿using Crucible.Mediator.Abstractions.Tests.Commands.Mocks;
 using Crucible.Mediator.Abstractions.Tests.Data.Internal;
 using Crucible.Mediator.Abstractions.Tests.Events.Mocks;
 using Crucible.Mediator.Abstractions.Tests.Invocation.Mocks;
@@ -7,6 +6,7 @@ using Crucible.Mediator.Abstractions.Tests.Requests.Mocks;
 using Crucible.Mediator.Commands;
 using Crucible.Mediator.Events;
 using Crucible.Mediator.Invocation;
+using Any = object;
 
 #pragma warning disable CA2211 // Non-constant fields should not be visible
 namespace Crucible.Mediator.Abstractions.Tests.Data
@@ -15,22 +15,10 @@ namespace Crucible.Mediator.Abstractions.Tests.Data
     {
         internal static object[] AppendExtraParams(this object[] data, object[] extraParams)
         {
-            var dataExpanded = new List<object[]>();
-            foreach (var item in data)
-            {
-                var lData = (object[])item;
-                var uData = new object[lData.Length + extraParams.Length];
-                for (var i = 0; i < lData.Length; i++)
-                {
-                    uData[i] = lData[i];
-                }
-                for (var i = lData.Length - 1; i < (extraParams.Length + (lData.Length - 1)); i++)
-                {
-                    uData[i] = lData[i];
-                }
-                dataExpanded.Add(uData);
-            }
-            return [.. dataExpanded];
+            var dataExpanded = new List<object>();
+            dataExpanded.AddRange(data);
+            dataExpanded.AddRange(extraParams);
+            return dataExpanded.ToArray();
         }
     }
 
@@ -43,9 +31,10 @@ namespace Crucible.Mediator.Abstractions.Tests.Data
 
         public static IEnumerable<ContractRequestResponseTestData> Get_RequestResponse_Command() =>
             Get_Request_Command()
-            .Select(data => new ContractRequestResponseTestData { 
-                Request = data.Request, 
-                Response = new CommandResponse() 
+            .Select(data => new ContractRequestResponseTestData
+            {
+                Request = data.Request,
+                Response = new CommandResponse()
             });
 
         public static IEnumerable<ContractRequestTestData> Get_Request_Event() => [
@@ -86,24 +75,174 @@ namespace Crucible.Mediator.Abstractions.Tests.Data
             return data;
         }
 
-        static MediatorTestData()
+        public static IEnumerable<ContractRequestResponseMediatorRequestResponseTestData> Get_RequestResponseMediatorRequestResponse_IsApplicable_All()
         {
-            //CommandContracts_ReqResGenerics_TestData = GetCommand_Request().Cast<object[]>()
-            //    .Select(a => new object[] { a[0], new CommandResponse() })
-            //    .ToArray();
+            var data = new List<ContractRequestResponseMediatorRequestResponseTestData>();
 
-            //var allNoResponseContracts = new List<object[]>();
-            //allNoResponseContracts.AddRange(CommandContracts_ReqResGenerics_TestData);
-            //allNoResponseContracts.AddRange(EventContracts_ReqResGenerics_TestData);
-            //allNoResponseContracts.AddRange(NoResponseContracts_ReqResGenerics_TestData);
-            //All_NoResponseContracts_ReqResGenerics_TestData = allNoResponseContracts.ToArray();
+            var allRequestResponses = Get_RequestResponse_All();
+            foreach (var requestResponse in allRequestResponses)
+            {
+                data.Add(new()
+                {
+                    Request = requestResponse.Request,
+                    Response = requestResponse.Response,
+                    MediatorRequest = new Any(),
+                    MediatorResponse = new Any(),
+                });
 
-            //var allContracts = new List<object[]>();
-            //allContracts.AddRange(RequestContracts_ReqResGenerics_TestData);
-            //allContracts.AddRange(CommandContracts_ReqResGenerics_TestData);
-            //allContracts.AddRange(EventContracts_ReqResGenerics_TestData);
-            //allContracts.AddRange(NoResponseContracts_ReqResGenerics_TestData);
-            //All_Contracts_ReqResGenerics_TestData = allContracts.ToArray();
+                data.Add(new()
+                {
+                    Request = requestResponse.Request,
+                    Response = requestResponse.Response,
+                    MediatorRequest = requestResponse.Request,
+                    MediatorResponse = new Any(),
+                });
+
+                data.Add(new()
+                {
+                    Request = requestResponse.Request,
+                    Response = requestResponse.Response,
+                    MediatorRequest = new Any(),
+                    MediatorResponse = requestResponse.Response,
+                });
+
+                data.Add(new()
+                {
+                    Request = requestResponse.Request,
+                    Response = requestResponse.Response,
+                    MediatorRequest = requestResponse.Request,
+                    MediatorResponse = requestResponse.Response,
+                });
+
+                if (requestResponse.Request is MockContract && requestResponse.Request.GetType() != typeof(MockContract))
+                {
+                    data.Add(new()
+                    {
+                        Request = requestResponse.Request,
+                        Response = requestResponse.Response,
+                        MediatorRequest = new MockContract(),
+                        MediatorResponse = requestResponse.Response,
+                    });
+
+                    data.Add(new()
+                    {
+                        Request = requestResponse.Request,
+                        Response = requestResponse.Response,
+                        MediatorRequest = new MockContract(),
+                        MediatorResponse = new Any(),
+                    });
+                }
+
+                if (requestResponse.Response is MockContract && requestResponse.Response.GetType() != typeof(MockContract))
+                {
+                    data.Add(new()
+                    {
+                        Request = requestResponse.Request,
+                        Response = requestResponse.Response,
+                        MediatorRequest = requestResponse.Request,
+                        MediatorResponse = new MockContract(),
+                    });
+
+                    data.Add(new()
+                    {
+                        Request = requestResponse.Request,
+                        Response = requestResponse.Response,
+                        MediatorRequest = new Any(),
+                        MediatorResponse = new MockContract(),
+                    });
+                }
+
+                if (requestResponse.Response is NoResponse && requestResponse.Response.GetType() != NoResponse.Type)
+                {
+                    data.Add(new()
+                    {
+                        Request = requestResponse.Request,
+                        Response = requestResponse.Response,
+                        MediatorRequest = requestResponse.Request,
+                        MediatorResponse = new NoResponse(),
+                    });
+                }
+            }
+
+            return data;
+        }
+
+        public static IEnumerable<ContractRequestResponseMediatorRequestResponseTestData> Get_RequestResponseMediatorRequestResponse_IsNotApplicable_All()
+        {
+            var data = new List<ContractRequestResponseMediatorRequestResponseTestData>();
+
+            var allRequestResponses = Get_RequestResponse_All();
+            foreach (var requestResponse in allRequestResponses)
+            {
+                data.Add(new()
+                {
+                    Request = requestResponse.Request,
+                    Response = requestResponse.Response,
+                    MediatorRequest = requestResponse.Request,
+                    MediatorResponse = new Unrelated(),
+                });
+
+                data.Add(new()
+                {
+                    Request = requestResponse.Request,
+                    Response = requestResponse.Response,
+                    MediatorRequest = new Unrelated(),
+                    MediatorResponse = requestResponse.Response,
+                });
+
+                data.Add(new()
+                {
+                    Request = requestResponse.Request,
+                    Response = requestResponse.Response,
+                    MediatorRequest = new Unrelated(),
+                    MediatorResponse = new Unrelated(),
+                });
+
+                data.Add(new()
+                {
+                    Request = requestResponse.Request,
+                    Response = requestResponse.Response,
+                    MediatorRequest = new Any(),
+                    MediatorResponse = new Unrelated(),
+                });
+
+                data.Add(new()
+                {
+                    Request = requestResponse.Request,
+                    Response = requestResponse.Response,
+                    MediatorRequest = new Unrelated(),
+                    MediatorResponse = new Any(),
+                });
+
+                if (requestResponse.Request is MockContract && requestResponse.Request.GetType() != typeof(MockContract))
+                {
+                    data.Add(new()
+                    {
+                        Request = requestResponse.Request,
+                        Response = requestResponse.Response,
+                        MediatorRequest = new MockContract(),
+                        MediatorResponse = new Unrelated(),
+                    });
+                }
+
+                if (requestResponse.Response is MockContract && requestResponse.Response.GetType() != typeof(MockContract))
+                {
+                    data.Add(new()
+                    {
+                        Request = requestResponse.Request,
+                        Response = requestResponse.Response,
+                        MediatorRequest = new Unrelated(),
+                        MediatorResponse = new MockContract(),
+                    });
+                }
+            }
+
+            return data;
+        }
+
+        public class Unrelated
+        {
+
         }
     }
 }

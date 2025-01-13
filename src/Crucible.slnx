@@ -1,0 +1,23 @@
+<Solution>
+  <Folder Name="/Mediator/">
+    <Project Path="Mediator/Crucible.Mediator.Abstractions.Annotations/Crucible.Mediator.Abstractions.Annotations.csproj" />
+    <Project Path="Mediator/Crucible.Mediator.Abstractions/Crucible.Mediator.Abstractions.csproj" />
+    <Project Path="Mediator/Crucible.Mediator.DependencyInjection/Crucible.Mediator.DependencyInjection.csproj" />
+    <Project Path="Mediator/Crucible.Mediator.Engine/Crucible.Mediator.Engine.csproj" />
+    <Project Path="Mediator/Crucible.Mediator/Crucible.Mediator.csproj" />
+  </Folder>
+  <Folder Name="/Mediator/Benchmarks/">
+    <Project Path="Mediator/Benchmarks/Crucible.Mediator.Benchmarks/Crucible.Mediator.Benchmarks.csproj" />
+  </Folder>
+  <Folder Name="/Mediator/Tests/">
+    <Project Path="Mediator/Tests/Crucible.Mediator.Abstractions.Tests/Crucible.Mediator.Abstractions.Tests.csproj" />
+    <Project Path="Mediator/Tests/Crucible.Mediator.Engine.Tests/Crucible.Mediator.Engine.Tests.csproj" />
+    <Project Path="Mediator/Tests/Crucible.Mediator.Tests/Crucible.Mediator.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="nuget.config" />
+  </Folder>
+</Solution>

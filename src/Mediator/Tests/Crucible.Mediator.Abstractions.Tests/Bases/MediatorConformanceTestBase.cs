@@ -410,82 +410,6 @@ namespace Crucible.Mediator.Abstractions.Tests.Bases
             Assert.That(actualResponse, Is.EqualTo(response));
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         [Test]
         [ConformanceTest]
         [TestCaseSource_RequestResponse_Request(1)]
@@ -532,8 +456,8 @@ namespace Crucible.Mediator.Abstractions.Tests.Bases
 
         [Test]
         [ConformanceTest]
-        [TestCaseSource_RequestResponseMediatorRequestResponse_Applicable(isApplicable: true, typeof(MockRequest), 1)]
-        [TestCaseSource_RequestResponseMediatorRequestResponse_Applicable(isApplicable: true, typeof(MockRequest), 10)]
+        [TestCaseSource_RequestResponseMediatorRequestResponse_Applicable(isApplicable: true, typeof(IRequest<>), 1)]
+        [TestCaseSource_RequestResponseMediatorRequestResponse_Applicable(isApplicable: true, typeof(IRequest<>), 10)]
         public async Task ExecuteAndCaptureAsync_InvokesMiddlewares<TRequest, TResponse, TMiddlewareRequest, TMiddlewareResponse>(TRequest request, TResponse response, TMiddlewareRequest middlewareRequest, TMiddlewareResponse middlewareResponse, int middlewareCount)
             where TRequest : IRequest<TResponse>
         {
@@ -559,7 +483,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Bases
 
         [Test]
         [ConformanceTest]
-        [TestCaseSource_RequestResponseMediatorRequestResponse_Applicable(isApplicable: false, typeof(MockRequest))]
+        [TestCaseSource_RequestResponseMediatorRequestResponse_Applicable(isApplicable: false, typeof(IRequest<>))]
         public async Task ExecuteAndCaptureAsync_DoesNotInvokeUnrelatedMiddleware<TRequest, TResponse, TMiddlewareRequest, TMiddlewareResponse>(TRequest request, TResponse response, TMiddlewareRequest middlewareRequest, TMiddlewareResponse middlewareResponse)
             where TRequest : IRequest<TResponse>
         {
@@ -760,8 +684,8 @@ namespace Crucible.Mediator.Abstractions.Tests.Bases
 
         [Test]
         [ConformanceTest]
-        [TestCaseSource_RequestResponseMediatorRequestResponse_Applicable(isApplicable: true, typeof(MockRequest), 1)]
-        [TestCaseSource_RequestResponseMediatorRequestResponse_Applicable(isApplicable: true, typeof(MockRequest), 10)]
+        [TestCaseSource_RequestResponseMediatorRequestResponse_Applicable(isApplicable: true, typeof(IRequest<>), 1)]
+        [TestCaseSource_RequestResponseMediatorRequestResponse_Applicable(isApplicable: true, typeof(IRequest<>), 10)]
         public async Task ExecuteAsync_InvokesMiddlewares<TRequest, TResponse, TMiddlewareRequest, TMiddlewareResponse>(TRequest request, TResponse response, TMiddlewareRequest middlewareRequest, TMiddlewareResponse middlewareResponse, int middlewareCount)
             where TRequest : IRequest<TResponse>
         {
@@ -787,7 +711,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Bases
 
         [Test]
         [ConformanceTest]
-        [TestCaseSource_RequestResponseMediatorRequestResponse_Applicable(isApplicable: false, typeof(MockRequest))]
+        [TestCaseSource_RequestResponseMediatorRequestResponse_Applicable(isApplicable: false, typeof(IRequest<>))]
         public async Task ExecuteAsync_DoesNotInvokeUnrelatedMiddleware<TRequest, TResponse, TMiddlewareRequest, TMiddlewareResponse>(TRequest request, TResponse response, TMiddlewareRequest middlewareRequest, TMiddlewareResponse middlewareResponse)
             where TRequest : IRequest<TResponse>
         {
@@ -861,69 +785,6 @@ namespace Crucible.Mediator.Abstractions.Tests.Bases
             // Assert
             Assert.That(actualResponse, Is.EqualTo(response));
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         [Test]
         [ConformanceTest]

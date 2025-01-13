@@ -1,6 +1,6 @@
-﻿using Crucible.Mediator.Abstractions.Tests.Bases;
-using Crucible.Mediator.Abstractions.Tests.Internal;
+﻿using Crucible.Mediator.Abstractions.Tests.Internal;
 using Crucible.Mediator.Engine.Pipeline.Internal;
+using Crucible.Mediator.Engine.Tests.Bases;
 using Crucible.Mediator.Engine.Tests.Pipeline.Internal.Mocks;
 using Crucible.Mediator.Engine.Tests.Pipeline.Mocks;
 using Crucible.Mediator.Invocation;
@@ -8,7 +8,7 @@ using Crucible.Mediator.Invocation;
 namespace Crucible.Mediator.Engine.Tests
 {
     [ImplementationTest]
-    public class DefaultMediatorTest : MediatorConformanceTestBase<DefaultMediator>
+    public class DefaultMediatorTest : EngineMediatorTestBase<DefaultMediator>
     {
         protected ICollection<IMiddlewareInvocationPipelineItem> MiddlewareItems { get; } = [];
 
@@ -46,6 +46,17 @@ namespace Crucible.Mediator.Engine.Tests
         {
             var item = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>()
             {
+                Middleware = middleware
+            };
+
+            MiddlewareItems.Add(item);
+        }
+
+        protected override void RegisterMiddleware<TRequest, TResponse>(int order, IInvocationMiddleware<TRequest, TResponse> middleware)
+        {
+            var item = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>()
+            {
+                Order = order,
                 Middleware = middleware
             };
 

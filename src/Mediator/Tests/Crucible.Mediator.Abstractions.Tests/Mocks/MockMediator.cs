@@ -19,9 +19,9 @@ namespace Crucible.Mediator.Abstractions.Tests.Mocks
 
         }
 
-        private ICollection<Pipeline> _pipelines = [];
+        private readonly ICollection<Pipeline> _pipelines = [];
 
-        private ICollection<Middleware> _middlewares = [];
+        private readonly ICollection<Middleware> _middlewares = [];
 
         private Task<IInvocationContext<TResponse>> InnerHandleAndCaptureAsync<TResponse>(object contract, CancellationToken cancellationToken)
         {
@@ -143,7 +143,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Mocks
 
         private class Pipeline<TRequest, TResponse> : Pipeline<TResponse>
         {
-            private IEnumerable<Middleware> _middlewares;
+            private readonly IEnumerable<Middleware> _middlewares;
 
             public Pipeline(IEnumerable<Middleware> middlewares) => _middlewares = middlewares;
 

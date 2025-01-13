@@ -8,7 +8,7 @@ namespace Crucible.Mediator.Abstractions.Tests
     [MockTest]
     public class MockMediatorTest : MediatorConformanceTestBase<MockMediator>
     {
-        private ICollection<Action<MockMediator>> _setups = [];
+        private readonly ICollection<Action<MockMediator>> _setups = [];
 
         protected override MockMediator CreateMediator()
         {

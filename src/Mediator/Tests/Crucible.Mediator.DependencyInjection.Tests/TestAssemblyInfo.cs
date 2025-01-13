@@ -1,0 +1,1 @@
+﻿[assembly: FixtureLifeCycle(LifeCycle.InstancePerTestCase)]

@@ -53,9 +53,9 @@ namespace Crucible.Mediator.Abstractions.Tests.Bases
 
         [Test]
         [ConformanceTest]
-        [TestCaseSource_RequestResponse_All(1)]
-        [TestCaseSource_RequestResponse_All(10)]
-        public async Task HandleAndCaptureAsync_InvokesHandlers<TRequest, TResponse>(TRequest request, TResponse response, int handlerCount)
+        [TestCaseSource_RequestResponse_Event(1)]
+        [TestCaseSource_RequestResponse_Event(10)]
+        public async Task HandleAndCaptureAsync_InvokesHandlers_WhenContractIsEvent<TRequest, TResponse>(TRequest request, TResponse response, int handlerCount)
         {
             // Arrange
             for (var i = 0; i < handlerCount; i++)
@@ -72,6 +72,23 @@ namespace Crucible.Mediator.Abstractions.Tests.Bases
             {
                 handler.Mock.Verify(m => m.HandleAsync(It.IsAny<TRequest>(), It.IsAny<CancellationToken>()), Times.Once);
             }
+        }
+
+        [Test]
+        [ConformanceTest]
+        [TestCaseSource_RequestResponse_Request]
+        [TestCaseSource_RequestResponse_Command]
+        public async Task HandleAndCaptureAsync_InvokesHandler_WhenContractIsNotEvent<TRequest, TResponse>(TRequest request, TResponse response)
+        {
+            // Arrange
+            var handler = new MockInvocationHandler<TRequest, TResponse>();
+            AddHandler(handler);
+
+            // Act
+            _ = await Mediator.HandleAndCaptureAsync<TResponse>(request!, CancellationToken);
+
+            // Assert
+            handler.Mock.Verify(m => m.HandleAsync(It.IsAny<TRequest>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Test]
@@ -270,9 +287,9 @@ namespace Crucible.Mediator.Abstractions.Tests.Bases
 
         [Test]
         [ConformanceTest]
-        [TestCaseSource_RequestResponse_All(1)]
-        [TestCaseSource_RequestResponse_All(10)]
-        public async Task HandleAsync_InvokesHandlers<TRequest, TResponse>(TRequest request, TResponse response, int handlerCount)
+        [TestCaseSource_RequestResponse_Event(1)]
+        [TestCaseSource_RequestResponse_Event(10)]
+        public async Task HandleAsync_InvokesHandlers_WhenContractIsEvent<TRequest, TResponse>(TRequest request, TResponse response, int handlerCount)
         {
             // Arrange
             for (var i = 0; i < handlerCount; i++)
@@ -289,6 +306,23 @@ namespace Crucible.Mediator.Abstractions.Tests.Bases
             {
                 handler.Mock.Verify(m => m.HandleAsync(It.IsAny<TRequest>(), It.IsAny<CancellationToken>()), Times.Once);
             }
+        }
+
+        [Test]
+        [ConformanceTest]
+        [TestCaseSource_RequestResponse_Request]
+        [TestCaseSource_RequestResponse_Command]
+        public async Task HandleAsync_InvokesHandlers_WhenContractIsNotEvent<TRequest, TResponse>(TRequest request, TResponse response)
+        {
+            // Arrange
+            var handler = new MockInvocationHandler<TRequest, TResponse>();
+            AddHandler(handler);
+
+            // Act
+            _ = await Mediator.HandleAsync<TResponse>(request!, CancellationToken);
+
+            // Assert
+            handler.Mock.Verify(m => m.HandleAsync(It.IsAny<TRequest>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Test]

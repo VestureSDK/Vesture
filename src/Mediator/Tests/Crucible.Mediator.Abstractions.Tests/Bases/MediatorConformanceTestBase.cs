@@ -60,7 +60,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Bases
             }
 
             // Act
-            _ = await Mediator.HandleAndCaptureAsync<TResponse>(request, CancellationToken);
+            _ = await Mediator.HandleAndCaptureAsync<TResponse>(request!, CancellationToken);
 
             // Assert
             foreach (var handler in Handlers.Cast<MockInvocationHandler<TRequest, TResponse>>())
@@ -82,7 +82,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Bases
             AddHandler(unrelatedHandler);
 
             // Act
-            _ = await Mediator.HandleAndCaptureAsync<TResponse>(request, CancellationToken);
+            _ = await Mediator.HandleAndCaptureAsync<TResponse>(request!, CancellationToken);
 
             // Assert
             unrelatedHandler.Mock.Verify(m => m.HandleAsync(It.IsAny<MediatorTestData.Unrelated>(), It.IsAny<CancellationToken>()), Times.Never);
@@ -105,7 +105,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Bases
             }
 
             // Act
-            _ = await Mediator.HandleAndCaptureAsync<TResponse>(request, CancellationToken);
+            _ = await Mediator.HandleAndCaptureAsync<TResponse>(request!, CancellationToken);
 
             // Assert
             foreach (var middleware in Middlewares.Cast<MockInvocationMiddleware<TMiddlewareRequest, TMiddlewareResponse>>())
@@ -127,7 +127,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Bases
             AddMiddleware(middleware);
 
             // Act
-            _ = await Mediator.HandleAndCaptureAsync<TResponse>(request, CancellationToken);
+            _ = await Mediator.HandleAndCaptureAsync<TResponse>(request!, CancellationToken);
 
             // Assert
             middleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<TMiddlewareRequest, TMiddlewareResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Never);
@@ -143,7 +143,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Bases
             AddHandler(handler);
 
             // Act
-            var context = await Mediator.HandleAndCaptureAsync<TResponse>(request, CancellationToken);
+            var context = await Mediator.HandleAndCaptureAsync<TResponse>(request!, CancellationToken);
 
             // Assert
             Assert.That(context, Is.Not.Null);
@@ -162,7 +162,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Bases
             AddHandler(handler);
 
             // Act
-            var context = await Mediator.HandleAndCaptureAsync<TResponse>(request, CancellationToken);
+            var context = await Mediator.HandleAndCaptureAsync<TResponse>(request!, CancellationToken);
 
             // Assert
             Assert.That(context.Response, Is.SameAs(response));
@@ -181,7 +181,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Bases
             AddHandler(handler);
 
             // Act / Assert
-            Assert.DoesNotThrowAsync(() => Mediator.HandleAndCaptureAsync<TResponse>(request, CancellationToken));
+            Assert.DoesNotThrowAsync(() => Mediator.HandleAndCaptureAsync<TResponse>(request!, CancellationToken));
         }
 
         [Theory]
@@ -197,7 +197,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Bases
             AddHandler(handler);
 
             // Act
-            var context = await Mediator.HandleAndCaptureAsync<TResponse>(request, CancellationToken);
+            var context = await Mediator.HandleAndCaptureAsync<TResponse>(request!, CancellationToken);
 
             // Assert
             Assert.That(context.HasError, Is.True);
@@ -219,7 +219,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Bases
             AddMiddleware(middleware);
 
             // Act / Assert
-            Assert.DoesNotThrowAsync(() => Mediator.HandleAndCaptureAsync<TResponse>(request, CancellationToken));
+            Assert.DoesNotThrowAsync(() => Mediator.HandleAndCaptureAsync<TResponse>(request!, CancellationToken));
         }
 
         [Theory]
@@ -238,7 +238,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Bases
             AddMiddleware(middleware);
 
             // Act
-            var context = await Mediator.HandleAndCaptureAsync<TResponse>(request, CancellationToken);
+            var context = await Mediator.HandleAndCaptureAsync<TResponse>(request!, CancellationToken);
 
             // Assert
             Assert.That(context.HasError, Is.True);

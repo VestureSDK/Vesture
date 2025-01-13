@@ -1,7 +1,9 @@
 ﻿using Crucible.Mediator.Abstractions.Tests.Data.Annotations.Commands;
 using Crucible.Mediator.Abstractions.Tests.Internal;
+using Crucible.Mediator.Engine.Pipeline.Resolvers;
 using Crucible.Mediator.Engine.Pipeline.Strategies;
 using Crucible.Mediator.Engine.Tests.Pipeline.Strategies.Bases;
+using Crucible.Mediator.Invocation;
 using Moq;
 
 namespace Crucible.Mediator.Engine.Tests.Pipeline.Strategies
@@ -14,6 +16,28 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Strategies
             : base(request, response) { }
 
         protected override ParallelHandlersStrategy<TRequest, TResponse> CreateStrategy() => new(Resolvers);
+
+        [Test]
+        public void Ctor_ArgumentNullException_IfResolversIsNull()
+        {
+            // Arrange
+            // No arrange required
+
+            // Act / Assert
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
+            Assert.Throws<ArgumentNullException>(() => new SequentialHandlersStrategy<TRequest, TResponse>(null));
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
+        }
+
+        [Test]
+        public void Ctor_ArgumentException_IfResolversIsEmpty()
+        {
+            // Arrange
+            var resolvers = Enumerable.Empty<IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>>>();
+
+            // Act / Assert
+            Assert.Throws<ArgumentException>(() => new SequentialHandlersStrategy<TRequest, TResponse>(resolvers));
+        }
 
         [Test]
         public async Task HandleAsync_BothHandlersAreInvoked_WhenEitherHandlerFails()

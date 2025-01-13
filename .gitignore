@@ -400,3 +400,6 @@ FodyWeavers.xsd
 # DocFx
 /docs/_site
 /docs/**/References
+
+# Coverage report
+/coverageresults

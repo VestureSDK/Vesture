@@ -151,7 +151,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Mocks
         }
 
 #pragma warning disable CS8603 // Possible null reference return.
-        TRequest IInvocationContext<TRequest, TResponse>.Request => Response is TRequest tr ? tr : default;
+        TRequest IInvocationContext<TRequest, TResponse>.Request => Request is TRequest tr ? tr : default;
 #pragma warning restore CS8603 // Possible null reference return.
 
         TResponse? IInvocationContext<TResponse>.Response => Response is TResponse tr ? tr : default;

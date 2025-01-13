@@ -255,10 +255,10 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
             var context = CreateInvocationContext<TRequest, TResponse>(request);
 
             // Act
-            var actualRequest = ((IInvocationContext)context).Request;
+            var actualRequest = context.Request;
 
             // Assert
-            Assert.That(actualRequest, Is.SameAs(request));
+            Assert.That(actualRequest, Is.EqualTo(request));
         }
 #pragma warning restore NUnit2020 // Incompatible types for SameAs constraint
 
@@ -481,6 +481,34 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
             {
                 Assert.That(error.InnerExceptions[0], Is.SameAs(firstSampleError));
                 Assert.That(error.InnerExceptions[1], Is.SameAs(lastSampleError));
+            });
+        }
+
+        [Test]
+        [ConformanceTest]
+        [TestCaseSource_RequestResponse_All]
+        public void AddError_AggregatedErrors_AreAllTheExceptions_WhenPreviouslySetExceptionIsAggregated<TRequest, TResponse>(TRequest request, TResponse response)
+        {
+            // Arrange
+            var context = CreateInvocationContext<TRequest, TResponse>(request);
+
+            var firstSampleError = new Exception("sample exception 1");
+            var secondSampleError = new Exception("sample exception 2");
+            var aggregateError = new AggregateException(firstSampleError, secondSampleError);
+            context.SetError(aggregateError);
+
+            var lastSampleError = new Exception("sample exception 3");
+
+            // Act
+            context.AddError(lastSampleError);
+
+            // Assert
+            var error = (AggregateException)context.Error!;
+            Assert.Multiple(() =>
+            {
+                Assert.That(error.InnerExceptions[0], Is.SameAs(firstSampleError));
+                Assert.That(error.InnerExceptions[1], Is.SameAs(secondSampleError));
+                Assert.That(error.InnerExceptions[2], Is.SameAs(lastSampleError));
             });
         }
     }

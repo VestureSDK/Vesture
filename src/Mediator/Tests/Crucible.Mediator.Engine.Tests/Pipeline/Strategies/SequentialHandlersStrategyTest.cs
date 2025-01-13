@@ -16,6 +16,28 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Strategies
         protected override SequentialHandlersStrategy<TRequest, TResponse> CreateStrategy() => new(Resolvers);
 
         [Test]
+        public void Ctor_ArgumentNullException_IfResolversIsNull()
+        {
+            // Arrange
+            // No arrange required
+
+            // Act / Assert
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
+            Assert.Throws<ArgumentNullException>(() => new SequentialHandlersStrategy<TRequest, TResponse>(null));
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
+        }
+
+        [Test]
+        public void Ctor_ArgumentException_IfResolversIsEmpty()
+        {
+            // Arrange
+            Resolvers.Clear();
+
+            // Act / Assert
+            Assert.Throws<ArgumentException>(() => new SequentialHandlersStrategy<TRequest, TResponse>(Resolvers));
+        }
+
+        [Test]
         public async Task HandleAsync_OnlyFirstHandlerIsInvoked_WhenTheFirstHandlerFails()
         {
             // Arrange

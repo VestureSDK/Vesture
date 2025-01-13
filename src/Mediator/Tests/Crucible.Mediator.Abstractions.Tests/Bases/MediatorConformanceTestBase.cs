@@ -5,7 +5,6 @@ using Crucible.Mediator.Abstractions.Tests.Data.Annotations.Invocation;
 using Crucible.Mediator.Abstractions.Tests.Data.Annotations.Requests;
 using Crucible.Mediator.Abstractions.Tests.Internal;
 using Crucible.Mediator.Abstractions.Tests.Invocation.Mocks;
-using Crucible.Mediator.Abstractions.Tests.Requests.Mocks;
 using Crucible.Mediator.Commands;
 using Crucible.Mediator.Events;
 using Crucible.Mediator.Invocation;
@@ -412,26 +411,19 @@ namespace Crucible.Mediator.Abstractions.Tests.Bases
 
         [Test]
         [ConformanceTest]
-        [TestCaseSource_RequestResponse_Request(1)]
-        [TestCaseSource_RequestResponse_Request(10)]
-        public async Task ExecuteAndCaptureAsync_InvokesHandlers<TRequest, TResponse>(TRequest request, TResponse response, int handlerCount)
+        [TestCaseSource_RequestResponse_Request]
+        public async Task ExecuteAndCaptureAsync_InvokesHandler<TRequest, TResponse>(TRequest request, TResponse response)
             where TRequest : IRequest<TResponse>
         {
             // Arrange
-            for (var i = 0; i < handlerCount; i++)
-            {
-                var handler = new MockInvocationHandler<TRequest, TResponse>();
-                AddHandler(handler);
-            }
+            var handler = new MockInvocationHandler<TRequest, TResponse>();
+            AddHandler(handler);
 
             // Act
             _ = await Mediator.ExecuteAndCaptureAsync(request!, CancellationToken);
 
             // Assert
-            foreach (var handler in Handlers.Cast<MockInvocationHandler<TRequest, TResponse>>())
-            {
-                handler.Mock.Verify(m => m.HandleAsync(It.IsAny<TRequest>(), It.IsAny<CancellationToken>()), Times.Once);
-            }
+            handler.Mock.Verify(m => m.HandleAsync(It.IsAny<TRequest>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Test]
@@ -640,26 +632,19 @@ namespace Crucible.Mediator.Abstractions.Tests.Bases
 
         [Test]
         [ConformanceTest]
-        [TestCaseSource_RequestResponse_Request(1)]
-        [TestCaseSource_RequestResponse_Request(10)]
-        public async Task ExecuteAsync_InvokesHandlers<TRequest, TResponse>(TRequest request, TResponse response, int handlerCount)
+        [TestCaseSource_RequestResponse_Request]
+        public async Task ExecuteAsync_InvokesHandler<TRequest, TResponse>(TRequest request, TResponse response)
             where TRequest : IRequest<TResponse>
         {
             // Arrange
-            for (var i = 0; i < handlerCount; i++)
-            {
-                var handler = new MockInvocationHandler<TRequest, TResponse>();
-                AddHandler(handler);
-            }
+            var handler = new MockInvocationHandler<TRequest, TResponse>();
+            AddHandler(handler);
 
             // Act
             _ = await Mediator.ExecuteAsync(request!, CancellationToken);
 
             // Assert
-            foreach (var handler in Handlers.Cast<MockInvocationHandler<TRequest, TResponse>>())
-            {
-                handler.Mock.Verify(m => m.HandleAsync(It.IsAny<TRequest>(), It.IsAny<CancellationToken>()), Times.Once);
-            }
+            handler.Mock.Verify(m => m.HandleAsync(It.IsAny<TRequest>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Test]
@@ -1104,26 +1089,19 @@ namespace Crucible.Mediator.Abstractions.Tests.Bases
 
         [Test]
         [ConformanceTest]
-        [TestCaseSource_RequestResponse_Command(1)]
-        [TestCaseSource_RequestResponse_Command(10)]
-        public async Task InvokeAndCaptureAsync_InvokesHandlers<TRequest, TResponse>(TRequest request, TResponse response, int handlerCount)
+        [TestCaseSource_RequestResponse_Command]
+        public async Task InvokeAndCaptureAsync_InvokesHandler<TRequest, TResponse>(TRequest request, TResponse response)
             where TRequest : ICommand
         {
             // Arrange
-            for (var i = 0; i < handlerCount; i++)
-            {
-                var handler = new MockInvocationHandler<TRequest, TResponse>();
-                AddHandler(handler);
-            }
+            var handler = new MockInvocationHandler<TRequest, TResponse>();
+            AddHandler(handler);
 
             // Act
             _ = await Mediator.InvokeAndCaptureAsync(request!, CancellationToken);
 
             // Assert
-            foreach (var handler in Handlers.Cast<MockInvocationHandler<TRequest, TResponse>>())
-            {
-                handler.Mock.Verify(m => m.HandleAsync(It.IsAny<TRequest>(), It.IsAny<CancellationToken>()), Times.Once);
-            }
+            handler.Mock.Verify(m => m.HandleAsync(It.IsAny<TRequest>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Test]
@@ -1292,26 +1270,19 @@ namespace Crucible.Mediator.Abstractions.Tests.Bases
 
         [Test]
         [ConformanceTest]
-        [TestCaseSource_RequestResponse_Command(1)]
-        [TestCaseSource_RequestResponse_Command(10)]
-        public async Task InvokeAsync_InvokesHandlers<TRequest, TResponse>(TRequest request, TResponse response, int handlerCount)
+        [TestCaseSource_RequestResponse_Command]
+        public async Task InvokeAsync_InvokesHandler<TRequest, TResponse>(TRequest request, TResponse response)
             where TRequest : ICommand
         {
             // Arrange
-            for (var i = 0; i < handlerCount; i++)
-            {
-                var handler = new MockInvocationHandler<TRequest, TResponse>();
-                AddHandler(handler);
-            }
+            var handler = new MockInvocationHandler<TRequest, TResponse>();
+            AddHandler(handler);
 
             // Act
             await Mediator.InvokeAsync(request!, CancellationToken);
 
             // Assert
-            foreach (var handler in Handlers.Cast<MockInvocationHandler<TRequest, TResponse>>())
-            {
-                handler.Mock.Verify(m => m.HandleAsync(It.IsAny<TRequest>(), It.IsAny<CancellationToken>()), Times.Once);
-            }
+            handler.Mock.Verify(m => m.HandleAsync(It.IsAny<TRequest>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Test]

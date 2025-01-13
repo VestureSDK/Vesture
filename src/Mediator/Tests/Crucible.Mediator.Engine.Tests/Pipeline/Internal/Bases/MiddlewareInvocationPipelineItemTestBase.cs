@@ -37,7 +37,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Internal.Bases
 
         protected abstract TMiddlewareItem CreateMiddlewareItem(int order);
 
-        [Theory]
+        [Test]
         [ConformanceTest]
         [TestCase(Int32.MinValue, Description = "Order set to a min")]
         [TestCase(-123, Description = "Order set to a negative number")]
@@ -56,7 +56,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Internal.Bases
             Assert.That(actualOrder, Is.EqualTo(expectedOrder), message: "Actual order should be equal to provided ctor order");
         }
 
-        [Theory]
+        [Test]
         [ConformanceTest]
         [TestCaseSource_RequestResponseMediatorRequestResponse_Applicable(isApplicable: true)]
         public void IsApplicable_IsTrue_WhenMiddlewareSignatureMacthesOrLowerLevelThanContracts
@@ -74,7 +74,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Internal.Bases
             Assert.That(isApplicable, Is.True, message: $"Middleware ({typeof(TMiddlewareRequest).Name} -> {typeof(TMiddlewareResponse).Name}) should be applicable for contract ({typeof(TContractRequest).Name} -> {typeof(TContractResponse).Name})");
         }
 
-        [Theory]
+        [Test]
         [ConformanceTest]
         [TestCaseSource_RequestResponseMediatorRequestResponse_Applicable(isApplicable: false)]
         public void IsApplicable_IsFalse_WhenMiddlewareSignatureDoesNotMatchOrGreaterLevelThanContracts

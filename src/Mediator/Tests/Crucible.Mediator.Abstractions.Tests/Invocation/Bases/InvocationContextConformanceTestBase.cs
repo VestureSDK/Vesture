@@ -10,7 +10,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
     {
         protected abstract IInvocationContext<TRequest, TResponse> CreateInvocationContext<TRequest, TResponse>(TRequest request);
 
-        [Theory]
+        [Test]
         [ConformanceTest]
         [TestCaseSource_RequestResponse_All]
 #pragma warning disable NUnit2020 // Incompatible types for SameAs constraint
@@ -27,7 +27,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
         }
 #pragma warning restore NUnit2020 // Incompatible types for SameAs constraint
 
-        [Theory]
+        [Test]
         [ConformanceTest]
         [TestCaseSource_RequestResponse_Event]
         public void IsEvent_IsTrue<TRequest, TResponse>(TRequest request, TResponse response)
@@ -42,7 +42,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
             Assert.That(isEvent, Is.True);
         }
 
-        [Theory]
+        [Test]
         [ConformanceTest]
         [TestCaseSource_RequestResponse_Command]
         [TestCaseSource_RequestResponse_Request]
@@ -60,7 +60,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
             Assert.That(isEvent, Is.False);
         }
 
-        [Theory]
+        [Test]
         [ConformanceTest]
         [TestCaseSource_RequestResponse_Command]
         public void IsCommand_IsTrue<TRequest, TResponse>(TRequest request, TResponse response)
@@ -75,7 +75,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
             Assert.That(isCommand, Is.True);
         }
 
-        [Theory]
+        [Test]
         [ConformanceTest]
         [TestCaseSource_RequestResponse_Event]
         [TestCaseSource_RequestResponse_Request]
@@ -93,7 +93,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
             Assert.That(isCommand, Is.False);
         }
 
-        [Theory]
+        [Test]
         [ConformanceTest]
         [TestCaseSource_RequestResponse_Request]
         [TestCaseSource_RequestResponse_Unmarked]
@@ -109,7 +109,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
             Assert.That(isRequest, Is.True);
         }
 
-        [Theory]
+        [Test]
         [ConformanceTest]
         [TestCaseSource_RequestResponse_Command]
         [TestCaseSource_RequestResponse_Event]
@@ -126,7 +126,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
             Assert.That(isRequest, Is.False);
         }
 
-        [Theory]
+        [Test]
         [ConformanceTest]
         [TestCaseSource_RequestResponse_Request]
         [TestCaseSource_RequestResponse_Unmarked]
@@ -142,7 +142,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
             Assert.That(hasResponseType, Is.True);
         }
 
-        [Theory]
+        [Test]
         [ConformanceTest]
         [TestCaseSource_RequestResponse_Command]
         [TestCaseSource_RequestResponse_Event]
@@ -159,7 +159,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
             Assert.That(hasResponseType, Is.False);
         }
 
-        [Theory]
+        [Test]
         [ConformanceTest]
         [TestCaseSource_RequestResponse_Request]
         [TestCaseSource_RequestResponse_Unmarked]
@@ -175,7 +175,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
             Assert.That(hasResponse, Is.False);
         }
 
-        [Theory]
+        [Test]
         [ConformanceTest]
         [TestCaseSource_RequestResponse_Request]
         [TestCaseSource_RequestResponse_Unmarked]
@@ -192,7 +192,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
             Assert.That(hasResponse, Is.True);
         }
 
-        [Theory]
+        [Test]
         [ConformanceTest]
         [TestCaseSource_RequestResponse_Request]
         [TestCaseSource_RequestResponse_Unmarked]
@@ -208,7 +208,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
             Assert.That(context.Response, Is.SameAs(response));
         }
 
-        [Theory]
+        [Test]
         [ConformanceTest]
         [TestCaseSource_RequestResponse_Request]
         [TestCaseSource_RequestResponse_Unmarked]
@@ -228,7 +228,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
             Assert.That(context.Response, Is.SameAs(lastExpectedResponse));
         }
 
-        [Theory]
+        [Test]
         [ConformanceTest]
         [TestCaseSource_RequestResponse_Request]
         [TestCaseSource_RequestResponse_Unmarked]
@@ -245,7 +245,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
             Assert.That(context.Response, Is.Null);
         }
 
-        [Theory]
+        [Test]
         [ConformanceTest]
         [TestCaseSource_RequestResponse_All]
 #pragma warning disable NUnit2020 // Incompatible types for SameAs constraint
@@ -262,7 +262,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
         }
 #pragma warning restore NUnit2020 // Incompatible types for SameAs constraint
 
-        [Theory]
+        [Test]
         [ConformanceTest]
         [TestCaseSource_RequestResponse_All]
         public void ResponseType_IsSetWithExpectedResponseType<TRequest, TResponse>(TRequest request, TResponse response)
@@ -277,7 +277,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
             Assert.That(responseType, Is.SameAs(typeof(TResponse)));
         }
 
-        [Theory]
+        [Test]
         [ConformanceTest]
         [TestCaseSource_RequestResponse_All]
         public void Response_IsNull_WithPristineContext<TRequest, TResponse>(TRequest request, TResponse response)
@@ -292,7 +292,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
             Assert.That(actualResponse, Is.Null);
         }
 
-        [Theory]
+        [Test]
         [ConformanceTest]
         [TestCaseSource_RequestResponse_All]
         public void Error_IsNull_WithPristineContext<TRequest, TResponse>(TRequest request, TResponse response)
@@ -307,7 +307,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
             Assert.That(error, Is.Null);
         }
 
-        [Theory]
+        [Test]
         [ConformanceTest]
         [TestCaseSource_RequestResponse_All]
         public void HasError_IsFalse_WhenErrorIsNull<TRequest, TResponse>(TRequest request, TResponse response)
@@ -322,7 +322,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
             Assert.That(hasError, Is.False);
         }
 
-        [Theory]
+        [Test]
         [ConformanceTest]
         [TestCaseSource_RequestResponse_All]
         public void HasError_IsTrue_WhenErrorIsNotNull<TRequest, TResponse>(TRequest request, TResponse response)
@@ -338,7 +338,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
             Assert.That(hasError, Is.True);
         }
 
-        [Theory]
+        [Test]
         [ConformanceTest]
         [TestCaseSource_RequestResponse_All]
         public void IsSuccess_IsTrue_WhenHasErrorIsFalse<TRequest, TResponse>(TRequest request, TResponse response)
@@ -353,7 +353,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
             Assert.That(isSuccess, Is.True);
         }
 
-        [Theory]
+        [Test]
         [ConformanceTest]
         [TestCaseSource_RequestResponse_All]
         public void IsSuccess_IsFalse_WhenHasErrorIsTrue<TRequest, TResponse>(TRequest request, TResponse response)
@@ -369,7 +369,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
             Assert.That(isSuccess, Is.False);
         }
 
-        [Theory]
+        [Test]
         [ConformanceTest]
         [TestCaseSource_RequestResponse_All]
         public void SetError_Error_IsTheOneSet_WhenNoErrorSetBefore<TRequest, TResponse>(TRequest request, TResponse response)
@@ -385,7 +385,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
             Assert.That(context.Error, Is.SameAs(sampleError));
         }
 
-        [Theory]
+        [Test]
         [ConformanceTest]
         [TestCaseSource_RequestResponse_All]
         public void SetError_Error_IsTheLastOneSet_WhenSettingMultipleErrors<TRequest, TResponse>(TRequest request, TResponse response)
@@ -405,7 +405,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
             Assert.That(context.Error, Is.SameAs(lastSampleError));
         }
 
-        [Theory]
+        [Test]
         [ConformanceTest]
         [TestCaseSource_RequestResponse_All]
         public void SetError_Error_IsUnset_WhenSettingNullError<TRequest, TResponse>(TRequest request, TResponse response)
@@ -422,7 +422,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
             Assert.That(context.Error, Is.Null);
         }
 
-        [Theory]
+        [Test]
         [ConformanceTest]
         [TestCaseSource_RequestResponse_All]
         public void AddError_Error_IsTheOneSet_WhenNoErrorSetBefore<TRequest, TResponse>(TRequest request, TResponse response)
@@ -440,7 +440,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
             Assert.That(context.Error, Is.SameAs(sampleError));
         }
 
-        [Theory]
+        [Test]
         [ConformanceTest]
         [TestCaseSource_RequestResponse_All]
         public void AddError_Error_IsAggregated_WhenMultipleErrorsSet<TRequest, TResponse>(TRequest request, TResponse response)
@@ -460,7 +460,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Invocation.Bases
             Assert.That(context.Error, Is.TypeOf<AggregateException>());
         }
 
-        [Theory]
+        [Test]
         [ConformanceTest]
         [TestCaseSource_RequestResponse_All]
         public void AddError_AggregatedErrors_AreAllTheExceptions<TRequest, TResponse>(TRequest request, TResponse response)

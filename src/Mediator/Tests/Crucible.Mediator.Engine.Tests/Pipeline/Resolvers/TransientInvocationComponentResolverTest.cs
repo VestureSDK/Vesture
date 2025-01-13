@@ -47,7 +47,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Resolvers
             Assert.That(component1, Is.SameAs(component2));
         }
 
-        [Theory]
+        [Test]
         [TestCase(2)]
         [TestCase(10)]
         public void ResolveComponent_FactoryIsCalledEverytime(int iterationCount)

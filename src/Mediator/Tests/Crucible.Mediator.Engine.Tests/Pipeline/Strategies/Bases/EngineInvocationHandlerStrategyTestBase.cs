@@ -30,7 +30,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Strategies.Bases
             Resolver.Mock.Verify(m => m.ResolveComponent(), Times.Never);
         }
 
-        [Theory]
+        [Test]
         [TestCase(1, Description = "Call HandleAsync once")]
         [TestCase(5, Description = "Call HandleAsync multiple times")]
         public async Task HandleAsync_ResolvesTheHandlerFromTheResolverEverytime(int iterationCount)

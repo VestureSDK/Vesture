@@ -36,7 +36,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Resolvers
             Assert.That(component, Is.SameAs(SingletonInstance));
         }
 
-        [Theory]
+        [Test]
         [TestCase(2)]
         [TestCase(10)]
         public void ResolveComponent_PassesThroughTheFactoryOnlyOnce(int iterationCount)

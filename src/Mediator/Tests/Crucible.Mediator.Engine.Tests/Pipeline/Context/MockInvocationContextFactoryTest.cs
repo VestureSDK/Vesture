@@ -9,7 +9,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Context
     {
         protected override MockInvocationContextFactory CreateFactory() => new();
 
-        //[Theory]
+        //[Test]
         //[ConformanceTest]
         //[TestCaseSource_RequestResponse_Unmarked]
         //public override void CreateContextForRequest_ReturnedContext_IsNotNull<TContractRequest, TContractResponse>(TContractRequest request, TContractResponse response)

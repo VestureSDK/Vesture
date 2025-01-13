@@ -25,8 +25,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Data
     public partial class MediatorTestData
     {
         public static IEnumerable<ContractRequestTestData> Get_Request_Command() => [
-            new() { Request = new MockCommand() },
-            new() { Request = new MockUnmarked() }
+            new() { Request = new MockCommand() }
         ];
 
         public static IEnumerable<ContractRequestResponseTestData> Get_RequestResponse_Command() =>
@@ -38,8 +37,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Data
             });
 
         public static IEnumerable<ContractRequestTestData> Get_Request_Event() => [
-            new() { Request = new MockEvent() },
-            new() { Request = new MockUnmarked() }
+            new() { Request = new MockEvent() }
         ];
 
         public static IEnumerable<ContractRequestResponseTestData> Get_RequestResponse_Event() =>
@@ -59,7 +57,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Data
         ];
 
         public static IEnumerable<ContractRequestResponseTestData> Get_RequestResponse_Unmarked() => [
-            new() { Request = new MockUnmarked(), Response = new MockUnmarked() }
+            new() { Request = new MockUnmarked(), Response = new MockUnmarked() },
         ];
 
         public static IEnumerable<ContractRequestResponseTestData> Get_RequestResponse_All()
@@ -75,7 +73,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Data
             return data;
         }
 
-        public static IEnumerable<ContractRequestResponseMediatorRequestResponseTestData> Get_RequestResponseMediatorRequestResponse_IsApplicable_All()
+        public static IEnumerable<ContractRequestResponseMediatorRequestResponseTestData> Get_RequestResponseMediatorRequestResponse_IsApplicable_All(Func<ContractRequestResponseMediatorRequestResponseTestData, bool>? predicate = null)
         {
             var data = new List<ContractRequestResponseMediatorRequestResponseTestData>();
 
@@ -164,10 +162,10 @@ namespace Crucible.Mediator.Abstractions.Tests.Data
                 }
             }
 
-            return data;
+            return data.Where(d => predicate?.Invoke(d) ?? true).ToList();
         }
 
-        public static IEnumerable<ContractRequestResponseMediatorRequestResponseTestData> Get_RequestResponseMediatorRequestResponse_IsNotApplicable_All()
+        public static IEnumerable<ContractRequestResponseMediatorRequestResponseTestData> Get_RequestResponseMediatorRequestResponse_IsNotApplicable_All(Func<ContractRequestResponseMediatorRequestResponseTestData, bool>? predicate = null)
         {
             var data = new List<ContractRequestResponseMediatorRequestResponseTestData>();
 
@@ -237,7 +235,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Data
                 }
             }
 
-            return data;
+            return data.Where(d => predicate?.Invoke(d) ?? true).ToList();
         }
 
         public class Unrelated

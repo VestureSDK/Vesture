@@ -18,7 +18,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Internal.Bases
             Resolver = new() { Component = Middleware };
         }
 
-        [Theory]
+        [Test]
         [TestCaseSource_RequestResponse_All]
         public void IsApplicable_DoesNotResolveComponent<TContractRequest, TContractResponse>(TContractRequest request, TContractResponse response)
         {
@@ -32,7 +32,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Internal.Bases
             Resolver.Mock.Verify(m => m.ResolveComponent(), Times.Never, failMessage: "ResolveComponent should not be called outside of HandleAsync");
         }
 
-        [Theory]
+        [Test]
         [TestCase(1, Description = "Call HandleAsync once")]
         [TestCase(5, Description = "Call HandleAsync multiple times")]
         public async Task HandleAsync_ResolvesTheComponentFromTheResolverEverytime(int iterationCount)

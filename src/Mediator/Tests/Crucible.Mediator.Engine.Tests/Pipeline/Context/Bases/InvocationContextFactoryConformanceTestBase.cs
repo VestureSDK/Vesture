@@ -20,7 +20,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Context.Bases
 #pragma warning restore IL2091 // Target generic argument does not satisfy 'DynamicallyAccessedMembersAttribute' in target method or type. The generic parameter of the source method or type does not have matching annotations.
         }
 
-        [Theory]
+        [Test]
         [ConformanceTest]
         [TestCaseSource_RequestResponse_All]
         public virtual void CreateContextForRequest_ReturnedContext_IsNotNull<TRequest, TResponse>(TRequest request, TResponse response)

@@ -214,7 +214,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Bases
             }
         }
 
-        [Theory]
+        [Test]
         [TestCase(1, Description = "One middleware")]
         [TestCase(5, Description = "Multiple middlewares")]
         public async Task HandleAsync_HandlerStrategyIsInvoked_WhenMiddlewaresAreRegistered(int middlewareCount)
@@ -233,7 +233,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Bases
             HandlerStrategy.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
-        [Theory]
+        [Test]
         public async Task HandleAsync_MiddlewaresAreInvokedInOrder(
             [Values(Int32.MinValue, -123, 0, 123, Int32.MaxValue)] int orderA,
             [Values(Int32.MinValue, -123, 0, 123, Int32.MaxValue)] int orderB)

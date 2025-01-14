@@ -8,8 +8,9 @@
             "**/Mediator/*/*.csproj"
           ],
           "exclude": [
-            "**/*.Benchmarks.csproj",
-            "**/*.Tests.csproj"
+            "**/Benchmarks/*.csproj",
+            "**/Tests/*.csproj",
+            "**/Mocks/*.csproj"
           ]
         }
       ],

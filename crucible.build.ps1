@@ -1,3 +1,11 @@
+task Src {
+    & $(& "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -prerelease -latest -property productPath -format json | ConvertFrom-Json)[0].productPath ./src/Crucible.sln -donotloadprojects
+}
+
+task Src-Full {
+    ./src/Crucible.sln
+}
+
 task Src-Clean {
     dotnet clean ./src --verbosity detailed
 }

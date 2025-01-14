@@ -1,9 +1,9 @@
 ﻿using Crucible.Mediator.Abstractions.Tests.Data.Annotations.Commands;
-using Crucible.Mediator.Abstractions.Tests.Internal;
+using Crucible.Mediator.Engine.Mocks.Pipeline.Resolvers;
 using Crucible.Mediator.Engine.Pipeline.Internal;
-using Crucible.Mediator.Engine.Tests.Pipeline.Internal.Bases;
-using Crucible.Mediator.Engine.Tests.Pipeline.Resolvers.Mocks;
+using Crucible.Mediator.Engine.Tests.Pipeline.Internal._TestBases;
 using Crucible.Mediator.Invocation;
+using Crucible.Testing.Annotations;
 
 namespace Crucible.Mediator.Engine.Tests.Pipeline.Internal
 {

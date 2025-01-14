@@ -1,9 +1,8 @@
 ﻿using Crucible.Mediator.Abstractions.Tests.Data.Annotations.Commands;
-using Crucible.Mediator.Abstractions.Tests.Internal;
 using Crucible.Mediator.Engine.Pipeline.Resolvers;
 using Crucible.Mediator.Engine.Pipeline.Strategies;
-using Crucible.Mediator.Engine.Tests.Pipeline.Strategies.Bases;
 using Crucible.Mediator.Invocation;
+using Crucible.Testing.Annotations;
 using Moq;
 
 namespace Crucible.Mediator.Engine.Tests.Pipeline.Strategies

@@ -1,7 +1,6 @@
-﻿using Crucible.Mediator.Abstractions.Tests.Bases;
-using Crucible.Mediator.Abstractions.Tests.Internal;
-using Crucible.Mediator.Abstractions.Tests.Mocks;
-using Crucible.Mediator.Invocation;
+﻿using Crucible.Mediator.Invocation;
+using Crucible.Mediator.Mocks;
+using Crucible.Testing.Annotations;
 
 namespace Crucible.Mediator.Abstractions.Tests
 {
@@ -26,7 +25,7 @@ namespace Crucible.Mediator.Abstractions.Tests
         {
             _setups.Add(m => m.AddHandler(handler));
         }
-        
+
         protected override void RegisterMiddleware<TRequest, TResponse>(IInvocationMiddleware<TRequest, TResponse> middleware)
         {
             _setups.Add(m => m.AddMiddleware(middleware));

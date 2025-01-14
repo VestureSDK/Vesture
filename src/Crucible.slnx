@@ -1,4 +1,10 @@
 <Solution>
+  <Folder Name="/.Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="nuget.config" />
+  </Folder>
   <Folder Name="/Mediator/">
     <Project Path="Mediator/Crucible.Mediator.Abstractions.Annotations/Crucible.Mediator.Abstractions.Annotations.csproj" />
     <Project Path="Mediator/Crucible.Mediator.Abstractions/Crucible.Mediator.Abstractions.csproj" />
@@ -6,18 +12,19 @@
     <Project Path="Mediator/Crucible.Mediator.Engine/Crucible.Mediator.Engine.csproj" />
     <Project Path="Mediator/Crucible.Mediator/Crucible.Mediator.csproj" />
   </Folder>
-  <Folder Name="/Mediator/Benchmarks/" Id="e3fe7f42-fda5-15c5-ebd7-df5bcc616ca4">
+  <Folder Name="/Mediator/Benchmarks/">
     <Project Path="Mediator/Benchmarks/Crucible.Mediator.Benchmarks/Crucible.Mediator.Benchmarks.csproj" />
   </Folder>
-  <Folder Name="/Mediator/Tests/" Id="8d59c2fc-11b0-6f37-3d5b-1719acde26d4">
+  <Folder Name="/Mediator/Mocks/">
+    <Project Path="Mediator/Mocks/Crucible.Mediator.Abstractions.Mocks/Crucible.Mediator.Abstractions.Mocks.csproj" />
+    <Project Path="Mediator/Mocks/Crucible.Mediator.Engine.Mocks/Crucible.Mediator.Engine.Mocks.csproj" />
+  </Folder>
+  <Folder Name="/Mediator/Tests/">
     <Project Path="Mediator/Tests/Crucible.Mediator.Abstractions.Tests/Crucible.Mediator.Abstractions.Tests.csproj" />
-    <Project Path="Mediator/Tests/Crucible.Mediator.DependencyInjection.Tests/Crucible.Mediator.DependencyInjection.Tests.csproj" Id="909f995d-854a-40b3-a4e5-43312f6f7037" />
+    <Project Path="Mediator/Tests/Crucible.Mediator.DependencyInjection.Tests/Crucible.Mediator.DependencyInjection.Tests.csproj" />
     <Project Path="Mediator/Tests/Crucible.Mediator.Engine.Tests/Crucible.Mediator.Engine.Tests.csproj" />
   </Folder>
-  <Folder Name="/Solution Items/">
-    <File Path=".editorconfig" />
-    <File Path="Directory.Build.props" />
-    <File Path="Directory.Packages.props" />
-    <File Path="nuget.config" />
+  <Folder Name="/Testing/">
+    <Project Path="Testing/Crucible.Testing.NUnit/Crucible.Testing.NUnit.csproj" />
   </Folder>
 </Solution>

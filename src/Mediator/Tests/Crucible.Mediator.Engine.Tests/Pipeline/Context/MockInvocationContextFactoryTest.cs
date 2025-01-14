@@ -1,6 +1,5 @@
-﻿using Crucible.Mediator.Abstractions.Tests.Internal;
-using Crucible.Mediator.Engine.Tests.Pipeline.Context.Bases;
-using Crucible.Mediator.Engine.Tests.Pipeline.Context.Mocks;
+﻿using Crucible.Mediator.Engine.Mocks.Pipeline.Context;
+using Crucible.Testing.Annotations;
 
 namespace Crucible.Mediator.Engine.Tests.Pipeline.Context
 {
@@ -8,13 +7,5 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Context
     public class MockInvocationContextFactoryTest : InvocationContextFactoryConformanceTestBase<MockInvocationContextFactory>
     {
         protected override MockInvocationContextFactory CreateFactory() => new();
-
-        //[Test]
-        //[ConformanceTest]
-        //[TestCaseSource_RequestResponse_Unmarked]
-        //public override void CreateContextForRequest_ReturnedContext_IsNotNull<TContractRequest, TContractResponse>(TContractRequest request, TContractResponse response)
-        //{
-        //    base.CreateContextForRequest_ReturnedContext_IsNotNull<TContractRequest, TContractResponse>(request, response);
-        //}
     }
 }

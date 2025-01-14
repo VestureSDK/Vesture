@@ -1,6 +1,5 @@
-﻿using Crucible.Mediator.Abstractions.Tests.Internal;
-using Crucible.Mediator.Engine.Pipeline.Context;
-using Crucible.Mediator.Engine.Tests.Pipeline.Context.Bases;
+﻿using Crucible.Mediator.Engine.Pipeline.Context;
+using Crucible.Testing.Annotations;
 
 namespace Crucible.Mediator.Engine.Tests.Pipeline.Context
 {

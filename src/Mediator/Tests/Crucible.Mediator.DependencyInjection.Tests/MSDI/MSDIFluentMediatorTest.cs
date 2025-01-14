@@ -1,7 +1,7 @@
-﻿using Crucible.Mediator.Abstractions.Tests.Internal;
-using Crucible.Mediator.DependencyInjection.Fluent;
+﻿using Crucible.Mediator.DependencyInjection.Fluent;
 using Crucible.Mediator.DependencyInjection.MSDI;
 using Crucible.Mediator.DependencyInjection.Tests.Fluent;
+using Crucible.Testing.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Crucible.Mediator.DependencyInjection.Tests.MSDI

@@ -1,5 +1,5 @@
 ﻿using Crucible.Mediator.DependencyInjection.Fluent;
-using Crucible.Mediator.Engine.Tests.Bases;
+using Crucible.Mediator.Engine.Tests;
 using Crucible.Mediator.Invocation;
 
 namespace Crucible.Mediator.DependencyInjection.Tests.Fluent

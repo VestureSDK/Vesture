@@ -1,6 +1,5 @@
-﻿using Crucible.Mediator.Abstractions.Tests.Internal;
-using Crucible.Mediator.Engine.Pipeline.Resolvers;
-using Crucible.Mediator.Engine.Tests.Pipeline.Resolvers.Bases;
+﻿using Crucible.Mediator.Engine.Pipeline.Resolvers;
+using Crucible.Testing.Annotations;
 
 namespace Crucible.Mediator.Engine.Tests.Pipeline.Resolvers
 {

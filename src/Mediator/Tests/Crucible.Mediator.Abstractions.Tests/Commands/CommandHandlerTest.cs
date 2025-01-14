@@ -1,8 +1,8 @@
 ﻿using Crucible.Mediator.Abstractions.Tests.Data.Annotations.Commands;
-using Crucible.Mediator.Abstractions.Tests.Internal;
-using Crucible.Mediator.Abstractions.Tests.Invocation.Bases;
+using Crucible.Mediator.Abstractions.Tests.Invocation;
 using Crucible.Mediator.Commands;
 using Crucible.Mediator.Invocation;
+using Crucible.Testing.Annotations;
 using Moq;
 
 namespace Crucible.Mediator.Abstractions.Tests.Commands

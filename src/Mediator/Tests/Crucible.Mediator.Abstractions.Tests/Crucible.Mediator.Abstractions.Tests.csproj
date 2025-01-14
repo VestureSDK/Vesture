@@ -16,7 +16,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Testing\Crucible.Testing.NUnit\Crucible.Testing.NUnit.csproj" />
     <ProjectReference Include="..\..\Crucible.Mediator.Abstractions\Crucible.Mediator.Abstractions.csproj" />
+    <ProjectReference Include="..\..\Mocks\Crucible.Mediator.Abstractions.Mocks\Crucible.Mediator.Abstractions.Mocks.csproj" />
   </ItemGroup>
 
   <ItemGroup>

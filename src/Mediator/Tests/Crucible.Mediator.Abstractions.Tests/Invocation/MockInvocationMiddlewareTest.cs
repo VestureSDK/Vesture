@@ -1,6 +1,5 @@
-﻿using Crucible.Mediator.Abstractions.Tests.Internal;
-using Crucible.Mediator.Abstractions.Tests.Invocation.Bases;
-using Crucible.Mediator.Abstractions.Tests.Invocation.Mocks;
+﻿using Crucible.Mediator.Mocks.Invocation;
+using Crucible.Testing.Annotations;
 
 namespace Crucible.Mediator.Abstractions.Tests.Invocation
 {

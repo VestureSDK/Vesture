@@ -45,7 +45,6 @@ namespace Crucible.Mediator.DependencyInjection.MSDI
 
             _services.TryAddSingleton<Engine.DefaultMediator>();
             _services.TryAddSingleton<IMediator>(sp => sp.GetRequiredService<Engine.DefaultMediator>());
-            _services.TryAddSingleton<IWorkflowMediator>(sp => sp.GetRequiredService<Engine.DefaultMediator>());
             _services.TryAddSingleton<IInvocationContextFactory, DefaultInvocationContextFactory>();
         }
 

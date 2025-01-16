@@ -17,25 +17,6 @@
     /// <typeparam name="TResponse">
     /// The response type produced by processing the <typeparamref name="TRequest"/>.
     /// </typeparam>
-    /// <remarks>
-    /// <para>
-    /// <see cref="IInvocationHandler{TRequest, TResponse}"/> should not directly depend on or invoke 
-    /// <see cref="IMediator"/> for subsequent operations, as this can lead to tightly 
-    /// coupled and difficult-to-maintain code.
-    /// </para>
-    /// <para>
-    /// Instead, a <seealso cref="IInvocationWorkflow"/> should be used to orchestrate 
-    /// the flow of operations. <see cref="IInvocationWorkflow"/> provide a higher-level abstraction for 
-    /// managing complex workflows, ensuring that different handlers are executed in the 
-    /// correct order while maintaining a clear separation of concerns. 
-    /// </para>
-    /// <para>
-    /// By using workflows, you ensure that each handler remains focused on its individual 
-    /// responsibility, leaving orchestration and sequencing to the workflows, thus adhering 
-    /// to the principles of loose coupling and maintainability.
-    /// </para>
-    /// </remarks>
-    /// <seealso cref="IInvocationWorkflow"/>
     /// <seealso cref="IMediator"/>
     public interface IInvocationHandler<TRequest, TResponse>
     {

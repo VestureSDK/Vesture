@@ -1,0 +1,83 @@
+﻿#nullable enable
+abstract Crucible.Mediator.Engine.Pipeline.Context.DefaultInvocationContext.RequestType.get -> System.Type!
+abstract Crucible.Mediator.Engine.Pipeline.Context.DefaultInvocationContext.ResponseType.get -> System.Type!
+Crucible.Mediator.Engine.DefaultMediator
+Crucible.Mediator.Engine.DefaultMediator.DefaultMediator(System.Collections.Generic.IEnumerable<Crucible.Mediator.Engine.Pipeline.IInvocationPipeline!>! invocationPipelines) -> void
+Crucible.Mediator.Engine.DefaultMediator.ExecuteAndCaptureAsync<TResponse>(Crucible.Mediator.Requests.IRequest<TResponse>! request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Crucible.Mediator.Invocation.IInvocationContext<TResponse>!>!
+Crucible.Mediator.Engine.DefaultMediator.ExecuteAsync<TResponse>(Crucible.Mediator.Requests.IRequest<TResponse>! request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TResponse>!
+Crucible.Mediator.Engine.DefaultMediator.HandleAndCaptureAsync<TResponse>(object! contract, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Crucible.Mediator.Invocation.IInvocationContext<TResponse>!>!
+Crucible.Mediator.Engine.DefaultMediator.HandleAsync<TResponse>(object! contract, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TResponse>!
+Crucible.Mediator.Engine.DefaultMediator.InvokeAndCaptureAsync(Crucible.Mediator.Commands.ICommand! command, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Crucible.Mediator.Invocation.IInvocationContext!>!
+Crucible.Mediator.Engine.DefaultMediator.InvokeAsync(Crucible.Mediator.Commands.ICommand! command, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Crucible.Mediator.Engine.DefaultMediator.PublishAndCaptureAsync(Crucible.Mediator.Events.IEvent! event, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Crucible.Mediator.Invocation.IInvocationContext!>!
+Crucible.Mediator.Engine.DefaultMediator.PublishAsync(Crucible.Mediator.Events.IEvent! event, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Crucible.Mediator.Engine.Pipeline.Context.DefaultInvocationContext
+Crucible.Mediator.Engine.Pipeline.Context.DefaultInvocationContext.AddError(System.Exception! error) -> void
+Crucible.Mediator.Engine.Pipeline.Context.DefaultInvocationContext.DefaultInvocationContext(object! request) -> void
+Crucible.Mediator.Engine.Pipeline.Context.DefaultInvocationContext.Error.get -> System.Exception?
+Crucible.Mediator.Engine.Pipeline.Context.DefaultInvocationContext.HasError.get -> bool
+Crucible.Mediator.Engine.Pipeline.Context.DefaultInvocationContext.HasResponse.get -> bool
+Crucible.Mediator.Engine.Pipeline.Context.DefaultInvocationContext.HasResponseType.get -> bool
+Crucible.Mediator.Engine.Pipeline.Context.DefaultInvocationContext.IsCommand.get -> bool
+Crucible.Mediator.Engine.Pipeline.Context.DefaultInvocationContext.IsEvent.get -> bool
+Crucible.Mediator.Engine.Pipeline.Context.DefaultInvocationContext.IsRequest.get -> bool
+Crucible.Mediator.Engine.Pipeline.Context.DefaultInvocationContext.IsSuccess.get -> bool
+Crucible.Mediator.Engine.Pipeline.Context.DefaultInvocationContext.Request.get -> object!
+Crucible.Mediator.Engine.Pipeline.Context.DefaultInvocationContext.Response.get -> object?
+Crucible.Mediator.Engine.Pipeline.Context.DefaultInvocationContext.SetError(System.Exception? error) -> void
+Crucible.Mediator.Engine.Pipeline.Context.DefaultInvocationContext.SetResponse(object? response) -> void
+Crucible.Mediator.Engine.Pipeline.Context.DefaultInvocationContext<TRequest, TResponse>
+Crucible.Mediator.Engine.Pipeline.Context.DefaultInvocationContext<TRequest, TResponse>.DefaultInvocationContext(TRequest request) -> void
+Crucible.Mediator.Engine.Pipeline.Context.DefaultInvocationContextFactory
+Crucible.Mediator.Engine.Pipeline.Context.DefaultInvocationContextFactory.CreateContextForRequest<TRequest, TResponse>(object! request) -> Crucible.Mediator.Invocation.IInvocationContext<TRequest, TResponse>!
+Crucible.Mediator.Engine.Pipeline.Context.DefaultInvocationContextFactory.DefaultInvocationContextFactory() -> void
+Crucible.Mediator.Engine.Pipeline.Context.IInvocationContextFactory
+Crucible.Mediator.Engine.Pipeline.Context.IInvocationContextFactory.CreateContextForRequest<TRequest, TResponse>(object! request) -> Crucible.Mediator.Invocation.IInvocationContext<TRequest, TResponse>!
+Crucible.Mediator.Engine.Pipeline.DefaultInvocationPipeline<TRequest, TResponse>
+Crucible.Mediator.Engine.Pipeline.DefaultInvocationPipeline<TRequest, TResponse>.DefaultInvocationPipeline(Crucible.Mediator.Engine.Pipeline.Context.IInvocationContextFactory! contextFactory, Crucible.Mediator.Engine.Pipeline.Resolvers.IInvocationComponentResolver<Crucible.Mediator.Engine.Pipeline.IPrePipelineMiddleware!>! preInvocationPipelineMiddlewareResolver, System.Collections.Generic.IEnumerable<Crucible.Mediator.Engine.Pipeline.Internal.IMiddlewareInvocationPipelineItem!>! middlewares, Crucible.Mediator.Engine.Pipeline.Resolvers.IInvocationComponentResolver<Crucible.Mediator.Engine.Pipeline.IPreHandlerMiddleware!>! preHandlerMiddlewareResolver, Crucible.Mediator.Engine.Pipeline.Strategies.IInvocationHandlerStrategy<TRequest, TResponse>! handlerStrategy) -> void
+Crucible.Mediator.Engine.Pipeline.DefaultInvocationPipeline<TRequest, TResponse>.HandleAsync(object! request, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Crucible.Mediator.Invocation.IInvocationContext<TResponse>!>!
+Crucible.Mediator.Engine.Pipeline.DefaultInvocationPipeline<TRequest, TResponse>.RequestType.get -> System.Type!
+Crucible.Mediator.Engine.Pipeline.DefaultInvocationPipeline<TRequest, TResponse>.ResponseType.get -> System.Type!
+Crucible.Mediator.Engine.Pipeline.IInvocationPipeline
+Crucible.Mediator.Engine.Pipeline.IInvocationPipeline.RequestType.get -> System.Type!
+Crucible.Mediator.Engine.Pipeline.IInvocationPipeline.ResponseType.get -> System.Type!
+Crucible.Mediator.Engine.Pipeline.IInvocationPipeline<TResponse>
+Crucible.Mediator.Engine.Pipeline.IInvocationPipeline<TResponse>.HandleAsync(object! request, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Crucible.Mediator.Invocation.IInvocationContext<TResponse>!>!
+Crucible.Mediator.Engine.Pipeline.Internal.DefaultMiddlewareInvocationPipelineItem<TRequest, TResponse>
+Crucible.Mediator.Engine.Pipeline.Internal.DefaultMiddlewareInvocationPipelineItem<TRequest, TResponse>.DefaultMiddlewareInvocationPipelineItem(int order, Crucible.Mediator.Engine.Pipeline.Resolvers.IInvocationComponentResolver<Crucible.Mediator.Invocation.IInvocationMiddleware<TRequest, TResponse>!>! resolver) -> void
+Crucible.Mediator.Engine.Pipeline.Internal.DefaultMiddlewareInvocationPipelineItem<TRequest, TResponse>.HandleAsync(Crucible.Mediator.Invocation.IInvocationContext<TRequest, TResponse>! context, System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task!>! next, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
+Crucible.Mediator.Engine.Pipeline.Internal.DefaultMiddlewareInvocationPipelineItem<TRequest, TResponse>.IsApplicable(System.Type! contextType) -> bool
+Crucible.Mediator.Engine.Pipeline.Internal.DefaultMiddlewareInvocationPipelineItem<TRequest, TResponse>.Order.get -> int
+Crucible.Mediator.Engine.Pipeline.Internal.DefaultPrePipelineAndHandlerMiddleware
+Crucible.Mediator.Engine.Pipeline.Internal.DefaultPrePipelineAndHandlerMiddleware.DefaultPrePipelineAndHandlerMiddleware() -> void
+Crucible.Mediator.Engine.Pipeline.Internal.DefaultPrePipelineAndHandlerMiddleware.HandleAsync(Crucible.Mediator.Invocation.IInvocationContext<object!, object!>! context, System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task!>! next, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
+Crucible.Mediator.Engine.Pipeline.Internal.IMiddlewareInvocationPipelineItem
+Crucible.Mediator.Engine.Pipeline.Internal.IMiddlewareInvocationPipelineItem.IsApplicable(System.Type! contextType) -> bool
+Crucible.Mediator.Engine.Pipeline.Internal.IMiddlewareInvocationPipelineItem.Order.get -> int
+Crucible.Mediator.Engine.Pipeline.Internal.IMiddlewareInvocationPipelineItem<TRequest, TResponse>
+Crucible.Mediator.Engine.Pipeline.IPreHandlerMiddleware
+Crucible.Mediator.Engine.Pipeline.IPrePipelineMiddleware
+Crucible.Mediator.Engine.Pipeline.Resolvers.DeferredSingletonInvocationComponentResolver<TComponent>
+Crucible.Mediator.Engine.Pipeline.Resolvers.DeferredSingletonInvocationComponentResolver<TComponent>.DeferredSingletonInvocationComponentResolver(System.Lazy<TComponent>! componentInitializer) -> void
+Crucible.Mediator.Engine.Pipeline.Resolvers.DeferredSingletonInvocationComponentResolver<TComponent>.ResolveComponent() -> TComponent
+Crucible.Mediator.Engine.Pipeline.Resolvers.IInvocationComponentResolver<TComponent>
+Crucible.Mediator.Engine.Pipeline.Resolvers.IInvocationComponentResolver<TComponent>.ResolveComponent() -> TComponent
+Crucible.Mediator.Engine.Pipeline.Resolvers.SingletonInvocationComponentResolver<TComponent>
+Crucible.Mediator.Engine.Pipeline.Resolvers.SingletonInvocationComponentResolver<TComponent>.ResolveComponent() -> TComponent
+Crucible.Mediator.Engine.Pipeline.Resolvers.SingletonInvocationComponentResolver<TComponent>.SingletonInvocationComponentResolver(TComponent component) -> void
+Crucible.Mediator.Engine.Pipeline.Resolvers.TransientInvocationComponentResolver<TComponent>
+Crucible.Mediator.Engine.Pipeline.Resolvers.TransientInvocationComponentResolver<TComponent>.ResolveComponent() -> TComponent
+Crucible.Mediator.Engine.Pipeline.Resolvers.TransientInvocationComponentResolver<TComponent>.TransientInvocationComponentResolver(System.Func<TComponent>! componentFactory) -> void
+Crucible.Mediator.Engine.Pipeline.Strategies.IInvocationHandlerStrategy<TRequest, TResponse>
+Crucible.Mediator.Engine.Pipeline.Strategies.ParallelHandlersStrategy<TRequest, TResponse>
+Crucible.Mediator.Engine.Pipeline.Strategies.ParallelHandlersStrategy<TRequest, TResponse>.HandleAsync(Crucible.Mediator.Invocation.IInvocationContext<TRequest, TResponse>! context, System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task!>! next, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
+Crucible.Mediator.Engine.Pipeline.Strategies.ParallelHandlersStrategy<TRequest, TResponse>.ParallelHandlersStrategy(System.Collections.Generic.IEnumerable<Crucible.Mediator.Engine.Pipeline.Resolvers.IInvocationComponentResolver<Crucible.Mediator.Invocation.IInvocationHandler<TRequest, TResponse>!>!>! resolvers) -> void
+Crucible.Mediator.Engine.Pipeline.Strategies.SequentialHandlersStrategy<TRequest, TResponse>
+Crucible.Mediator.Engine.Pipeline.Strategies.SequentialHandlersStrategy<TRequest, TResponse>.HandleAsync(Crucible.Mediator.Invocation.IInvocationContext<TRequest, TResponse>! context, System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task!>! next, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
+Crucible.Mediator.Engine.Pipeline.Strategies.SequentialHandlersStrategy<TRequest, TResponse>.SequentialHandlersStrategy(System.Collections.Generic.IEnumerable<Crucible.Mediator.Engine.Pipeline.Resolvers.IInvocationComponentResolver<Crucible.Mediator.Invocation.IInvocationHandler<TRequest, TResponse>!>!>! resolvers) -> void
+Crucible.Mediator.Engine.Pipeline.Strategies.SingleHandlerStrategy<TRequest, TResponse>
+Crucible.Mediator.Engine.Pipeline.Strategies.SingleHandlerStrategy<TRequest, TResponse>.HandleAsync(Crucible.Mediator.Invocation.IInvocationContext<TRequest, TResponse>! context, System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task!>! next, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
+Crucible.Mediator.Engine.Pipeline.Strategies.SingleHandlerStrategy<TRequest, TResponse>.SingleHandlerStrategy(Crucible.Mediator.Engine.Pipeline.Resolvers.IInvocationComponentResolver<Crucible.Mediator.Invocation.IInvocationHandler<TRequest, TResponse>!>! resolver) -> void
+override Crucible.Mediator.Engine.Pipeline.Context.DefaultInvocationContext<TRequest, TResponse>.RequestType.get -> System.Type!
+override Crucible.Mediator.Engine.Pipeline.Context.DefaultInvocationContext<TRequest, TResponse>.ResponseType.get -> System.Type!
+static readonly Crucible.Mediator.Engine.Pipeline.Internal.DefaultPrePipelineAndHandlerMiddleware.Instance -> Crucible.Mediator.Engine.Pipeline.Internal.DefaultPrePipelineAndHandlerMiddleware!

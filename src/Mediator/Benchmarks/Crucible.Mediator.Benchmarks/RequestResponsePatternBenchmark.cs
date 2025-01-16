@@ -94,7 +94,7 @@ namespace Crucible.Mediator.Benchmarks
             public string? Value { get; set; }
         }
 
-        public class SampleHandler : RequestWorkflow<SampleRequest, SampleResponse>, MediatR.IRequestHandler<SampleRequest, SampleResponse>
+        public class SampleHandler : RequestHandler<SampleRequest, SampleResponse>, MediatR.IRequestHandler<SampleRequest, SampleResponse>
         {
             public Task<SampleResponse> Handle(SampleRequest request, CancellationToken cancellationToken = default)
             {

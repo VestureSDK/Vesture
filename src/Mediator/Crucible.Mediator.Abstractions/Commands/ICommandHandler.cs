@@ -17,27 +17,8 @@ namespace Crucible.Mediator.Commands
     /// <typeparam name="TCommand">
     /// The <see cref="ICommand"/> contract type handled by this handler.
     /// </typeparam>
-    /// <remarks>
-    /// <para>
-    /// <see cref="ICommandHandler{TCommand}"/> should not directly depend on or invoke 
-    /// <see cref="IMediator"/> for subsequent operations, as this can lead to tightly 
-    /// coupled and difficult-to-maintain code.
-    /// </para>
-    /// <para>
-    /// Instead, a <seealso cref="CommandWorkflow{TCommand}"/> should be used to orchestrate 
-    /// the flow of operations. <see cref="IInvocationWorkflow"/> provide a higher-level abstraction for 
-    /// managing complex workflows, ensuring that different handlers are executed in the 
-    /// correct order while maintaining a clear separation of concerns. 
-    /// </para>
-    /// <para>
-    /// By using workflows, you ensure that each handler remains focused on its individual 
-    /// responsibility, leaving orchestration and sequencing to the workflows, thus adhering 
-    /// to the principles of loose coupling and maintainability.
-    /// </para>
-    /// </remarks>
     /// <seealso cref="ICommand"/>
     /// <seealso cref="CommandHandler{TCommand}"/>
-    /// <seealso cref="CommandWorkflow{TCommand}"/>
     /// <seealso cref="IMediator"/>
     public interface ICommandHandler<TCommand> : IInvocationHandler<TCommand, CommandResponse>
     {

@@ -16,7 +16,6 @@ namespace Crucible.Mediator.Commands
     /// <inheritdoc cref="ICommandHandler{TCommand}"/>
     /// <seealso cref="ICommand"/>
     /// <seealso cref="ICommandHandler{TCommand}"/>
-    /// <seealso cref="CommandWorkflow{TCommand}"/>
     /// <seealso cref="IMediator"/>
     public abstract class CommandHandler<TCommand> : ICommandHandler<TCommand>
     {

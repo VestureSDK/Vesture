@@ -60,7 +60,7 @@ namespace Crucible.Mediator.Abstractions.Tests.Requests
             Task InnerEntersHandleAsync(TRequest request, CancellationToken cancellationToken);
         }
 
-        public class SampleRequestHandler : CommandHandler<TRequest, TResponse>
+        public class SampleRequestHandler : RequestHandler<TRequest, TResponse>
         {
             private readonly IRequestHandlerLifeCycle _lifeCycle;
 

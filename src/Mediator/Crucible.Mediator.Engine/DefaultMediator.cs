@@ -37,11 +37,10 @@ namespace Crucible.Mediator.Engine
     /// <seealso cref="IRequest{TResponse}"/>
     /// <seealso cref="ICommand"/>
     /// <seealso cref="IEvent"/>
-    /// <seealso cref="CommandHandler{TRequest, TResponse}"/>
     /// <seealso cref="CommandHandler{TCommand}"/>
     /// <seealso cref="Crucible.Mediator.Events.EventHandler{TEvent}"/>
     /// <seealso cref="InvocationMiddleware{TRequest, TResponse}"/>
-    public class DefaultMediator : IMediator, IWorkflowMediator
+    public class DefaultMediator : IMediator
     {
         private readonly Lazy<IDictionary<(Type request, Type response), IInvocationPipeline>> _invocationPipelines;
 

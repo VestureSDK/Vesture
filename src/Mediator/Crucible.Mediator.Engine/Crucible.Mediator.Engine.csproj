@@ -1,6 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <AdditionalFiles Include="PublicAPI.Shipped.txt" />
+    <AdditionalFiles Include="PublicAPI.Unshipped.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Crucible.Mediator.Abstractions\Crucible.Mediator.Abstractions.csproj" />
   </ItemGroup>
 

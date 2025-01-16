@@ -16,7 +16,6 @@ namespace Crucible.Mediator.Events
     /// <inheritdoc cref="IEventHandler{TEvent}"/>
     /// <seealso cref="IEvent"/>
     /// <seealso cref="IEventHandler{TEvent}"/>
-    /// <seealso cref="EventWorkflow{TEvent}"/>
     /// <seealso cref="IMediator"/>
     public abstract class EventHandler<TEvent> : IEventHandler<TEvent>
     {

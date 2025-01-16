@@ -6,7 +6,6 @@ using Crucible.Mediator.Commands;
 using Crucible.Mediator.Engine.Mocks.Pipeline;
 using Crucible.Mediator.Engine.Mocks.Pipeline.Context;
 using Crucible.Mediator.Engine.Mocks.Pipeline.Internal;
-using Crucible.Mediator.Engine.Pipeline;
 using Crucible.Mediator.Engine.Pipeline.Internal;
 using Crucible.Mediator.Events;
 using Crucible.Mediator.Invocation;

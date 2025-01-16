@@ -29,7 +29,7 @@ namespace Crucible.Mediator.Engine.Pipeline
 
         private readonly IInvocationComponentResolver<IPreHandlerMiddleware> _preHandlerMiddlewareResolver;
 
-        private readonly IInvocationHandlerStrategy<TRequest, TResponse> _handler;
+        private readonly IInvocationHandlerStrategy<TRequest, TResponse> _handlerStrategy;
 
         /// <inheritdoc />
         public Type RequestType { get; } = typeof(TRequest);
@@ -71,7 +71,7 @@ namespace Crucible.Mediator.Engine.Pipeline
             _preInvocationPipelineMiddlewareResolver = preInvocationPipelineMiddlewareResolver;
             _middlewares = middlewares;
             _preHandlerMiddlewareResolver = preHandlerMiddlewareResolver;
-            _handler = handlerStrategy;
+            _handlerStrategy = handlerStrategy;
             _chainOfResponsibility = new Lazy<Func<IInvocationContext<TRequest, TResponse>, CancellationToken, Task>>(CreateChainOfresponsibility);
         }
 
@@ -114,7 +114,7 @@ namespace Crucible.Mediator.Engine.Pipeline
             return chain!;
 
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-            Task handler(IInvocationContext<TRequest, TResponse> ctx, CancellationToken ct) => _handler.HandleAsync(ctx, null, ct);
+            Task handler(IInvocationContext<TRequest, TResponse> ctx, CancellationToken ct) => _handlerStrategy.HandleAsync(ctx, null, ct);
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 

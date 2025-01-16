@@ -28,15 +28,17 @@ namespace Crucible.Mediator.Mocks
         {
             if (!TryGetPipeline<TResponse>(contract.GetType(), out var pipeline))
             {
-                if (EventResponse.Type == typeof(TResponse))
+                var context = new MockInvocationContext<object, TResponse>()
                 {
-                    return new MockInvocationContext<object, TResponse>()
-                    {
-                        Request = contract,
-                    };
+                    Request = contract,
+                };
+
+                if (EventResponse.Type != typeof(TResponse))
+                {
+                    context.AddError(new KeyNotFoundException($"No relevant invocation pipeline found for contract '{contract.GetType().Name} -> {typeof(TResponse).Name}'."));
                 }
 
-                throw new KeyNotFoundException($"No relevant invocation pipeline found for contract '{contract.GetType().Name} -> {typeof(TResponse).Name}'.");
+                return context;
             }
 
             return await pipeline.HandleAndCaptureAsync(contract, cancellationToken);
@@ -103,9 +105,19 @@ namespace Crucible.Mediator.Mocks
         {
             if (!TryGetPipeline<TRequest, TResponse>(out var pipeline))
             {
-                pipeline = new Pipeline<TRequest, TResponse>(_middlewares);
+                pipeline = CreatePipeline<TRequest, TResponse>();
                 _pipelines.Add(pipeline);
+            }
 
+            return pipeline;
+        }
+
+        private Pipeline<TRequest, TResponse> CreatePipeline<TRequest, TResponse>(object? request = null)
+        {
+            var pipeline = new Pipeline<TRequest, TResponse>(_middlewares);
+
+            if (request is null)
+            {
                 Mock.Setup(m => m.HandleAndCaptureAsync<TResponse>(It.Is<object>((o, _) => o.GetType() == typeof(TRequest)), It.IsAny<CancellationToken>()))
                     .Returns<object, CancellationToken>((request, cancellationToken) => InnerHandleAndCaptureAsync<TResponse>(request, cancellationToken));
 
@@ -130,8 +142,43 @@ namespace Crucible.Mediator.Mocks
                 Mock.Setup(m => m.PublishAsync(It.Is<IEvent>((o, _) => o.GetType() == typeof(TRequest)), It.IsAny<CancellationToken>()))
                     .Returns<IEvent, CancellationToken>((request, cancellationToken) => InnerHandleAsync<EventResponse>(request, cancellationToken));
             }
+            else
+            {
+                Mock.Setup(m => m.HandleAndCaptureAsync<TResponse>(It.Is<object>((o, _) => o == request), It.IsAny<CancellationToken>()))
+                    .Returns<object, CancellationToken>((request, cancellationToken) => InnerHandleAndCaptureAsync<TResponse>(request, cancellationToken));
+
+                Mock.Setup(m => m.HandleAsync<TResponse>(It.Is<object>((o, _) => o == request), It.IsAny<CancellationToken>()))
+                    .Returns<object, CancellationToken>((request, cancellationToken) => InnerHandleAsync<TResponse>(request, cancellationToken));
+
+                Mock.Setup(m => m.ExecuteAndCaptureAsync<TResponse>(It.Is<IRequest<TResponse>>((o, _) => o == request), It.IsAny<CancellationToken>()))
+                    .Returns<IRequest<TResponse>, CancellationToken>((request, cancellationToken) => InnerHandleAndCaptureAsync<TResponse>(request, cancellationToken));
+
+                Mock.Setup(m => m.ExecuteAsync<TResponse>(It.Is<IRequest<TResponse>>((o, _) => o == request), It.IsAny<CancellationToken>()))
+                    .Returns<IRequest<TResponse>, CancellationToken>((request, cancellationToken) => InnerHandleAsync<TResponse>(request, cancellationToken));
+
+                Mock.Setup(m => m.InvokeAndCaptureAsync(It.Is<ICommand>((o, _) => o == request), It.IsAny<CancellationToken>()))
+                    .Returns<ICommand, CancellationToken>(async (request, cancellationToken) => await InnerHandleAndCaptureAsync<CommandResponse>(request, cancellationToken));
+
+                Mock.Setup(m => m.InvokeAsync(It.Is<ICommand>((o, _) => o == request), It.IsAny<CancellationToken>()))
+                    .Returns<ICommand, CancellationToken>((request, cancellationToken) => InnerHandleAsync<CommandResponse>(request, cancellationToken));
+
+                Mock.Setup(m => m.PublishAndCaptureAsync(It.Is<IEvent>((o, _) => o == request), It.IsAny<CancellationToken>()))
+                    .Returns<IEvent, CancellationToken>(async (request, cancellationToken) => await InnerHandleAndCaptureAsync<EventResponse>(request, cancellationToken));
+
+                Mock.Setup(m => m.PublishAsync(It.Is<IEvent>((o, _) => o == request), It.IsAny<CancellationToken>()))
+                    .Returns<IEvent, CancellationToken>((request, cancellationToken) => InnerHandleAsync<EventResponse>(request, cancellationToken));
+            }
 
             return pipeline;
+        }
+
+        private void CreateDefaultPipelineIfItDoesntExists<TResponse>(object request)
+        {
+            if (!TryGetPipeline<TResponse>(request.GetType(), out var pipeline))
+            {
+                pipeline = CreatePipeline<object, TResponse>(request);
+                _pipelines.Add(pipeline);
+            }
         }
 
         private abstract class Middleware
@@ -236,27 +283,59 @@ namespace Crucible.Mediator.Mocks
         }
 
         /// <inheritdoc />
-        public Task<IInvocationContext<TResponse>> ExecuteAndCaptureAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default) => _inner.ExecuteAndCaptureAsync(request, cancellationToken);
+        public async Task<IInvocationContext<TResponse>> ExecuteAndCaptureAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
+        {
+            CreateDefaultPipelineIfItDoesntExists<TResponse>(request);
+            return await _inner.ExecuteAndCaptureAsync(request, cancellationToken);
+        }
 
         /// <inheritdoc />
-        public Task<TResponse> ExecuteAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default) => _inner.ExecuteAsync(request, cancellationToken);
+        public Task<TResponse> ExecuteAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
+        {
+            CreateDefaultPipelineIfItDoesntExists<TResponse>(request);
+            return _inner.ExecuteAsync(request, cancellationToken);
+        }
 
         /// <inheritdoc />
-        public Task<IInvocationContext<TResponse>> HandleAndCaptureAsync<TResponse>(object contract, CancellationToken cancellationToken = default) => _inner.HandleAndCaptureAsync<TResponse>(contract, cancellationToken);
+        public async Task<IInvocationContext<TResponse>> HandleAndCaptureAsync<TResponse>(object contract, CancellationToken cancellationToken = default)
+        {
+            CreateDefaultPipelineIfItDoesntExists<TResponse>(contract);
+            return await _inner.HandleAndCaptureAsync<TResponse>(contract, cancellationToken);
+        }
 
         /// <inheritdoc />
-        public Task<TResponse> HandleAsync<TResponse>(object contract, CancellationToken cancellationToken = default) => _inner.HandleAsync<TResponse>(contract, cancellationToken);
+        public Task<TResponse> HandleAsync<TResponse>(object contract, CancellationToken cancellationToken = default)
+        {
+            CreateDefaultPipelineIfItDoesntExists<TResponse>(contract);
+            return _inner.HandleAsync<TResponse>(contract, cancellationToken);
+        }
 
         /// <inheritdoc />
-        public Task<IInvocationContext> InvokeAndCaptureAsync(ICommand command, CancellationToken cancellationToken = default) => _inner.InvokeAndCaptureAsync(command, cancellationToken);
+        public async Task<IInvocationContext> InvokeAndCaptureAsync(ICommand command, CancellationToken cancellationToken = default)
+        {
+            CreateDefaultPipelineIfItDoesntExists<CommandResponse>(command);
+            return await _inner.InvokeAndCaptureAsync(command, cancellationToken);
+        }
 
         /// <inheritdoc />
-        public Task InvokeAsync(ICommand command, CancellationToken cancellationToken = default) => _inner.InvokeAsync(command, cancellationToken);
+        public Task InvokeAsync(ICommand command, CancellationToken cancellationToken = default)
+        {
+            CreateDefaultPipelineIfItDoesntExists<CommandResponse>(command);
+            return _inner.InvokeAsync(command, cancellationToken);
+        }
 
         /// <inheritdoc />
-        public Task<IInvocationContext> PublishAndCaptureAsync(IEvent @event, CancellationToken cancellationToken = default) => _inner.PublishAndCaptureAsync(@event, cancellationToken);
+        public async Task<IInvocationContext> PublishAndCaptureAsync(IEvent @event, CancellationToken cancellationToken = default)
+        {
+            CreateDefaultPipelineIfItDoesntExists<EventResponse>(@event);
+            return await _inner.PublishAndCaptureAsync(@event, cancellationToken);
+        }
 
         /// <inheritdoc />
-        public Task PublishAsync(IEvent @event, CancellationToken cancellationToken = default) => _inner.PublishAsync(@event, cancellationToken);
+        public Task PublishAsync(IEvent @event, CancellationToken cancellationToken = default)
+        {
+            CreateDefaultPipelineIfItDoesntExists<EventResponse>(@event);
+            return _inner.PublishAsync(@event, cancellationToken);
+        }
     }
 }

@@ -23,6 +23,9 @@ namespace Crucible.Mediator.DependencyInjection.Tests.MSDI
 
         protected override IMediator CreateMediator()
         {
+            // Ensures initialization
+            _ = FluentBuilder;
+
             _serviceProvider = _services.BuildServiceProvider();
             return _serviceProvider.GetRequiredService<IMediator>();
         }

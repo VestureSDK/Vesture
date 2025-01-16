@@ -24,14 +24,22 @@ namespace Crucible.Mediator.Mocks
 
         private readonly ICollection<Middleware> _middlewares = [];
 
-        private Task<IInvocationContext<TResponse>> InnerHandleAndCaptureAsync<TResponse>(object contract, CancellationToken cancellationToken)
+        private async Task<IInvocationContext<TResponse>> InnerHandleAndCaptureAsync<TResponse>(object contract, CancellationToken cancellationToken)
         {
             if (!TryGetPipeline<TResponse>(contract.GetType(), out var pipeline))
             {
+                if (EventResponse.Type == typeof(TResponse))
+                {
+                    return new MockInvocationContext<object, TResponse>()
+                    {
+                        Request = contract,
+                    };
+                }
+
                 throw new KeyNotFoundException($"No relevant invocation pipeline found for contract '{contract.GetType().Name} -> {typeof(TResponse).Name}'.");
             }
 
-            return pipeline.HandleAndCaptureAsync(contract, cancellationToken);
+            return await pipeline.HandleAndCaptureAsync(contract, cancellationToken);
         }
 
         private async Task<TResponse> InnerHandleAsync<TResponse>(object contract, CancellationToken cancellationToken)

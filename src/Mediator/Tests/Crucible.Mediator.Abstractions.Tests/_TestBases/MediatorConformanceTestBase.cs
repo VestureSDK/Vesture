@@ -53,6 +53,38 @@ namespace Crucible.Mediator.Abstractions.Tests
 
         [Test]
         [ConformanceTest]
+        [TestCaseSource_RequestResponse_Request]
+        [TestCaseSource_RequestResponse_Command]
+        [TestCaseSource_RequestResponse_Unmarked]
+        public async Task HandleAndCaptureAsync_ContextHasError_WhenNoHandlersRegisteredAndContractIsNotEvent<TRequest, TResponse>(TRequest request, TResponse response)
+        {
+            // Arrange
+            // No arrange required
+
+            // Act
+            var context = await Mediator.HandleAndCaptureAsync<TResponse>(request!, CancellationToken);
+
+            // Act / Assert
+            Assert.That(context.HasError, Is.True);
+        }
+
+        [Test]
+        [ConformanceTest]
+        [TestCaseSource_RequestResponse_Event]
+        public async Task HandleAndCaptureAsync_ContextDoesNotHaveError_WhenNoHandlersRegisteredAndContractIsEvent<TRequest, TResponse>(TRequest request, TResponse response)
+        {
+            // Arrange
+            // No arrange required
+
+            // Act
+            var context = await Mediator.HandleAndCaptureAsync<TResponse>(request!, CancellationToken);
+
+            // Act / Assert
+            Assert.That(context.HasError, Is.False);
+        }
+
+        [Test]
+        [ConformanceTest]
         [TestCaseSource_RequestResponse_Event(1)]
         [TestCaseSource_RequestResponse_Event(10)]
         public async Task HandleAndCaptureAsync_InvokesHandlers_WhenContractIsEvent<TRequest, TResponse>(TRequest request, TResponse response, int handlerCount)
@@ -287,6 +319,32 @@ namespace Crucible.Mediator.Abstractions.Tests
 
         [Test]
         [ConformanceTest]
+        [TestCaseSource_RequestResponse_Event]
+        public void HandleAsync_DoesNotThrow_WhenNoHandlersRegisteredAndContractIsEvent<TRequest, TResponse>(TRequest request, TResponse response)
+        {
+            // Arrange
+            // No arrange required
+
+            // Act / Assert
+            Assert.DoesNotThrowAsync(() => Mediator.HandleAsync<TResponse>(request!, CancellationToken));
+        }
+
+        [Test]
+        [ConformanceTest]
+        [TestCaseSource_RequestResponse_Request]
+        [TestCaseSource_RequestResponse_Command]
+        [TestCaseSource_RequestResponse_Unmarked]
+        public void HandleAsync_Throws_WhenNoHandlersRegisteredAndContractIsNotEvent<TRequest, TResponse>(TRequest request, TResponse response)
+        {
+            // Arrange
+            // No arrange required
+
+            // Act / Assert
+            Assert.ThrowsAsync<KeyNotFoundException>(() => Mediator.HandleAsync<TResponse>(request!, CancellationToken));
+        }
+
+        [Test]
+        [ConformanceTest]
         [TestCaseSource_RequestResponse_Event(1)]
         [TestCaseSource_RequestResponse_Event(10)]
         public async Task HandleAsync_InvokesHandlers_WhenContractIsEvent<TRequest, TResponse>(TRequest request, TResponse response, int handlerCount)
@@ -441,6 +499,22 @@ namespace Crucible.Mediator.Abstractions.Tests
 
             // Assert
             Assert.That(actualResponse, Is.EqualTo(response));
+        }
+
+        [Test]
+        [ConformanceTest]
+        [TestCaseSource_RequestResponse_Request]
+        public async Task ExecuteAndCaptureAsync_ContextHasError_WhenNoHandlersRegistered<TRequest, TResponse>(TRequest request, TResponse response)
+            where TRequest : IRequest<TResponse>
+        {
+            // Arrange
+            // No arrange required
+
+            // Act
+            var context = await Mediator.ExecuteAndCaptureAsync<TResponse>(request!, CancellationToken);
+
+            // Act / Assert
+            Assert.That(context.HasError, Is.True);
         }
 
         [Test]
@@ -667,6 +741,19 @@ namespace Crucible.Mediator.Abstractions.Tests
         [Test]
         [ConformanceTest]
         [TestCaseSource_RequestResponse_Request]
+        public void ExecuteAsync_Throws_WhenNoHandlersRegistered<TRequest, TResponse>(TRequest request, TResponse response)
+            where TRequest : IRequest<TResponse>
+        {
+            // Arrange
+            // No arrange required
+
+            // Act / Assert
+            Assert.ThrowsAsync<KeyNotFoundException>(() => Mediator.ExecuteAsync(request!, CancellationToken));
+        }
+
+        [Test]
+        [ConformanceTest]
+        [TestCaseSource_RequestResponse_Request]
         public async Task ExecuteAsync_InvokesHandler<TRequest, TResponse>(TRequest request, TResponse response)
             where TRequest : IRequest<TResponse>
         {
@@ -803,6 +890,22 @@ namespace Crucible.Mediator.Abstractions.Tests
 
             // Assert
             Assert.That(actualResponse, Is.EqualTo(response));
+        }
+
+        [Test]
+        [ConformanceTest]
+        [TestCaseSource_RequestResponse_Event]
+        public async Task PublishAndCaptureAsync_ContextDoesNotHaveError_WhenNoHandlersRegistered<TRequest, TResponse>(TRequest request, TResponse response)
+            where TRequest : IEvent
+        {
+            // Arrange
+            // No arrange required
+
+            // Act
+            var context = await Mediator.PublishAndCaptureAsync(request!, CancellationToken);
+
+            // Assert
+            Assert.That(context.HasError, Is.False);
         }
 
         [Test]
@@ -995,6 +1098,19 @@ namespace Crucible.Mediator.Abstractions.Tests
 
         [Test]
         [ConformanceTest]
+        [TestCaseSource_RequestResponse_Event]
+        public void PublishAsync_DoesNotThrow_WhenNoHandlersRegistered<TRequest, TResponse>(TRequest request, TResponse response)
+            where TRequest : IEvent
+        {
+            // Arrange
+            // No arrange required
+
+            // Act / Assert
+            Assert.DoesNotThrowAsync(() => Mediator.PublishAsync(request!, CancellationToken));
+        }
+
+        [Test]
+        [ConformanceTest]
         [TestCaseSource_RequestResponse_Event(1)]
         [TestCaseSource_RequestResponse_Event(10)]
         public async Task PublishAsync_InvokesHandlers<TRequest, TResponse>(TRequest request, TResponse response, int handlerCount)
@@ -1119,6 +1235,22 @@ namespace Crucible.Mediator.Abstractions.Tests
 
             // Act / Assert
             Assert.ThrowsAsync<Exception>(() => Mediator.PublishAsync(request!, CancellationToken));
+        }
+
+        [Test]
+        [ConformanceTest]
+        [TestCaseSource_RequestResponse_Command]
+        public async Task InvokeAndCaptureAsync_ContextHasError_WhenNoHandlersRegistered<TRequest, TResponse>(TRequest request, TResponse response)
+            where TRequest : ICommand
+        {
+            // Arrange
+            // No arrange required
+
+            // Act
+            var context = await Mediator.InvokeAndCaptureAsync(request!, CancellationToken);
+
+            // Act / Assert
+            Assert.That(context.HasError, Is.True);
         }
 
         [Test]
@@ -1300,6 +1432,19 @@ namespace Crucible.Mediator.Abstractions.Tests
 
             // Assert
             Assert.That(context.HasError, Is.True);
+        }
+
+        [Test]
+        [ConformanceTest]
+        [TestCaseSource_RequestResponse_Command]
+        public void InvokeAsync_Throws_WhenNoHandlersRegistered<TRequest, TResponse>(TRequest request, TResponse response)
+            where TRequest : ICommand
+        {
+            // Arrange
+            // No arrange required
+
+            // Act / Assert
+            Assert.ThrowsAsync<KeyNotFoundException>(() => Mediator.InvokeAsync(request!, CancellationToken));
         }
 
         [Test]

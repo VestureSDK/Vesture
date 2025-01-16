@@ -4,6 +4,7 @@ using Crucible.Mediator.Abstractions.Tests.Data.Annotations.Events;
 using Crucible.Mediator.Abstractions.Tests.Data.Annotations.Requests;
 using Crucible.Mediator.Commands;
 using Crucible.Mediator.Engine.Mocks.Pipeline;
+using Crucible.Mediator.Engine.Mocks.Pipeline.Context;
 using Crucible.Mediator.Engine.Mocks.Pipeline.Internal;
 using Crucible.Mediator.Engine.Pipeline;
 using Crucible.Mediator.Engine.Pipeline.Internal;
@@ -22,6 +23,8 @@ namespace Crucible.Mediator.Engine.Tests
 
         protected Dictionary<(Type RequestType, Type ResponseType), MockInvocationPipeline> Pipelines { get; } = new Dictionary<(Type RequestType, Type ResponseType), MockInvocationPipeline>();
 
+        protected MockInvocationContextFactory ContextFactory { get; } = new();
+
         protected override DefaultMediator CreateMediator()
         {
             foreach (var pipeline in Pipelines.Values)
@@ -29,7 +32,7 @@ namespace Crucible.Mediator.Engine.Tests
                 pipeline.Middlewares = MiddlewareItems;
             }
 
-            return new(Pipelines.Values);
+            return new(Pipelines.Values, ContextFactory);
         }
 
         protected MockInvocationPipeline<TRequest, TResponse> GetOrCreatePipeline<TRequest, TResponse>()
@@ -79,18 +82,20 @@ namespace Crucible.Mediator.Engine.Tests
 
             // Act / Assert
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-            Assert.Throws<ArgumentNullException>(() => new DefaultMediator(null));
+            Assert.Throws<ArgumentNullException>(() => new DefaultMediator(null, ContextFactory));
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 
         [Test]
-        public void Ctor_ArgumentException_IfResolversIsEmpty()
+        public void Ctor_ArgumentNullException_IfContextFactoryIsNull()
         {
             // Arrange
-            var pipelines = Enumerable.Empty<IInvocationPipeline>();
+            // No arrange required
 
             // Act / Assert
-            Assert.Throws<ArgumentException>(() => new DefaultMediator(pipelines));
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
+            Assert.Throws<ArgumentNullException>(() => new DefaultMediator([], null));
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 
 #pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
@@ -113,19 +118,6 @@ namespace Crucible.Mediator.Engine.Tests
 
         [Test]
         [TestCaseSource_RequestResponse_All]
-        public void HandleAndCaptureAsync_Throws_IfNoPipelineRegistered<TRequest, TResponse>(TRequest request, TResponse response)
-            where TRequest : class
-        {
-            // Arrange
-            var handler = new MockInvocationHandler<MediatorTestData.Unrelated, MediatorTestData.Unrelated>();
-            AddHandler(handler);
-
-            // Act / Assert
-            Assert.ThrowsAsync<KeyNotFoundException>(() => Mediator.HandleAndCaptureAsync<TResponse>(request, CancellationToken));
-        }
-
-        [Test]
-        [TestCaseSource_RequestResponse_All]
         public void HandleAsync_Throws_IfContractIsNull<TRequest, TResponse>(TRequest request, TResponse response)
             where TRequest : class
         {
@@ -137,19 +129,6 @@ namespace Crucible.Mediator.Engine.Tests
 
             // Act / Assert
             Assert.ThrowsAsync<ArgumentNullException>(() => Mediator.HandleAsync<TResponse>(request, CancellationToken));
-        }
-
-        [Test]
-        [TestCaseSource_RequestResponse_All]
-        public void HandleAsync_Throws_IfNoPipelineRegistered<TRequest, TResponse>(TRequest request, TResponse response)
-            where TRequest : class
-        {
-            // Arrange
-            var handler = new MockInvocationHandler<MediatorTestData.Unrelated, MediatorTestData.Unrelated>();
-            AddHandler(handler);
-
-            // Act / Assert
-            Assert.ThrowsAsync<KeyNotFoundException>(() => Mediator.HandleAsync<TResponse>(request, CancellationToken));
         }
 
         [Test]
@@ -165,19 +144,6 @@ namespace Crucible.Mediator.Engine.Tests
 
             // Act / Assert
             Assert.ThrowsAsync<ArgumentNullException>(() => Mediator.ExecuteAndCaptureAsync(request, CancellationToken));
-        }
-
-        [Test]
-        [TestCaseSource_RequestResponse_Request]
-        public void ExecuteAndCaptureAsync_Throws_IfNoPipelineRegistered<TRequest, TResponse>(TRequest request, TResponse response)
-            where TRequest : class, IRequest<TResponse>
-        {
-            // Arrange
-            var handler = new MockInvocationHandler<MediatorTestData.Unrelated, MediatorTestData.Unrelated>();
-            AddHandler(handler);
-
-            // Act / Assert
-            Assert.ThrowsAsync<KeyNotFoundException>(() => Mediator.ExecuteAndCaptureAsync(request, CancellationToken));
         }
 
         [Test]
@@ -221,20 +187,6 @@ namespace Crucible.Mediator.Engine.Tests
 
             // Act / Assert
             Assert.ThrowsAsync<ArgumentNullException>(() => Mediator.InvokeAndCaptureAsync(request, CancellationToken));
-        }
-
-
-        [Test]
-        [TestCaseSource_RequestResponse_Command]
-        public void InvokeAndCaptureAsync_Throws_IfNoPipelineRegistered<TRequest, TResponse>(TRequest request, TResponse response)
-            where TRequest : class, ICommand
-        {
-            // Arrange
-            var handler = new MockInvocationHandler<MediatorTestData.Unrelated, MediatorTestData.Unrelated>();
-            AddHandler(handler);
-
-            // Act / Assert
-            Assert.ThrowsAsync<KeyNotFoundException>(() => Mediator.InvokeAndCaptureAsync(request, CancellationToken));
         }
 
         [Test]
@@ -282,19 +234,6 @@ namespace Crucible.Mediator.Engine.Tests
 
         [Test]
         [TestCaseSource_RequestResponse_Event]
-        public void PublishAndCaptureAsync_Throws_IfNoPipelineRegistered<TRequest, TResponse>(TRequest request, TResponse response)
-            where TRequest : class, IEvent
-        {
-            // Arrange
-            var handler = new MockInvocationHandler<MediatorTestData.Unrelated, MediatorTestData.Unrelated>();
-            AddHandler(handler);
-
-            // Act / Assert
-            Assert.ThrowsAsync<KeyNotFoundException>(() => Mediator.PublishAndCaptureAsync(request, CancellationToken));
-        }
-
-        [Test]
-        [TestCaseSource_RequestResponse_Event]
         public void PublishAsync_Throws_IfContractIsNull<TRequest, TResponse>(TRequest request, TResponse response)
             where TRequest : class, IEvent
         {
@@ -307,21 +246,6 @@ namespace Crucible.Mediator.Engine.Tests
             // Act / Assert
             Assert.ThrowsAsync<ArgumentNullException>(() => Mediator.PublishAsync(request, CancellationToken));
         }
-
-        [Test]
-        [TestCaseSource_RequestResponse_Event]
-        public void PublishAsync_Throws_IfNoPipelineRegistered<TRequest, TResponse>(TRequest request, TResponse response)
-            where TRequest : class, IEvent
-        {
-            // Arrange
-            var handler = new MockInvocationHandler<MediatorTestData.Unrelated, MediatorTestData.Unrelated>();
-            AddHandler(handler);
-
-            // Act / Assert
-            Assert.ThrowsAsync<KeyNotFoundException>(() => Mediator.PublishAsync(request, CancellationToken));
-        }
-
-
 #pragma warning restore CS8604 // Possible null reference argument.
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
     }

@@ -79,11 +79,7 @@ namespace Crucible.Mediator.DependencyInjection.MSDI
                 if (singleton)
                 {
                     _services.AddSingleton<TMiddleware>();
-                    _services.AddSingleton<IInvocationComponentResolver<TMiddleware>>(sp =>
-                    {
-                        var lazy = new Lazy<TMiddleware>(() => sp.GetRequiredService<TMiddleware>());
-                        return new DeferredSingletonInvocationComponentResolver<TMiddleware>(lazy);
-                    });
+                    _services.AddSingleton<IInvocationComponentResolver<TMiddleware>, SingletonInvocationComponentResolver<TMiddleware>>();
                 }
                 else
                 {
@@ -105,19 +101,6 @@ namespace Crucible.Mediator.DependencyInjection.MSDI
         {
             ArgumentNullException.ThrowIfNull(handler, nameof(handler));
 
-            if (handler is IInvocationWorkflow workflow)
-            {
-                _services.AddSingleton((sp) =>
-                {
-                    PostInitializeWorkflow(sp, workflow);
-                    return handler;
-                });
-            }
-            else
-            {
-                _services.AddSingleton(handler);
-            }
-
             _services.AddSingleton<IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>>>(new SingletonInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>>(handler));
             TryAddInvocationPipeline<TRequest, TResponse>();
         }
@@ -129,34 +112,12 @@ namespace Crucible.Mediator.DependencyInjection.MSDI
             if (singleton)
             {
                 _services.TryAddSingleton<THandler>();
-                _services.AddSingleton<IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>>>((sp) =>
-                {
-                    var lazy = new Lazy<THandler>(() =>
-                    {
-                        var implementation = sp.GetRequiredService<THandler>();
-                        if (implementation is IInvocationWorkflow workflow)
-                        {
-                            PostInitializeWorkflow(sp, (IInvocationWorkflow)implementation);
-                        }
-
-                        return implementation;
-                    });
-
-                    return new DeferredSingletonInvocationComponentResolver<THandler>(lazy);
-                });
+                _services.AddSingleton<IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>>, SingletonInvocationComponentResolver<THandler>>();
             }
             else
             {
                 _services.TryAddTransient<THandler>();
-                _services.AddSingleton<IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>>>((sp) => new TransientInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>>(() =>
-                {
-                    var implementation = sp.GetRequiredService<THandler>();
-                    if (implementation is IInvocationWorkflow workflow)
-                    {
-                        PostInitializeWorkflow(sp, (IInvocationWorkflow)implementation);
-                    }
-                    return implementation;
-                }));
+                _services.AddSingleton<IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>>>((sp) => new TransientInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>>(() => sp.GetRequiredService<THandler>()));
             }
 
 
@@ -194,11 +155,6 @@ namespace Crucible.Mediator.DependencyInjection.MSDI
             {
                 _services.TryAddSingleton<IInvocationHandlerStrategy<TRequest, TResponse>, SingleHandlerStrategy<TRequest, TResponse>>();
             }
-        }
-
-        private static void PostInitializeWorkflow(IServiceProvider serviceProvider, IInvocationWorkflow workflow)
-        {
-            workflow.Mediator = serviceProvider.GetRequiredService<IWorkflowMediator>();
         }
     }
 }

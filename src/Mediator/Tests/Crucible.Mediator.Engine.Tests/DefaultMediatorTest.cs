@@ -7,6 +7,7 @@ using Crucible.Mediator.Engine.Mocks.Pipeline;
 using Crucible.Mediator.Engine.Mocks.Pipeline.Context;
 using Crucible.Mediator.Engine.Mocks.Pipeline.Internal;
 using Crucible.Mediator.Engine.Pipeline.Internal;
+using Crucible.Mediator.Engine.Tests.Pipeline.Internal.NoOp;
 using Crucible.Mediator.Events;
 using Crucible.Mediator.Invocation;
 using Crucible.Mediator.Mocks.Invocation;
@@ -24,6 +25,8 @@ namespace Crucible.Mediator.Engine.Tests
 
         protected MockInvocationContextFactory ContextFactory { get; } = new();
 
+        protected MockNoOpInvocationPipelineResolver NoOpInvocationPipelineResolver { get; } = new();
+
         protected override DefaultMediator CreateMediator()
         {
             foreach (var pipeline in Pipelines.Values)
@@ -31,7 +34,7 @@ namespace Crucible.Mediator.Engine.Tests
                 pipeline.Middlewares = MiddlewareItems;
             }
 
-            return new(Pipelines.Values, ContextFactory);
+            return new(Pipelines.Values, ContextFactory, NoOpInvocationPipelineResolver);
         }
 
         protected MockInvocationPipeline<TRequest, TResponse> GetOrCreatePipeline<TRequest, TResponse>()
@@ -81,7 +84,7 @@ namespace Crucible.Mediator.Engine.Tests
 
             // Act / Assert
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-            Assert.Throws<ArgumentNullException>(() => new DefaultMediator(null, ContextFactory));
+            Assert.Throws<ArgumentNullException>(() => new DefaultMediator(null, ContextFactory, NoOpInvocationPipelineResolver));
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 
@@ -93,7 +96,19 @@ namespace Crucible.Mediator.Engine.Tests
 
             // Act / Assert
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-            Assert.Throws<ArgumentNullException>(() => new DefaultMediator([], null));
+            Assert.Throws<ArgumentNullException>(() => new DefaultMediator([], null, NoOpInvocationPipelineResolver));
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
+        }
+
+        [Test]
+        public void Ctor_ArgumentNullException_IfResolverIsNull()
+        {
+            // Arrange
+            // No arrange required
+
+            // Act / Assert
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
+            Assert.Throws<ArgumentNullException>(() => new DefaultMediator([], ContextFactory, null));
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 

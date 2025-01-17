@@ -2,7 +2,7 @@
 using Crucible.Mediator.Commands;
 using Crucible.Mediator.Engine.Pipeline;
 using Crucible.Mediator.Engine.Pipeline.Context;
-using Crucible.Mediator.Engine.Pipeline.Internal;
+using Crucible.Mediator.Engine.Pipeline.Internal.NoOp;
 using Crucible.Mediator.Events;
 using Crucible.Mediator.Invocation;
 using Crucible.Mediator.Requests;
@@ -48,19 +48,24 @@ namespace Crucible.Mediator.Engine
 
         private readonly IInvocationContextFactory _contextFactory;
 
+        private readonly INoOpInvocationPipelineResolver _noOpInvocationPipelineResolver;
+
         /// <summary>
         /// Initializes a new <see cref="DefaultMediator"/> instance.
         /// </summary>
         /// <param name="invocationPipelines">The <see cref="IInvocationPipeline{TResponse}"/> instances.</param>
         /// <param name="contextFactory">The <see cref="IInvocationContextFactory"/> instances.</param>
+        /// <param name="noOpInvocationPipelineResolver">The <see cref="INoOpInvocationPipelineResolver"/> instances.</param>
         /// <exception cref="ArgumentNullException"><paramref name="invocationPipelines"/> is <see langword="null" /> or <paramref name="contextFactory"/> is <see langword="null" />.</exception>
-        public DefaultMediator(IEnumerable<IInvocationPipeline> invocationPipelines, IInvocationContextFactory contextFactory)
+        public DefaultMediator(IEnumerable<IInvocationPipeline> invocationPipelines, IInvocationContextFactory contextFactory, INoOpInvocationPipelineResolver noOpInvocationPipelineResolver)
         {
             ArgumentNullException.ThrowIfNull(invocationPipelines, nameof(invocationPipelines));
             ArgumentNullException.ThrowIfNull(contextFactory, nameof(contextFactory));
+            ArgumentNullException.ThrowIfNull(noOpInvocationPipelineResolver, nameof(noOpInvocationPipelineResolver));
 
             _invocationPipelines = new Lazy<IDictionary<(Type request, Type response), IInvocationPipeline>>(() => CreateInvocationPipelineCache(invocationPipelines));
             _contextFactory = contextFactory;
+            _noOpInvocationPipelineResolver = noOpInvocationPipelineResolver;
         }
 
         /// <exception cref="KeyNotFoundException">No relevant invocation pipeline found for contract '<paramref name="request"/> -> <typeparamref name="TResponse"/>'.</exception>
@@ -73,16 +78,9 @@ namespace Crucible.Mediator.Engine
             {
                 return pipeline;
             }
-            else if (typeof(TResponse) == EventResponse.Type)
-            {
-                return new NoOpInvocationPipeline<TResponse>(_contextFactory);
-            }
             else
             {
-                return new NoOpInvocationPipeline<TResponse>(_contextFactory, (ctx) =>
-                {
-                    ctx.AddError(new KeyNotFoundException($"No relevant invocation pipeline found for contract '{requestType.Name} -> {responseType.Name}'."));
-                });
+                return _noOpInvocationPipelineResolver.ResolveNoOpInvocationPipeline<TResponse>();
             }
         }
 

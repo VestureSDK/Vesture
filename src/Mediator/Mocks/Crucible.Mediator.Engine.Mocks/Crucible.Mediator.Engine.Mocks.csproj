@@ -9,4 +9,8 @@
     <ProjectReference Include="..\Crucible.Mediator.Abstractions.Mocks\Crucible.Mediator.Abstractions.Mocks.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Pipeline\Internal\NoOp\" />
+  </ItemGroup>
+
 </Project>

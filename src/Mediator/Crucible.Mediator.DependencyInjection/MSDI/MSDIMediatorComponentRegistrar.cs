@@ -2,6 +2,7 @@
 using Crucible.Mediator.Engine.Pipeline;
 using Crucible.Mediator.Engine.Pipeline.Context;
 using Crucible.Mediator.Engine.Pipeline.Internal;
+using Crucible.Mediator.Engine.Pipeline.Internal.NoOp;
 using Crucible.Mediator.Engine.Pipeline.Resolvers;
 using Crucible.Mediator.Engine.Pipeline.Strategies;
 using Crucible.Mediator.Events;
@@ -43,9 +44,12 @@ namespace Crucible.Mediator.DependencyInjection.MSDI
             _services.TryAddSingleton<IPrePipelineMiddleware>(DefaultPrePipelineAndHandlerMiddleware.Instance);
             _services.TryAddSingleton<IInvocationComponentResolver<IPrePipelineMiddleware>, SingletonInvocationComponentResolver<IPrePipelineMiddleware>>();
 
-            _services.TryAddSingleton<Engine.DefaultMediator>();
-            _services.TryAddSingleton<IMediator>(sp => sp.GetRequiredService<Engine.DefaultMediator>());
+            _services.TryAddSingleton<IMediator, Engine.DefaultMediator>();
             _services.TryAddSingleton<IInvocationContextFactory, DefaultInvocationContextFactory>();
+
+            _services.TryAddSingleton<INoOpInvocationHandlerStrategyResolver, DefaultNoOpInvocationHandlerStrategyResolver>();
+            _services.TryAddSingleton<INoOpInvocationPipelineResolver, DefaultNoOpInvocationPipelineResolver>();
+            _services.TryAddSingleton<INoOpInvocationHandlerStrategyResolver, DefaultNoOpInvocationHandlerStrategyResolver>();
         }
 
         private IServiceCollection _services { get; }

@@ -1,13 +1,9 @@
 ﻿using Crucible.Mediator.Engine.Pipeline.Context;
 using Crucible.Mediator.Engine.Pipeline.Resolvers;
-using Crucible.Mediator.Engine.Pipeline.Strategies;
-using Crucible.Mediator.Invocation;
-using Crucible.Mediator.Requests;
-using System.Reflection.Metadata;
 
-namespace Crucible.Mediator.Engine.Pipeline.Internal
+namespace Crucible.Mediator.Engine.Pipeline.Internal.NoOp
 {
-    public class DefaultNoOpInvocationPipelineProvider : INoOpInvocationPipelineProvider
+    public class DefaultNoOpInvocationPipelineResolver : INoOpInvocationPipelineResolver
     {
         private readonly IInvocationContextFactory _contextFactory;
 
@@ -17,35 +13,37 @@ namespace Crucible.Mediator.Engine.Pipeline.Internal
 
         private readonly IInvocationComponentResolver<IPreHandlerMiddleware> _preHandlerMiddlewareResolver;
 
-        private readonly IInvocationHandlerStrategy<TRequest, TResponse> _handler;
+        private readonly INoOpInvocationHandlerStrategyResolver _handlerStrategyResolver;
 
-        public DefaultNoOpInvocationPipelineProvider(
+        public DefaultNoOpInvocationPipelineResolver(
             IInvocationContextFactory contextFactory,
             IInvocationComponentResolver<IPrePipelineMiddleware> preInvocationPipelineMiddlewareResolver,
             IEnumerable<IMiddlewareInvocationPipelineItem> middlewares,
             IInvocationComponentResolver<IPreHandlerMiddleware> preHandlerMiddlewareResolver,
-            IInvocationHandlerStrategy<TRequest, TResponse> handlerStrategy)
+            INoOpInvocationHandlerStrategyResolver handlerStrategyResolver)
         {
             ArgumentNullException.ThrowIfNull(contextFactory, nameof(contextFactory));
             ArgumentNullException.ThrowIfNull(preInvocationPipelineMiddlewareResolver, nameof(preInvocationPipelineMiddlewareResolver));
             ArgumentNullException.ThrowIfNull(middlewares, nameof(middlewares));
             ArgumentNullException.ThrowIfNull(preHandlerMiddlewareResolver, nameof(preHandlerMiddlewareResolver));
-            ArgumentNullException.ThrowIfNull(handlerStrategy, nameof(handlerStrategy));
+            ArgumentNullException.ThrowIfNull(handlerStrategyResolver, nameof(handlerStrategyResolver));
 
             _contextFactory = contextFactory;
             _preInvocationPipelineMiddlewareResolver = preInvocationPipelineMiddlewareResolver;
             _middlewares = middlewares;
             _preHandlerMiddlewareResolver = preHandlerMiddlewareResolver;
-            _handler = handlerStrategy;
+            _handlerStrategyResolver = handlerStrategyResolver;
         }
 
-        public IInvocationPipeline<TResponse> GetNoOpInvocationPipeline<TResponse>()
+        public IInvocationPipeline<TResponse> ResolveNoOpInvocationPipeline<TResponse>()
         {
+            var handlerStrategy = _handlerStrategyResolver.ResolveNoOpInvocationHandlerStrategy<TResponse>(); ;
             return new DefaultInvocationPipeline<object, TResponse>(
                 _contextFactory,
                 _preInvocationPipelineMiddlewareResolver,
                 _middlewares,
-                _handler);
+                _preHandlerMiddlewareResolver,
+                handlerStrategy);
         }
     }
 }

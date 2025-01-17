@@ -1,1 +1,1 @@
-# Ingot
+# ![image](docs/images/banner.png)

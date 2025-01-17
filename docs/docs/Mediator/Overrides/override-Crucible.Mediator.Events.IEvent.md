@@ -1,11 +1,11 @@
 ---
-uid: Crucible.Mediator.Events.IEvent
+uid: Ingot.Mediator.Events.IEvent
 ---
 
 [!INCLUDE [example](../Fragments/marker-devx-tip.md)]
 
 ---
-uid: Crucible.Mediator.Events.IEvent
+uid: Ingot.Mediator.Events.IEvent
 example: [*content]
 ---
 

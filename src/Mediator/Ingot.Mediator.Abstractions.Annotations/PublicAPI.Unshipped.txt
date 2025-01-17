@@ -1,0 +1,4 @@
+﻿#nullable enable
+Ingot.Mediator.Commands.ICommand
+Ingot.Mediator.Events.IEvent
+Ingot.Mediator.Requests.IRequest<TResponse>

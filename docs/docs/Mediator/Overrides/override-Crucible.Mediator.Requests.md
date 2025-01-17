@@ -1,5 +1,5 @@
 ---
-uid: Crucible.Mediator.Requests
+uid: Ingot.Mediator.Requests
 summary: *content
 ---
 
@@ -7,9 +7,9 @@ summary: *content
 
 ---
 
-The namespace <xref:Crucible.Mediator.Requests> includes classes and interfaces
-to handle the mediator request use case with <xref:Crucible.Mediator.Requests.IRequest`1> 
-as contract and <xref:Crucible.Mediator.Requests.RequestHandler`2> as handler.
+The namespace <xref:Ingot.Mediator.Requests> includes classes and interfaces
+to handle the mediator request use case with <xref:Ingot.Mediator.Requests.IRequest`1> 
+as contract and <xref:Ingot.Mediator.Requests.RequestHandler`2> as handler.
 
 Requests typically represent queries or operations that require a 
 response or result, such as retrieving data or performing calculations. 

@@ -1,5 +1,5 @@
 ---
-uid: Crucible.Mediator.Commands
+uid: Ingot.Mediator.Commands
 summary: *content
 ---
 
@@ -7,9 +7,9 @@ summary: *content
 
 ---
 
-The namespace <xref:Crucible.Mediator.Commands> includes classes and interfaces
-to handle the mediator event use case with <xref:Crucible.Mediator.Commands.ICommand> 
-as contract and <xref:Crucible.Mediator.Commands.CommandHandler`1> as handler.
+The namespace <xref:Ingot.Mediator.Commands> includes classes and interfaces
+to handle the mediator event use case with <xref:Ingot.Mediator.Commands.ICommand> 
+as contract and <xref:Ingot.Mediator.Commands.CommandHandler`1> as handler.
 
 Commands represent actions or operations that trigger 
 state changes in the system that do not require a response 

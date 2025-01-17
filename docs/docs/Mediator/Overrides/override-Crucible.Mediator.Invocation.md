@@ -1,5 +1,5 @@
 ---
-uid: Crucible.Mediator.Invocation
+uid: Ingot.Mediator.Invocation
 summary: *content
 ---
 
@@ -7,8 +7,8 @@ summary: *content
 
 ---
 
-The namespace <xref:Crucible.Mediator.Invocation> includes classes and interfaces
-to extend the mediator pipeline via <xref:Crucible.Mediator.Invocation.InvocationMiddleware`2>.
+The namespace <xref:Ingot.Mediator.Invocation> includes classes and interfaces
+to extend the mediator pipeline via <xref:Ingot.Mediator.Invocation.InvocationMiddleware`2>.
 
 Middlewares process requests as they pass through 
 the mediator pipeline. They enable cross-cutting concerns, such as logging, 

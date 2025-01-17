@@ -1,5 +1,5 @@
 ---
-uid: Crucible.Mediator.Events.EventWorkflow`1
+uid: Ingot.Mediator.Events.EventWorkflow`1
 ---
 
 [!INCLUDE [example](../Fragments/workflow-wip-disclaimer.md)]

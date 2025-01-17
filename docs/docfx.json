@@ -24,7 +24,7 @@
     //    {
     //      "src": "../src",
     //      "files": [
-    //        "**/Crucible.Mediator.csproj"
+    //        "**/Ingot.Mediator.csproj"
     //      ]
     //    }
     //  ],
@@ -62,8 +62,8 @@
       "template"
     ],
     "globalMetadata": {
-      "_appName": "Crucible",
-      "_appTitle": "Crucible",
+      "_appName": "Ingot",
+      "_appTitle": "Ingot",
       "_enableSearch": true,
       "_appFooter": null,
       "_disableContribution": true,

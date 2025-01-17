@@ -1,0 +1,44 @@
+﻿#nullable enable
+Ingot.Mediator.DependencyInjection.Fluent.MultiHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>
+Ingot.Mediator.DependencyInjection.Fluent.MultiHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>.AddMiddleware<TMiddleware>(int? order = null, bool singleton = false) -> Ingot.Mediator.DependencyInjection.Fluent.MultiHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>!
+Ingot.Mediator.DependencyInjection.Fluent.MultiHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>.AddMiddleware<TMiddleware>(TMiddleware! middleware, int? order = null) -> Ingot.Mediator.DependencyInjection.Fluent.MultiHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>!
+Ingot.Mediator.DependencyInjection.Fluent.MultiHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>.HandleWith(Ingot.Mediator.Invocation.IInvocationHandler<TRequest, TResponse>! handler) -> Ingot.Mediator.DependencyInjection.Fluent.MultiHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>!
+Ingot.Mediator.DependencyInjection.Fluent.MultiHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>.HandleWith<THandler>(bool singleton = false) -> Ingot.Mediator.DependencyInjection.Fluent.MultiHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>!
+Ingot.Mediator.DependencyInjection.Fluent.MultiHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>.InParallel() -> Ingot.Mediator.DependencyInjection.Fluent.MultiHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>!
+Ingot.Mediator.DependencyInjection.Fluent.MultiHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>.InSequence() -> Ingot.Mediator.DependencyInjection.Fluent.MultiHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>!
+Ingot.Mediator.DependencyInjection.Fluent.MultiHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>.MultiHandlerFluentMediatorComponentRegistrar(Ingot.Mediator.DependencyInjection.IMediatorComponentRegistrar! registrar) -> void
+Ingot.Mediator.DependencyInjection.Fluent.MultiHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>.WithStrategy<TStrategy>() -> Ingot.Mediator.DependencyInjection.Fluent.MultiHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>!
+Ingot.Mediator.DependencyInjection.Fluent.NoHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>
+Ingot.Mediator.DependencyInjection.Fluent.NoHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>.AddMiddleware<TMiddleware>(int? order = null, bool singleton = false) -> Ingot.Mediator.DependencyInjection.Fluent.NoHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>!
+Ingot.Mediator.DependencyInjection.Fluent.NoHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>.AddMiddleware<TMiddleware>(TMiddleware! middleware, int? order = null) -> Ingot.Mediator.DependencyInjection.Fluent.NoHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>!
+Ingot.Mediator.DependencyInjection.Fluent.NoHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>.NoHandlerFluentMediatorComponentRegistrar(Ingot.Mediator.DependencyInjection.IMediatorComponentRegistrar! registrar) -> void
+Ingot.Mediator.DependencyInjection.Fluent.RootFluentMediatorComponentRegistrar
+Ingot.Mediator.DependencyInjection.Fluent.RootFluentMediatorComponentRegistrar.Command<TCommand>() -> Ingot.Mediator.DependencyInjection.Fluent.SingleHandlerFluentMediatorComponentRegistrar<TCommand, Ingot.Mediator.Commands.CommandResponse!>!
+Ingot.Mediator.DependencyInjection.Fluent.RootFluentMediatorComponentRegistrar.Event<TEvent>() -> Ingot.Mediator.DependencyInjection.Fluent.MultiHandlerFluentMediatorComponentRegistrar<TEvent, Ingot.Mediator.Events.EventResponse!>!
+Ingot.Mediator.DependencyInjection.Fluent.RootFluentMediatorComponentRegistrar.Invocation<TRequest, TResponse>() -> Ingot.Mediator.DependencyInjection.Fluent.NoHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>!
+Ingot.Mediator.DependencyInjection.Fluent.RootFluentMediatorComponentRegistrar.Registrar.get -> Ingot.Mediator.DependencyInjection.IMediatorComponentRegistrar!
+Ingot.Mediator.DependencyInjection.Fluent.RootFluentMediatorComponentRegistrar.Request<TRequest, TResponse>() -> Ingot.Mediator.DependencyInjection.Fluent.SingleHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>!
+Ingot.Mediator.DependencyInjection.Fluent.RootFluentMediatorComponentRegistrar.RootFluentMediatorComponentRegistrar(Ingot.Mediator.DependencyInjection.IMediatorComponentRegistrar! registrar) -> void
+Ingot.Mediator.DependencyInjection.Fluent.SingleHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>
+Ingot.Mediator.DependencyInjection.Fluent.SingleHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>.AddMiddleware(Ingot.Mediator.Invocation.IInvocationMiddleware<TRequest, TResponse>! middleware, int? order = null) -> Ingot.Mediator.DependencyInjection.Fluent.SingleHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>!
+Ingot.Mediator.DependencyInjection.Fluent.SingleHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>.AddMiddleware<TMiddleware>(int? order = null, bool singleton = false) -> Ingot.Mediator.DependencyInjection.Fluent.SingleHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>!
+Ingot.Mediator.DependencyInjection.Fluent.SingleHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>.HandleWith(Ingot.Mediator.Invocation.IInvocationHandler<TRequest, TResponse>! handler) -> Ingot.Mediator.DependencyInjection.Fluent.RootFluentMediatorComponentRegistrar!
+Ingot.Mediator.DependencyInjection.Fluent.SingleHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>.HandleWith<THandler>(bool singleton = false) -> Ingot.Mediator.DependencyInjection.Fluent.RootFluentMediatorComponentRegistrar!
+Ingot.Mediator.DependencyInjection.Fluent.SingleHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>.SingleHandlerFluentMediatorComponentRegistrar(Ingot.Mediator.DependencyInjection.IMediatorComponentRegistrar! registrar) -> void
+Ingot.Mediator.DependencyInjection.IMediatorComponentRegistrar
+Ingot.Mediator.DependencyInjection.IMediatorComponentRegistrar.RegisterHandler<TRequest, TResponse, THandler>(bool singleton = false) -> void
+Ingot.Mediator.DependencyInjection.IMediatorComponentRegistrar.RegisterHandler<TRequest, TResponse>(Ingot.Mediator.Invocation.IInvocationHandler<TRequest, TResponse>! handler) -> void
+Ingot.Mediator.DependencyInjection.IMediatorComponentRegistrar.RegisterHandlerStrategy<TRequest, TResponse, TStrategy>() -> void
+Ingot.Mediator.DependencyInjection.IMediatorComponentRegistrar.RegisterHandlerStrategy<TRequest, TResponse>(Ingot.Mediator.Engine.Pipeline.Strategies.IInvocationHandlerStrategy<TRequest, TResponse>! strategy) -> void
+Ingot.Mediator.DependencyInjection.IMediatorComponentRegistrar.RegisterMiddleware<TRequest, TResponse, TMiddleware>(int? order = null, bool singleton = false) -> void
+Ingot.Mediator.DependencyInjection.IMediatorComponentRegistrar.RegisterMiddleware<TRequest, TResponse>(Ingot.Mediator.Invocation.IInvocationMiddleware<TRequest, TResponse>! middleware, int? order = null) -> void
+Ingot.Mediator.DependencyInjection.MSDI.MSDIMediatorComponentRegistrar
+Ingot.Mediator.DependencyInjection.MSDI.MSDIMediatorComponentRegistrar.MSDIMediatorComponentRegistrar(Microsoft.Extensions.DependencyInjection.IServiceCollection! services) -> void
+Ingot.Mediator.DependencyInjection.MSDI.MSDIMediatorComponentRegistrar.RegisterHandler<TRequest, TResponse, THandler>(bool singleton = false) -> void
+Ingot.Mediator.DependencyInjection.MSDI.MSDIMediatorComponentRegistrar.RegisterHandler<TRequest, TResponse>(Ingot.Mediator.Invocation.IInvocationHandler<TRequest, TResponse>! handler) -> void
+Ingot.Mediator.DependencyInjection.MSDI.MSDIMediatorComponentRegistrar.RegisterHandlerStrategy<TRequest, TResponse, TStrategy>() -> void
+Ingot.Mediator.DependencyInjection.MSDI.MSDIMediatorComponentRegistrar.RegisterHandlerStrategy<TRequest, TResponse>(Ingot.Mediator.Engine.Pipeline.Strategies.IInvocationHandlerStrategy<TRequest, TResponse>! strategy) -> void
+Ingot.Mediator.DependencyInjection.MSDI.MSDIMediatorComponentRegistrar.RegisterMiddleware<TRequest, TResponse, TMiddleware>(int? order = null, bool singleton = false) -> void
+Ingot.Mediator.DependencyInjection.MSDI.MSDIMediatorComponentRegistrar.RegisterMiddleware<TRequest, TResponse>(Ingot.Mediator.Invocation.IInvocationMiddleware<TRequest, TResponse>! middleware, int? order = null) -> void
+Microsoft.Extensions.DependencyInjection.MSDIMediatorExtensions
+static Microsoft.Extensions.DependencyInjection.MSDIMediatorExtensions.AddMediator(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services) -> Ingot.Mediator.DependencyInjection.Fluent.RootFluentMediatorComponentRegistrar!

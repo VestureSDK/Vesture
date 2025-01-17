@@ -1,4 +1,0 @@
-﻿#nullable enable
-Crucible.Mediator.Commands.ICommand
-Crucible.Mediator.Events.IEvent
-Crucible.Mediator.Requests.IRequest<TResponse>

@@ -17,8 +17,8 @@
     <IncludeSymbols>true</IncludeSymbols>
     <Authors>Stéphane Boulnois</Authors>
     <Copyright>Copyright © Stéphane Boulnois 2025</Copyright>
-    <PackageProjectUrl>https://github.com/stfbln/crucible</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/stfbln/crucible</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/stfbln/Ingot</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/stfbln/Ingot</RepositoryUrl>
     <!--<PackageLicenseExpression>MIT</PackageLicenseExpression>-->
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageIcon>ICON.png</PackageIcon>

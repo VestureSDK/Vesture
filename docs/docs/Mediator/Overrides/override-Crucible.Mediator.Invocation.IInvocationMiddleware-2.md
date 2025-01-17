@@ -1,5 +1,5 @@
 ---
-uid: Crucible.Mediator.Invocation.IInvocationMiddleware`2
+uid: Ingot.Mediator.Invocation.IInvocationMiddleware`2
 ---
 
 [!INCLUDE [example](../Fragments/middleware-devx-tip.md)]

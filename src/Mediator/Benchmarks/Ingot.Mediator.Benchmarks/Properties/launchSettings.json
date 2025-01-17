@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Ingot.Mediator.Benchmarks": {
+      "commandName": "Project",
+      "commandLineArgs": "local-test"
+    }
+  }
+}

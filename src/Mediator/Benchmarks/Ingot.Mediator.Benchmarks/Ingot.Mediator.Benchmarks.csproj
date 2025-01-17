@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+		<GenerateDocumentationFile>false</GenerateDocumentationFile>
+		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="BenchmarkDotNet" />
+		<PackageReference Include="MediatR" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\Ingot.Mediator.Abstractions.Annotations\Ingot.Mediator.Abstractions.Annotations.csproj" />
+	  <ProjectReference Include="..\..\Ingot.Mediator.Abstractions\Ingot.Mediator.Abstractions.csproj" />
+	  <ProjectReference Include="..\..\Ingot.Mediator\Ingot.Mediator.csproj" />
+	</ItemGroup>
+
+</Project>

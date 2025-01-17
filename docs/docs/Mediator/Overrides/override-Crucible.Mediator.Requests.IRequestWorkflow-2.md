@@ -1,5 +1,5 @@
 ---
-uid: Crucible.Mediator.Requests.RequestWorkflow`2
+uid: Ingot.Mediator.Requests.RequestWorkflow`2
 ---
 
 [!INCLUDE [example](../Fragments/workflow-wip-disclaimer.md)]

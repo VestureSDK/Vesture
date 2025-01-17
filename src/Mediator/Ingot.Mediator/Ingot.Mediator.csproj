@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>My description</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\ICON.png" Pack="true" PackagePath="\" />
+    <None Include="..\..\..\LICENSE.md" Pack="true" PackagePath="" />
+    <None Include="..\..\..\README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+  
+	<ItemGroup>
+		<ProjectReference Include="..\Ingot.Mediator.Abstractions\Ingot.Mediator.Abstractions.csproj" />
+		<ProjectReference Include="..\Ingot.Mediator.DependencyInjection\Ingot.Mediator.DependencyInjection.csproj" />
+		<ProjectReference Include="..\Ingot.Mediator.Engine\Ingot.Mediator.Engine.csproj" />
+	</ItemGroup>
+
+</Project>

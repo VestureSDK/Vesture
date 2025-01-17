@@ -1,11 +1,11 @@
 ---
-uid: Crucible.Mediator.Commands.ICommand
+uid: Ingot.Mediator.Commands.ICommand
 ---
 
 [!INCLUDE [example](../Fragments/marker-devx-tip.md)]
 
 ---
-uid: Crucible.Mediator.Commands.ICommand
+uid: Ingot.Mediator.Commands.ICommand
 example: [*content]
 ---
 
@@ -19,7 +19,7 @@ public class SampleCommand : ICommand
 ```
 
 ---
-uid: Crucible.Mediator.Commands.ICommand
+uid: Ingot.Mediator.Commands.ICommand
 example: []
 remarks: *content
 ---

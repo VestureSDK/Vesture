@@ -56,7 +56,7 @@ namespace Crucible.Mediator.Engine
         /// <param name="invocationPipelines">The <see cref="IInvocationPipeline{TResponse}"/> instances.</param>
         /// <param name="contextFactory">The <see cref="IInvocationContextFactory"/> instances.</param>
         /// <param name="noOpInvocationPipelineResolver">The <see cref="INoOpInvocationPipelineResolver"/> instances.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="invocationPipelines"/> is <see langword="null" /> or <paramref name="contextFactory"/> is <see langword="null" />.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="invocationPipelines"/> is <see langword="null" /> or <paramref name="contextFactory"/> is <see langword="null" />  or <paramref name="noOpInvocationPipelineResolver"/> is <see langword="null" />.</exception>
         public DefaultMediator(IEnumerable<IInvocationPipeline> invocationPipelines, IInvocationContextFactory contextFactory, INoOpInvocationPipelineResolver noOpInvocationPipelineResolver)
         {
             ArgumentNullException.ThrowIfNull(invocationPipelines, nameof(invocationPipelines));

@@ -11,7 +11,7 @@ namespace Crucible.Mediator.Engine.Tests.Pipeline.Internal.NoOp
     {
         private readonly HashSet<Type> _setupResponses = [];
 
-        public Mock<INoOpInvocationPipelineResolver> Mock { get; } = new ();
+        public Mock<INoOpInvocationPipelineResolver> Mock { get; } = new();
 
         private INoOpInvocationPipelineResolver _inner => Mock.Object;
 

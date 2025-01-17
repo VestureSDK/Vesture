@@ -4,8 +4,13 @@ using Crucible.Mediator.Invocation;
 
 namespace Crucible.Mediator.Engine.Pipeline.Internal.NoOp
 {
+    /// <summary>
+    /// Default implementation of <see cref="INoOpInvocationHandlerStrategyResolver"/>.
+    /// </summary>
+    /// <seealso cref="INoOpInvocationHandlerStrategyResolver"/>
     public class DefaultNoOpInvocationHandlerStrategyResolver : INoOpInvocationHandlerStrategyResolver
     {
+        /// <inheritdoc />
         public IInvocationHandlerStrategy<object, TResponse> ResolveNoOpInvocationHandlerStrategy<TResponse>()
         {
             return new NoOpInvocationHandlerStrategy<TResponse>();

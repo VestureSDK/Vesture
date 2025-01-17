@@ -2,7 +2,7 @@
 abstract Crucible.Mediator.Engine.Pipeline.Context.DefaultInvocationContext.RequestType.get -> System.Type!
 abstract Crucible.Mediator.Engine.Pipeline.Context.DefaultInvocationContext.ResponseType.get -> System.Type!
 Crucible.Mediator.Engine.DefaultMediator
-Crucible.Mediator.Engine.DefaultMediator.DefaultMediator(System.Collections.Generic.IEnumerable<Crucible.Mediator.Engine.Pipeline.IInvocationPipeline!>! invocationPipelines) -> void
+Crucible.Mediator.Engine.DefaultMediator.DefaultMediator(System.Collections.Generic.IEnumerable<Crucible.Mediator.Engine.Pipeline.IInvocationPipeline!>! invocationPipelines, Crucible.Mediator.Engine.Pipeline.Context.IInvocationContextFactory! contextFactory, Crucible.Mediator.Engine.Pipeline.Internal.NoOp.INoOpInvocationPipelineResolver! noOpInvocationPipelineResolver) -> void
 Crucible.Mediator.Engine.DefaultMediator.ExecuteAndCaptureAsync<TResponse>(Crucible.Mediator.Requests.IRequest<TResponse>! request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Crucible.Mediator.Invocation.IInvocationContext<TResponse>!>!
 Crucible.Mediator.Engine.DefaultMediator.ExecuteAsync<TResponse>(Crucible.Mediator.Requests.IRequest<TResponse>! request, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TResponse>!
 Crucible.Mediator.Engine.DefaultMediator.HandleAndCaptureAsync<TResponse>(object! contract, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Crucible.Mediator.Invocation.IInvocationContext<TResponse>!>!
@@ -55,6 +55,16 @@ Crucible.Mediator.Engine.Pipeline.Internal.IMiddlewareInvocationPipelineItem
 Crucible.Mediator.Engine.Pipeline.Internal.IMiddlewareInvocationPipelineItem.IsApplicable(System.Type! contextType) -> bool
 Crucible.Mediator.Engine.Pipeline.Internal.IMiddlewareInvocationPipelineItem.Order.get -> int
 Crucible.Mediator.Engine.Pipeline.Internal.IMiddlewareInvocationPipelineItem<TRequest, TResponse>
+Crucible.Mediator.Engine.Pipeline.Internal.NoOp.DefaultNoOpInvocationHandlerStrategyResolver
+Crucible.Mediator.Engine.Pipeline.Internal.NoOp.DefaultNoOpInvocationHandlerStrategyResolver.DefaultNoOpInvocationHandlerStrategyResolver() -> void
+Crucible.Mediator.Engine.Pipeline.Internal.NoOp.DefaultNoOpInvocationHandlerStrategyResolver.ResolveNoOpInvocationHandlerStrategy<TResponse>() -> Crucible.Mediator.Engine.Pipeline.Strategies.IInvocationHandlerStrategy<object!, TResponse>!
+Crucible.Mediator.Engine.Pipeline.Internal.NoOp.DefaultNoOpInvocationPipelineResolver
+Crucible.Mediator.Engine.Pipeline.Internal.NoOp.DefaultNoOpInvocationPipelineResolver.DefaultNoOpInvocationPipelineResolver(Crucible.Mediator.Engine.Pipeline.Context.IInvocationContextFactory! contextFactory, Crucible.Mediator.Engine.Pipeline.Resolvers.IInvocationComponentResolver<Crucible.Mediator.Engine.Pipeline.IPrePipelineMiddleware!>! preInvocationPipelineMiddlewareResolver, System.Collections.Generic.IEnumerable<Crucible.Mediator.Engine.Pipeline.Internal.IMiddlewareInvocationPipelineItem!>! middlewares, Crucible.Mediator.Engine.Pipeline.Resolvers.IInvocationComponentResolver<Crucible.Mediator.Engine.Pipeline.IPreHandlerMiddleware!>! preHandlerMiddlewareResolver, Crucible.Mediator.Engine.Pipeline.Internal.NoOp.INoOpInvocationHandlerStrategyResolver! handlerStrategyResolver) -> void
+Crucible.Mediator.Engine.Pipeline.Internal.NoOp.DefaultNoOpInvocationPipelineResolver.ResolveNoOpInvocationPipeline<TResponse>() -> Crucible.Mediator.Engine.Pipeline.IInvocationPipeline<TResponse>!
+Crucible.Mediator.Engine.Pipeline.Internal.NoOp.INoOpInvocationHandlerStrategyResolver
+Crucible.Mediator.Engine.Pipeline.Internal.NoOp.INoOpInvocationHandlerStrategyResolver.ResolveNoOpInvocationHandlerStrategy<TResponse>() -> Crucible.Mediator.Engine.Pipeline.Strategies.IInvocationHandlerStrategy<object!, TResponse>!
+Crucible.Mediator.Engine.Pipeline.Internal.NoOp.INoOpInvocationPipelineResolver
+Crucible.Mediator.Engine.Pipeline.Internal.NoOp.INoOpInvocationPipelineResolver.ResolveNoOpInvocationPipeline<TResponse>() -> Crucible.Mediator.Engine.Pipeline.IInvocationPipeline<TResponse>!
 Crucible.Mediator.Engine.Pipeline.IPreHandlerMiddleware
 Crucible.Mediator.Engine.Pipeline.IPrePipelineMiddleware
 Crucible.Mediator.Engine.Pipeline.Resolvers.DeferredSingletonInvocationComponentResolver<TComponent>

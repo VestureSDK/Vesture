@@ -64,6 +64,7 @@
     "globalMetadata": {
       "_appName": "Ingot",
       "_appTitle": "Ingot",
+      "_appLogoPath": "images/ICON.png",
       "_enableSearch": true,
       "_appFooter": null,
       "_disableContribution": true,

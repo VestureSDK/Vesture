@@ -2,6 +2,11 @@
     text-decoration: none;
 }
 
+img#logo {
+    max-height: 50px;
+    margin-right: 1rem;
+}
+
 body[data-yaml-mime=ManagedReference] article dl.parameters > dt, body[data-yaml-mime=ApiPage] article dl.parameters > dt {
     margin: 0;
 }

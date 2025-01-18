@@ -12,7 +12,7 @@ namespace Ingot.Mediator.Engine.Pipeline.Extensions
         private static EventId Event(int id, string? name = null)
         {
             ThrowIfIdInvalid(id);
-            return new EventId(11000 + id, nameof(InvocationPipelineFound));
+            return new EventId(11000 + id, name);
         }
 
         [Conditional("DEBUG")]
@@ -31,6 +31,12 @@ namespace Ingot.Mediator.Engine.Pipeline.Extensions
 
         internal static void InvocationPipelinesCached(this ILogger logger, IEnumerable<(Type RequestType, Type ResponseType)> registeredPipelines)
         {
+            if (!logger.IsEnabled(LogLevel.Trace))
+            {
+                // Early exit to avoid extra compute
+                return;
+            }
+
             s_invocationPipelineCompiled(logger, registeredPipelines.Select(p => $"{p.RequestType} -> {p.ResponseType}"), null);
         }
 
@@ -41,6 +47,12 @@ namespace Ingot.Mediator.Engine.Pipeline.Extensions
 
         internal static void InvocationPipelineFound<TResponse>(this ILogger logger, object request)
         {
+            if (!logger.IsEnabled(LogLevel.Debug))
+            {
+                // Early exit to avoid extra compute
+                return;
+            }
+
             s_invocationPipelineFound(logger, request.GetType(), typeof(TResponse), request, null);
         }
 
@@ -51,6 +63,12 @@ namespace Ingot.Mediator.Engine.Pipeline.Extensions
 
         internal static void InvocationPipelineNotFound<TResponse>(this ILogger logger, object request)
         {
+            if (!logger.IsEnabled(LogLevel.Debug))
+            {
+                // Early exit to avoid extra compute
+                return;
+            }
+
             s_invocationPipelineNotFound(logger, request.GetType(), typeof(TResponse), request, null);
         }
     }

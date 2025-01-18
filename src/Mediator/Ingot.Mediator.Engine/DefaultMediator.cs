@@ -1,11 +1,12 @@
 ﻿using System.Collections.Frozen;
 using Ingot.Mediator.Commands;
 using Ingot.Mediator.Engine.Pipeline;
-using Ingot.Mediator.Engine.Pipeline.Context;
+using Ingot.Mediator.Engine.Pipeline.Extensions;
 using Ingot.Mediator.Engine.Pipeline.Internal.NoOp;
 using Ingot.Mediator.Events;
 using Ingot.Mediator.Invocation;
 using Ingot.Mediator.Requests;
+using Microsoft.Extensions.Logging;
 
 namespace Ingot.Mediator.Engine
 {
@@ -45,27 +46,35 @@ namespace Ingot.Mediator.Engine
     public class DefaultMediator : IMediator
     {
         private readonly Lazy<IDictionary<(Type request, Type response), IInvocationPipeline>> _invocationPipelines;
-
-        private readonly IInvocationContextFactory _contextFactory;
-
+        
+        private readonly ILogger<DefaultMediator> _logger;
+        
         private readonly INoOpInvocationPipelineResolver _noOpInvocationPipelineResolver;
 
         /// <summary>
         /// Initializes a new <see cref="DefaultMediator"/> instance.
         /// </summary>
+        /// <param name="logger">The <see cref="ILogger{TCategoryName}"/> instance.</param>
         /// <param name="invocationPipelines">The <see cref="IInvocationPipeline{TResponse}"/> instances.</param>
-        /// <param name="contextFactory">The <see cref="IInvocationContextFactory"/> instances.</param>
         /// <param name="noOpInvocationPipelineResolver">The <see cref="INoOpInvocationPipelineResolver"/> instances.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="invocationPipelines"/> is <see langword="null" /> or <paramref name="contextFactory"/> is <see langword="null" />  or <paramref name="noOpInvocationPipelineResolver"/> is <see langword="null" />.</exception>
-        public DefaultMediator(IEnumerable<IInvocationPipeline> invocationPipelines, IInvocationContextFactory contextFactory, INoOpInvocationPipelineResolver noOpInvocationPipelineResolver)
+        /// <exception cref="ArgumentNullException"><paramref name="logger"/> is <see langword="null" /> or <paramref name="invocationPipelines"/> is <see langword="null" /> or <paramref name="noOpInvocationPipelineResolver"/> is <see langword="null" />.</exception>
+        public DefaultMediator(
+            ILogger<DefaultMediator> logger,
+            IEnumerable<IInvocationPipeline> invocationPipelines, 
+            INoOpInvocationPipelineResolver noOpInvocationPipelineResolver)
         {
+            ArgumentNullException.ThrowIfNull(logger, nameof(logger));
             ArgumentNullException.ThrowIfNull(invocationPipelines, nameof(invocationPipelines));
-            ArgumentNullException.ThrowIfNull(contextFactory, nameof(contextFactory));
             ArgumentNullException.ThrowIfNull(noOpInvocationPipelineResolver, nameof(noOpInvocationPipelineResolver));
 
-            _invocationPipelines = new Lazy<IDictionary<(Type request, Type response), IInvocationPipeline>>(() => CreateInvocationPipelineCache(invocationPipelines));
-            _contextFactory = contextFactory;
+            _logger = logger;
             _noOpInvocationPipelineResolver = noOpInvocationPipelineResolver;
+            _invocationPipelines = new Lazy<IDictionary<(Type request, Type response), IInvocationPipeline>>(() =>
+            {
+                var pipelines = CreateInvocationPipelineCache(invocationPipelines);
+                _logger.InvocationPipelinesCached(pipelines.Keys);
+                return pipelines;
+            });
         }
 
         /// <exception cref="KeyNotFoundException">No relevant invocation pipeline found for contract '<paramref name="request"/> -> <typeparamref name="TResponse"/>'.</exception>
@@ -76,10 +85,12 @@ namespace Ingot.Mediator.Engine
 
             if (_invocationPipelines.Value.TryGetValue((requestType, responseType), out var p) && p is IInvocationPipeline<TResponse> pipeline)
             {
+                _logger.InvocationPipelineFound<TResponse>(request);
                 return pipeline;
             }
             else
             {
+                _logger.InvocationPipelineNotFound<TResponse>(request);
                 return _noOpInvocationPipelineResolver.ResolveNoOpInvocationPipeline<TResponse>();
             }
         }

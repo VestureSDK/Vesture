@@ -4,7 +4,6 @@ using Ingot.Mediator.Abstractions.Tests.Data.Annotations.Events;
 using Ingot.Mediator.Abstractions.Tests.Data.Annotations.Requests;
 using Ingot.Mediator.Commands;
 using Ingot.Mediator.Engine.Mocks.Pipeline;
-using Ingot.Mediator.Engine.Mocks.Pipeline.Context;
 using Ingot.Mediator.Engine.Mocks.Pipeline.Internal;
 using Ingot.Mediator.Engine.Pipeline.Internal;
 using Ingot.Mediator.Engine.Tests.Pipeline.Internal.NoOp;
@@ -12,6 +11,7 @@ using Ingot.Mediator.Events;
 using Ingot.Mediator.Invocation;
 using Ingot.Mediator.Mocks.Invocation;
 using Ingot.Mediator.Requests;
+using Ingot.Testing;
 using Ingot.Testing.Annotations;
 
 namespace Ingot.Mediator.Engine.Tests
@@ -23,7 +23,7 @@ namespace Ingot.Mediator.Engine.Tests
 
         protected Dictionary<(Type RequestType, Type ResponseType), MockInvocationPipeline> Pipelines { get; } = new Dictionary<(Type RequestType, Type ResponseType), MockInvocationPipeline>();
 
-        protected MockInvocationContextFactory ContextFactory { get; } = new();
+        protected NUnitTestContextMsLogger<DefaultMediator> Logger { get; } = new();
 
         protected MockNoOpInvocationPipelineResolver NoOpInvocationPipelineResolver { get; } = new();
 
@@ -34,7 +34,10 @@ namespace Ingot.Mediator.Engine.Tests
                 pipeline.Middlewares = MiddlewareItems;
             }
 
-            return new(Pipelines.Values, ContextFactory, NoOpInvocationPipelineResolver);
+            return new(
+                Logger, 
+                Pipelines.Values, 
+                NoOpInvocationPipelineResolver);
         }
 
         protected MockInvocationPipeline<TRequest, TResponse> GetOrCreatePipeline<TRequest, TResponse>()
@@ -77,26 +80,26 @@ namespace Ingot.Mediator.Engine.Tests
         }
 
         [Test]
-        public void Ctor_ArgumentNullException_IfResolversIsNull()
+        public void Ctor_ArgumentNullException_IfLoggerIsNull()
         {
             // Arrange
             // No arrange required
 
             // Act / Assert
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-            Assert.Throws<ArgumentNullException>(() => new DefaultMediator(null, ContextFactory, NoOpInvocationPipelineResolver));
+            Assert.Throws<ArgumentNullException>(() => new DefaultMediator(null, [], NoOpInvocationPipelineResolver));
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 
         [Test]
-        public void Ctor_ArgumentNullException_IfContextFactoryIsNull()
+        public void Ctor_ArgumentNullException_IfPipelinesIsNull()
         {
             // Arrange
             // No arrange required
 
             // Act / Assert
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-            Assert.Throws<ArgumentNullException>(() => new DefaultMediator([], null, NoOpInvocationPipelineResolver));
+            Assert.Throws<ArgumentNullException>(() => new DefaultMediator(Logger, null, NoOpInvocationPipelineResolver));
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 
@@ -108,7 +111,7 @@ namespace Ingot.Mediator.Engine.Tests
 
             // Act / Assert
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-            Assert.Throws<ArgumentNullException>(() => new DefaultMediator([], ContextFactory, null));
+            Assert.Throws<ArgumentNullException>(() => new DefaultMediator(Logger, [], null));
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 

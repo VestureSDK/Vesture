@@ -38,6 +38,8 @@ namespace Ingot.Mediator.DependencyInjection.MSDI
 
             _services = services;
 
+            _services.AddLogging();
+
             _services.TryAddSingleton<IPreHandlerMiddleware, DefaultPrePipelineAndHandlerMiddleware>();
             _services.TryAddSingleton<IInvocationComponentResolver<IPreHandlerMiddleware>, SingletonInvocationComponentResolver<IPreHandlerMiddleware>>();
 

@@ -28,6 +28,9 @@ namespace Ingot.Mediator.Engine.Mocks.Pipeline.Internal
         {
             _managedMiddleware = new();
 
+            Mock.SetupGet(m => m.MiddlewareType)
+                .Returns(typeof(IInvocationMiddleware<TRequest, TResponse>));
+
             Mock.Setup(m => m.IsApplicable(It.IsAny<Type>()))
                 .Returns<Type>(t => typeof(IInvocationContext<TRequest, TResponse>).IsAssignableFrom(t));
 
@@ -36,6 +39,12 @@ namespace Ingot.Mediator.Engine.Mocks.Pipeline.Internal
                 {
                     return Middleware.HandleAsync(ctx, next, ct);
                 });
+        }
+
+        public Type MiddlewareType
+        {
+            get => _inner.MiddlewareType;
+            set => Mock.SetupGet(m => m.MiddlewareType).Returns(value);
         }
 
         public int Order

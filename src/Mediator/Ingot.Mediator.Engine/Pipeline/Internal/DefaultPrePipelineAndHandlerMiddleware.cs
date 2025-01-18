@@ -1,4 +1,6 @@
-﻿using Ingot.Mediator.Invocation;
+﻿using Ingot.Mediator.Engine.Pipeline.Extensions;
+using Ingot.Mediator.Invocation;
+using Microsoft.Extensions.Logging;
 
 namespace Ingot.Mediator.Engine.Pipeline.Internal
 {
@@ -13,8 +15,19 @@ namespace Ingot.Mediator.Engine.Pipeline.Internal
     /// <seealso cref="IPreHandlerMiddleware"/>
     public class DefaultPrePipelineAndHandlerMiddleware : IPrePipelineMiddleware, IPreHandlerMiddleware
     {
-        /// <exclude />
-        public static readonly DefaultPrePipelineAndHandlerMiddleware Instance = new();
+        private readonly ILogger _logger;
+
+        /// <summary>
+        /// Initializes a new <see cref="DefaultPrePipelineAndHandlerMiddleware"/> instance.
+        /// </summary>
+        /// <param name="logger">The <see cref="ILogger{TCategoryName}"/> instance.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="logger"/> is <see langword="null"/>.</exception>
+        public DefaultPrePipelineAndHandlerMiddleware(ILogger<DefaultPrePipelineAndHandlerMiddleware> logger)
+        {
+            ArgumentNullException.ThrowIfNull(logger, nameof(logger));
+
+            _logger = logger;
+        }
 
         /// <inheritdoc />
         public async Task HandleAsync(IInvocationContext<object, object> context, Func<CancellationToken, Task> next, CancellationToken cancellationToken)
@@ -25,7 +38,8 @@ namespace Ingot.Mediator.Engine.Pipeline.Internal
             }
             catch (Exception ex)
             {
-                context.SetError(ex);
+                context.AddError(ex);
+                _logger.PrePipelineAndHandlerMiddlewareUnhandledException(context, ex);
             }
         }
     }

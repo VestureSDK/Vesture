@@ -9,6 +9,11 @@ namespace Ingot.Mediator.Engine.Pipeline.Internal
     public interface IMiddlewareInvocationPipelineItem
     {
         /// <summary>
+        /// The underlying <see cref="IInvocationMiddleware{TRequest, TResponse}"/> type.
+        /// </summary>
+        Type MiddlewareType { get; }
+
+        /// <summary>
         /// The order of the <see cref="IInvocationHandler{TRequest, TResponse}"/> compare
         /// to the others. The lower, the earliest in the pipeline, the greater the closest
         /// to the handler.

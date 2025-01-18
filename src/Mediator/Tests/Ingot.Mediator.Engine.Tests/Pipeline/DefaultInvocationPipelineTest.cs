@@ -1,6 +1,7 @@
 ﻿using Ingot.Mediator.Abstractions.Tests.Data.Annotations.Commands;
 using Ingot.Mediator.Engine.Mocks.Pipeline.Resolvers;
 using Ingot.Mediator.Engine.Pipeline;
+using Ingot.Testing;
 using Ingot.Testing.Annotations;
 
 namespace Ingot.Mediator.Engine.Tests.Pipeline
@@ -9,6 +10,8 @@ namespace Ingot.Mediator.Engine.Tests.Pipeline
     [TestFixtureSource_RequestResponse_All]
     public class DefaultInvocationPipelineTest<TRequest, TResponse> : InvocationPipelineConformanceTestBase<TRequest, TResponse, DefaultInvocationPipeline<TRequest, TResponse>>
     {
+        protected NUnitTestContextMsLogger<DefaultInvocationPipeline<TRequest, TResponse>> Logger { get; } = new();
+
         protected MockInvocationComponentResolver<IPrePipelineMiddleware> PrePipelineMiddlewareResolver { get; }
 
         protected MockInvocationComponentResolver<IPreHandlerMiddleware> PreHandlerMiddlewareResolver { get; }
@@ -21,6 +24,7 @@ namespace Ingot.Mediator.Engine.Tests.Pipeline
         }
 
         protected override DefaultInvocationPipeline<TRequest, TResponse> CreateInvocationPipeline() => new(
+            Logger,
             ContextFactory,
             PrePipelineMiddlewareResolver,
             MiddlewareItems,

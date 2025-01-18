@@ -38,10 +38,10 @@ namespace Ingot.Mediator.DependencyInjection.MSDI
 
             _services = services;
 
-            _services.TryAddSingleton<IPreHandlerMiddleware>(DefaultPrePipelineAndHandlerMiddleware.Instance);
+            _services.TryAddSingleton<IPreHandlerMiddleware, DefaultPrePipelineAndHandlerMiddleware>();
             _services.TryAddSingleton<IInvocationComponentResolver<IPreHandlerMiddleware>, SingletonInvocationComponentResolver<IPreHandlerMiddleware>>();
 
-            _services.TryAddSingleton<IPrePipelineMiddleware>(DefaultPrePipelineAndHandlerMiddleware.Instance);
+            _services.TryAddSingleton<IPrePipelineMiddleware, DefaultPrePipelineAndHandlerMiddleware>();
             _services.TryAddSingleton<IInvocationComponentResolver<IPrePipelineMiddleware>, SingletonInvocationComponentResolver<IPrePipelineMiddleware>>();
 
             _services.TryAddSingleton<IMediator, Engine.DefaultMediator>();
@@ -67,7 +67,7 @@ namespace Ingot.Mediator.DependencyInjection.MSDI
                 _services.AddSingleton<IMiddlewareInvocationPipelineItem>(sp =>
                 {
                     var accessor = new SingletonInvocationComponentResolver<IInvocationMiddleware<TRequest, TResponse>>(middleware);
-                    return new DefaultMiddlewareInvocationPipelineItem<TRequest, TResponse>(order ?? 0, accessor);
+                    return new DefaultMiddlewareInvocationPipelineItem<TRequest, TResponse>(order ?? 0, middleware.GetType(), accessor);
                 });
             }
         }
@@ -93,7 +93,7 @@ namespace Ingot.Mediator.DependencyInjection.MSDI
                 _services.AddSingleton<IMiddlewareInvocationPipelineItem>(sp =>
                 {
                     var accessor = sp.GetRequiredService<IInvocationComponentResolver<TMiddleware>>();
-                    return new DefaultMiddlewareInvocationPipelineItem<TRequest, TResponse>(finalOrder, accessor);
+                    return new DefaultMiddlewareInvocationPipelineItem<TRequest, TResponse>(finalOrder, typeof(TMiddleware), accessor);
                 });
             }
         }

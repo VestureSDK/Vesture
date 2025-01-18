@@ -18,19 +18,25 @@ namespace Ingot.Mediator.Engine.Pipeline.Internal
         private readonly IInvocationComponentResolver<IInvocationMiddleware<TRequest, TResponse>> _resolver;
 
         /// <inheritdoc/>
+        public Type MiddlewareType { get; private set; }
+
+        /// <inheritdoc/>
         public int Order { get; private set; }
 
         /// <summary>
         /// Initializes a new <see cref="DefaultMiddlewareInvocationPipelineItem{TRequest, TResponse}"/> instance.
         /// </summary>
         /// <param name="order"><inheritdoc cref="IMiddlewareInvocationPipelineItem.Order" path="/summary"/></param>
+        /// <param name="middlewareType"><inheritdoc cref="IMiddlewareInvocationPipelineItem.MiddlewareType" path="/summary"/></param>
         /// <param name="resolver">The <see cref="IInvocationComponentResolver{TComponent}"/> of <see cref="IInvocationMiddleware{TRequest, TResponse}"/> instance.</param>
         /// <exception cref="ArgumentNullException"><paramref name="resolver"/> is <see langword="null" />.</exception>
-        public DefaultMiddlewareInvocationPipelineItem(int order, IInvocationComponentResolver<IInvocationMiddleware<TRequest, TResponse>> resolver)
+        public DefaultMiddlewareInvocationPipelineItem(int order, Type middlewareType, IInvocationComponentResolver<IInvocationMiddleware<TRequest, TResponse>> resolver)
         {
             ArgumentNullException.ThrowIfNull(resolver, nameof(resolver));
+            ArgumentNullException.ThrowIfNull(middlewareType, nameof(middlewareType));
 
             Order = order;
+            MiddlewareType = middlewareType;
             _resolver = resolver;
         }
 

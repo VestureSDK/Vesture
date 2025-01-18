@@ -46,9 +46,9 @@ namespace Ingot.Mediator.Engine
     public class DefaultMediator : IMediator
     {
         private readonly Lazy<IDictionary<(Type request, Type response), IInvocationPipeline>> _invocationPipelines;
-        
-        private readonly ILogger<DefaultMediator> _logger;
-        
+
+        private readonly ILogger _logger;
+
         private readonly INoOpInvocationPipelineResolver _noOpInvocationPipelineResolver;
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace Ingot.Mediator.Engine
         /// <exception cref="ArgumentNullException"><paramref name="logger"/> is <see langword="null" /> or <paramref name="invocationPipelines"/> is <see langword="null" /> or <paramref name="noOpInvocationPipelineResolver"/> is <see langword="null" />.</exception>
         public DefaultMediator(
             ILogger<DefaultMediator> logger,
-            IEnumerable<IInvocationPipeline> invocationPipelines, 
+            IEnumerable<IInvocationPipeline> invocationPipelines,
             INoOpInvocationPipelineResolver noOpInvocationPipelineResolver)
         {
             ArgumentNullException.ThrowIfNull(logger, nameof(logger));

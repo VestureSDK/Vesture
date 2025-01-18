@@ -1,8 +1,10 @@
 ﻿using Ingot.Mediator.Engine.Pipeline.Context;
+using Ingot.Mediator.Engine.Pipeline.Extensions;
 using Ingot.Mediator.Engine.Pipeline.Internal;
 using Ingot.Mediator.Engine.Pipeline.Resolvers;
 using Ingot.Mediator.Engine.Pipeline.Strategies;
 using Ingot.Mediator.Invocation;
+using Microsoft.Extensions.Logging;
 
 namespace Ingot.Mediator.Engine.Pipeline
 {
@@ -21,6 +23,8 @@ namespace Ingot.Mediator.Engine.Pipeline
     /// <inheritdoc cref="IInvocationPipeline{TResponse}"/>
     public class DefaultInvocationPipeline<TRequest, TResponse> : IInvocationPipeline<TResponse>
     {
+        private readonly ILogger _logger;
+
         private readonly IInvocationContextFactory _contextFactory;
 
         private readonly IInvocationComponentResolver<IPrePipelineMiddleware> _preInvocationPipelineMiddlewareResolver;
@@ -40,6 +44,7 @@ namespace Ingot.Mediator.Engine.Pipeline
         /// <summary>
         /// Initializes a new <see cref="DefaultInvocationPipeline{TRequest, TResponse}"/> instance.
         /// </summary>
+        /// <param name="logger">The <see cref="ILogger{TCategoryName}"/> instance.</param>
         /// <param name="contextFactory">The <see cref="IInvocationContextFactory"/> instance.</param>
         /// <param name="preInvocationPipelineMiddlewareResolver">The <see cref="IInvocationComponentResolver{TComponent}"/> of <see cref="IPrePipelineMiddleware"/> instance.</param>
         /// <param name="middlewares">The <see cref="IMiddlewareInvocationPipelineItem"/> instances.</param>
@@ -47,6 +52,7 @@ namespace Ingot.Mediator.Engine.Pipeline
         /// <param name="handlerStrategy">The <see cref="IInvocationHandlerStrategy{TRequest, TResponse}"/> instance.</param>
         /// <exception cref="ArgumentNullException">
         /// <list type="bullet">
+        /// <item><paramref name="logger"/> is <see langword="null" />.</item>
         /// <item><paramref name="contextFactory"/> is <see langword="null" />.</item>
         /// <item><paramref name="preInvocationPipelineMiddlewareResolver"/> is <see langword="null" />.</item>
         /// <item><paramref name="middlewares"/> is <see langword="null" />.</item>
@@ -55,38 +61,46 @@ namespace Ingot.Mediator.Engine.Pipeline
         /// </list>
         /// </exception>
         public DefaultInvocationPipeline(
+            ILogger<DefaultInvocationPipeline<TRequest, TResponse>> logger,
             IInvocationContextFactory contextFactory,
             IInvocationComponentResolver<IPrePipelineMiddleware> preInvocationPipelineMiddlewareResolver,
             IEnumerable<IMiddlewareInvocationPipelineItem> middlewares,
             IInvocationComponentResolver<IPreHandlerMiddleware> preHandlerMiddlewareResolver,
             IInvocationHandlerStrategy<TRequest, TResponse> handlerStrategy)
         {
+            ArgumentNullException.ThrowIfNull(contextFactory, nameof(logger));
             ArgumentNullException.ThrowIfNull(contextFactory, nameof(contextFactory));
             ArgumentNullException.ThrowIfNull(preInvocationPipelineMiddlewareResolver, nameof(preInvocationPipelineMiddlewareResolver));
             ArgumentNullException.ThrowIfNull(middlewares, nameof(middlewares));
             ArgumentNullException.ThrowIfNull(preHandlerMiddlewareResolver, nameof(preHandlerMiddlewareResolver));
             ArgumentNullException.ThrowIfNull(handlerStrategy, nameof(handlerStrategy));
 
+            _logger = logger;
             _contextFactory = contextFactory;
             _preInvocationPipelineMiddlewareResolver = preInvocationPipelineMiddlewareResolver;
             _middlewares = middlewares;
             _preHandlerMiddlewareResolver = preHandlerMiddlewareResolver;
             _handlerStrategy = handlerStrategy;
-            _chainOfResponsibility = new Lazy<Func<IInvocationContext<TRequest, TResponse>, CancellationToken, Task>>(CreateChainOfresponsibility);
+            _chainOfResponsibility = new Lazy<Func<IInvocationContext<TRequest, TResponse>, CancellationToken, Task>>(CreateChainOfResponsibility);
         }
 
         private readonly Lazy<Func<IInvocationContext<TRequest, TResponse>, CancellationToken, Task>> _chainOfResponsibility;
 
-        private Func<IInvocationContext<TRequest, TResponse>, CancellationToken, Task> CreateChainOfresponsibility()
+        private Func<IInvocationContext<TRequest, TResponse>, CancellationToken, Task> CreateChainOfResponsibility()
         {
-            var middlewares = new List<IInvocationMiddleware<TRequest, TResponse>>();
+            var middlewares = new List<IMiddlewareInvocationPipelineItem>();
 
             var contextType = typeof(IInvocationContext<TRequest, TResponse>);
             foreach (var middleware in _middlewares.OrderBy(m => m.Order))
             {
                 if (middleware.IsApplicable(contextType))
                 {
-                    middlewares.Add((IInvocationMiddleware<TRequest, TResponse>)middleware);
+                    _logger.InvocationPipelineChainMiddlewareMatches<TRequest, TResponse>(middleware, middlewares);
+                    middlewares.Add(middleware);
+                }
+                else
+                {
+                    _logger.InvocationPipelineChainMiddlewareDoesNotMatch<TRequest, TResponse>(middleware);
                 }
             }
 
@@ -100,7 +114,7 @@ namespace Ingot.Mediator.Engine.Pipeline
             for (var i = middlewares.Count - 1; i >= 0; i--)
             {
                 var nextMiddleware = chain;
-                var item = middlewares[i];
+                var item = (IInvocationMiddleware<TRequest, TResponse>)middlewares[i];
                 chain = (ctx, ct) => item.HandleAsync(ctx, (t) => nextMiddleware.Invoke(ctx, t), ct);
             }
 
@@ -110,6 +124,8 @@ namespace Ingot.Mediator.Engine.Pipeline
                 var preHandlerMiddleware = _preInvocationPipelineMiddlewareResolver.ResolveComponent();
                 return preHandlerMiddleware.HandleAsync((IInvocationContext<object, object>)ctx, (t) => next.Invoke(ctx, t), ct);
             };
+
+            _logger.InvocationPipelineChainCreated<TRequest, TResponse>(middlewares);
 
             return chain!;
 

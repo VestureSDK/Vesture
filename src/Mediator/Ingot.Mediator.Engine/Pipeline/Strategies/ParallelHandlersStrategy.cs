@@ -1,6 +1,7 @@
 ﻿using Ingot.Mediator.Engine.Pipeline.Resolvers;
 using Ingot.Mediator.Events;
 using Ingot.Mediator.Invocation;
+using Microsoft.Extensions.Logging;
 
 namespace Ingot.Mediator.Engine.Pipeline.Strategies
 {
@@ -17,29 +18,37 @@ namespace Ingot.Mediator.Engine.Pipeline.Strategies
     /// <seealso cref="SequentialHandlersStrategy{TRequest, TResponse}"/>
     public class ParallelHandlersStrategy<TRequest, TResponse> : IInvocationHandlerStrategy<TRequest, TResponse>
     {
+        private readonly ILogger _logger;
+
         private readonly IEnumerable<IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>>> _resolvers;
 
         /// <summary>
         /// Initializes a new <see cref="ParallelHandlersStrategy{TRequest, TResponse}"/> instance.
         /// </summary>
+        /// <param name="logger">The <see cref="ILogger{TCategoryName}"/> instance.</param>
         /// <param name="resolvers">The <see cref="IInvocationComponentResolver{TComponent}"/> of <see cref="IInvocationHandler{TRequest, TResponse}"/> instances.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="resolvers"/> is <see langword="null" />.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="logger"/> is <see langword="null" /> or <paramref name="resolvers"/> is <see langword="null" />.</exception>
         /// <exception cref="ArgumentException"><paramref name="resolvers"/> is empty.</exception>
-        public ParallelHandlersStrategy(IEnumerable<IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>>> resolvers)
+        public ParallelHandlersStrategy(
+            ILogger<ParallelHandlersStrategy<TRequest, TResponse>> logger,
+            IEnumerable<IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>>> resolvers)
         {
+            ArgumentNullException.ThrowIfNull(logger, nameof(logger));
             ArgumentNullException.ThrowIfNull(resolvers, nameof(resolvers));
+
             if (!resolvers.Any())
             {
                 throw new ArgumentException($"{nameof(resolvers)} is empty", nameof(resolvers));
             }
 
+            _logger = logger;
             _resolvers = resolvers;
         }
 
         /// <inheritdoc />
         public Task HandleAsync(IInvocationContext<TRequest, TResponse> context, Func<CancellationToken, Task> next, CancellationToken cancellationToken)
         {
-            var tasks = _resolvers.Select(resolver => SingleHandlerStrategy<TRequest, TResponse>.InvokeHandlerAsync(resolver, context, cancellationToken));
+            var tasks = _resolvers.Select(resolver => SingleHandlerStrategy<TRequest, TResponse>.InvokeHandlerAsync(_logger, resolver, context, cancellationToken));
             return Task.WhenAll(tasks);
         }
     }

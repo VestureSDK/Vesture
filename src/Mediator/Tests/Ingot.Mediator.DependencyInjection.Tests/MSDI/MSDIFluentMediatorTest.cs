@@ -1,5 +1,4 @@
-﻿using Castle.Core.Logging;
-using Ingot.Mediator.DependencyInjection.Fluent;
+﻿using Ingot.Mediator.DependencyInjection.Fluent;
 using Ingot.Mediator.DependencyInjection.MSDI;
 using Ingot.Mediator.DependencyInjection.Tests.Fluent;
 using Ingot.Testing;
@@ -19,6 +18,7 @@ namespace Ingot.Mediator.DependencyInjection.Tests.MSDI
 
         public MSDIFluentMediatorTest()
         {
+            _services.AddTransient(typeof(Microsoft.Extensions.Logging.ILoggerFactory), typeof(NUnitTestContextMsLoggerFactory));
             _services.AddTransient(typeof(Microsoft.Extensions.Logging.ILogger), typeof(NUnitTestContextMsLogger));
             _services.AddTransient(typeof(Microsoft.Extensions.Logging.ILogger<>), typeof(NUnitTestContextMsLogger<>));
         }

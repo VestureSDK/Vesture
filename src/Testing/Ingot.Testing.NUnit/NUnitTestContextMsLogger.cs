@@ -4,6 +4,24 @@ using NUnit.Framework;
 
 namespace Ingot.Testing
 {
+    public class NUnitTestContextMsLoggerFactory : ILoggerFactory
+    {
+        public void AddProvider(ILoggerProvider provider)
+        {
+
+        }
+
+        public ILogger CreateLogger(string categoryName)
+        {
+            return new NUnitTestContextMsLogger();
+        }
+
+        public void Dispose()
+        {
+
+        }
+    }
+
     public class NUnitTestContextMsLogger<TCategoryName> :
         NUnitTestContextMsLogger,
         Microsoft.Extensions.Logging.ILogger<TCategoryName>
@@ -17,7 +35,7 @@ namespace Ingot.Testing
             where TState : notnull => NoOpDisposable.Instance;
 
         public bool IsEnabled(LogLevel logLevel) => true;
-        
+
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
         {
             if (!IsEnabled(logLevel))
@@ -40,7 +58,7 @@ namespace Ingot.Testing
                 sb.AppendLine(exception.ToString());
             }
 
-            TestContext.Out?.Write(sb.ToString());
+            TestContext.Error?.Write(sb.ToString());
         }
 
         private class NoOpDisposable : IDisposable

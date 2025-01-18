@@ -1,8 +1,10 @@
 ﻿using System.Runtime.CompilerServices;
 using Ingot.Mediator.Commands;
+using Ingot.Mediator.Engine.Pipeline.Extensions;
 using Ingot.Mediator.Engine.Pipeline.Resolvers;
 using Ingot.Mediator.Invocation;
 using Ingot.Mediator.Requests;
+using Microsoft.Extensions.Logging;
 
 namespace Ingot.Mediator.Engine.Pipeline.Strategies
 {
@@ -20,32 +22,44 @@ namespace Ingot.Mediator.Engine.Pipeline.Strategies
     /// <seealso cref="IInvocationHandlerStrategy{TRequest, TResponse}"/>
     public class SingleHandlerStrategy<TRequest, TResponse> : IInvocationHandlerStrategy<TRequest, TResponse>
     {
+        private readonly ILogger _logger;
+
         private readonly IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>> _resolver;
 
         /// <summary>
         /// Initializes a new <see cref="SingleHandlerStrategy{TRequest, TResponse}"/> instance.
         /// </summary>
+        /// <param name="logger">The <see cref="ILogger{TCategoryName}"/> instance.</param>
         /// <param name="resolver">The <see cref="IInvocationComponentResolver{TComponent}"/> of <see cref="IInvocationHandler{TRequest, TResponse}"/> instance.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="resolver"/> is <see langword="null" />.</exception>
-        public SingleHandlerStrategy(IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>> resolver)
+        /// <exception cref="ArgumentNullException"><paramref name="logger"/> is <see langword="null" /> or <paramref name="resolver"/> is <see langword="null" />.</exception>
+        public SingleHandlerStrategy(
+            ILogger<SingleHandlerStrategy<TRequest, TResponse>> logger,
+            IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>> resolver)
         {
+            ArgumentNullException.ThrowIfNull(logger, nameof(logger));
             ArgumentNullException.ThrowIfNull(resolver, nameof(resolver));
 
+            _logger = logger;
             _resolver = resolver;
         }
 
         /// <inheritdoc/>
         public Task HandleAsync(IInvocationContext<TRequest, TResponse> context, Func<CancellationToken, Task> next, CancellationToken cancellationToken)
         {
-            return InvokeHandlerAsync(_resolver, context, cancellationToken);
+            return InvokeHandlerAsync(_logger, _resolver, context, cancellationToken);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static async Task InvokeHandlerAsync(IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>> resolver, IInvocationContext<TRequest, TResponse> context, CancellationToken cancellationToken)
+        internal static async Task InvokeHandlerAsync(ILogger logger, IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>> resolver, IInvocationContext<TRequest, TResponse> context, CancellationToken cancellationToken)
         {
             var handler = resolver.ResolveComponent();
+
+            logger.InvokingHandler(handler);
+
             var response = await handler.HandleAsync(context.Request, cancellationToken);
             context.SetResponse(response);
+
+            logger.InvokedHandler(handler);
         }
     }
 }

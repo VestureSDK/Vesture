@@ -1,5 +1,6 @@
 ﻿using Ingot.Mediator.Engine.Pipeline.Resolvers;
 using Ingot.Mediator.Invocation;
+using Microsoft.Extensions.Logging;
 
 namespace Ingot.Mediator.Engine.Pipeline.Strategies
 {
@@ -13,22 +14,30 @@ namespace Ingot.Mediator.Engine.Pipeline.Strategies
     /// <seealso cref="ParallelHandlersStrategy{TRequest, TResponse}"/>
     public class SequentialHandlersStrategy<TRequest, TResponse> : IInvocationHandlerStrategy<TRequest, TResponse>
     {
+        private readonly ILogger _logger;
+
         private readonly IEnumerable<IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>>> _resolvers;
 
         /// <summary>
         /// Initializes a new <see cref="SequentialHandlersStrategy{TRequest, TResponse}"/> instance.
         /// </summary>
+        /// <param name="logger">The <see cref="ILogger{TCategoryName}"/> instance.</param>
         /// <param name="resolvers">The <see cref="IInvocationComponentResolver{TComponent}"/> of <see cref="IInvocationHandler{TRequest, TResponse}"/> instances.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="resolvers"/> is <see langword="null" />.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="logger"/> is <see langword="null" /> or <paramref name="resolvers"/> is <see langword="null" />.</exception>
         /// <exception cref="ArgumentException"><paramref name="resolvers"/> is empty.</exception>
-        public SequentialHandlersStrategy(IEnumerable<IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>>> resolvers)
+        public SequentialHandlersStrategy(
+            ILogger<SequentialHandlersStrategy<TRequest, TResponse>> logger,
+            IEnumerable<IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>>> resolvers)
         {
+            ArgumentNullException.ThrowIfNull(logger, nameof(logger));
             ArgumentNullException.ThrowIfNull(resolvers, nameof(resolvers));
+
             if (!resolvers.Any())
             {
                 throw new ArgumentException($"{nameof(resolvers)} is empty", nameof(resolvers));
             }
 
+            _logger = logger;
             _resolvers = resolvers;
         }
 
@@ -37,7 +46,7 @@ namespace Ingot.Mediator.Engine.Pipeline.Strategies
         {
             foreach (var resolver in _resolvers)
             {
-                await SingleHandlerStrategy<TRequest, TResponse>.InvokeHandlerAsync(resolver, context, cancellationToken);
+                await SingleHandlerStrategy<TRequest, TResponse>.InvokeHandlerAsync(_logger, resolver, context, cancellationToken);
             }
         }
     }

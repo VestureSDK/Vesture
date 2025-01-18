@@ -1,5 +1,6 @@
 ﻿using Ingot.Mediator.Engine.Pipeline.Context;
 using Ingot.Mediator.Engine.Pipeline.Resolvers;
+using Microsoft.Extensions.Logging;
 
 namespace Ingot.Mediator.Engine.Pipeline.Internal.NoOp
 {
@@ -9,6 +10,8 @@ namespace Ingot.Mediator.Engine.Pipeline.Internal.NoOp
     /// <seealso cref="INoOpInvocationPipelineResolver"/>
     public class DefaultNoOpInvocationPipelineResolver : INoOpInvocationPipelineResolver
     {
+        private readonly ILoggerFactory _loggerFactory;
+
         private readonly IInvocationContextFactory _contextFactory;
 
         private readonly IInvocationComponentResolver<IPrePipelineMiddleware> _preInvocationPipelineMiddlewareResolver;
@@ -22,6 +25,7 @@ namespace Ingot.Mediator.Engine.Pipeline.Internal.NoOp
         /// <summary>
         /// Initializes a new <see cref="DefaultNoOpInvocationPipelineResolver"/> instance.
         /// </summary>
+        /// <param name="loggerFactory">The <see cref="ILoggerFactory"/> instance.</param>
         /// <param name="contextFactory">The <see cref="IInvocationContextFactory"/> instance.</param>
         /// <param name="preInvocationPipelineMiddlewareResolver">The <see cref="IInvocationComponentResolver{TComponent}"/> instance.</param>
         /// <param name="middlewares">The <see cref="IMiddlewareInvocationPipelineItem"/> instances.</param>
@@ -29,6 +33,7 @@ namespace Ingot.Mediator.Engine.Pipeline.Internal.NoOp
         /// <param name="handlerStrategyResolver">The <see cref="INoOpInvocationHandlerStrategyResolver"/> instance.</param>
         /// <exception cref="ArgumentNullException"><paramref name="contextFactory"/> is <see langword="null" /> or <paramref name="preInvocationPipelineMiddlewareResolver"/> is <see langword="null" /> or <paramref name="middlewares"/> is <see langword="null" /> or <paramref name="preHandlerMiddlewareResolver"/> is <see langword="null" /> or <paramref name="handlerStrategyResolver"/> is <see langword="null" />.</exception>
         public DefaultNoOpInvocationPipelineResolver(
+            ILoggerFactory loggerFactory,
             IInvocationContextFactory contextFactory,
             IInvocationComponentResolver<IPrePipelineMiddleware> preInvocationPipelineMiddlewareResolver,
             IEnumerable<IMiddlewareInvocationPipelineItem> middlewares,
@@ -40,7 +45,7 @@ namespace Ingot.Mediator.Engine.Pipeline.Internal.NoOp
             ArgumentNullException.ThrowIfNull(middlewares, nameof(middlewares));
             ArgumentNullException.ThrowIfNull(preHandlerMiddlewareResolver, nameof(preHandlerMiddlewareResolver));
             ArgumentNullException.ThrowIfNull(handlerStrategyResolver, nameof(handlerStrategyResolver));
-
+            _loggerFactory = loggerFactory;
             _contextFactory = contextFactory;
             _preInvocationPipelineMiddlewareResolver = preInvocationPipelineMiddlewareResolver;
             _middlewares = middlewares;
@@ -51,8 +56,10 @@ namespace Ingot.Mediator.Engine.Pipeline.Internal.NoOp
         /// <inheritdoc />
         public IInvocationPipeline<TResponse> ResolveNoOpInvocationPipeline<TResponse>()
         {
-            var handlerStrategy = _handlerStrategyResolver.ResolveNoOpInvocationHandlerStrategy<TResponse>(); ;
+            var logger = _loggerFactory.CreateLogger<DefaultInvocationPipeline<object, TResponse>>();
+            var handlerStrategy = _handlerStrategyResolver.ResolveNoOpInvocationHandlerStrategy<TResponse>();
             return new DefaultInvocationPipeline<object, TResponse>(
+                logger,
                 _contextFactory,
                 _preInvocationPipelineMiddlewareResolver,
                 _middlewares,

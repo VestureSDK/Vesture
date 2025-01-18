@@ -1,5 +1,6 @@
 ﻿using Ingot.Mediator.Abstractions.Tests.Data.Annotations.Commands;
 using Ingot.Mediator.Engine.Pipeline.Strategies;
+using Ingot.Testing;
 using Ingot.Testing.Annotations;
 using Moq;
 
@@ -9,10 +10,24 @@ namespace Ingot.Mediator.Engine.Tests.Pipeline.Strategies
     [TestFixtureSource_RequestResponse_All]
     public class SequentialHandlersStrategyTest<TRequest, TResponse> : EngineMultiInvocationHandlerStrategyTestBase<TRequest, TResponse, SequentialHandlersStrategy<TRequest, TResponse>>
     {
+        protected NUnitTestContextMsLogger<SequentialHandlersStrategy<TRequest, TResponse>> Logger { get; } = new();
+
         public SequentialHandlersStrategyTest(TRequest request, TResponse response)
             : base(request, response) { }
 
-        protected override SequentialHandlersStrategy<TRequest, TResponse> CreateStrategy() => new(Resolvers);
+        protected override SequentialHandlersStrategy<TRequest, TResponse> CreateStrategy() => new(Logger, Resolvers);
+
+        [Test]
+        public void Ctor_ArgumentNullException_IfLoggerIsNull()
+        {
+            // Arrange
+            // No arrange required
+
+            // Act / Assert
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
+            Assert.Throws<ArgumentNullException>(() => new ParallelHandlersStrategy<TRequest, TResponse>(null, Resolvers));
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
+        }
 
         [Test]
         public void Ctor_ArgumentNullException_IfResolversIsNull()
@@ -22,7 +37,7 @@ namespace Ingot.Mediator.Engine.Tests.Pipeline.Strategies
 
             // Act / Assert
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-            Assert.Throws<ArgumentNullException>(() => new SequentialHandlersStrategy<TRequest, TResponse>(null));
+            Assert.Throws<ArgumentNullException>(() => new SequentialHandlersStrategy<TRequest, TResponse>(Logger, null));
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 
@@ -30,10 +45,10 @@ namespace Ingot.Mediator.Engine.Tests.Pipeline.Strategies
         public void Ctor_ArgumentException_IfResolversIsEmpty()
         {
             // Arrange
-            Resolvers.Clear();
+            // No arrange required
 
             // Act / Assert
-            Assert.Throws<ArgumentException>(() => new SequentialHandlersStrategy<TRequest, TResponse>(Resolvers));
+            Assert.Throws<ArgumentException>(() => new SequentialHandlersStrategy<TRequest, TResponse>(Logger, []));
         }
 
         [Test]

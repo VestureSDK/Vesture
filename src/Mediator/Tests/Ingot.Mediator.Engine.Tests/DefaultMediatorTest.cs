@@ -21,7 +21,7 @@ namespace Ingot.Mediator.Engine.Tests
     {
         protected ICollection<IMiddlewareInvocationPipelineItem> MiddlewareItems { get; } = [];
 
-        protected Dictionary<(Type RequestType, Type ResponseType), MockInvocationPipeline> Pipelines { get; } = new Dictionary<(Type RequestType, Type ResponseType), MockInvocationPipeline>();
+        protected Dictionary<(Type RequestType, Type ResponseType), MockInvocationPipeline> Pipelines { get; } = [];
 
         protected NUnitTestContextMsLogger<DefaultMediator> Logger { get; } = new();
 
@@ -35,8 +35,8 @@ namespace Ingot.Mediator.Engine.Tests
             }
 
             return new(
-                Logger, 
-                Pipelines.Values, 
+                Logger,
+                Pipelines.Values,
                 NoOpInvocationPipelineResolver);
         }
 

@@ -1,8 +1,6 @@
 <Project>
   <ItemGroup>
-    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.0.0-*"/>
-  </ItemGroup>
-  <ItemGroup>
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0"/>
     <PackageVersion Include="MinVer" Version="6.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="9.0.1" />

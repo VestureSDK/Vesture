@@ -162,6 +162,50 @@ namespace Ingot.Mediator.Engine.Pipeline.Extensions
         [LoggerMessage(
             SkipEnabledCheck = true,
             EventId = BaseEventId + 7,
+            EventName = nameof(InvokingPipeline),
+            Level = LogLevel.Debug,
+            Message = "Invoking invocation pipeline ({RequestType} -> {ResponseType})")]
+        private static partial void InnerInvokingPipeline(this ILogger logger, Exception ex,
+            Type requestType,
+            Type? responseType);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static void InvokingPipeline<TRequest, TResponse>(this ILogger logger)
+        {
+            if (logger.IsEnabled(LogLevel.Debug))
+            {
+                InnerInvokingPipeline(logger,
+                    ex: null,
+                    requestType: typeof(TRequest),
+                    responseType: typeof(TResponse));
+            }
+        }
+
+        [LoggerMessage(
+            SkipEnabledCheck = true,
+            EventId = BaseEventId + 8,
+            EventName = nameof(InvokedPipeline),
+            Level = LogLevel.Debug,
+            Message = "Invoked invocation pipeline ({RequestType} -> {ResponseType})")]
+        private static partial void InnerInvokedPipeline(this ILogger logger, Exception ex,
+            Type requestType,
+            Type? responseType);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static void InvokedPipeline<TRequest, TResponse>(this ILogger logger)
+        {
+            if (logger.IsEnabled(LogLevel.Debug))
+            {
+                InnerInvokedPipeline(logger,
+                    ex: null,
+                    requestType: typeof(TRequest),
+                    responseType: typeof(TResponse));
+            }
+        }
+
+        [LoggerMessage(
+            SkipEnabledCheck = true,
+            EventId = BaseEventId + 9,
             EventName = nameof(PrePipelineAndHandlerMiddlewareUnhandledException),
             Level = LogLevel.Debug,
             Message = "Invocation pipeline chain ({RequestType} -> {ResponseType}) encountered an unhandled exception; an error has been added to the current invocation context")]
@@ -183,7 +227,7 @@ namespace Ingot.Mediator.Engine.Pipeline.Extensions
 
         [LoggerMessage(
             SkipEnabledCheck = true,
-            EventId = BaseEventId + 8,
+            EventId = BaseEventId + 10,
             EventName = nameof(NoHandlersRegisteredException),
             Level = LogLevel.Debug,
             Message = "Invocation pipeline chain ({RequestType} -> {ResponseType}) does not have the required handler; an error has been added to the current invocation context")]
@@ -205,7 +249,7 @@ namespace Ingot.Mediator.Engine.Pipeline.Extensions
 
         [LoggerMessage(
             SkipEnabledCheck = true,
-            EventId = BaseEventId + 9,
+            EventId = BaseEventId + 11,
             EventName = nameof(InvokingHandler),
             Level = LogLevel.Debug,
             Message = "Invoking {Handler} ({RequestType} -> {ResponseType})")]
@@ -229,9 +273,9 @@ namespace Ingot.Mediator.Engine.Pipeline.Extensions
 
         [LoggerMessage(
             SkipEnabledCheck = true,
-            EventId = BaseEventId + 10,
+            EventId = BaseEventId + 12,
             EventName = nameof(InvokedHandler),
-            Level = LogLevel.Trace,
+            Level = LogLevel.Debug,
             Message = "Invoked {Handler} ({RequestType} -> {ResponseType}); response has been set into the current invocation context")]
         private static partial void InnerInvokedHandler(this ILogger logger, Exception ex,
             object handler,
@@ -241,7 +285,7 @@ namespace Ingot.Mediator.Engine.Pipeline.Extensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static void InvokedHandler<TRequest, TResponse>(this ILogger logger, IInvocationHandler<TRequest, TResponse> handler)
         {
-            if (logger.IsEnabled(LogLevel.Trace))
+            if (logger.IsEnabled(LogLevel.Debug))
             {
                 InnerInvokedHandler(logger,
                     ex: null,

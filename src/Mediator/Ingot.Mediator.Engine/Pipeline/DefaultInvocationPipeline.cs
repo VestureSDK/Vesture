@@ -137,8 +137,13 @@ namespace Ingot.Mediator.Engine.Pipeline
         /// <inheritdoc />
         public async Task<IInvocationContext<TResponse>> HandleAsync(object request, CancellationToken cancellationToken)
         {
+            _logger.InvokingPipeline<TRequest, TResponse>();
+
             var context = _contextFactory.CreateContextForRequest<TRequest, TResponse>(request);
             await _chainOfResponsibility.Value.Invoke(context, cancellationToken);
+            
+            _logger.InvokedPipeline<TRequest, TResponse>();
+            
             return context;
         }
     }

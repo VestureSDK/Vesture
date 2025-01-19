@@ -52,6 +52,13 @@ namespace Ingot.Mediator.Engine.Pipeline.Strategies
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static async Task InvokeHandlerAsync(ILogger logger, IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>> resolver, IInvocationContext<TRequest, TResponse> context, CancellationToken cancellationToken)
         {
+            using var activity = MediatorEngineDiagnostics.s_invocationHandlerActivitySource
+                .StartActivity("Handler Invocation");
+
+            // Set the activity status as error since it will be switched
+            // back to "OK" if no errors are thrown.
+            activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Error);
+
             var handler = resolver.ResolveComponent();
 
             logger.InvokingHandler(handler);
@@ -60,6 +67,9 @@ namespace Ingot.Mediator.Engine.Pipeline.Strategies
             context.SetResponse(response);
 
             logger.InvokedHandler(handler);
+
+            // Set the activity status as "OK" since no error has been thrown
+            activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Ok);
         }
     }
 }

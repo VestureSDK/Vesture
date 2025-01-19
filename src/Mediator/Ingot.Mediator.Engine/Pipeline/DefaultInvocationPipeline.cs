@@ -1,4 +1,5 @@
-﻿using Ingot.Mediator.Engine.Pipeline.Context;
+﻿using System.Diagnostics;
+using Ingot.Mediator.Engine.Pipeline.Context;
 using Ingot.Mediator.Engine.Pipeline.Extensions;
 using Ingot.Mediator.Engine.Pipeline.Internal;
 using Ingot.Mediator.Engine.Pipeline.Resolvers;
@@ -88,6 +89,9 @@ namespace Ingot.Mediator.Engine.Pipeline
 
         private Func<IInvocationContext<TRequest, TResponse>, CancellationToken, Task> CreateChainOfResponsibility()
         {
+            using var activity = MediatorEngineDiagnostics.s_invocationPipelineActivitySource
+                .StartActivity("Pipeline Chain Creation");
+
             var middlewares = new List<IMiddlewareInvocationPipelineItem>();
 
             var contextType = typeof(IInvocationContext<TRequest, TResponse>);
@@ -137,6 +141,9 @@ namespace Ingot.Mediator.Engine.Pipeline
         /// <inheritdoc />
         public async Task<IInvocationContext<TResponse>> HandleAsync(object request, CancellationToken cancellationToken)
         {
+            using var activity = MediatorEngineDiagnostics.s_invocationPipelineActivitySource
+                .StartActivity("Pipeline Invocation");
+
             _logger.InvokingPipeline<TRequest, TResponse>();
 
             var context = _contextFactory.CreateContextForRequest<TRequest, TResponse>(request);
@@ -144,6 +151,18 @@ namespace Ingot.Mediator.Engine.Pipeline
             
             _logger.InvokedPipeline<TRequest, TResponse>();
             
+            if (activity is not null)
+            {
+                if (context.HasError)
+                {
+                    activity.SetStatus(ActivityStatusCode.Error);
+                }
+                else
+                {
+                    activity.SetStatus(ActivityStatusCode.Ok);
+                }
+            }
+
             return context;
         }
     }

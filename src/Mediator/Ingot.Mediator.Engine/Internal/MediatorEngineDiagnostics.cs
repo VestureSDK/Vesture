@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Ingot.Mediator.Engine.Pipeline.Internal;
 using Ingot.Mediator.Invocation;
@@ -11,8 +12,16 @@ namespace Ingot.Mediator.Engine.Pipeline.Extensions
     // Ingot:           ## {component} + ### {event}
     // Mediator:        10###
     // Mediator.Engine: 10001 -> 10999
-    internal static partial class MediatorLoggerExtensions
+    internal static partial class MediatorEngineDiagnostics
     {
+        internal const string BaseActivitySourceName = "Ingot.Mediator.Engine.";
+
+        internal static readonly ActivitySource s_mediatorActivitySource = new(BaseActivitySourceName + "Mediator");
+
+        internal static readonly ActivitySource s_invocationPipelineActivitySource = new(BaseActivitySourceName + "Pipeline");
+
+        internal static readonly ActivitySource s_invocationHandlerActivitySource = new(BaseActivitySourceName + "Handler");
+
         internal const int BaseEventId = 10000;
 
         [LoggerMessage(

@@ -71,6 +71,9 @@ namespace Ingot.Mediator.Engine
             _noOpInvocationPipelineResolver = noOpInvocationPipelineResolver;
             _invocationPipelines = new Lazy<IDictionary<(Type request, Type response), IInvocationPipeline>>(() =>
             {
+                using var activity = MediatorEngineDiagnostics.s_mediatorActivitySource
+                    .StartActivity("Invocation Pipelines Caching");
+
                 var pipelines = CreateInvocationPipelineCache(invocationPipelines);
                 _logger.InvocationPipelinesCached(pipelines.Keys);
                 return pipelines;

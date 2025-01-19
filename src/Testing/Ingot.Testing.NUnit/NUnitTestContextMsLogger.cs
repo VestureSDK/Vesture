@@ -4,24 +4,21 @@ using NUnit.Framework;
 
 namespace Ingot.Testing
 {
-    public class NUnitTestContextMsLoggerFactory : ILoggerFactory
+    /// <summary>
+    /// NUnit stderr console implementation of <see cref="ILoggerProvider"/>.
+    /// </summary>
+    public class NUnitTestContextLoggingProvider : ILoggerProvider
     {
-        public void AddProvider(ILoggerProvider provider)
-        {
+        /// <inheritdoc/>
+        public ILogger CreateLogger(string categoryName) => new NUnitTestContextMsLogger();
 
-        }
-
-        public ILogger CreateLogger(string categoryName)
-        {
-            return new NUnitTestContextMsLogger();
-        }
-
-        public void Dispose()
-        {
-
-        }
+        /// <inheritdoc/>
+        public void Dispose() { }
     }
 
+    /// <summary>
+    /// NUnit stderr console implementation of <see cref="ILogger{TCategoryName}"/>.
+    /// </summary>
     public class NUnitTestContextMsLogger<TCategoryName> :
         NUnitTestContextMsLogger,
         Microsoft.Extensions.Logging.ILogger<TCategoryName>
@@ -29,13 +26,19 @@ namespace Ingot.Testing
 
     }
 
+    /// <summary>
+    /// NUnit stderr console implementation of <see cref="ILogger"/>.
+    /// </summary>
     public class NUnitTestContextMsLogger : Microsoft.Extensions.Logging.ILogger
     {
+        /// <inheritdoc/>
         public IDisposable? BeginScope<TState>(TState state)
             where TState : notnull => NoOpDisposable.Instance;
 
+        /// <inheritdoc/>
         public bool IsEnabled(LogLevel logLevel) => true;
 
+        /// <inheritdoc/>
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
         {
             if (!IsEnabled(logLevel))

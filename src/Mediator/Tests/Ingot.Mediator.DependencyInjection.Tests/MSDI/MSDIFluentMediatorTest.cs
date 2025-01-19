@@ -4,27 +4,25 @@ using Ingot.Mediator.DependencyInjection.Tests.Fluent;
 using Ingot.Testing;
 using Ingot.Testing.Annotations;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Ingot.Mediator.DependencyInjection.Tests.MSDI
 {
     [ImplementationTest]
     public class MSDIFluentMediatorTest : FluentMediatorTestBase, IDisposable
     {
-        private readonly ServiceCollection _services = new();
+        private readonly ServiceCollection _services = [];
 
         private ServiceProvider? _serviceProvider;
 
         public void Dispose() => _serviceProvider?.Dispose();
 
-        public MSDIFluentMediatorTest()
-        {
-            _services.AddTransient(typeof(Microsoft.Extensions.Logging.ILoggerFactory), typeof(NUnitTestContextMsLoggerFactory));
-            _services.AddTransient(typeof(Microsoft.Extensions.Logging.ILogger), typeof(NUnitTestContextMsLogger));
-            _services.AddTransient(typeof(Microsoft.Extensions.Logging.ILogger<>), typeof(NUnitTestContextMsLogger<>));
-        }
-
         protected override RootFluentMediatorComponentRegistrar CreateFluentBuilder()
         {
+            _services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, NUnitTestContextLoggingProvider>());
+            _services.AddLogging(c => c.SetMinimumLevel(LogLevel.Trace));
+
             var registrar = new MSDIMediatorComponentRegistrar(_services);
             return new RootFluentMediatorComponentRegistrar(registrar);
         }

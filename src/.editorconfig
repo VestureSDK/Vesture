@@ -18,6 +18,9 @@ indent_size = 2
 [*.{cs,vb}]
 charset = utf-8-bom
 
+# CA1816: Dispose methods should call SuppressFinalize
+dotnet_diagnostic.CA1816.severity = none
+
 dotnet_public_api_analyzer.require_api_files = true
 
 # Code quality analyzers

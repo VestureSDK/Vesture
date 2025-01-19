@@ -74,8 +74,16 @@ namespace Ingot.Mediator.Engine
                 using var activity = MediatorEngineDiagnostics.s_mediatorActivitySource
                     .StartActivity("Invocation Pipelines Caching");
 
+                // Set the activity status as error since it will be switched
+                // back to "OK" if no errors are thrown.
+                activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Error);
+
                 var pipelines = CreateInvocationPipelineCache(invocationPipelines);
                 _logger.InvocationPipelinesCached(pipelines.Keys);
+
+                // Set the activity status as "OK" since no error has been thrown
+                activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Ok);
+
                 return pipelines;
             });
         }

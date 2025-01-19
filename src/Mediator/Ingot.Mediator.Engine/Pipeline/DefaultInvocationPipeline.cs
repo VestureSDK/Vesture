@@ -92,6 +92,10 @@ namespace Ingot.Mediator.Engine.Pipeline
             using var activity = MediatorEngineDiagnostics.s_invocationPipelineActivitySource
                 .StartActivity("Pipeline Chain Creation");
 
+            // Set the activity status as error since it will be switched
+            // back to "OK" if no errors are thrown.
+            activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Error);
+
             var middlewares = new List<IMiddlewareInvocationPipelineItem>();
 
             var contextType = typeof(IInvocationContext<TRequest, TResponse>);
@@ -130,6 +134,9 @@ namespace Ingot.Mediator.Engine.Pipeline
             };
 
             _logger.InvocationPipelineChainCreated<TRequest, TResponse>(middlewares);
+
+            // Set the activity status as "OK" since no error has been thrown
+            activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Ok);
 
             return chain!;
 

@@ -12,6 +12,7 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <Deterministic>true</Deterministic>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
 	</PropertyGroup>
 
   <PropertyGroup>

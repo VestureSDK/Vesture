@@ -34,7 +34,7 @@ namespace Ingot.Mediator.Engine.Mocks.Pipeline.Strategies
             set
             {
                 _handler = value;
-                _managedHandlers[1] = value ?? ManagedOtherHandler;
+                _managedHandlers[1] = value ?? ManagedHandler;
             }
         }
 

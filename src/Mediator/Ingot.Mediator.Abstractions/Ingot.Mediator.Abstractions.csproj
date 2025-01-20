@@ -15,7 +15,7 @@
   </PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Ingot.Mediator.Abstractions.Annotations\Ingot.Mediator.Abstractions.Annotations.csproj" />
+		<ProjectReference Include="..\Ingot.Mediator.Contracts\Ingot.Mediator.Contracts.csproj" />
 	</ItemGroup>
 
 </Project>

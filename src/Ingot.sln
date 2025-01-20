@@ -12,7 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Solution Items", ".Solutio
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mediator", "Mediator", "{C72E896A-0986-84B8-B02A-D018EDF3EC0B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ingot.Mediator.Abstractions.Annotations", "Mediator\Ingot.Mediator.Abstractions.Annotations\Ingot.Mediator.Abstractions.Annotations.csproj", "{B9F771B7-8F4E-7A07-6D09-6CAF0CDDCEEC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ingot.Mediator.Contracts", "Mediator\Ingot.Mediator.Contracts\Ingot.Mediator.Contracts.csproj", "{B9F771B7-8F4E-7A07-6D09-6CAF0CDDCEEC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ingot.Mediator.Abstractions", "Mediator\Ingot.Mediator.Abstractions\Ingot.Mediator.Abstractions.csproj", "{0CADA0E7-3C14-449E-B20E-FAB44B049484}"
 EndProject

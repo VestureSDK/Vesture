@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Ingot.Mediator.Contracts\Ingot.Mediator.Contracts.csproj" />
     <ProjectReference Include="..\Ingot.Mediator.Abstractions\Ingot.Mediator.Abstractions.csproj" />
   </ItemGroup>
 

@@ -11,7 +11,8 @@
   </ItemGroup>
   
 	<ItemGroup>
-		<ProjectReference Include="..\Ingot.Mediator.Abstractions\Ingot.Mediator.Abstractions.csproj" />
+    <ProjectReference Include="..\Ingot.Mediator.Contracts\Ingot.Mediator.Contracts.csproj" />
+    <ProjectReference Include="..\Ingot.Mediator.Abstractions\Ingot.Mediator.Abstractions.csproj" />
 		<ProjectReference Include="..\Ingot.Mediator.DependencyInjection\Ingot.Mediator.DependencyInjection.csproj" />
 		<ProjectReference Include="..\Ingot.Mediator.Engine\Ingot.Mediator.Engine.csproj" />
 	</ItemGroup>

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>My description</Description>
+    <Description>Provides the default implementation of the Mediator pattern abstractions defined in Ingot.Mediator.Abstractions. This package offers a fully functional and extensible mediator engine for routing messages, invoking handlers, and processing middleware. It is designed to seamlessly integrate into your application and adhere to best practices for message handling and pipeline management.</Description>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>My description</Description>
+    <Description>Defines the core abstractions for the Mediator pattern, including message handling, pipelines, and middleware support. This package allows developers to define contracts for their handlers, request-response pipelines, and middleware layers without being tied to a specific implementation. It facilitates loose coupling and promotes separation of concerns in your application architecture.</Description>
   </PropertyGroup>
 
   <ItemGroup>

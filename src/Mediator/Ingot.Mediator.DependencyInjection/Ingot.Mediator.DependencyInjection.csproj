@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>My description</Description>
+    <Description>An integration library for registering handlers and middleware in the mediator through Microsoft Dependency Injection (MSDI). This package allows developers to easily register and configure mediator components within an MSDI container, enabling a clean and efficient way to inject dependencies into the mediator and its handlers.</Description>
   </PropertyGroup>
 
   <ItemGroup>

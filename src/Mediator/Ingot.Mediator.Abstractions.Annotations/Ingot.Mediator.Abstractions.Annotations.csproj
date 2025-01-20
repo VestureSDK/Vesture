@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>My description</Description>
+    <Description>Provides abstractions for annotations related to the Mediator pattern. This library is intended for use in contract libraries that require mediator annotations but do not need full access to the underlying abstractions. It simplifies the definition of handler and message relationships without introducing unnecessary dependencies.</Description>
   </PropertyGroup>
 
   <ItemGroup>

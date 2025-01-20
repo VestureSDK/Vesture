@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>My description</Description>
+    <Description>A meta package that references all the core packages of the Ingot Mediator framework. It provides a one-stop solution for integrating the Mediator pattern into your application, with built-in abstractions, default implementations, and Dependency Injection support. Ideal for developers looking for a comprehensive, plug-and-play mediator solution with minimal setup.</Description>
   </PropertyGroup>
 
   <ItemGroup>

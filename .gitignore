@@ -403,3 +403,6 @@ FodyWeavers.xsd
 
 # Coverage report
 /coverageresults
+
+# Outputs
+/dist

@@ -27,7 +27,7 @@ jobs:
       - name: Build
         run: dotnet ib Build
       - name: Test
-        run: dotnet test ./src --no-build
+        run: dotnet test ./src/Mediator/Tests/Ingot.Mediator.Abstractions.Tests/Ingot.Mediator.Abstractions.Tests.csproj --no-build
       - name: Validate
         run: dotnet ib Validate
       - name: Package

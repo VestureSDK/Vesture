@@ -27,7 +27,7 @@ jobs:
       - name: Build
         run: dotnet ib Build
       - name: Test
-        run: dotnet ib Test
+        run: dotnet test ./src --no-build
       - name: Validate
         run: dotnet ib Validate
       - name: Package

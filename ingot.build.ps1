@@ -13,10 +13,6 @@ task Setup {
 
 task Build {
     
-    dotnet clean ./src --verbosity $DotnetVerbosity
-
-    assert ($LASTEXITCODE -eq 0) "Clean encountered an error"
-    
     dotnet restore ./src --verbosity $DotnetVerbosity
     
     assert ($LASTEXITCODE -eq 0) "Restore encountered an error"

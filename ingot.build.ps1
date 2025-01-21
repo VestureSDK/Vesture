@@ -5,7 +5,7 @@ task Setup {
 }
 
 task Build {
-    $verbosity = "detailed"
+    $verbosity = "normal"
 
     # Builds the solution in Release configuration
     dotnet clean ./src --verbosity $verbosity
@@ -14,25 +14,25 @@ task Build {
 }
 
 task Test {
-    $verbosity = "detailed"
+    $verbosity = "normal"
 
     dotnet test ./src --no-build --verbosity $verbosity
 }
 
 task Validate {
-    $verbosity = "detailed"
+    $verbosity = "normal"
     
     dotnet format --verify-no-changes --verbosity $verbosity
 }
 
 task Release {
-    $verbosity = "detailed"    
+    $verbosity = "normal"    
     $apiKey = "test"
     $source = "https://api.nuget.org/v3/index.json"
     $dist = "./dist/nuget"    
 
     dotnet pack ./src --no-build --output ./dist/nuget --verbosity $verbosity
-    ls $dist/*.nupkg | ForEach-Object -Process { dotnet nuget push "$($dist)/$($_.Name)" --api-key $apiKey --source $source }
+    Get-ChildItem $dist/*.nupkg | ForEach-Object -Process { dotnet nuget push "$($dist)/$($_.Name)" --api-key $apiKey --source $source }
 }
 
 

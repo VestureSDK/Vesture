@@ -1,3 +1,10 @@
+param(
+    $DotnetVerbosity = 'normal',
+    $NupkgDirectory = './dist',
+    $NupkgPushSource = 'https://api.nuget.org/v3/index.json',
+    $NupkgPushApiKey = 'test'
+)
+
 task Setup {
     # Do the setup of the environment and repository
     # It might also be used to migrate an existing
@@ -5,53 +12,44 @@ task Setup {
 }
 
 task Build {
-    $verbosity = "normal"
-
-    # Builds the solution in Release configuration
-    dotnet clean ./src --verbosity $verbosity
+    
+    dotnet clean ./src --verbosity $DotnetVerbosity
 
     assert ($LASTEXITCODE -eq 0) "Clean encountered an error"
     
-    dotnet restore ./src --verbosity $verbosity
+    dotnet restore ./src --verbosity $DotnetVerbosity
     
     assert ($LASTEXITCODE -eq 0) "Restore encountered an error"
     
-    dotnet build ./src -c Release --no-restore --verbosity $verbosity
+    dotnet build ./src -c Release --no-restore --verbosity $DotnetVerbosity
     
     assert ($LASTEXITCODE -eq 0) "Build encountered an error"
 }
 
 task Test {
-    $verbosity = "normal"
 
-    dotnet test ./src --no-build --verbosity $verbosity
+    dotnet test ./src --no-build --verbosity $DotnetVerbosity
     
     assert ($LASTEXITCODE -eq 0) "Test encountered an error"
 }
 
 task Validate {
-    $verbosity = "normal"
     
-    dotnet format --verify-no-changes --verbosity $verbosity
+    dotnet format --verify-no-changes --verbosity $DotnetVerbosity
     
     assert ($LASTEXITCODE -eq 0) "Format not applied. Run dotnet format ./src"
 }
 
 task Package {
-    $verbosity = "normal"
-    $dist = "./dist/nuget"    
-
-    dotnet pack ./src --no-build --output $dist --verbosity $verbosity
+    
+    dotnet pack ./src --no-build --output $NupkgDirectory --verbosity $DotnetVerbosity
     
     assert ($LASTEXITCODE -eq 0) "Pack nuget packages encountered an error"
 }
 
 task Release {    
-    $apiKey = "test"
-    $source = "https://api.nuget.org/v3/index.json"
-    $dist = "./dist/nuget"    
-
-    Get-ChildItem "$($dist)/*.nupkg" | ForEach-Object -Process { dotnet nuget push "$($dist)/$($_.Name)" --api-key $apiKey --source $source --skip-duplicate }
+    
+    Get-ChildItem "$($NupkgDirectory)/*.nupkg" | ForEach-Object -Process { dotnet nuget push "$($NupkgDirectory)/$($_.Name)" --api-key $NupkgPushApiKey --source $NupkgPushSource --skip-duplicate }
 
     assert ($LASTEXITCODE -eq 0) "Push nuget packages encountered an error"
 }
@@ -82,9 +80,9 @@ task Src-Build {
 }
 
 task Docs-Clean {
-    rm -Force -Recurse ./docs/docs/Mediator/References -ErrorAction SilentlyContinue
-    rm -Force -Recurse ./docs/docs/Mediator/Advanced/References -ErrorAction SilentlyContinue
-    rm -Force -Recurse ./docs/_site -ErrorAction SilentlyContinue
+    REmove-Item -Force -Recurse ./docs/docs/Mediator/References -ErrorAction SilentlyContinue
+    REmove-Item -Force -Recurse ./docs/docs/Mediator/Advanced/References -ErrorAction SilentlyContinue
+    REmove-Item -Force -Recurse ./docs/_site -ErrorAction SilentlyContinue
 }
 
 task Docs-Build {

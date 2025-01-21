@@ -6,6 +6,12 @@ on:
   pull_request:
     branches:
       - main
+
+env:
+  NUPKG_DiRECTORY: "./dist"
+  NUPKG_PUSH_SOURCE: "https://api.nuget.org/v3/index.json"
+  NUPKG_PUSH_API_KEY: "test"
+
 jobs:
   libs:
     name: Libraries
@@ -25,13 +31,19 @@ jobs:
       - name: Validate
         run: dotnet ib Validate
       - name: Package
-        run: dotnet ib Package
+        run: |
+          dotnet ib Package \
+            -NupkgDirectory ${{ env.NUPKG_DiRECTORY }}
       - uses: actions/upload-artifact@v4
         name: "Artifact: nuget"
         with:
           name: nuget
           if-no-files-found: error
           retention-days: 3
-          path: ./dist/nuget/*.nupkg
+          path: ${{ env.NUPKG_DiRECTORY }}/*.nupkg
       - name: Release
-        run: dotnet ib Release
+        run: |
+          dotnet ib Release \
+            -NupkgDirectory ${{ env.NUPKG_DiRECTORY }} \
+            -NupkgPushSource ${{ env.NUPKG_PUSH_SOURCE }} \
+            -NupkgPushApiKey ${{ env.NUPKG_PUSH_API_KEY }}

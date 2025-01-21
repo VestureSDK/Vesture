@@ -19,6 +19,23 @@ task Test {
     dotnet test ./src --no-build --verbosity $verbosity
 }
 
+task Validate {
+    $verbosity = "detailed"
+    
+    dotnet format --verify-no-changes --verbosity $verbosity
+}
+
+task Release {
+    $verbosity = "detailed"    
+    $apiKey = "test"
+    $source = "https://api.nuget.org/v3/index.json"
+    $dist = "./dist/nuget"    
+
+    dotnet pack ./src --no-build --output ./dist/nuget --verbosity $verbosity
+    ls $dist/*.nupkg | ForEach-Object -Process { dotnet nuget push "$($dist)/$($_.Name)" --api-key $apiKey --source $source }
+}
+
+
 task Src {
     & $(& "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -prerelease -latest -property productPath -format json | ConvertFrom-Json)[0].productPath ./src/Ingot.sln -donotloadprojects
 }

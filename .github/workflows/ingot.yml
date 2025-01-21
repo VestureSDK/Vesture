@@ -1,0 +1,64 @@
+name: Ingot
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+jobs:
+  libs-build:
+    name: Libs Build
+    runs-on: ubuntu-latest
+    container: mcr.microsoft.com/dotnet/sdk:9.0
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup
+        run: |
+          dotnet tool restore
+          dotnet ib Setup
+      - name: Build
+        run: dotnet ib Build
+
+  libs-test:
+    name: Libs Test
+    runs-on: ubuntu-latest
+    container: mcr.microsoft.com/dotnet/sdk:9.0
+    steps:
+      - name: Setup
+        run: |
+          dotnet tool restore
+          dotnet ib Setup
+      - name: Test
+        run: dotnet ib Test
+    needs:
+      - libs-build
+
+  libs-validate:
+    name: Libs Validate
+    runs-on: ubuntu-latest
+    container: mcr.microsoft.com/dotnet/sdk:9.0
+    steps:
+      - name: Setup
+        run: |
+          dotnet tool restore
+          dotnet ib Setup
+      - name: Validate
+        run: dotnet ib Validate
+    needs:
+      - libs-build
+      - libs-test
+
+  libs-release:
+    name: Libs Release
+    runs-on: ubuntu-latest
+    container: mcr.microsoft.com/dotnet/sdk:9.0
+    steps:
+      - name: Setup
+        run: |
+          dotnet tool restore
+          dotnet ib Setup
+      - name: Release
+        run: dotnet ib Release
+    needs:
+      - libs-validate

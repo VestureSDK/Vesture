@@ -9,20 +9,32 @@ task Build {
 
     # Builds the solution in Release configuration
     dotnet clean ./src --verbosity $verbosity
+
+    assert ($LASTEXITCODE -eq 0) "Clean encountered an error"
+    
     dotnet restore ./src --verbosity $verbosity
+    
+    assert ($LASTEXITCODE -eq 0) "Restore encountered an error"
+    
     dotnet build ./src -c Release --no-restore --verbosity $verbosity
+    
+    assert ($LASTEXITCODE -eq 0) "Build encountered an error"
 }
 
 task Test {
     $verbosity = "normal"
 
     dotnet test ./src --no-build --verbosity $verbosity
+    
+    assert ($LASTEXITCODE -eq 0) "Test encountered an error"
 }
 
 task Validate {
     $verbosity = "normal"
     
     dotnet format --verify-no-changes --verbosity $verbosity
+    
+    assert ($LASTEXITCODE -eq 0) "Format not applied. Run dotnet format ./src"
 }
 
 task Package {
@@ -30,15 +42,18 @@ task Package {
     $dist = "./dist/nuget"    
 
     dotnet pack ./src --no-build --output $dist --verbosity $verbosity
+    
+    assert ($LASTEXITCODE -eq 0) "Pack nuget packages encountered an error"
 }
 
-task Release {
-    $verbosity = "normal"    
+task Release {    
     $apiKey = "test"
     $source = "https://api.nuget.org/v3/index.json"
     $dist = "./dist/nuget"    
 
-    Get-ChildItem "$($dist)/*.nupkg" | ForEach-Object -Process { dotnet nuget push "$($dist)/$($_.Name)" --api-key $apiKey --source $source }
+    Get-ChildItem "$($dist)/*.nupkg" | ForEach-Object -Process { dotnet nuget push "$($dist)/$($_.Name)" --api-key $apiKey --source $source --skip-duplicate }
+
+    assert ($LASTEXITCODE -eq 0) "Push nuget packages encountered an error"
 }
 
 

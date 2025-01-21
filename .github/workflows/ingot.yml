@@ -23,5 +23,13 @@ jobs:
         run: dotnet ib Test
       - name: Validate
         run: dotnet ib Validate
+      - name: Package
+        run: dotnet ib Package
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nuget
+          if-no-files-found: error
+          retention-days: 3
+          path: ./dist/nuget/*.nupkg
       - name: Release
         run: dotnet ib Release

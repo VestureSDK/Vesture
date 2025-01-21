@@ -25,14 +25,20 @@ task Validate {
     dotnet format --verify-no-changes --verbosity $verbosity
 }
 
+task Package {
+    $verbosity = "normal"
+    $dist = "./dist/nuget"    
+
+    dotnet pack ./src --no-build --output $dist --verbosity $verbosity
+}
+
 task Release {
     $verbosity = "normal"    
     $apiKey = "test"
     $source = "https://api.nuget.org/v3/index.json"
     $dist = "./dist/nuget"    
 
-    dotnet pack ./src --no-build --output ./dist/nuget --verbosity $verbosity
-    Get-ChildItem $dist/*.nupkg | ForEach-Object -Process { dotnet nuget push "$($dist)/$($_.Name)" --api-key $apiKey --source $source }
+    Get-ChildItem "$($dist)/*.nupkg" | ForEach-Object -Process { dotnet nuget push "$($dist)/$($_.Name)" --api-key $apiKey --source $source }
 }
 
 

@@ -1,9 +1,18 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project>
 
-  <PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
     <IsTestProject>true</IsTestProject>
     <IsPackable>false</IsPackable>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
+	</PropertyGroup>
+
+  <PropertyGroup>
+    <LangVersion>13.0</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,23 +21,17 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="Moq" />
     <PackageReference Include="NUnit" />
     <PackageReference Include="NUnit.Analyzers">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="NUnit3TestAdapter" />
-    <PackageReference Remove="Microsoft.CodeAnalysis.PublicApiAnalyzers" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\Ingot.Mediator.Engine\Ingot.Mediator.Engine.csproj" />
-    <ProjectReference Include="..\..\Mocks\Ingot.Mediator.Engine.Mocks\Ingot.Mediator.Engine.Mocks.csproj" />
-    <ProjectReference Include="..\Ingot.Mediator.Abstractions.Tests\Ingot.Mediator.Abstractions.Tests.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Using Include="NUnit.Framework" />
   </ItemGroup>
-
+  
 </Project>

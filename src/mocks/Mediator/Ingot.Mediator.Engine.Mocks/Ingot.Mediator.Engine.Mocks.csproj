@@ -1,0 +1,8 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\libs\Mediator\Ingot.Mediator.Engine\Ingot.Mediator.Engine.csproj" />
+    <ProjectReference Include="..\Ingot.Mediator.Abstractions.Mocks\Ingot.Mediator.Abstractions.Mocks.csproj" />
+  </ItemGroup>
+
+</Project>

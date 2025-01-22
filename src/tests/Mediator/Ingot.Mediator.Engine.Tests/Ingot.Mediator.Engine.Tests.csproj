@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsTestProject>true</IsTestProject>
+    <IsPackable>false</IsPackable>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\libs\Mediator\Ingot.Mediator.Engine\Ingot.Mediator.Engine.csproj" />
+    <ProjectReference Include="..\..\..\mocks\Mediator\Ingot.Mediator.Engine.Mocks\Ingot.Mediator.Engine.Mocks.csproj" />
+    <ProjectReference Include="..\Ingot.Mediator.Abstractions.Tests\Ingot.Mediator.Abstractions.Tests.csproj" />
+  </ItemGroup>
+
+</Project>

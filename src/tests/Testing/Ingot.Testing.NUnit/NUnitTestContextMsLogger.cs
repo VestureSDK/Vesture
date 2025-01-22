@@ -18,12 +18,9 @@ namespace Ingot.Testing
     /// <summary>
     /// NUnit stderr console implementation of <see cref="ILogger{TCategoryName}"/>.
     /// </summary>
-    public class NUnitTestContextMsLogger<TCategoryName> :
-        NUnitTestContextMsLogger,
-        Microsoft.Extensions.Logging.ILogger<TCategoryName>
-    {
-
-    }
+    public class NUnitTestContextMsLogger<TCategoryName>
+        : NUnitTestContextMsLogger,
+            Microsoft.Extensions.Logging.ILogger<TCategoryName> { }
 
     /// <summary>
     /// NUnit stderr console implementation of <see cref="ILogger"/>.
@@ -38,7 +35,13 @@ namespace Ingot.Testing
         public bool IsEnabled(LogLevel logLevel) => true;
 
         /// <inheritdoc/>
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+        public void Log<TState>(
+            LogLevel logLevel,
+            EventId eventId,
+            TState state,
+            Exception? exception,
+            Func<TState, Exception?, string> formatter
+        )
         {
             if (!IsEnabled(logLevel))
             {

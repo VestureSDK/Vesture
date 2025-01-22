@@ -5,8 +5,9 @@
         public TestFixtureSource_RequestResponse_RequestAttribute()
             : base(typeof(TestFixtureSource_RequestResponse_RequestAttribute), nameof(TestData)) { }
 
-        public static IEnumerable<TestFixtureData> TestData => MediatorTestData
-            .Get_RequestResponse_Request()
-            .Select(x => new TestFixtureData(x.Request, x.Response));
+        public static IEnumerable<TestFixtureData> TestData =>
+            MediatorTestData
+                .Get_RequestResponse_Request()
+                .Select(x => new TestFixtureData(x.Request, x.Response));
     }
 }

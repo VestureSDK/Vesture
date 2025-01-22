@@ -13,6 +13,9 @@ namespace Ingot.Mediator.Engine.Pipeline.Internal.NoOp
         /// </summary>
         /// <typeparam name="TResponse">The response contract.</typeparam>
         /// <returns>The resolved NoOp <see cref="IInvocationHandlerStrategy{TRequest, TResponse}"/> instance.</returns>
-        IInvocationHandlerStrategy<object, TResponse> ResolveNoOpInvocationHandlerStrategy<TResponse>();
+        IInvocationHandlerStrategy<
+            object,
+            TResponse
+        > ResolveNoOpInvocationHandlerStrategy<TResponse>();
     }
 }

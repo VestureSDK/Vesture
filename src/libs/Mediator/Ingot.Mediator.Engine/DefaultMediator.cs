@@ -15,24 +15,24 @@ namespace Ingot.Mediator.Engine
     /// The <see cref="DefaultMediator"/> provides a default implementation of <see cref="IMediator"/>.
     /// </para>
     /// <para>
-    /// An <see cref="IMediator"/> coordinates the execution of different types of contracts 
+    /// An <see cref="IMediator"/> coordinates the execution of different types of contracts
     /// such as requests, commands, and events by invoking the appropriate handlers and middlewares.
     /// </para>
     /// <para>
-    /// The mediator acts as a central point of communication in your application, 
+    /// The mediator acts as a central point of communication in your application,
     /// decoupling the components that send requests, commands, or events from those that handle them.
     /// </para>
     /// </summary>
     /// <remarks>
     /// <para>
-    /// The <see cref="DefaultMediator"/> uses the provided <see cref="IInvocationPipeline{TResponse}"/> 
-    /// instances to create an efficient cache based on <see cref="FrozenDictionary{TKey, TValue}"/> to 
-    /// lookup the right pipeline for the incoming <see cref="IRequest{TResponse}"/>, <see cref="ICommand"/>, 
+    /// The <see cref="DefaultMediator"/> uses the provided <see cref="IInvocationPipeline{TResponse}"/>
+    /// instances to create an efficient cache based on <see cref="FrozenDictionary{TKey, TValue}"/> to
+    /// lookup the right pipeline for the incoming <see cref="IRequest{TResponse}"/>, <see cref="ICommand"/>,
     /// <see cref="IEvent"/> and invoke the corresponding <see cref="IInvocationMiddleware{TRequest, TResponse}"/>s
     /// and <see cref="IInvocationHandler{TRequest, TResponse}"/>.
     /// </para>
     /// <para>
-    /// By pre-building the pipeline structure, the system optimizes performance by reducing 
+    /// By pre-building the pipeline structure, the system optimizes performance by reducing
     /// runtime resolution overhead, ensuring a more efficient execution flow while maintaining flexibility.
     /// </para>
     /// </remarks>
@@ -45,7 +45,9 @@ namespace Ingot.Mediator.Engine
     /// <seealso cref="InvocationMiddleware{TRequest, TResponse}"/>
     public class DefaultMediator : IMediator
     {
-        private readonly Lazy<IDictionary<(Type request, Type response), IInvocationPipeline>> _invocationPipelines;
+        private readonly Lazy<
+            IDictionary<(Type request, Type response), IInvocationPipeline>
+        > _invocationPipelines;
 
         private readonly ILogger _logger;
 
@@ -61,18 +63,26 @@ namespace Ingot.Mediator.Engine
         public DefaultMediator(
             ILogger<DefaultMediator> logger,
             IEnumerable<IInvocationPipeline> invocationPipelines,
-            INoOpInvocationPipelineResolver noOpInvocationPipelineResolver)
+            INoOpInvocationPipelineResolver noOpInvocationPipelineResolver
+        )
         {
             ArgumentNullException.ThrowIfNull(logger, nameof(logger));
             ArgumentNullException.ThrowIfNull(invocationPipelines, nameof(invocationPipelines));
-            ArgumentNullException.ThrowIfNull(noOpInvocationPipelineResolver, nameof(noOpInvocationPipelineResolver));
+            ArgumentNullException.ThrowIfNull(
+                noOpInvocationPipelineResolver,
+                nameof(noOpInvocationPipelineResolver)
+            );
 
             _logger = logger;
             _noOpInvocationPipelineResolver = noOpInvocationPipelineResolver;
-            _invocationPipelines = new Lazy<IDictionary<(Type request, Type response), IInvocationPipeline>>(() =>
+            _invocationPipelines = new Lazy<
+                IDictionary<(Type request, Type response), IInvocationPipeline>
+            >(() =>
             {
-                using var activity = MediatorEngineDiagnostics.s_mediatorActivitySource
-                    .StartActivity("Invocation Pipelines Caching");
+                using var activity =
+                    MediatorEngineDiagnostics.s_mediatorActivitySource.StartActivity(
+                        "Invocation Pipelines Caching"
+                    );
 
                 // Set the activity status as error since it will be switched
                 // back to "OK" if no errors are thrown.
@@ -94,7 +104,10 @@ namespace Ingot.Mediator.Engine
             var requestType = request.GetType();
             var responseType = typeof(TResponse);
 
-            if (_invocationPipelines.Value.TryGetValue((requestType, responseType), out var p) && p is IInvocationPipeline<TResponse> pipeline)
+            if (
+                _invocationPipelines.Value.TryGetValue((requestType, responseType), out var p)
+                && p is IInvocationPipeline<TResponse> pipeline
+            )
             {
                 _logger.InvocationPipelineFound<TResponse>(request);
                 return pipeline;
@@ -109,7 +122,10 @@ namespace Ingot.Mediator.Engine
         /// <exception cref="ArgumentNullException"><paramref name="contract"/> is <see langword="null" />.</exception>
         /// <exception cref="KeyNotFoundException">No relevant <see cref="IInvocationPipeline{TResponse}"/> found for contract '<paramref name="contract"/> -> <typeparamref name="TResponse"/>'.</exception>
         /// <inheritdoc/>
-        public Task<IInvocationContext<TResponse>> HandleAndCaptureAsync<TResponse>(object contract, CancellationToken cancellationToken = default)
+        public Task<IInvocationContext<TResponse>> HandleAndCaptureAsync<TResponse>(
+            object contract,
+            CancellationToken cancellationToken = default
+        )
         {
             ArgumentNullException.ThrowIfNull(contract, nameof(contract));
 
@@ -120,18 +136,24 @@ namespace Ingot.Mediator.Engine
         /// <inheritdoc cref="HandleAndCaptureAsync{TResponse}(object, CancellationToken)" path="/exception"/>
         /// <inheritdoc cref="InvocationContextExtensions.ThrowIfHasError{TContext}(TContext)" path="/exception[@name='invocation-exception']"/>
         /// <inheritdoc/>
-        public async Task<TResponse> HandleAsync<TResponse>(object contract, CancellationToken cancellationToken = default)
+        public async Task<TResponse> HandleAsync<TResponse>(
+            object contract,
+            CancellationToken cancellationToken = default
+        )
         {
             ArgumentNullException.ThrowIfNull(contract, nameof(contract));
 
-            var context = await HandleAndCaptureAsync<TResponse>(contract, cancellationToken).ConfigureAwait(false);
+            var context = await HandleAndCaptureAsync<TResponse>(contract, cancellationToken)
+                .ConfigureAwait(false);
             return context.ThrowIfHasError().GetResponseOrDefault<TResponse>();
         }
 
-
         /// <inheritdoc cref="HandleAndCaptureAsync{TResponse}(object, CancellationToken)" path="/exception"/>
         /// <inheritdoc/>
-        public Task<IInvocationContext<TResponse>> ExecuteAndCaptureAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
+        public Task<IInvocationContext<TResponse>> ExecuteAndCaptureAsync<TResponse>(
+            IRequest<TResponse> request,
+            CancellationToken cancellationToken = default
+        )
         {
             return HandleAndCaptureAsync<TResponse>(request, cancellationToken);
         }
@@ -139,7 +161,10 @@ namespace Ingot.Mediator.Engine
         /// <inheritdoc cref="HandleAndCaptureAsync{TResponse}(object, CancellationToken)" path="/exception"/>
         /// <inheritdoc cref="InvocationContextExtensions.ThrowIfHasError{TContext}(TContext)" path="/exception[@name='invocation-exception']"/>
         /// <inheritdoc/>
-        public Task<TResponse> ExecuteAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
+        public Task<TResponse> ExecuteAsync<TResponse>(
+            IRequest<TResponse> request,
+            CancellationToken cancellationToken = default
+        )
         {
             return HandleAsync<TResponse>(request, cancellationToken);
         }
@@ -147,9 +172,13 @@ namespace Ingot.Mediator.Engine
         /// <exception cref="ArgumentNullException"><paramref name="command"/> is <see langword="null" />.</exception>
         /// <exception cref="KeyNotFoundException">No relevant <see cref="IInvocationPipeline{TResponse}"/> found for contract '<paramref name="command"/> -> <see cref="CommandResponse"/>'.</exception>
         /// <inheritdoc/>
-        public async Task<IInvocationContext> InvokeAndCaptureAsync(ICommand command, CancellationToken cancellationToken = default)
+        public async Task<IInvocationContext> InvokeAndCaptureAsync(
+            ICommand command,
+            CancellationToken cancellationToken = default
+        )
         {
-            return await HandleAndCaptureAsync<CommandResponse>(command, cancellationToken).ConfigureAwait(false);
+            return await HandleAndCaptureAsync<CommandResponse>(command, cancellationToken)
+                .ConfigureAwait(false);
         }
 
         /// <inheritdoc cref="InvokeAndCaptureAsync(ICommand, CancellationToken)" path="/exception"/>
@@ -163,9 +192,13 @@ namespace Ingot.Mediator.Engine
         /// <exception cref="ArgumentNullException"><paramref name="event"/> is <see langword="null" />.</exception>
         /// <exception cref="KeyNotFoundException">No relevant <see cref="IInvocationPipeline{TResponse}"/> found for contract '<paramref name="event"/> -> <see cref="EventResponse"/>'.</exception>
         /// <inheritdoc/>
-        public async Task<IInvocationContext> PublishAndCaptureAsync(IEvent @event, CancellationToken cancellationToken = default)
+        public async Task<IInvocationContext> PublishAndCaptureAsync(
+            IEvent @event,
+            CancellationToken cancellationToken = default
+        )
         {
-            return await HandleAndCaptureAsync<EventResponse>(@event, cancellationToken).ConfigureAwait(false);
+            return await HandleAndCaptureAsync<EventResponse>(@event, cancellationToken)
+                .ConfigureAwait(false);
         }
 
         /// <inheritdoc cref="PublishAndCaptureAsync(IEvent, CancellationToken)" path="/exception"/>
@@ -176,12 +209,16 @@ namespace Ingot.Mediator.Engine
             return HandleAsync<EventResponse>(@event, cancellationToken);
         }
 
-        private static FrozenDictionary<(Type request, Type response), IInvocationPipeline> CreateInvocationPipelineCache(IEnumerable<IInvocationPipeline> invocationPipelines)
+        private static FrozenDictionary<
+            (Type request, Type response),
+            IInvocationPipeline
+        > CreateInvocationPipelineCache(IEnumerable<IInvocationPipeline> invocationPipelines)
         {
             var dict = new Dictionary<(Type request, Type response), IInvocationPipeline>();
             foreach (var invocationPipeline in invocationPipelines)
             {
-                dict[(invocationPipeline.RequestType, invocationPipeline.ResponseType)] = invocationPipeline;
+                dict[(invocationPipeline.RequestType, invocationPipeline.ResponseType)] =
+                    invocationPipeline;
             }
 
             return dict.ToFrozenDictionary();

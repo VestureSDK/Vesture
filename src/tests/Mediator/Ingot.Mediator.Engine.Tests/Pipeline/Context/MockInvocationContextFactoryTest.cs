@@ -4,7 +4,8 @@ using Ingot.Testing.Annotations;
 namespace Ingot.Mediator.Engine.Tests.Pipeline.Context
 {
     [MockTest]
-    public class MockInvocationContextFactoryTest : InvocationContextFactoryConformanceTestBase<MockInvocationContextFactory>
+    public class MockInvocationContextFactoryTest
+        : InvocationContextFactoryConformanceTestBase<MockInvocationContextFactory>
     {
         protected override MockInvocationContextFactory CreateFactory() => new();
     }

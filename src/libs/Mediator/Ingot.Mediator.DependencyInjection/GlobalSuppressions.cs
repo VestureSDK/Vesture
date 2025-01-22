@@ -5,5 +5,13 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("ApiDesign", "RS0026:Do not add multiple public overloads with optional parameters", Justification = "False positive")]
-[assembly: SuppressMessage("ApiDesign", "RS0027:API with optional parameter(s) should have the most parameters amongst its public overloads", Justification = "False positive")]
+[assembly: SuppressMessage(
+    "ApiDesign",
+    "RS0026:Do not add multiple public overloads with optional parameters",
+    Justification = "False positive"
+)]
+[assembly: SuppressMessage(
+    "ApiDesign",
+    "RS0027:API with optional parameter(s) should have the most parameters amongst its public overloads",
+    Justification = "False positive"
+)]

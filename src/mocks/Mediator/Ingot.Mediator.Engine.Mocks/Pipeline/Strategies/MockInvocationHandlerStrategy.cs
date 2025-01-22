@@ -5,7 +5,8 @@ using Moq;
 
 namespace Ingot.Mediator.Engine.Mocks.Pipeline.Strategies
 {
-    public class MockInvocationHandlerStrategy<TRequest, TResponse> : IInvocationHandlerStrategy<TRequest, TResponse>
+    public class MockInvocationHandlerStrategy<TRequest, TResponse>
+        : IInvocationHandlerStrategy<TRequest, TResponse>
     {
         public Mock<IInvocationHandlerStrategy<TRequest, TResponse>> Mock { get; } = new();
 
@@ -72,18 +73,33 @@ namespace Ingot.Mediator.Engine.Mocks.Pipeline.Strategies
             ManagedOtherHandler = new MockInvocationHandler<TRequest, TResponse>();
             _managedHandlers = [ManagedOtherHandler, ManagedHandler];
 
-            Mock
-                .Setup(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
-                .Returns<IInvocationContext<TRequest, TResponse>, Func<CancellationToken, Task>, CancellationToken>(async (ctx, next, ct) =>
-                {
-                    foreach (var handler in Handlers)
+            Mock.Setup(m =>
+                    m.HandleAsync(
+                        It.IsAny<IInvocationContext<TRequest, TResponse>>(),
+                        It.IsAny<Func<CancellationToken, Task>>(),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .Returns<
+                    IInvocationContext<TRequest, TResponse>,
+                    Func<CancellationToken, Task>,
+                    CancellationToken
+                >(
+                    async (ctx, next, ct) =>
                     {
-                        var response = await handler.HandleAsync(ctx.Request, ct);
-                        ctx.SetResponse(response);
+                        foreach (var handler in Handlers)
+                        {
+                            var response = await handler.HandleAsync(ctx.Request, ct);
+                            ctx.SetResponse(response);
+                        }
                     }
-                });
+                );
         }
 
-        public Task HandleAsync(IInvocationContext<TRequest, TResponse> context, Func<CancellationToken, Task> next, CancellationToken cancellationToken) => _inner.HandleAsync(context, next, cancellationToken);
+        public Task HandleAsync(
+            IInvocationContext<TRequest, TResponse> context,
+            Func<CancellationToken, Task> next,
+            CancellationToken cancellationToken
+        ) => _inner.HandleAsync(context, next, cancellationToken);
     }
 }

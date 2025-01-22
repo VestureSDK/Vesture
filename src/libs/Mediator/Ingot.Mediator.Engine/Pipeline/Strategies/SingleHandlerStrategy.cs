@@ -14,17 +14,20 @@ namespace Ingot.Mediator.Engine.Pipeline.Strategies
     /// invoking the <see cref="IInvocationHandler{TRequest, TResponse}"/> and awaiting its execution.
     /// </para>
     /// <para>
-    /// It is the default <see cref="IInvocationHandlerStrategy{TRequest, TResponse}"/> for 
+    /// It is the default <see cref="IInvocationHandlerStrategy{TRequest, TResponse}"/> for
     /// <see cref="IRequest{TResponse}"/> and <see cref="ICommand"/>.
     /// </para>
     /// </summary>
     /// <inheritdoc cref="IInvocationHandlerStrategy{TRequest, TResponse}"/>
     /// <seealso cref="IInvocationHandlerStrategy{TRequest, TResponse}"/>
-    public class SingleHandlerStrategy<TRequest, TResponse> : IInvocationHandlerStrategy<TRequest, TResponse>
+    public class SingleHandlerStrategy<TRequest, TResponse>
+        : IInvocationHandlerStrategy<TRequest, TResponse>
     {
         private readonly ILogger _logger;
 
-        private readonly IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>> _resolver;
+        private readonly IInvocationComponentResolver<
+            IInvocationHandler<TRequest, TResponse>
+        > _resolver;
 
         /// <summary>
         /// Initializes a new <see cref="SingleHandlerStrategy{TRequest, TResponse}"/> instance.
@@ -34,7 +37,8 @@ namespace Ingot.Mediator.Engine.Pipeline.Strategies
         /// <exception cref="ArgumentNullException"><paramref name="logger"/> is <see langword="null" /> or <paramref name="resolver"/> is <see langword="null" />.</exception>
         public SingleHandlerStrategy(
             ILogger<SingleHandlerStrategy<TRequest, TResponse>> logger,
-            IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>> resolver)
+            IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>> resolver
+        )
         {
             ArgumentNullException.ThrowIfNull(logger, nameof(logger));
             ArgumentNullException.ThrowIfNull(resolver, nameof(resolver));
@@ -44,16 +48,27 @@ namespace Ingot.Mediator.Engine.Pipeline.Strategies
         }
 
         /// <inheritdoc/>
-        public Task HandleAsync(IInvocationContext<TRequest, TResponse> context, Func<CancellationToken, Task> next, CancellationToken cancellationToken)
+        public Task HandleAsync(
+            IInvocationContext<TRequest, TResponse> context,
+            Func<CancellationToken, Task> next,
+            CancellationToken cancellationToken
+        )
         {
             return InvokeHandlerAsync(_logger, _resolver, context, cancellationToken);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static async Task InvokeHandlerAsync(ILogger logger, IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>> resolver, IInvocationContext<TRequest, TResponse> context, CancellationToken cancellationToken)
+        internal static async Task InvokeHandlerAsync(
+            ILogger logger,
+            IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>> resolver,
+            IInvocationContext<TRequest, TResponse> context,
+            CancellationToken cancellationToken
+        )
         {
-            using var activity = MediatorEngineDiagnostics.s_invocationHandlerActivitySource
-                .StartActivity("Handler Invocation");
+            using var activity =
+                MediatorEngineDiagnostics.s_invocationHandlerActivitySource.StartActivity(
+                    "Handler Invocation"
+                );
 
             // Set the activity status as error since it will be switched
             // back to "OK" if no errors are thrown.

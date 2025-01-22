@@ -21,7 +21,9 @@ namespace Ingot.Mediator.Invocation
         public static TResponse GetResponseOrDefault<TResponse>(this IInvocationContext context)
         {
 #pragma warning disable CS8603 // Possible null reference return.
-            return context.HasResponse && context.Response is TResponse tResponse ? tResponse! : default;
+            return context.HasResponse && context.Response is TResponse tResponse
+                ? tResponse!
+                : default;
 #pragma warning restore CS8603 // Possible null reference return.
         }
 

@@ -9,7 +9,12 @@ namespace Ingot.Mediator.Abstractions.Tests.Requests
 {
     [SampleTest]
     [TestFixtureSource_RequestResponse_RequestAttribute]
-    public class RequestHandlerTest<TRequest, TResponse> : InvocationHandlerConformanceTestBase<TRequest, TResponse, RequestHandlerTest<TRequest, TResponse>.SampleRequestHandler>
+    public class RequestHandlerTest<TRequest, TResponse>
+        : InvocationHandlerConformanceTestBase<
+            TRequest,
+            TResponse,
+            RequestHandlerTest<TRequest, TResponse>.SampleRequestHandler
+        >
         where TRequest : IRequest<TResponse>
     {
         protected Mock<IRequestHandlerLifeCycle> LifeCycle { get; } = new();
@@ -22,20 +27,30 @@ namespace Ingot.Mediator.Abstractions.Tests.Requests
             Response = response;
         }
 
-        protected override SampleRequestHandler CreateInvocationHandler() => new(LifeCycle.Object, Response);
+        protected override SampleRequestHandler CreateInvocationHandler() =>
+            new(LifeCycle.Object, Response);
 
         [Test]
         public async Task HandleAsync_InnerInvokes()
         {
             // Arrange
             var entersHandleAsyncTaskCompletionSource = new TaskCompletionSource();
-            LifeCycle.Setup(m => m.InnerEntersHandleAsync(It.IsAny<TRequest>(), It.IsAny<CancellationToken>()))
+            LifeCycle
+                .Setup(m =>
+                    m.InnerEntersHandleAsync(It.IsAny<TRequest>(), It.IsAny<CancellationToken>())
+                )
                 .Returns(entersHandleAsyncTaskCompletionSource.Task);
 
             // Act / Assert
-            var task = ((IInvocationHandler<TRequest, TResponse>)Handler).HandleAsync(Request, CancellationToken);
+            var task = ((IInvocationHandler<TRequest, TResponse>)Handler).HandleAsync(
+                Request,
+                CancellationToken
+            );
 
-            LifeCycle.Verify(m => m.InnerEntersHandleAsync(It.IsAny<TRequest>(), It.IsAny<CancellationToken>()), Times.Once);
+            LifeCycle.Verify(
+                m => m.InnerEntersHandleAsync(It.IsAny<TRequest>(), It.IsAny<CancellationToken>()),
+                Times.Once
+            );
 
             // Cleanup
             entersHandleAsyncTaskCompletionSource.SetResult();
@@ -49,7 +64,10 @@ namespace Ingot.Mediator.Abstractions.Tests.Requests
             // No arrange required
 
             // Act
-            var response = await ((IInvocationHandler<TRequest, TResponse>)Handler).HandleAsync(Request, CancellationToken);
+            var response = await ((IInvocationHandler<TRequest, TResponse>)Handler).HandleAsync(
+                Request,
+                CancellationToken
+            );
 
             // Assert
             Assert.That(response, Is.EqualTo(Response));
@@ -72,7 +90,10 @@ namespace Ingot.Mediator.Abstractions.Tests.Requests
                 _response = response;
             }
 
-            public override async Task<TResponse> HandleAsync(TRequest request, CancellationToken cancellationToken = default)
+            public override async Task<TResponse> HandleAsync(
+                TRequest request,
+                CancellationToken cancellationToken = default
+            )
             {
                 await _lifeCycle.InnerEntersHandleAsync(request, cancellationToken);
                 return _response;

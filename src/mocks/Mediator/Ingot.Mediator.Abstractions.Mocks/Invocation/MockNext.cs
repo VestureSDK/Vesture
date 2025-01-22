@@ -33,9 +33,7 @@ namespace Ingot.Mediator.Mocks.Invocation
         /// </summary>
         public MockNext()
         {
-            Mock
-                .Setup(m => m(It.IsAny<CancellationToken>()))
-                .Returns(() => ReturnTask);
+            Mock.Setup(m => m(It.IsAny<CancellationToken>())).Returns(() => ReturnTask);
         }
 
         /// <summary>

@@ -45,9 +45,14 @@ namespace Ingot.Mediator.DependencyInjection.Fluent
         /// <typeparam name="TRequest">The <see cref="IRequest{TResponse}"/> type handled by this pipeline.</typeparam>
         /// <typeparam name="TResponse"><inheritdoc cref="IInvocationHandler{TRequest, TResponse}" path="/typeparam[@name='TResponse']"/></typeparam>
         /// <returns>The next fluent registrar instance to pursue registration.</returns>
-        public SingleHandlerFluentMediatorComponentRegistrar<TRequest, TResponse> Request<TRequest, TResponse>()
+        public SingleHandlerFluentMediatorComponentRegistrar<TRequest, TResponse> Request<
+            TRequest,
+            TResponse
+        >()
         {
-            return new SingleHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>(Registrar);
+            return new SingleHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>(
+                Registrar
+            );
         }
 
         /// <summary>
@@ -56,7 +61,10 @@ namespace Ingot.Mediator.DependencyInjection.Fluent
         /// </summary>
         /// <typeparam name="TCommand">The <see cref="ICommand"/> type handled by this pipeline.</typeparam>
         /// <returns>The next fluent registrar instance to pursue registration.</returns>
-        public SingleHandlerFluentMediatorComponentRegistrar<TCommand, CommandResponse> Command<TCommand>()
+        public SingleHandlerFluentMediatorComponentRegistrar<
+            TCommand,
+            CommandResponse
+        > Command<TCommand>()
         {
             return Request<TCommand, CommandResponse>();
         }
@@ -69,7 +77,9 @@ namespace Ingot.Mediator.DependencyInjection.Fluent
         /// <returns>The next fluent registrar instance to pursue registration.</returns>
         public MultiHandlerFluentMediatorComponentRegistrar<TEvent, EventResponse> Event<TEvent>()
         {
-            return new MultiHandlerFluentMediatorComponentRegistrar<TEvent, EventResponse>(Registrar);
+            return new MultiHandlerFluentMediatorComponentRegistrar<TEvent, EventResponse>(
+                Registrar
+            );
         }
 
         /// <summary>
@@ -79,7 +89,10 @@ namespace Ingot.Mediator.DependencyInjection.Fluent
         /// <typeparam name="TRequest">The contract type handled by this pipeline.</typeparam>
         /// <typeparam name="TResponse"><inheritdoc cref="IInvocationHandler{TRequest, TResponse}" path="/typeparam[@name='TResponse']"/></typeparam>
         /// <returns>The next fluent registrar instance to pursue registration.</returns>
-        public NoHandlerFluentMediatorComponentRegistrar<TRequest, TResponse> Invocation<TRequest, TResponse>()
+        public NoHandlerFluentMediatorComponentRegistrar<TRequest, TResponse> Invocation<
+            TRequest,
+            TResponse
+        >()
         {
             return new NoHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>(Registrar);
         }

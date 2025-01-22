@@ -23,7 +23,10 @@ namespace Ingot.Mediator.Engine.Tests.Pipeline.Context
         [Test]
         [ConformanceTest]
         [TestCaseSource_RequestResponse_All]
-        public virtual void CreateContextForRequest_ReturnedContext_IsNotNull<TRequest, TResponse>(TRequest request, TResponse response)
+        public virtual void CreateContextForRequest_ReturnedContext_IsNotNull<TRequest, TResponse>(
+            TRequest request,
+            TResponse response
+        )
         {
             // Arrange
             // No arrange required

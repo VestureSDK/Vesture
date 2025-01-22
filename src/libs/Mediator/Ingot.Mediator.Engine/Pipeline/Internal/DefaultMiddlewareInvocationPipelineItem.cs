@@ -11,11 +11,17 @@ namespace Ingot.Mediator.Engine.Pipeline.Internal
     /// </summary>
     /// <inheritdoc cref="IInvocationMiddleware{TRequest, TResponse}"/>
     /// <seealso cref="IMiddlewareInvocationPipelineItem{TRequest, TResponse}"/>
-    public class DefaultMiddlewareInvocationPipelineItem<TRequest, TResponse> : IMiddlewareInvocationPipelineItem<TRequest, TResponse>
+    public class DefaultMiddlewareInvocationPipelineItem<TRequest, TResponse>
+        : IMiddlewareInvocationPipelineItem<TRequest, TResponse>
     {
-        private static readonly Type s_matchingInvocationContextType = typeof(IInvocationContext<TRequest, TResponse>);
+        private static readonly Type s_matchingInvocationContextType = typeof(IInvocationContext<
+            TRequest,
+            TResponse
+        >);
 
-        private readonly IInvocationComponentResolver<IInvocationMiddleware<TRequest, TResponse>> _resolver;
+        private readonly IInvocationComponentResolver<
+            IInvocationMiddleware<TRequest, TResponse>
+        > _resolver;
 
         /// <inheritdoc/>
         public Type MiddlewareType { get; private set; }
@@ -30,7 +36,11 @@ namespace Ingot.Mediator.Engine.Pipeline.Internal
         /// <param name="middlewareType"><inheritdoc cref="IMiddlewareInvocationPipelineItem.MiddlewareType" path="/summary"/></param>
         /// <param name="resolver">The <see cref="IInvocationComponentResolver{TComponent}"/> of <see cref="IInvocationMiddleware{TRequest, TResponse}"/> instance.</param>
         /// <exception cref="ArgumentNullException"><paramref name="resolver"/> is <see langword="null" />.</exception>
-        public DefaultMiddlewareInvocationPipelineItem(int order, Type middlewareType, IInvocationComponentResolver<IInvocationMiddleware<TRequest, TResponse>> resolver)
+        public DefaultMiddlewareInvocationPipelineItem(
+            int order,
+            Type middlewareType,
+            IInvocationComponentResolver<IInvocationMiddleware<TRequest, TResponse>> resolver
+        )
         {
             ArgumentNullException.ThrowIfNull(resolver, nameof(resolver));
             ArgumentNullException.ThrowIfNull(middlewareType, nameof(middlewareType));
@@ -47,13 +57,14 @@ namespace Ingot.Mediator.Engine.Pipeline.Internal
         }
 
         /// <inheritdoc/>
-        public Task HandleAsync(IInvocationContext<TRequest, TResponse> context, Func<CancellationToken, Task> next, CancellationToken cancellationToken)
+        public Task HandleAsync(
+            IInvocationContext<TRequest, TResponse> context,
+            Func<CancellationToken, Task> next,
+            CancellationToken cancellationToken
+        )
         {
             var middleware = _resolver.ResolveComponent();
-            return middleware.HandleAsync(
-                context,
-                next,
-                cancellationToken);
+            return middleware.HandleAsync(context, next, cancellationToken);
         }
     }
 }

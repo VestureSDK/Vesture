@@ -12,8 +12,5 @@ namespace Ingot.Mediator.Engine.Pipeline
     /// </summary>
     /// <seealso cref="DefaultPrePipelineAndHandlerMiddleware"/>
     /// <seealso cref="IInvocationMiddleware{TRequest, TResponse}"/>
-    public interface IPreHandlerMiddleware : IInvocationMiddleware<object, object>
-    {
-
-    }
+    public interface IPreHandlerMiddleware : IInvocationMiddleware<object, object> { }
 }

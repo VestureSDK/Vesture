@@ -38,13 +38,23 @@ namespace Ingot.Mediator.Engine.Pipeline.Internal.NoOp
             IInvocationComponentResolver<IPrePipelineMiddleware> preInvocationPipelineMiddlewareResolver,
             IEnumerable<IMiddlewareInvocationPipelineItem> middlewares,
             IInvocationComponentResolver<IPreHandlerMiddleware> preHandlerMiddlewareResolver,
-            INoOpInvocationHandlerStrategyResolver handlerStrategyResolver)
+            INoOpInvocationHandlerStrategyResolver handlerStrategyResolver
+        )
         {
             ArgumentNullException.ThrowIfNull(contextFactory, nameof(contextFactory));
-            ArgumentNullException.ThrowIfNull(preInvocationPipelineMiddlewareResolver, nameof(preInvocationPipelineMiddlewareResolver));
+            ArgumentNullException.ThrowIfNull(
+                preInvocationPipelineMiddlewareResolver,
+                nameof(preInvocationPipelineMiddlewareResolver)
+            );
             ArgumentNullException.ThrowIfNull(middlewares, nameof(middlewares));
-            ArgumentNullException.ThrowIfNull(preHandlerMiddlewareResolver, nameof(preHandlerMiddlewareResolver));
-            ArgumentNullException.ThrowIfNull(handlerStrategyResolver, nameof(handlerStrategyResolver));
+            ArgumentNullException.ThrowIfNull(
+                preHandlerMiddlewareResolver,
+                nameof(preHandlerMiddlewareResolver)
+            );
+            ArgumentNullException.ThrowIfNull(
+                handlerStrategyResolver,
+                nameof(handlerStrategyResolver)
+            );
             _loggerFactory = loggerFactory;
             _contextFactory = contextFactory;
             _preInvocationPipelineMiddlewareResolver = preInvocationPipelineMiddlewareResolver;
@@ -56,15 +66,19 @@ namespace Ingot.Mediator.Engine.Pipeline.Internal.NoOp
         /// <inheritdoc />
         public IInvocationPipeline<TResponse> ResolveNoOpInvocationPipeline<TResponse>()
         {
-            var logger = _loggerFactory.CreateLogger<DefaultInvocationPipeline<object, TResponse>>();
-            var handlerStrategy = _handlerStrategyResolver.ResolveNoOpInvocationHandlerStrategy<TResponse>();
+            var logger = _loggerFactory.CreateLogger<
+                DefaultInvocationPipeline<object, TResponse>
+            >();
+            var handlerStrategy =
+                _handlerStrategyResolver.ResolveNoOpInvocationHandlerStrategy<TResponse>();
             return new DefaultInvocationPipeline<object, TResponse>(
                 logger,
                 _contextFactory,
                 _preInvocationPipelineMiddlewareResolver,
                 _middlewares,
                 _preHandlerMiddlewareResolver,
-                handlerStrategy);
+                handlerStrategy
+            );
         }
     }
 }

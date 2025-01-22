@@ -22,26 +22,30 @@ namespace Ingot.Mediator.Engine.Tests.Pipeline.Internal.NoOp
                 var pipeline = new MockInvocationPipeline<object, TResponse>();
                 var handler = new MockInvocationHandler<object, TResponse>();
 
-                handler.Mock
-                    .Setup(m => m.HandleAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()))
-                    .Returns<object, CancellationToken>((request, _) =>
-                    {
-                        if (typeof(TResponse) != EventResponse.Type)
+                handler
+                    .Mock.Setup(m =>
+                        m.HandleAsync(It.IsAny<object>(), It.IsAny<CancellationToken>())
+                    )
+                    .Returns<object, CancellationToken>(
+                        (request, _) =>
                         {
-                            throw new KeyNotFoundException($"No relevant invocation pipeline found for contract '??? -> {typeof(TResponse).Name}'.");
-                        }
+                            if (typeof(TResponse) != EventResponse.Type)
+                            {
+                                throw new KeyNotFoundException(
+                                    $"No relevant invocation pipeline found for contract '??? -> {typeof(TResponse).Name}'."
+                                );
+                            }
 
-                        return Task.FromResult<TResponse>(default!);
-                    });
+                            return Task.FromResult<TResponse>(default!);
+                        }
+                    );
 
                 pipeline.Handlers.Add(handler);
 
-                Mock.Setup(m => m.ResolveNoOpInvocationPipeline<TResponse>())
-                    .Returns(pipeline);
+                Mock.Setup(m => m.ResolveNoOpInvocationPipeline<TResponse>()).Returns(pipeline);
             }
 
             return _inner.ResolveNoOpInvocationPipeline<TResponse>();
         }
-
     }
 }

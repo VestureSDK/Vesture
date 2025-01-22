@@ -21,11 +21,15 @@ namespace Ingot.Mediator.Engine.Tests
     {
         protected ICollection<IMiddlewareInvocationPipelineItem> MiddlewareItems { get; } = [];
 
-        protected Dictionary<(Type RequestType, Type ResponseType), MockInvocationPipeline> Pipelines { get; } = [];
+        protected Dictionary<
+            (Type RequestType, Type ResponseType),
+            MockInvocationPipeline
+        > Pipelines { get; } = [];
 
         protected NUnitTestContextMsLogger<DefaultMediator> Logger { get; } = new();
 
-        protected MockNoOpInvocationPipelineResolver NoOpInvocationPipelineResolver { get; } = new();
+        protected MockNoOpInvocationPipelineResolver NoOpInvocationPipelineResolver { get; } =
+            new();
 
         protected override DefaultMediator CreateMediator()
         {
@@ -34,16 +38,21 @@ namespace Ingot.Mediator.Engine.Tests
                 pipeline.Middlewares = MiddlewareItems;
             }
 
-            return new(
-                Logger,
-                Pipelines.Values,
-                NoOpInvocationPipelineResolver);
+            return new(Logger, Pipelines.Values, NoOpInvocationPipelineResolver);
         }
 
-        protected MockInvocationPipeline<TRequest, TResponse> GetOrCreatePipeline<TRequest, TResponse>()
+        protected MockInvocationPipeline<TRequest, TResponse> GetOrCreatePipeline<
+            TRequest,
+            TResponse
+        >()
         {
             var pipelineKey = (typeof(TRequest), typeof(TResponse));
-            if (!(Pipelines.TryGetValue(pipelineKey, out var p) && p is MockInvocationPipeline<TRequest, TResponse> pipeline))
+            if (
+                !(
+                    Pipelines.TryGetValue(pipelineKey, out var p)
+                    && p is MockInvocationPipeline<TRequest, TResponse> pipeline
+                )
+            )
             {
                 pipeline = new MockInvocationPipeline<TRequest, TResponse>();
                 Pipelines[pipelineKey] = pipeline;
@@ -52,28 +61,35 @@ namespace Ingot.Mediator.Engine.Tests
             return pipeline;
         }
 
-        protected override void RegisterHandler<TRequest, TResponse>(IInvocationHandler<TRequest, TResponse> handler)
+        protected override void RegisterHandler<TRequest, TResponse>(
+            IInvocationHandler<TRequest, TResponse> handler
+        )
         {
             var pipeline = GetOrCreatePipeline<TRequest, TResponse>();
             pipeline.Handlers.Add(handler);
         }
 
-        protected override void RegisterMiddleware<TRequest, TResponse>(IInvocationMiddleware<TRequest, TResponse> middleware)
+        protected override void RegisterMiddleware<TRequest, TResponse>(
+            IInvocationMiddleware<TRequest, TResponse> middleware
+        )
         {
             var item = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>()
             {
-                Middleware = middleware
+                Middleware = middleware,
             };
 
             MiddlewareItems.Add(item);
         }
 
-        protected override void RegisterMiddleware<TRequest, TResponse>(int order, IInvocationMiddleware<TRequest, TResponse> middleware)
+        protected override void RegisterMiddleware<TRequest, TResponse>(
+            int order,
+            IInvocationMiddleware<TRequest, TResponse> middleware
+        )
         {
             var item = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>()
             {
                 Order = order,
-                Middleware = middleware
+                Middleware = middleware,
             };
 
             MiddlewareItems.Add(item);
@@ -87,7 +103,9 @@ namespace Ingot.Mediator.Engine.Tests
 
             // Act / Assert
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-            Assert.Throws<ArgumentNullException>(() => new DefaultMediator(null, [], NoOpInvocationPipelineResolver));
+            Assert.Throws<ArgumentNullException>(
+                () => new DefaultMediator(null, [], NoOpInvocationPipelineResolver)
+            );
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 
@@ -99,7 +117,9 @@ namespace Ingot.Mediator.Engine.Tests
 
             // Act / Assert
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-            Assert.Throws<ArgumentNullException>(() => new DefaultMediator(Logger, null, NoOpInvocationPipelineResolver));
+            Assert.Throws<ArgumentNullException>(
+                () => new DefaultMediator(Logger, null, NoOpInvocationPipelineResolver)
+            );
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 
@@ -120,7 +140,10 @@ namespace Ingot.Mediator.Engine.Tests
 
         [Test]
         [TestCaseSource_RequestResponse_All]
-        public void HandleAndCaptureAsync_Throws_IfContractIsNull<TRequest, TResponse>(TRequest request, TResponse response)
+        public void HandleAndCaptureAsync_Throws_IfContractIsNull<TRequest, TResponse>(
+            TRequest request,
+            TResponse response
+        )
             where TRequest : class
         {
             // Arrange
@@ -130,12 +153,17 @@ namespace Ingot.Mediator.Engine.Tests
             request = null;
 
             // Act / Assert
-            Assert.ThrowsAsync<ArgumentNullException>(() => Mediator.HandleAndCaptureAsync<TResponse>(request, CancellationToken));
+            Assert.ThrowsAsync<ArgumentNullException>(
+                () => Mediator.HandleAndCaptureAsync<TResponse>(request, CancellationToken)
+            );
         }
 
         [Test]
         [TestCaseSource_RequestResponse_All]
-        public void HandleAsync_Throws_IfContractIsNull<TRequest, TResponse>(TRequest request, TResponse response)
+        public void HandleAsync_Throws_IfContractIsNull<TRequest, TResponse>(
+            TRequest request,
+            TResponse response
+        )
             where TRequest : class
         {
             // Arrange
@@ -145,12 +173,17 @@ namespace Ingot.Mediator.Engine.Tests
             request = null;
 
             // Act / Assert
-            Assert.ThrowsAsync<ArgumentNullException>(() => Mediator.HandleAsync<TResponse>(request, CancellationToken));
+            Assert.ThrowsAsync<ArgumentNullException>(
+                () => Mediator.HandleAsync<TResponse>(request, CancellationToken)
+            );
         }
 
         [Test]
         [TestCaseSource_RequestResponse_Request]
-        public void ExecuteAndCaptureAsync_Throws_IfContractIsNull<TRequest, TResponse>(TRequest request, TResponse response)
+        public void ExecuteAndCaptureAsync_Throws_IfContractIsNull<TRequest, TResponse>(
+            TRequest request,
+            TResponse response
+        )
             where TRequest : class, IRequest<TResponse>
         {
             // Arrange
@@ -160,12 +193,17 @@ namespace Ingot.Mediator.Engine.Tests
             request = null;
 
             // Act / Assert
-            Assert.ThrowsAsync<ArgumentNullException>(() => Mediator.ExecuteAndCaptureAsync(request, CancellationToken));
+            Assert.ThrowsAsync<ArgumentNullException>(
+                () => Mediator.ExecuteAndCaptureAsync(request, CancellationToken)
+            );
         }
 
         [Test]
         [TestCaseSource_RequestResponse_Request]
-        public void ExecuteAsync_Throws_IfContractIsNull<TRequest, TResponse>(TRequest request, TResponse response)
+        public void ExecuteAsync_Throws_IfContractIsNull<TRequest, TResponse>(
+            TRequest request,
+            TResponse response
+        )
             where TRequest : class, IRequest<TResponse>
         {
             // Arrange
@@ -175,25 +213,36 @@ namespace Ingot.Mediator.Engine.Tests
             request = null;
 
             // Act / Assert
-            Assert.ThrowsAsync<ArgumentNullException>(() => Mediator.ExecuteAsync(request, CancellationToken));
+            Assert.ThrowsAsync<ArgumentNullException>(
+                () => Mediator.ExecuteAsync(request, CancellationToken)
+            );
         }
 
         [Test]
         [TestCaseSource_RequestResponse_Request]
-        public void ExecuteAsync_Throws_IfNoPipelineRegistered<TRequest, TResponse>(TRequest request, TResponse response)
+        public void ExecuteAsync_Throws_IfNoPipelineRegistered<TRequest, TResponse>(
+            TRequest request,
+            TResponse response
+        )
             where TRequest : class, IRequest<TResponse>
         {
             // Arrange
-            var handler = new MockInvocationHandler<MediatorTestData.Unrelated, MediatorTestData.Unrelated>();
+            var handler =
+                new MockInvocationHandler<MediatorTestData.Unrelated, MediatorTestData.Unrelated>();
             AddHandler(handler);
 
             // Act / Assert
-            Assert.ThrowsAsync<KeyNotFoundException>(() => Mediator.ExecuteAsync(request, CancellationToken));
+            Assert.ThrowsAsync<KeyNotFoundException>(
+                () => Mediator.ExecuteAsync(request, CancellationToken)
+            );
         }
 
         [Test]
         [TestCaseSource_RequestResponse_Command]
-        public void InvokeAndCaptureAsync_Throws_IfContractIsNull<TRequest, TResponse>(TRequest request, TResponse response)
+        public void InvokeAndCaptureAsync_Throws_IfContractIsNull<TRequest, TResponse>(
+            TRequest request,
+            TResponse response
+        )
             where TRequest : class, ICommand
         {
             // Arrange
@@ -203,12 +252,17 @@ namespace Ingot.Mediator.Engine.Tests
             request = null;
 
             // Act / Assert
-            Assert.ThrowsAsync<ArgumentNullException>(() => Mediator.InvokeAndCaptureAsync(request, CancellationToken));
+            Assert.ThrowsAsync<ArgumentNullException>(
+                () => Mediator.InvokeAndCaptureAsync(request, CancellationToken)
+            );
         }
 
         [Test]
         [TestCaseSource_RequestResponse_Command]
-        public void InvokeAsync_Throws_IfContractIsNull<TRequest, TResponse>(TRequest request, TResponse response)
+        public void InvokeAsync_Throws_IfContractIsNull<TRequest, TResponse>(
+            TRequest request,
+            TResponse response
+        )
             where TRequest : class, ICommand
         {
             // Arrange
@@ -218,25 +272,36 @@ namespace Ingot.Mediator.Engine.Tests
             request = null;
 
             // Act / Assert
-            Assert.ThrowsAsync<ArgumentNullException>(() => Mediator.InvokeAsync(request, CancellationToken));
+            Assert.ThrowsAsync<ArgumentNullException>(
+                () => Mediator.InvokeAsync(request, CancellationToken)
+            );
         }
 
         [Test]
         [TestCaseSource_RequestResponse_Command]
-        public void InvokeAsync_Throws_IfNoPipelineRegistered<TRequest, TResponse>(TRequest request, TResponse response)
+        public void InvokeAsync_Throws_IfNoPipelineRegistered<TRequest, TResponse>(
+            TRequest request,
+            TResponse response
+        )
             where TRequest : class, ICommand
         {
             // Arrange
-            var handler = new MockInvocationHandler<MediatorTestData.Unrelated, MediatorTestData.Unrelated>();
+            var handler =
+                new MockInvocationHandler<MediatorTestData.Unrelated, MediatorTestData.Unrelated>();
             AddHandler(handler);
 
             // Act / Assert
-            Assert.ThrowsAsync<KeyNotFoundException>(() => Mediator.InvokeAsync(request, CancellationToken));
+            Assert.ThrowsAsync<KeyNotFoundException>(
+                () => Mediator.InvokeAsync(request, CancellationToken)
+            );
         }
 
         [Test]
         [TestCaseSource_RequestResponse_Event]
-        public void PublishAndCaptureAsync_Throws_IfContractIsNull<TRequest, TResponse>(TRequest request, TResponse response)
+        public void PublishAndCaptureAsync_Throws_IfContractIsNull<TRequest, TResponse>(
+            TRequest request,
+            TResponse response
+        )
             where TRequest : class, IEvent
         {
             // Arrange
@@ -246,12 +311,17 @@ namespace Ingot.Mediator.Engine.Tests
             request = null;
 
             // Act / Assert
-            Assert.ThrowsAsync<ArgumentNullException>(() => Mediator.PublishAndCaptureAsync(request, CancellationToken));
+            Assert.ThrowsAsync<ArgumentNullException>(
+                () => Mediator.PublishAndCaptureAsync(request, CancellationToken)
+            );
         }
 
         [Test]
         [TestCaseSource_RequestResponse_Event]
-        public void PublishAsync_Throws_IfContractIsNull<TRequest, TResponse>(TRequest request, TResponse response)
+        public void PublishAsync_Throws_IfContractIsNull<TRequest, TResponse>(
+            TRequest request,
+            TResponse response
+        )
             where TRequest : class, IEvent
         {
             // Arrange
@@ -261,7 +331,9 @@ namespace Ingot.Mediator.Engine.Tests
             request = null;
 
             // Act / Assert
-            Assert.ThrowsAsync<ArgumentNullException>(() => Mediator.PublishAsync(request, CancellationToken));
+            Assert.ThrowsAsync<ArgumentNullException>(
+                () => Mediator.PublishAsync(request, CancellationToken)
+            );
         }
 #pragma warning restore CS8604 // Possible null reference argument.
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.

@@ -17,10 +17,14 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/> instance.</param>
         /// <returns>The <see cref="RootFluentMediatorComponentRegistrar"/> for further configuration.</returns>
-        public static RootFluentMediatorComponentRegistrar AddMediator(this IServiceCollection services)
+        public static RootFluentMediatorComponentRegistrar AddMediator(
+            this IServiceCollection services
+        )
         {
             // Returns the builder for chaining
-            return new RootFluentMediatorComponentRegistrar(new MSDIMediatorComponentRegistrar(services));
+            return new RootFluentMediatorComponentRegistrar(
+                new MSDIMediatorComponentRegistrar(services)
+            );
         }
     }
 }

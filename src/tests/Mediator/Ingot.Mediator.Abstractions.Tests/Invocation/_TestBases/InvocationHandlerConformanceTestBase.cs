@@ -23,6 +23,5 @@ namespace Ingot.Mediator.Abstractions.Tests.Invocation
         }
 
         protected abstract THandler CreateInvocationHandler();
-
     }
 }

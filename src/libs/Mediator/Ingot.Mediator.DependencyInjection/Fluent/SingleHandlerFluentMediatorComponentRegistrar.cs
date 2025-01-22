@@ -16,7 +16,8 @@ namespace Ingot.Mediator.DependencyInjection.Fluent
     /// <seealso cref="RootFluentMediatorComponentRegistrar"/>
     /// <seealso cref="NoHandlerFluentMediatorComponentRegistrar{TRequest, TResponse}"/>
     /// <seealso cref="MultiHandlerFluentMediatorComponentRegistrar{TRequest, TResponse}"/>
-    public class SingleHandlerFluentMediatorComponentRegistrar<TRequest, TResponse> : RootFluentMediatorComponentRegistrar
+    public class SingleHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>
+        : RootFluentMediatorComponentRegistrar
     {
         /// <summary>
         /// Initializes a new <see cref="SingleHandlerFluentMediatorComponentRegistrar{TRequest, TResponse}"/> instance.
@@ -24,12 +25,13 @@ namespace Ingot.Mediator.DependencyInjection.Fluent
         /// <param name="registrar">The <see cref="IMediatorComponentRegistrar"/> instance.</param>
         /// <exception cref="ArgumentNullException"><paramref name="registrar"/> is <see langword="null" />.</exception>
         public SingleHandlerFluentMediatorComponentRegistrar(IMediatorComponentRegistrar registrar)
-            : base(registrar)
-        {
-        }
+            : base(registrar) { }
 
         /// <inheritdoc cref="NoHandlerFluentMediatorComponentRegistrar{TRequest, TResponse}.AddMiddleware{TMiddleware}(int?, bool)"/>
-        public SingleHandlerFluentMediatorComponentRegistrar<TRequest, TResponse> AddMiddleware<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TMiddleware>(int? order = null, bool singleton = false)
+        public SingleHandlerFluentMediatorComponentRegistrar<TRequest, TResponse> AddMiddleware<
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+                TMiddleware
+        >(int? order = null, bool singleton = false)
             where TMiddleware : class, IInvocationMiddleware<TRequest, TResponse>
         {
             Registrar.RegisterMiddleware<TRequest, TResponse, TMiddleware>(order, singleton);
@@ -37,14 +39,19 @@ namespace Ingot.Mediator.DependencyInjection.Fluent
         }
 
         /// <inheritdoc cref="NoHandlerFluentMediatorComponentRegistrar{TRequest, TResponse}.AddMiddleware{TMiddleware}(TMiddleware, int?)"/>
-        public SingleHandlerFluentMediatorComponentRegistrar<TRequest, TResponse> AddMiddleware(IInvocationMiddleware<TRequest, TResponse> middleware, int? order = null)
+        public SingleHandlerFluentMediatorComponentRegistrar<TRequest, TResponse> AddMiddleware(
+            IInvocationMiddleware<TRequest, TResponse> middleware,
+            int? order = null
+        )
         {
             Registrar.RegisterMiddleware(middleware, order);
             return this;
         }
 
         /// <inheritdoc cref="MultiHandlerFluentMediatorComponentRegistrar{TRequest, TResponse}.HandleWith{THandler}(bool)"/>
-        public RootFluentMediatorComponentRegistrar HandleWith<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] THandler>(bool singleton = false)
+        public RootFluentMediatorComponentRegistrar HandleWith<
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] THandler
+        >(bool singleton = false)
             where THandler : class, IInvocationHandler<TRequest, TResponse>
         {
             Registrar.RegisterHandler<TRequest, TResponse, THandler>(singleton);
@@ -52,7 +59,9 @@ namespace Ingot.Mediator.DependencyInjection.Fluent
         }
 
         /// <inheritdoc cref="MultiHandlerFluentMediatorComponentRegistrar{TRequest, TResponse}.HandleWith(IInvocationHandler{TRequest,TResponse})"/>
-        public RootFluentMediatorComponentRegistrar HandleWith(IInvocationHandler<TRequest, TResponse> handler)
+        public RootFluentMediatorComponentRegistrar HandleWith(
+            IInvocationHandler<TRequest, TResponse> handler
+        )
         {
             Registrar.RegisterHandler(handler);
             return this;

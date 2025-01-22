@@ -17,7 +17,8 @@ namespace Ingot.Mediator.DependencyInjection.Fluent
     /// <seealso cref="RootFluentMediatorComponentRegistrar"/>
     /// <seealso cref="NoHandlerFluentMediatorComponentRegistrar{TRequest, TResponse}"/>
     /// <seealso cref="SingleHandlerFluentMediatorComponentRegistrar{TRequest, TResponse}"/>
-    public class MultiHandlerFluentMediatorComponentRegistrar<TRequest, TResponse> : RootFluentMediatorComponentRegistrar
+    public class MultiHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>
+        : RootFluentMediatorComponentRegistrar
     {
         /// <summary>
         /// Initializes a new <see cref="MultiHandlerFluentMediatorComponentRegistrar{TRequest, TResponse}"/> instance.
@@ -28,7 +29,10 @@ namespace Ingot.Mediator.DependencyInjection.Fluent
             : base(registrar) { }
 
         /// <inheritdoc cref="NoHandlerFluentMediatorComponentRegistrar{TRequest, TResponse}.AddMiddleware{TMiddleware}(int?, bool)"/>
-        public MultiHandlerFluentMediatorComponentRegistrar<TRequest, TResponse> AddMiddleware<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TMiddleware>(int? order = null, bool singleton = false)
+        public MultiHandlerFluentMediatorComponentRegistrar<TRequest, TResponse> AddMiddleware<
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+                TMiddleware
+        >(int? order = null, bool singleton = false)
             where TMiddleware : class, IInvocationMiddleware<TRequest, TResponse>
         {
             Registrar.RegisterMiddleware<TRequest, TResponse, TMiddleware>(order, singleton);
@@ -36,7 +40,10 @@ namespace Ingot.Mediator.DependencyInjection.Fluent
         }
 
         /// <inheritdoc cref="NoHandlerFluentMediatorComponentRegistrar{TRequest, TResponse}.AddMiddleware{TMiddleware}(TMiddleware, int?)"/>
-        public MultiHandlerFluentMediatorComponentRegistrar<TRequest, TResponse> AddMiddleware<TMiddleware>(TMiddleware middleware, int? order = null)
+        public MultiHandlerFluentMediatorComponentRegistrar<
+            TRequest,
+            TResponse
+        > AddMiddleware<TMiddleware>(TMiddleware middleware, int? order = null)
             where TMiddleware : class, IInvocationMiddleware<TRequest, TResponse>
         {
             Registrar.RegisterMiddleware(middleware, order);
@@ -49,7 +56,9 @@ namespace Ingot.Mediator.DependencyInjection.Fluent
         /// <typeparam name="THandler">The <see cref="IInvocationHandler{TRequest, TResponse}"/> type to register.</typeparam>
         /// <param name="singleton"><inheritdoc cref="IMediatorComponentRegistrar.RegisterHandler{TRequest, TResponse, THandler}(bool)" path="/param[@name='singleton']"/></param>
         /// <returns>The next fluent registrar instance to pursue registration.</returns>
-        public MultiHandlerFluentMediatorComponentRegistrar<TRequest, TResponse> HandleWith<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] THandler>(bool singleton = false)
+        public MultiHandlerFluentMediatorComponentRegistrar<TRequest, TResponse> HandleWith<
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] THandler
+        >(bool singleton = false)
             where THandler : class, IInvocationHandler<TRequest, TResponse>
         {
             Registrar.RegisterHandler<TRequest, TResponse, THandler>(singleton);
@@ -58,14 +67,16 @@ namespace Ingot.Mediator.DependencyInjection.Fluent
 
         /// <param name="handler">The <see cref="IInvocationHandler{TRequest, TResponse}"/> singleton instance.</param>
         /// <inheritdoc cref="HandleWith{THandler}(bool)"/>
-        public MultiHandlerFluentMediatorComponentRegistrar<TRequest, TResponse> HandleWith(IInvocationHandler<TRequest, TResponse> handler)
+        public MultiHandlerFluentMediatorComponentRegistrar<TRequest, TResponse> HandleWith(
+            IInvocationHandler<TRequest, TResponse> handler
+        )
         {
             Registrar.RegisterHandler(handler);
             return this;
         }
 
         /// <summary>
-        /// Sets the <see cref="ParallelHandlersStrategy{TRequest, TResponse}"/> as 
+        /// Sets the <see cref="ParallelHandlersStrategy{TRequest, TResponse}"/> as
         /// <see cref="IInvocationHandlerStrategy{TRequest, TResponse}"/> for the
         /// <see cref="IInvocationPipeline{TResponse}"/>.
         /// </summary>
@@ -76,7 +87,7 @@ namespace Ingot.Mediator.DependencyInjection.Fluent
         }
 
         /// <summary>
-        /// Sets the <see cref="SequentialHandlersStrategy{TRequest, TResponse}"/> as 
+        /// Sets the <see cref="SequentialHandlersStrategy{TRequest, TResponse}"/> as
         /// <see cref="IInvocationHandlerStrategy{TRequest, TResponse}"/> for the
         /// <see cref="IInvocationPipeline{TResponse}"/>.
         /// </summary>
@@ -91,7 +102,10 @@ namespace Ingot.Mediator.DependencyInjection.Fluent
         /// </summary>
         /// <typeparam name="TStrategy">The <see cref="IInvocationHandlerStrategy{TRequest, TResponse}"/> type to register.</typeparam>
         /// <returns>The next fluent registrar instance to pursue registration.</returns>
-        public MultiHandlerFluentMediatorComponentRegistrar<TRequest, TResponse> WithStrategy<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TStrategy>()
+        public MultiHandlerFluentMediatorComponentRegistrar<TRequest, TResponse> WithStrategy<
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+                TStrategy
+        >()
             where TStrategy : class, IInvocationHandlerStrategy<TRequest, TResponse>
         {
             Registrar.RegisterHandlerStrategy<TRequest, TResponse, TStrategy>();

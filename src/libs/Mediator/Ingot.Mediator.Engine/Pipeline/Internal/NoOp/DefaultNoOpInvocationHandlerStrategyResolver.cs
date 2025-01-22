@@ -10,7 +10,8 @@ namespace Ingot.Mediator.Engine.Pipeline.Internal.NoOp
     /// Default implementation of <see cref="INoOpInvocationHandlerStrategyResolver"/>.
     /// </summary>
     /// <seealso cref="INoOpInvocationHandlerStrategyResolver"/>
-    public class DefaultNoOpInvocationHandlerStrategyResolver : INoOpInvocationHandlerStrategyResolver
+    public class DefaultNoOpInvocationHandlerStrategyResolver
+        : INoOpInvocationHandlerStrategyResolver
     {
         private readonly ILoggerFactory _loggerFactory;
 
@@ -27,26 +28,38 @@ namespace Ingot.Mediator.Engine.Pipeline.Internal.NoOp
         }
 
         /// <inheritdoc />
-        public IInvocationHandlerStrategy<object, TResponse> ResolveNoOpInvocationHandlerStrategy<TResponse>()
+        public IInvocationHandlerStrategy<
+            object,
+            TResponse
+        > ResolveNoOpInvocationHandlerStrategy<TResponse>()
         {
             var logger = _loggerFactory.CreateLogger<NoOpInvocationHandlerStrategy<TResponse>>();
             return new NoOpInvocationHandlerStrategy<TResponse>(logger);
         }
 
-        private class NoOpInvocationHandlerStrategy<TResponse> : IInvocationHandlerStrategy<object, TResponse>
+        private class NoOpInvocationHandlerStrategy<TResponse>
+            : IInvocationHandlerStrategy<object, TResponse>
         {
             private readonly ILogger _logger;
 
-            public NoOpInvocationHandlerStrategy(ILogger<NoOpInvocationHandlerStrategy<TResponse>> logger)
+            public NoOpInvocationHandlerStrategy(
+                ILogger<NoOpInvocationHandlerStrategy<TResponse>> logger
+            )
             {
                 _logger = logger;
             }
 
-            public Task HandleAsync(IInvocationContext<object, TResponse> context, Func<CancellationToken, Task> next, CancellationToken cancellationToken)
+            public Task HandleAsync(
+                IInvocationContext<object, TResponse> context,
+                Func<CancellationToken, Task> next,
+                CancellationToken cancellationToken
+            )
             {
                 if (typeof(TResponse) != EventResponse.Type)
                 {
-                    var error = new KeyNotFoundException($"No relevant invocation pipeline found for contract '{context.RequestType.Name} -> {typeof(TResponse).Name}'.");
+                    var error = new KeyNotFoundException(
+                        $"No relevant invocation pipeline found for contract '{context.RequestType.Name} -> {typeof(TResponse).Name}'."
+                    );
                     context.AddError(error);
 
                     _logger.NoHandlersRegisteredException(context, error);

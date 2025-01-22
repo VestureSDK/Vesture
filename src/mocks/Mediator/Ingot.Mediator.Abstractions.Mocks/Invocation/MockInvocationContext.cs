@@ -10,7 +10,9 @@ namespace Ingot.Mediator.Mocks.Invocation
     /// </summary>
     /// <typeparam name="TRequest">The request type.</typeparam>
     /// <typeparam name="TResponse">The response type.</typeparam>
-    public class MockInvocationContext<TRequest, TResponse> : IInvocationContext, IInvocationContext<TRequest, TResponse>
+    public class MockInvocationContext<TRequest, TResponse>
+        : IInvocationContext,
+            IInvocationContext<TRequest, TResponse>
     {
         /// <summary>
         /// The <see cref="Mock{T}"/> instance.
@@ -26,21 +28,24 @@ namespace Ingot.Mediator.Mocks.Invocation
         {
             Request = default!;
 
-            Mock.Setup(m => m.SetResponse(It.IsAny<object>())).Callback<object>(response => Response = response);
-            Mock.Setup(m => m.SetError(It.IsAny<Exception>())).Callback<Exception>(error => Error = error);
-            Mock.Setup(m => m.AddError(It.IsAny<Exception>())).Callback<Exception>(error =>
-            {
-                if (Error is null)
+            Mock.Setup(m => m.SetResponse(It.IsAny<object>()))
+                .Callback<object>(response => Response = response);
+            Mock.Setup(m => m.SetError(It.IsAny<Exception>()))
+                .Callback<Exception>(error => Error = error);
+            Mock.Setup(m => m.AddError(It.IsAny<Exception>()))
+                .Callback<Exception>(error =>
                 {
-                    SetError(error);
-                }
-                else
-                {
-                    var errors = AggregateErrors(Error);
-                    errors.Add(error);
-                    Error = new AggregateException(errors);
-                }
-            });
+                    if (Error is null)
+                    {
+                        SetError(error);
+                    }
+                    else
+                    {
+                        var errors = AggregateErrors(Error);
+                        errors.Add(error);
+                        Error = new AggregateException(errors);
+                    }
+                });
 
             RequestType = typeof(TRequest);
             ResponseType = typeof(TResponse);
@@ -175,11 +180,13 @@ namespace Ingot.Mediator.Mocks.Invocation
 
 #pragma warning disable CS8603 // Possible null reference return.
         /// <inheritdoc />
-        TRequest IInvocationContext<TRequest, TResponse>.Request => Request is TRequest tr ? tr : default;
+        TRequest IInvocationContext<TRequest, TResponse>.Request =>
+            Request is TRequest tr ? tr : default;
 #pragma warning restore CS8603 // Possible null reference return.
 
         /// <inheritdoc />
-        TResponse? IInvocationContext<TResponse>.Response => Response is TResponse tr ? tr : default;
+        TResponse? IInvocationContext<TResponse>.Response =>
+            Response is TResponse tr ? tr : default;
 
         /// <inheritdoc />
         public void SetError(Exception? error) => _inner.SetError(error);

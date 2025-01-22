@@ -6,7 +6,8 @@
     /// a <typeparamref name="TComponent"/>.
     /// </summary>
     /// <inheritdoc cref="IInvocationComponentResolver{TComponent}"/>
-    public class TransientInvocationComponentResolver<TComponent> : IInvocationComponentResolver<TComponent>
+    public class TransientInvocationComponentResolver<TComponent>
+        : IInvocationComponentResolver<TComponent>
     {
         private readonly Func<TComponent> _componentFactory;
 

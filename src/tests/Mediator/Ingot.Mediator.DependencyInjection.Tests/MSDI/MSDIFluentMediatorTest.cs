@@ -20,7 +20,9 @@ namespace Ingot.Mediator.DependencyInjection.Tests.MSDI
 
         protected override RootFluentMediatorComponentRegistrar CreateFluentBuilder()
         {
-            _services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, NUnitTestContextLoggingProvider>());
+            _services.TryAddEnumerable(
+                ServiceDescriptor.Singleton<ILoggerProvider, NUnitTestContextLoggingProvider>()
+            );
             _services.AddLogging(c => c.SetMinimumLevel(LogLevel.Trace));
 
             var registrar = new MSDIMediatorComponentRegistrar(_services);

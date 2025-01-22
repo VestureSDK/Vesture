@@ -4,11 +4,16 @@ using Ingot.Testing.Annotations;
 namespace Ingot.Mediator.Engine.Tests.Pipeline.Resolvers
 {
     [ImplementationTest]
-    public class SingletonInvocationComponentResolverTest : InvocationComponentResolverConformanceTestBase<object, SingletonInvocationComponentResolver<object>>
+    public class SingletonInvocationComponentResolverTest
+        : InvocationComponentResolverConformanceTestBase<
+            object,
+            SingletonInvocationComponentResolver<object>
+        >
     {
         public object SingletonInstance { get; set; } = new object();
 
-        protected override SingletonInvocationComponentResolver<object> CreateInvocationComponentResolver() => new(SingletonInstance);
+        protected override SingletonInvocationComponentResolver<object> CreateInvocationComponentResolver() =>
+            new(SingletonInstance);
 
         [Test]
         public void ResolveComponent_IsSingletonInstance()

@@ -6,17 +6,29 @@ using Moq;
 
 namespace Ingot.Mediator.Engine.Tests.Pipeline.Strategies
 {
-    public abstract class EngineMultiInvocationHandlerStrategyTestBase<TRequest, TResponse, TStrategy> :
-       MultiInvocationHandlerStrategyConformanceTestBase<TRequest, TResponse, TStrategy>
-       where TStrategy : IInvocationHandlerStrategy<TRequest, TResponse>
+    public abstract class EngineMultiInvocationHandlerStrategyTestBase<
+        TRequest,
+        TResponse,
+        TStrategy
+    > : MultiInvocationHandlerStrategyConformanceTestBase<TRequest, TResponse, TStrategy>
+        where TStrategy : IInvocationHandlerStrategy<TRequest, TResponse>
     {
-        protected MockInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>> Resolver { get; }
+        protected MockInvocationComponentResolver<
+            IInvocationHandler<TRequest, TResponse>
+        > Resolver { get; }
 
-        protected MockInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>> OtherResolver { get; }
+        protected MockInvocationComponentResolver<
+            IInvocationHandler<TRequest, TResponse>
+        > OtherResolver { get; }
 
-        protected ICollection<IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>>> Resolvers { get; } = [];
+        protected ICollection<
+            IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>>
+        > Resolvers { get; } = [];
 
-        protected EngineMultiInvocationHandlerStrategyTestBase(TRequest defaultRequest, TResponse defaultResponse)
+        protected EngineMultiInvocationHandlerStrategyTestBase(
+            TRequest defaultRequest,
+            TResponse defaultResponse
+        )
             : base(defaultRequest, defaultResponse)
         {
             Resolver = new() { Component = Handler };
@@ -43,7 +55,9 @@ namespace Ingot.Mediator.Engine.Tests.Pipeline.Strategies
         [Test]
         [TestCase(1, Description = "Call HandleAsync once")]
         [TestCase(5, Description = "Call HandleAsync multiple times")]
-        public async Task HandleAsync_ResolvesTheHandlersFromTheResolverEverytime(int iterationCount)
+        public async Task HandleAsync_ResolvesTheHandlersFromTheResolverEverytime(
+            int iterationCount
+        )
         {
             // Arrange
             // No arrange required

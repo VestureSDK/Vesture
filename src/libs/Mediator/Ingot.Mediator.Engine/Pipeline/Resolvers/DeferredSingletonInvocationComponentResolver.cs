@@ -6,7 +6,8 @@
     /// a <typeparamref name="TComponent"/>.
     /// </summary>
     /// <inheritdoc cref="IInvocationComponentResolver{TComponent}"/>
-    public class DeferredSingletonInvocationComponentResolver<TComponent> : IInvocationComponentResolver<TComponent>
+    public class DeferredSingletonInvocationComponentResolver<TComponent>
+        : IInvocationComponentResolver<TComponent>
     {
         private readonly Lazy<TComponent> _componentInitializer;
 

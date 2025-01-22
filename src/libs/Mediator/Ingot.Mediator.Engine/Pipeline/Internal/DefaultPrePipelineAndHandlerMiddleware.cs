@@ -13,7 +13,9 @@ namespace Ingot.Mediator.Engine.Pipeline.Internal
     /// </summary>
     /// <seealso cref="IPrePipelineMiddleware"/>
     /// <seealso cref="IPreHandlerMiddleware"/>
-    public class DefaultPrePipelineAndHandlerMiddleware : IPrePipelineMiddleware, IPreHandlerMiddleware
+    public class DefaultPrePipelineAndHandlerMiddleware
+        : IPrePipelineMiddleware,
+            IPreHandlerMiddleware
     {
         private readonly ILogger _logger;
 
@@ -22,7 +24,9 @@ namespace Ingot.Mediator.Engine.Pipeline.Internal
         /// </summary>
         /// <param name="logger">The <see cref="ILogger{TCategoryName}"/> instance.</param>
         /// <exception cref="ArgumentNullException"><paramref name="logger"/> is <see langword="null"/>.</exception>
-        public DefaultPrePipelineAndHandlerMiddleware(ILogger<DefaultPrePipelineAndHandlerMiddleware> logger)
+        public DefaultPrePipelineAndHandlerMiddleware(
+            ILogger<DefaultPrePipelineAndHandlerMiddleware> logger
+        )
         {
             ArgumentNullException.ThrowIfNull(logger, nameof(logger));
 
@@ -30,7 +34,11 @@ namespace Ingot.Mediator.Engine.Pipeline.Internal
         }
 
         /// <inheritdoc />
-        public async Task HandleAsync(IInvocationContext<object, object> context, Func<CancellationToken, Task> next, CancellationToken cancellationToken)
+        public async Task HandleAsync(
+            IInvocationContext<object, object> context,
+            Func<CancellationToken, Task> next,
+            CancellationToken cancellationToken
+        )
         {
             try
             {

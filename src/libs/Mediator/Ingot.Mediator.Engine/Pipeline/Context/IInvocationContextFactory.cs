@@ -17,6 +17,8 @@ namespace Ingot.Mediator.Engine.Pipeline.Context
         /// <typeparam name="TResponse">The expected response type.</typeparam>
         /// <param name="request">The <see cref="IRequest{TResponse}"/>, <see cref="ICommand"/> or <see cref="IEvent"/> to create the context from.</param>
         /// <returns>The created <see cref="IInvocationContext{TRequest, TResponse}"/></returns>
-        IInvocationContext<TRequest, TResponse> CreateContextForRequest<TRequest, TResponse>(object request);
+        IInvocationContext<TRequest, TResponse> CreateContextForRequest<TRequest, TResponse>(
+            object request
+        );
     }
 }

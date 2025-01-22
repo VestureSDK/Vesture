@@ -5,8 +5,12 @@ using Moq;
 
 namespace Ingot.Mediator.Engine.Tests.Pipeline.Strategies
 {
-    public abstract class InvocationHandlerStrategyConformanceTestBase<TRequest, TResponse, TStrategy>
-       where TStrategy : IInvocationHandlerStrategy<TRequest, TResponse>
+    public abstract class InvocationHandlerStrategyConformanceTestBase<
+        TRequest,
+        TResponse,
+        TStrategy
+    >
+        where TStrategy : IInvocationHandlerStrategy<TRequest, TResponse>
     {
         protected Lazy<TStrategy> StrategyInitializer { get; }
 
@@ -22,14 +26,14 @@ namespace Ingot.Mediator.Engine.Tests.Pipeline.Strategies
 
         protected TResponse Response { get; set; }
 
-        protected InvocationHandlerStrategyConformanceTestBase(TRequest defaultRequest, TResponse defaultResponse)
+        protected InvocationHandlerStrategyConformanceTestBase(
+            TRequest defaultRequest,
+            TResponse defaultResponse
+        )
         {
             Response = defaultResponse;
             Context = new() { Request = defaultRequest! };
-            Handler = new()
-            {
-                Response = defaultResponse
-            };
+            Handler = new() { Response = defaultResponse };
 
 #pragma warning disable IL2091 // Target generic argument does not satisfy 'DynamicallyAccessedMembersAttribute' in target method or type. The generic parameter of the source method or type does not have matching annotations.
             StrategyInitializer = new Lazy<TStrategy>(() => CreateStrategy());
@@ -93,7 +97,10 @@ namespace Ingot.Mediator.Engine.Tests.Pipeline.Strategies
             await Strategy.HandleAsync(Context, Next!, CancellationToken);
 
             // Assert
-            Handler.Mock.Verify(m => m.HandleAsync(It.IsAny<TRequest>(), It.IsAny<CancellationToken>()), Times.Once);
+            Handler.Mock.Verify(
+                m => m.HandleAsync(It.IsAny<TRequest>(), It.IsAny<CancellationToken>()),
+                Times.Once
+            );
         }
     }
 }

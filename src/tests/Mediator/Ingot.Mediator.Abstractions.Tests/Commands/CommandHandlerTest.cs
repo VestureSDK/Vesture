@@ -9,7 +9,12 @@ namespace Ingot.Mediator.Abstractions.Tests.Commands
 {
     [SampleTest]
     [TestFixtureSource_Request_Command]
-    public class CommandHandlerTest<TCommand> : InvocationHandlerConformanceTestBase<TCommand, CommandResponse, CommandHandlerTest<TCommand>.SampleCommandHandler>
+    public class CommandHandlerTest<TCommand>
+        : InvocationHandlerConformanceTestBase<
+            TCommand,
+            CommandResponse,
+            CommandHandlerTest<TCommand>.SampleCommandHandler
+        >
     {
         protected Mock<ICommandHandlerLifeCycle> LifeCycle { get; } = new();
 
@@ -23,13 +28,22 @@ namespace Ingot.Mediator.Abstractions.Tests.Commands
         {
             // Arrange
             var entersHandleAsyncTaskCompletionSource = new TaskCompletionSource();
-            LifeCycle.Setup(m => m.InnerEntersHandleAsync(It.IsAny<TCommand>(), It.IsAny<CancellationToken>()))
+            LifeCycle
+                .Setup(m =>
+                    m.InnerEntersHandleAsync(It.IsAny<TCommand>(), It.IsAny<CancellationToken>())
+                )
                 .Returns(entersHandleAsyncTaskCompletionSource.Task);
 
             // Act / Assert
-            var task = ((IInvocationHandler<TCommand, CommandResponse>)Handler).HandleAsync(Request, CancellationToken);
+            var task = ((IInvocationHandler<TCommand, CommandResponse>)Handler).HandleAsync(
+                Request,
+                CancellationToken
+            );
 
-            LifeCycle.Verify(m => m.InnerEntersHandleAsync(It.IsAny<TCommand>(), It.IsAny<CancellationToken>()), Times.Once);
+            LifeCycle.Verify(
+                m => m.InnerEntersHandleAsync(It.IsAny<TCommand>(), It.IsAny<CancellationToken>()),
+                Times.Once
+            );
 
             // Cleanup
             entersHandleAsyncTaskCompletionSource.SetResult();
@@ -50,7 +64,10 @@ namespace Ingot.Mediator.Abstractions.Tests.Commands
                 _lifeCycle = lifeCycle;
             }
 
-            public override async Task HandleAsync(TCommand command, CancellationToken cancellationToken = default)
+            public override async Task HandleAsync(
+                TCommand command,
+                CancellationToken cancellationToken = default
+            )
             {
                 await _lifeCycle.InnerEntersHandleAsync(command, cancellationToken);
             }

@@ -8,9 +8,16 @@ namespace Ingot.Mediator.Engine.Tests.Pipeline
 {
     [ImplementationTest]
     [TestFixtureSource_RequestResponse_All]
-    public class DefaultInvocationPipelineTest<TRequest, TResponse> : InvocationPipelineConformanceTestBase<TRequest, TResponse, DefaultInvocationPipeline<TRequest, TResponse>>
+    public class DefaultInvocationPipelineTest<TRequest, TResponse>
+        : InvocationPipelineConformanceTestBase<
+            TRequest,
+            TResponse,
+            DefaultInvocationPipeline<TRequest, TResponse>
+        >
     {
-        protected NUnitTestContextMsLogger<DefaultInvocationPipeline<TRequest, TResponse>> Logger { get; } = new();
+        protected NUnitTestContextMsLogger<
+            DefaultInvocationPipeline<TRequest, TResponse>
+        > Logger { get; } = new();
 
         protected MockInvocationComponentResolver<IPrePipelineMiddleware> PrePipelineMiddlewareResolver { get; }
 
@@ -23,12 +30,17 @@ namespace Ingot.Mediator.Engine.Tests.Pipeline
             PreHandlerMiddlewareResolver = new() { Component = PreHandlerMiddleware };
         }
 
-        protected override DefaultInvocationPipeline<TRequest, TResponse> CreateInvocationPipeline() => new(
-            Logger,
-            ContextFactory,
-            PrePipelineMiddlewareResolver,
-            MiddlewareItems,
-            PreHandlerMiddlewareResolver,
-            HandlerStrategy);
+        protected override DefaultInvocationPipeline<
+            TRequest,
+            TResponse
+        > CreateInvocationPipeline() =>
+            new(
+                Logger,
+                ContextFactory,
+                PrePipelineMiddlewareResolver,
+                MiddlewareItems,
+                PreHandlerMiddlewareResolver,
+                HandlerStrategy
+            );
     }
 }

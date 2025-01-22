@@ -5,7 +5,7 @@ namespace Ingot.Mediator.Commands
     /// <summary>
     /// <para>
     /// The <see cref="CommandHandler{TCommand}"/> provides a base implementation of the <see cref="ICommandHandler{TCommand}"/>.
-    /// You should inherit from this class and override the <see cref="HandleAsync"/> method 
+    /// You should inherit from this class and override the <see cref="HandleAsync"/> method
     /// to define the logic for processing a specific <see cref="ICommand"/> contract.
     /// </para>
     /// </summary>
@@ -33,7 +33,10 @@ namespace Ingot.Mediator.Commands
         /// </returns>
         public abstract Task HandleAsync(TCommand command, CancellationToken cancellationToken);
 
-        async Task<CommandResponse> IInvocationHandler<TCommand, CommandResponse>.HandleAsync(TCommand request, CancellationToken cancellationToken)
+        async Task<CommandResponse> IInvocationHandler<TCommand, CommandResponse>.HandleAsync(
+            TCommand request,
+            CancellationToken cancellationToken
+        )
         {
             await HandleAsync(request, cancellationToken).ConfigureAwait(false);
             return default!;

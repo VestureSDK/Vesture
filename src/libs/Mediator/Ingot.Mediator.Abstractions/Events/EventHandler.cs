@@ -5,7 +5,7 @@ namespace Ingot.Mediator.Events
     /// <summary>
     /// <para>
     /// The <see cref="EventHandler{TEvent}"/> provides a base implementation of the <see cref="IEventHandler{TEvent}"/>.
-    /// You should inherit from this class and override the <see cref="HandleAsync"/> method 
+    /// You should inherit from this class and override the <see cref="HandleAsync"/> method
     /// to define the logic for processing a specific <see cref="IEvent"/> contract.
     /// </para>
     /// </summary>
@@ -33,7 +33,10 @@ namespace Ingot.Mediator.Events
         /// </returns>
         public abstract Task HandleAsync(TEvent @event, CancellationToken cancellationToken);
 
-        async Task<EventResponse> IInvocationHandler<TEvent, EventResponse>.HandleAsync(TEvent request, CancellationToken cancellationToken)
+        async Task<EventResponse> IInvocationHandler<TEvent, EventResponse>.HandleAsync(
+            TEvent request,
+            CancellationToken cancellationToken
+        )
         {
             await HandleAsync(request, cancellationToken).ConfigureAwait(false);
             return default!;

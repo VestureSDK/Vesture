@@ -6,11 +6,16 @@ using Moq;
 
 namespace Ingot.Mediator.Engine.Tests.Pipeline.Internal._TestBases
 {
-    public abstract class EngineMiddlewareInvocationPipelineItemTestBase<TRequest, TResponse, TMiddlewareItem> :
-        MiddlewareInvocationPipelineItemConformanceTestBase<TRequest, TResponse, TMiddlewareItem>
+    public abstract class EngineMiddlewareInvocationPipelineItemTestBase<
+        TRequest,
+        TResponse,
+        TMiddlewareItem
+    > : MiddlewareInvocationPipelineItemConformanceTestBase<TRequest, TResponse, TMiddlewareItem>
         where TMiddlewareItem : IMiddlewareInvocationPipelineItem<TRequest, TResponse>
     {
-        protected MockInvocationComponentResolver<IInvocationMiddleware<TRequest, TResponse>> Resolver { get; } = new();
+        protected MockInvocationComponentResolver<
+            IInvocationMiddleware<TRequest, TResponse>
+        > Resolver { get; } = new();
 
         protected EngineMiddlewareInvocationPipelineItemTestBase(TRequest defaultRequest)
             : base(defaultRequest)
@@ -20,7 +25,10 @@ namespace Ingot.Mediator.Engine.Tests.Pipeline.Internal._TestBases
 
         [Test]
         [TestCaseSource_RequestResponse_All]
-        public void IsApplicable_DoesNotResolveComponent<TContractRequest, TContractResponse>(TContractRequest request, TContractResponse response)
+        public void IsApplicable_DoesNotResolveComponent<TContractRequest, TContractResponse>(
+            TContractRequest request,
+            TContractResponse response
+        )
         {
             // Arrange
             var contextType = typeof(IInvocationContext<TContractRequest, TContractResponse>);
@@ -29,13 +37,19 @@ namespace Ingot.Mediator.Engine.Tests.Pipeline.Internal._TestBases
             var isApplicable = MiddlewareItem.IsApplicable(contextType);
 
             // Assert
-            Resolver.Mock.Verify(m => m.ResolveComponent(), Times.Never, failMessage: "ResolveComponent should not be called outside of HandleAsync");
+            Resolver.Mock.Verify(
+                m => m.ResolveComponent(),
+                Times.Never,
+                failMessage: "ResolveComponent should not be called outside of HandleAsync"
+            );
         }
 
         [Test]
         [TestCase(1, Description = "Call HandleAsync once")]
         [TestCase(5, Description = "Call HandleAsync multiple times")]
-        public async Task HandleAsync_ResolvesTheComponentFromTheResolverEverytime(int iterationCount)
+        public async Task HandleAsync_ResolvesTheComponentFromTheResolverEverytime(
+            int iterationCount
+        )
         {
             // Arrange
             // No arrange required
@@ -47,7 +61,11 @@ namespace Ingot.Mediator.Engine.Tests.Pipeline.Internal._TestBases
             }
 
             // Assert
-            Resolver.Mock.Verify(m => m.ResolveComponent(), Times.Exactly(iterationCount), failMessage: "ResolveComponent should not be called everytime HandleAsync is invoked");
+            Resolver.Mock.Verify(
+                m => m.ResolveComponent(),
+                Times.Exactly(iterationCount),
+                failMessage: "ResolveComponent should not be called everytime HandleAsync is invoked"
+            );
         }
     }
 }

@@ -5,7 +5,11 @@ using Moq;
 namespace Ingot.Mediator.Engine.Tests.Pipeline.Resolvers
 {
     [ImplementationTest]
-    public class TransientInvocationComponentResolverTest : InvocationComponentResolverConformanceTestBase<object, TransientInvocationComponentResolver<object>>
+    public class TransientInvocationComponentResolverTest
+        : InvocationComponentResolverConformanceTestBase<
+            object,
+            TransientInvocationComponentResolver<object>
+        >
     {
         public Mock<Func<object>> Factory { get; }
 
@@ -15,7 +19,8 @@ namespace Ingot.Mediator.Engine.Tests.Pipeline.Resolvers
             Factory.Setup(m => m()).Returns(() => new object());
         }
 
-        protected override TransientInvocationComponentResolver<object> CreateInvocationComponentResolver() => new(Factory.Object);
+        protected override TransientInvocationComponentResolver<object> CreateInvocationComponentResolver() =>
+            new(Factory.Object);
 
         [Test]
         public void ResolveComponent_AreNotTheSame_WithStraightFactory()

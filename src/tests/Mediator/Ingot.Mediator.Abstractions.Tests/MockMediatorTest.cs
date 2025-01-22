@@ -21,12 +21,16 @@ namespace Ingot.Mediator.Abstractions.Tests
             return mediator;
         }
 
-        protected override void RegisterHandler<TRequest, TResponse>(IInvocationHandler<TRequest, TResponse> handler)
+        protected override void RegisterHandler<TRequest, TResponse>(
+            IInvocationHandler<TRequest, TResponse> handler
+        )
         {
             _setups.Add(m => m.AddHandler(handler));
         }
 
-        protected override void RegisterMiddleware<TRequest, TResponse>(IInvocationMiddleware<TRequest, TResponse> middleware)
+        protected override void RegisterMiddleware<TRequest, TResponse>(
+            IInvocationMiddleware<TRequest, TResponse> middleware
+        )
         {
             _setups.Add(m => m.AddMiddleware(middleware));
         }

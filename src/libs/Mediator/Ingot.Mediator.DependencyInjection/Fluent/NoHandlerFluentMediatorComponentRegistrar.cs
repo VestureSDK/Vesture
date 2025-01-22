@@ -15,7 +15,8 @@ namespace Ingot.Mediator.DependencyInjection.Fluent
     /// <seealso cref="RootFluentMediatorComponentRegistrar"/>
     /// <seealso cref="MultiHandlerFluentMediatorComponentRegistrar{TRequest, TResponse}"/>
     /// <seealso cref="SingleHandlerFluentMediatorComponentRegistrar{TRequest, TResponse}"/>
-    public class NoHandlerFluentMediatorComponentRegistrar<TRequest, TResponse> : RootFluentMediatorComponentRegistrar
+    public class NoHandlerFluentMediatorComponentRegistrar<TRequest, TResponse>
+        : RootFluentMediatorComponentRegistrar
     {
         /// <summary>
         /// Initializes a new <see cref="NoHandlerFluentMediatorComponentRegistrar{TRequest, TResponse}"/> instance.
@@ -32,7 +33,10 @@ namespace Ingot.Mediator.DependencyInjection.Fluent
         /// <param name="order"><inheritdoc cref="IMediatorComponentRegistrar.RegisterMiddleware{TRequest, TResponse, TMiddleware}(int?, bool)" path="/param[@name='order']"/></param>
         /// <param name="singleton"><inheritdoc cref="IMediatorComponentRegistrar.RegisterMiddleware{TRequest, TResponse, TMiddleware}(int?, bool)" path="/param[@name='singleton']"/></param>
         /// <returns>The next fluent registrar instance to pursue registration.</returns>
-        public NoHandlerFluentMediatorComponentRegistrar<TRequest, TResponse> AddMiddleware<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TMiddleware>(int? order = null, bool singleton = false)
+        public NoHandlerFluentMediatorComponentRegistrar<TRequest, TResponse> AddMiddleware<
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+                TMiddleware
+        >(int? order = null, bool singleton = false)
             where TMiddleware : class, IInvocationMiddleware<TRequest, TResponse>
         {
             Registrar.RegisterMiddleware<TRequest, TResponse, TMiddleware>(order, singleton);
@@ -42,7 +46,10 @@ namespace Ingot.Mediator.DependencyInjection.Fluent
         /// <param name="middleware">The <see cref="IInvocationMiddleware{TRequest, TResponse}"/> singleton instance.</param>
         /// <param name="order"><inheritdoc cref="AddMiddleware{TMiddleware}(int?, bool)" path="/param[@name='order']"/></param>
         /// <inheritdoc cref="AddMiddleware{TMiddleware}(int?, bool)"/>
-        public NoHandlerFluentMediatorComponentRegistrar<TRequest, TResponse> AddMiddleware<TMiddleware>(TMiddleware middleware, int? order = null)
+        public NoHandlerFluentMediatorComponentRegistrar<
+            TRequest,
+            TResponse
+        > AddMiddleware<TMiddleware>(TMiddleware middleware, int? order = null)
             where TMiddleware : class, IInvocationMiddleware<TRequest, TResponse>
         {
             Registrar.RegisterMiddleware(middleware, order);

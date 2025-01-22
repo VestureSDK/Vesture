@@ -114,7 +114,10 @@ namespace Ingot.Mediator.Engine.Pipeline.Context
     /// </summary>
     /// <inheritdoc cref="IInvocationContext{TRequest, TResponse}"/>
     [DebuggerDisplay("{typeof(TRequest).Name} -> {typeof(TResponse).Name}")]
-    public class DefaultInvocationContext<TRequest, TResponse> : DefaultInvocationContext, IInvocationContext<TRequest, TResponse>, IInvocationContext<TResponse>
+    public class DefaultInvocationContext<TRequest, TResponse>
+        : DefaultInvocationContext,
+            IInvocationContext<TRequest, TResponse>,
+            IInvocationContext<TResponse>
     {
         /// <summary>
         /// Initializes a new <see cref="DefaultInvocationContext{TRequest, TResponse}"/> instance.

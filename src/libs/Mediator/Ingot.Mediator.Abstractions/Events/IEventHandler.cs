@@ -4,13 +4,13 @@ namespace Ingot.Mediator.Events
 {
     /// <summary>
     /// <para>
-    /// An <see cref="IEventHandler{TEvent}"/> is responsible for the actual 
+    /// An <see cref="IEventHandler{TEvent}"/> is responsible for the actual
     /// logic of processing a specific <see cref="IEvent"/> contract.
     /// </para>
     /// <para>
-    /// When an <see cref="IEvent"/> contract is sent to the mediator, the mediator 
+    /// When an <see cref="IEvent"/> contract is sent to the mediator, the mediator
     /// routes it to the appropriate handler, which then processes the event.
-    /// It helps decouple event processing logic from the core application logic, enabling 
+    /// It helps decouple event processing logic from the core application logic, enabling
     /// cleaner, more modular code.
     /// </para>
     /// </summary>
@@ -20,8 +20,5 @@ namespace Ingot.Mediator.Events
     /// <seealso cref="IEvent"/>
     /// <seealso cref="EventHandler{TEvent}"/>
     /// <seealso cref="IMediator"/>
-    public interface IEventHandler<TEvent> : IInvocationHandler<TEvent, EventResponse>
-    {
-
-    }
+    public interface IEventHandler<TEvent> : IInvocationHandler<TEvent, EventResponse> { }
 }

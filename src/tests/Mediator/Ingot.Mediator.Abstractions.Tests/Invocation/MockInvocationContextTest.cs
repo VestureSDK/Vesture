@@ -7,12 +7,12 @@ namespace Ingot.Mediator.Abstractions.Tests.Invocation
     [MockTest]
     public class MockInvocationContextTest : InvocationContextConformanceTestBase
     {
-        protected override IInvocationContext<TRequest, TResponse> CreateInvocationContext<TRequest, TResponse>(TRequest request)
+        protected override IInvocationContext<TRequest, TResponse> CreateInvocationContext<
+            TRequest,
+            TResponse
+        >(TRequest request)
         {
-            return new MockInvocationContext<TRequest, TResponse>
-            {
-                Request = request!,
-            };
+            return new MockInvocationContext<TRequest, TResponse> { Request = request! };
         }
     }
 }

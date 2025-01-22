@@ -19,17 +19,17 @@ namespace Ingot.Mediator.Engine.Pipeline
 
     /// <summary>
     /// <para>
-    /// An <see cref="IInvocationPipeline{TResponse}"/> represents the orchestrated sequence of execution 
-    /// that processes a specific contract through a series of <see cref="IInvocationMiddleware{TRequest, TResponse}"/> 
+    /// An <see cref="IInvocationPipeline{TResponse}"/> represents the orchestrated sequence of execution
+    /// that processes a specific contract through a series of <see cref="IInvocationMiddleware{TRequest, TResponse}"/>
     /// and ultimately reaches an <see cref="IInvocationHandler{TRequest, TResponse}"/>.
     /// </para>
     /// <para>
-    /// Invocation pipelines are a core component in the mediator pattern that enhances 
-    /// modularity and separation of concerns by encapsulating cross-cutting logic such as logging, 
+    /// Invocation pipelines are a core component in the mediator pattern that enhances
+    /// modularity and separation of concerns by encapsulating cross-cutting logic such as logging,
     /// validation, authorization, and more within middlewares.
     /// </para>
     /// <para>
-    /// This pipeline embodies a chain of responsibility, where each middleware can perform actions 
+    /// This pipeline embodies a chain of responsibility, where each middleware can perform actions
     /// before or after invoking the next item in the chain, culminating with the handler.
     /// </para>
     /// </summary>
@@ -40,8 +40,8 @@ namespace Ingot.Mediator.Engine.Pipeline
     public interface IInvocationPipeline<TResponse> : IInvocationPipeline
     {
         /// <summary>
-        /// Processes the specified contract and returns 
-        /// the <see cref="IInvocationContext{TResponse}"/> containing the expected <typeparamref name="TResponse"/> 
+        /// Processes the specified contract and returns
+        /// the <see cref="IInvocationContext{TResponse}"/> containing the expected <typeparamref name="TResponse"/>
         /// or any <see cref="Exception"/> that might have occurred.
         /// </summary>
         /// <param name="request">The contract instance to process.</param>
@@ -49,10 +49,13 @@ namespace Ingot.Mediator.Engine.Pipeline
         /// <inheritdoc cref="IInvocationHandler{TRequest, TResponse}.HandleAsync(TRequest, CancellationToken)" path="/param[@name='cancellationToken']"/>
         /// </param>
         /// <returns>
-        /// A <see cref="Task{TResult}"/> representing the asynchronous operation, with 
-        /// a result of type <see cref="IInvocationContext{TResponse}"/> containing the expected 
+        /// A <see cref="Task{TResult}"/> representing the asynchronous operation, with
+        /// a result of type <see cref="IInvocationContext{TResponse}"/> containing the expected
         /// <typeparamref name="TResponse"/> or any <see cref="Exception"/> that might have occurred.
         /// </returns>
-        Task<IInvocationContext<TResponse>> HandleAsync(object request, CancellationToken cancellationToken);
+        Task<IInvocationContext<TResponse>> HandleAsync(
+            object request,
+            CancellationToken cancellationToken
+        );
     }
 }

@@ -14,10 +14,10 @@ namespace Ingot.Mediator.Engine.Pipeline
     /// The <see cref="DefaultInvocationPipeline{TRequest, TResponse}"/> provides a default implementation of <see cref="IInvocationPipeline{TResponse}"/>.
     /// </para>
     /// <para>
-    /// An <see cref="IInvocationPipeline{TResponse}"/> represents the orchestrated sequence of execution 
-    /// that processes a specific contract through a series of <see cref="IInvocationMiddleware{TRequest, TResponse}"/> 
+    /// An <see cref="IInvocationPipeline{TResponse}"/> represents the orchestrated sequence of execution
+    /// that processes a specific contract through a series of <see cref="IInvocationMiddleware{TRequest, TResponse}"/>
     /// and ultimately reaches an <see cref="IInvocationHandler{TRequest, TResponse}"/>.
-    /// </para> 
+    /// </para>
     /// </summary>
     /// <typeparam name="TRequest">The type of contract handled by this pipeline.</typeparam>
     /// <typeparam name="TResponse"><inheritdoc cref="IInvocationPipeline{TResponse}" path="/typeparam[@name='TResponse']"/></typeparam>
@@ -67,13 +67,20 @@ namespace Ingot.Mediator.Engine.Pipeline
             IInvocationComponentResolver<IPrePipelineMiddleware> preInvocationPipelineMiddlewareResolver,
             IEnumerable<IMiddlewareInvocationPipelineItem> middlewares,
             IInvocationComponentResolver<IPreHandlerMiddleware> preHandlerMiddlewareResolver,
-            IInvocationHandlerStrategy<TRequest, TResponse> handlerStrategy)
+            IInvocationHandlerStrategy<TRequest, TResponse> handlerStrategy
+        )
         {
             ArgumentNullException.ThrowIfNull(contextFactory, nameof(logger));
             ArgumentNullException.ThrowIfNull(contextFactory, nameof(contextFactory));
-            ArgumentNullException.ThrowIfNull(preInvocationPipelineMiddlewareResolver, nameof(preInvocationPipelineMiddlewareResolver));
+            ArgumentNullException.ThrowIfNull(
+                preInvocationPipelineMiddlewareResolver,
+                nameof(preInvocationPipelineMiddlewareResolver)
+            );
             ArgumentNullException.ThrowIfNull(middlewares, nameof(middlewares));
-            ArgumentNullException.ThrowIfNull(preHandlerMiddlewareResolver, nameof(preHandlerMiddlewareResolver));
+            ArgumentNullException.ThrowIfNull(
+                preHandlerMiddlewareResolver,
+                nameof(preHandlerMiddlewareResolver)
+            );
             ArgumentNullException.ThrowIfNull(handlerStrategy, nameof(handlerStrategy));
 
             _logger = logger;
@@ -82,15 +89,25 @@ namespace Ingot.Mediator.Engine.Pipeline
             _middlewares = middlewares;
             _preHandlerMiddlewareResolver = preHandlerMiddlewareResolver;
             _handlerStrategy = handlerStrategy;
-            _chainOfResponsibility = new Lazy<Func<IInvocationContext<TRequest, TResponse>, CancellationToken, Task>>(CreateChainOfResponsibility);
+            _chainOfResponsibility = new Lazy<
+                Func<IInvocationContext<TRequest, TResponse>, CancellationToken, Task>
+            >(CreateChainOfResponsibility);
         }
 
-        private readonly Lazy<Func<IInvocationContext<TRequest, TResponse>, CancellationToken, Task>> _chainOfResponsibility;
+        private readonly Lazy<
+            Func<IInvocationContext<TRequest, TResponse>, CancellationToken, Task>
+        > _chainOfResponsibility;
 
-        private Func<IInvocationContext<TRequest, TResponse>, CancellationToken, Task> CreateChainOfResponsibility()
+        private Func<
+            IInvocationContext<TRequest, TResponse>,
+            CancellationToken,
+            Task
+        > CreateChainOfResponsibility()
         {
-            using var activity = MediatorEngineDiagnostics.s_invocationPipelineActivitySource
-                .StartActivity("Pipeline Chain Creation");
+            using var activity =
+                MediatorEngineDiagnostics.s_invocationPipelineActivitySource.StartActivity(
+                    "Pipeline Chain Creation"
+                );
 
             // Set the activity status as error since it will be switched
             // back to "OK" if no errors are thrown.
@@ -103,19 +120,31 @@ namespace Ingot.Mediator.Engine.Pipeline
             {
                 if (middleware.IsApplicable(contextType))
                 {
-                    _logger.InvocationPipelineChainMiddlewareMatches<TRequest, TResponse>(middleware, middlewares);
+                    _logger.InvocationPipelineChainMiddlewareMatches<TRequest, TResponse>(
+                        middleware,
+                        middlewares
+                    );
                     middlewares.Add(middleware);
                 }
                 else
                 {
-                    _logger.InvocationPipelineChainMiddlewareDoesNotMatch<TRequest, TResponse>(middleware);
+                    _logger.InvocationPipelineChainMiddlewareDoesNotMatch<TRequest, TResponse>(
+                        middleware
+                    );
                 }
             }
 
-            Func<IInvocationContext<TRequest, TResponse>, CancellationToken, Task> chain = (ctx, ct) =>
+            Func<IInvocationContext<TRequest, TResponse>, CancellationToken, Task> chain = (
+                ctx,
+                ct
+            ) =>
             {
                 var preHandlerMiddleware = _preHandlerMiddlewareResolver.ResolveComponent();
-                return preHandlerMiddleware.HandleAsync((IInvocationContext<object, object>)ctx, (t) => handler(ctx, t), ct);
+                return preHandlerMiddleware.HandleAsync(
+                    (IInvocationContext<object, object>)ctx,
+                    (t) => handler(ctx, t),
+                    ct
+                );
             };
 
             // Build the chain of responsibility and return the new root func.
@@ -123,14 +152,20 @@ namespace Ingot.Mediator.Engine.Pipeline
             {
                 var nextMiddleware = chain;
                 var item = (IInvocationMiddleware<TRequest, TResponse>)middlewares[i];
-                chain = (ctx, ct) => item.HandleAsync(ctx, (t) => nextMiddleware.Invoke(ctx, t), ct);
+                chain = (ctx, ct) =>
+                    item.HandleAsync(ctx, (t) => nextMiddleware.Invoke(ctx, t), ct);
             }
 
             var next = chain;
             chain = (ctx, ct) =>
             {
-                var preHandlerMiddleware = _preInvocationPipelineMiddlewareResolver.ResolveComponent();
-                return preHandlerMiddleware.HandleAsync((IInvocationContext<object, object>)ctx, (t) => next.Invoke(ctx, t), ct);
+                var preHandlerMiddleware =
+                    _preInvocationPipelineMiddlewareResolver.ResolveComponent();
+                return preHandlerMiddleware.HandleAsync(
+                    (IInvocationContext<object, object>)ctx,
+                    (t) => next.Invoke(ctx, t),
+                    ct
+                );
             };
 
             _logger.InvocationPipelineChainCreated<TRequest, TResponse>(middlewares);
@@ -141,15 +176,21 @@ namespace Ingot.Mediator.Engine.Pipeline
             return chain!;
 
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-            Task handler(IInvocationContext<TRequest, TResponse> ctx, CancellationToken ct) => _handlerStrategy.HandleAsync(ctx, null, ct);
+            Task handler(IInvocationContext<TRequest, TResponse> ctx, CancellationToken ct) =>
+                _handlerStrategy.HandleAsync(ctx, null, ct);
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 
         /// <inheritdoc />
-        public async Task<IInvocationContext<TResponse>> HandleAsync(object request, CancellationToken cancellationToken)
+        public async Task<IInvocationContext<TResponse>> HandleAsync(
+            object request,
+            CancellationToken cancellationToken
+        )
         {
-            using var activity = MediatorEngineDiagnostics.s_invocationPipelineActivitySource
-                .StartActivity("Pipeline Invocation");
+            using var activity =
+                MediatorEngineDiagnostics.s_invocationPipelineActivitySource.StartActivity(
+                    "Pipeline Invocation"
+                );
 
             _logger.InvokingPipeline<TRequest, TResponse>();
 

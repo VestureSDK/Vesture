@@ -32,8 +32,7 @@ namespace Ingot.Mediator.Engine.Pipeline.Internal
     /// <inheritdoc cref="IMiddlewareInvocationPipelineItem"/>
     /// <inheritdoc cref="IInvocationMiddleware{TRequest, TResponse}"/>
     /// <seealso cref="IInvocationMiddleware{TRequest, TResponse}"/>
-    public interface IMiddlewareInvocationPipelineItem<TRequest, TResponse> : IMiddlewareInvocationPipelineItem, IInvocationMiddleware<TRequest, TResponse>
-    {
-
-    }
+    public interface IMiddlewareInvocationPipelineItem<TRequest, TResponse>
+        : IMiddlewareInvocationPipelineItem,
+            IInvocationMiddleware<TRequest, TResponse> { }
 }

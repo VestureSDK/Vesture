@@ -5,7 +5,7 @@ using Ingot.Mediator.Requests;
 namespace Ingot.Mediator.Invocation
 {
     /// <summary>
-    /// An <see cref="IInvocationContext"/> defines an invocation context 
+    /// An <see cref="IInvocationContext"/> defines an invocation context
     /// for a <see cref="IRequest{TResponse}"/>, <see cref="ICommand"/> or <see cref="IEvent"/>.
     /// This context is used throughout the mediator pipeline to hold and manage the state of the request,
     /// response, and any errors that may occur during processing.
@@ -20,7 +20,7 @@ namespace Ingot.Mediator.Invocation
         Type RequestType { get; }
 
         /// <summary>
-        /// Gets the actual <see cref="IRequest{TResponse}"/>, <see cref="ICommand"/> or <see cref="IEvent"/> 
+        /// Gets the actual <see cref="IRequest{TResponse}"/>, <see cref="ICommand"/> or <see cref="IEvent"/>
         /// that needs to be handled in the current pipeline.
         /// </summary>
         object Request { get; }
@@ -53,7 +53,7 @@ namespace Ingot.Mediator.Invocation
         Type? ResponseType { get; }
 
         /// <summary>
-        /// Gets the actual response produced after processing the <see cref="Request"/>. 
+        /// Gets the actual response produced after processing the <see cref="Request"/>.
         /// This is <c>null</c> if the <see cref="Request"/> is a <see cref="ICommand"/> or <see cref="IEvent"/>.
         /// </summary>
         object? Response { get; }
@@ -116,4 +116,3 @@ namespace Ingot.Mediator.Invocation
         new TRequest Request { get; }
     }
 }
-

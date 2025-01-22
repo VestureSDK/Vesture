@@ -6,16 +6,16 @@ namespace Ingot.Mediator.Invocation
 {
     /// <summary>
     /// <para>
-    /// An <see cref="IInvocationMiddleware{TRequest, TResponse}"/> in the context of the mediator pattern provides 
-    /// a mechanism for injecting cross-cutting concerns into the request, command, or event processing pipeline. 
-    /// This interface allows you to define custom logic that  can be executed before, after, or even instead 
+    /// An <see cref="IInvocationMiddleware{TRequest, TResponse}"/> in the context of the mediator pattern provides
+    /// a mechanism for injecting cross-cutting concerns into the request, command, or event processing pipeline.
+    /// This interface allows you to define custom logic that  can be executed before, after, or even instead
     /// of the actual handler for the given contract.
     /// </para>
     /// <para>
-    /// <see cref="IInvocationMiddleware{TRequest, TResponse}"/> are part of a chain of responsibility pattern, 
-    /// where each middleware has the opportunity to either pass control to the next middleware in the chain 
-    /// or stop the process early by returning a response directly, effectively "shortcircuiting" the execution 
-    /// of subsequent handlers. This flexibility makes it ideal for handling concerns such as logging, 
+    /// <see cref="IInvocationMiddleware{TRequest, TResponse}"/> are part of a chain of responsibility pattern,
+    /// where each middleware has the opportunity to either pass control to the next middleware in the chain
+    /// or stop the process early by returning a response directly, effectively "shortcircuiting" the execution
+    /// of subsequent handlers. This flexibility makes it ideal for handling concerns such as logging,
     /// validation, authorization, caching, and more.
     /// </para>
     /// </summary>
@@ -48,6 +48,10 @@ namespace Ingot.Mediator.Invocation
         /// <returns>
         /// A <see cref="Task"/> representing the asynchronous execution of the middleware and handler chain process.
         /// </returns>
-        Task HandleAsync(IInvocationContext<TRequest, TResponse> context, Func<CancellationToken, Task> next, CancellationToken cancellationToken);
+        Task HandleAsync(
+            IInvocationContext<TRequest, TResponse> context,
+            Func<CancellationToken, Task> next,
+            CancellationToken cancellationToken
+        );
     }
 }

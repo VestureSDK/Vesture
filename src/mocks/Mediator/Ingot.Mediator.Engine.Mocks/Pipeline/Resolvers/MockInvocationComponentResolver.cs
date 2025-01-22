@@ -3,9 +3,11 @@ using Moq;
 
 namespace Ingot.Mediator.Engine.Mocks.Pipeline.Resolvers
 {
-    public class MockInvocationComponentResolver<TComponent> : IInvocationComponentResolver<TComponent>
+    public class MockInvocationComponentResolver<TComponent>
+        : IInvocationComponentResolver<TComponent>
     {
-        public Mock<IInvocationComponentResolver<TComponent>> Mock { get; } = new Mock<IInvocationComponentResolver<TComponent>>();
+        public Mock<IInvocationComponentResolver<TComponent>> Mock { get; } =
+            new Mock<IInvocationComponentResolver<TComponent>>();
 
         private IInvocationComponentResolver<TComponent> _inner => Mock.Object;
 

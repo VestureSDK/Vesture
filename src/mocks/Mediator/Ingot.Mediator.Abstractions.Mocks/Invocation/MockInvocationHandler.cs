@@ -8,7 +8,8 @@ namespace Ingot.Mediator.Mocks.Invocation
     /// </summary>
     /// <typeparam name="TRequest">The request type.</typeparam>
     /// <typeparam name="TResponse">The response type.</typeparam>
-    public class MockInvocationHandler<TRequest, TResponse> : IInvocationHandler<TRequest, TResponse>
+    public class MockInvocationHandler<TRequest, TResponse>
+        : IInvocationHandler<TRequest, TResponse>
     {
         /// <summary>
         /// The <see cref="Mock{T}"/> instance.
@@ -27,10 +28,14 @@ namespace Ingot.Mediator.Mocks.Invocation
         /// </summary>
         public MockInvocationHandler()
         {
-            Mock.Setup(m => m.HandleAsync(It.IsAny<TRequest>(), It.IsAny<CancellationToken>())).Returns(() => Task.FromResult(Response!));
+            Mock.Setup(m => m.HandleAsync(It.IsAny<TRequest>(), It.IsAny<CancellationToken>()))
+                .Returns(() => Task.FromResult(Response!));
         }
 
         /// <inheritdoc/>
-        public Task<TResponse> HandleAsync(TRequest request, CancellationToken cancellationToken = default) => _inner.HandleAsync(request, cancellationToken);
+        public Task<TResponse> HandleAsync(
+            TRequest request,
+            CancellationToken cancellationToken = default
+        ) => _inner.HandleAsync(request, cancellationToken);
     }
 }

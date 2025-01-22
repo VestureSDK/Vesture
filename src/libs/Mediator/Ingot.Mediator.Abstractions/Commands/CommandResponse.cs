@@ -4,11 +4,11 @@ namespace Ingot.Mediator.Commands
 {
     /// <summary>
     /// <para>
-    /// The <see cref="CommandResponse"/> is a <see cref="System.Type"/> used as a response placeholder 
+    /// The <see cref="CommandResponse"/> is a <see cref="System.Type"/> used as a response placeholder
     /// when handling a <see cref="ICommand"/> via a <see cref="IMediator"/>.
     /// </para>
     /// <para>
-    /// The <see cref="CommandResponse"/> type should be used when 
+    /// The <see cref="CommandResponse"/> type should be used when
     /// implementing an <see cref="IInvocationMiddleware{TRequest, TResponse}"/> for
     /// either all or specific <see cref="ICommand"/> contracts.
     /// </para>

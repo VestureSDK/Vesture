@@ -6,7 +6,8 @@
     /// initialized instance of <typeparamref name="TComponent"/>.
     /// </summary>
     /// <inheritdoc cref="IInvocationComponentResolver{TComponent}"/>
-    public class SingletonInvocationComponentResolver<TComponent> : IInvocationComponentResolver<TComponent>
+    public class SingletonInvocationComponentResolver<TComponent>
+        : IInvocationComponentResolver<TComponent>
     {
         private readonly TComponent _component;
 

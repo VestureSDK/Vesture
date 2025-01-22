@@ -9,7 +9,12 @@ namespace Ingot.Mediator.Abstractions.Tests.Events
 {
     [SampleTest]
     [TestFixtureSource_Request_Event]
-    public class EventHandlerTest<TEvent> : InvocationHandlerConformanceTestBase<TEvent, EventResponse, EventHandlerTest<TEvent>.SampleEventHandler>
+    public class EventHandlerTest<TEvent>
+        : InvocationHandlerConformanceTestBase<
+            TEvent,
+            EventResponse,
+            EventHandlerTest<TEvent>.SampleEventHandler
+        >
     {
         protected Mock<IEventHandlerLifeCycle> LifeCycle { get; } = new();
 
@@ -23,13 +28,22 @@ namespace Ingot.Mediator.Abstractions.Tests.Events
         {
             // Arrange
             var entersHandleAsyncTaskCompletionSource = new TaskCompletionSource();
-            LifeCycle.Setup(m => m.InnerEntersHandleAsync(It.IsAny<TEvent>(), It.IsAny<CancellationToken>()))
+            LifeCycle
+                .Setup(m =>
+                    m.InnerEntersHandleAsync(It.IsAny<TEvent>(), It.IsAny<CancellationToken>())
+                )
                 .Returns(entersHandleAsyncTaskCompletionSource.Task);
 
             // Act / Assert
-            var task = ((IInvocationHandler<TEvent, EventResponse>)Handler).HandleAsync(Request, CancellationToken);
+            var task = ((IInvocationHandler<TEvent, EventResponse>)Handler).HandleAsync(
+                Request,
+                CancellationToken
+            );
 
-            LifeCycle.Verify(m => m.InnerEntersHandleAsync(It.IsAny<TEvent>(), It.IsAny<CancellationToken>()), Times.Once);
+            LifeCycle.Verify(
+                m => m.InnerEntersHandleAsync(It.IsAny<TEvent>(), It.IsAny<CancellationToken>()),
+                Times.Once
+            );
 
             // Cleanup
             entersHandleAsyncTaskCompletionSource.SetResult();
@@ -50,7 +64,10 @@ namespace Ingot.Mediator.Abstractions.Tests.Events
                 _lifeCycle = lifeCycle;
             }
 
-            public override async Task HandleAsync(TEvent @event, CancellationToken cancellationToken = default)
+            public override async Task HandleAsync(
+                TEvent @event,
+                CancellationToken cancellationToken = default
+            )
             {
                 await _lifeCycle.InnerEntersHandleAsync(@event, cancellationToken);
             }

@@ -7,7 +7,11 @@ using Moq;
 
 namespace Ingot.Mediator.Engine.Tests.Pipeline.Internal._TestBases
 {
-    public abstract class MiddlewareInvocationPipelineItemConformanceTestBase<TRequest, TResponse, TMiddlewareItem>
+    public abstract class MiddlewareInvocationPipelineItemConformanceTestBase<
+        TRequest,
+        TResponse,
+        TMiddlewareItem
+    >
         where TMiddlewareItem : IMiddlewareInvocationPipelineItem<TRequest, TResponse>
     {
         protected int Order { get; set; }
@@ -31,7 +35,9 @@ namespace Ingot.Mediator.Engine.Tests.Pipeline.Internal._TestBases
             Context = new() { Request = defaultRequest! };
 
 #pragma warning disable IL2091 // Target generic argument does not satisfy 'DynamicallyAccessedMembersAttribute' in target method or type. The generic parameter of the source method or type does not have matching annotations.
-            MiddlewareItemInitializer = new Lazy<TMiddlewareItem>(() => CreateMiddlewareItem(Order));
+            MiddlewareItemInitializer = new Lazy<TMiddlewareItem>(
+                () => CreateMiddlewareItem(Order)
+            );
 #pragma warning restore IL2091 // Target generic argument does not satisfy 'DynamicallyAccessedMembersAttribute' in target method or type. The generic parameter of the source method or type does not have matching annotations.
         }
 
@@ -53,43 +59,77 @@ namespace Ingot.Mediator.Engine.Tests.Pipeline.Internal._TestBases
             var actualOrder = MiddlewareItem.Order;
 
             // Assert
-            Assert.That(actualOrder, Is.EqualTo(expectedOrder), message: "Actual order should be equal to provided ctor order");
+            Assert.That(
+                actualOrder,
+                Is.EqualTo(expectedOrder),
+                message: "Actual order should be equal to provided ctor order"
+            );
         }
 
         [Test]
         [ConformanceTest]
         [TestCaseSource_RequestResponseMediatorRequestResponse_Applicable(isApplicable: true)]
-        public void IsApplicable_IsTrue_WhenMiddlewareSignatureMacthesOrLowerLevelThanContracts
-            <TContractRequest, TContractResponse, TMiddlewareRequest, TMiddlewareResponse>
-            (TContractRequest request, TContractResponse response, TMiddlewareRequest middlewareRequest, TMiddlewareResponse middlewareResponse)
+        public void IsApplicable_IsTrue_WhenMiddlewareSignatureMacthesOrLowerLevelThanContracts<
+            TContractRequest,
+            TContractResponse,
+            TMiddlewareRequest,
+            TMiddlewareResponse
+        >(
+            TContractRequest request,
+            TContractResponse response,
+            TMiddlewareRequest middlewareRequest,
+            TMiddlewareResponse middlewareResponse
+        )
         {
             // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<TMiddlewareRequest, TMiddlewareResponse>();
+            var middlewareItem = CreateItemForMiddlewareSignature<
+                TMiddlewareRequest,
+                TMiddlewareResponse
+            >();
             var contextType = typeof(IInvocationContext<TContractRequest, TContractResponse>);
 
             // Act
             var isApplicable = middlewareItem.IsApplicable(contextType);
 
             // Asser
-            Assert.That(isApplicable, Is.True, message: $"Middleware ({typeof(TMiddlewareRequest).Name} -> {typeof(TMiddlewareResponse).Name}) should be applicable for contract ({typeof(TContractRequest).Name} -> {typeof(TContractResponse).Name})");
+            Assert.That(
+                isApplicable,
+                Is.True,
+                message: $"Middleware ({typeof(TMiddlewareRequest).Name} -> {typeof(TMiddlewareResponse).Name}) should be applicable for contract ({typeof(TContractRequest).Name} -> {typeof(TContractResponse).Name})"
+            );
         }
 
         [Test]
         [ConformanceTest]
         [TestCaseSource_RequestResponseMediatorRequestResponse_Applicable(isApplicable: false)]
-        public void IsApplicable_IsFalse_WhenMiddlewareSignatureDoesNotMatchOrGreaterLevelThanContracts
-            <TContractRequest, TContractResponse, TMiddlewareRequest, TMiddlewareResponse>
-            (TContractRequest request, TContractResponse response, TMiddlewareRequest middlewareRequest, TMiddlewareResponse middlewareResponse)
+        public void IsApplicable_IsFalse_WhenMiddlewareSignatureDoesNotMatchOrGreaterLevelThanContracts<
+            TContractRequest,
+            TContractResponse,
+            TMiddlewareRequest,
+            TMiddlewareResponse
+        >(
+            TContractRequest request,
+            TContractResponse response,
+            TMiddlewareRequest middlewareRequest,
+            TMiddlewareResponse middlewareResponse
+        )
         {
             // Arrange
-            var middlewareItem = CreateItemForMiddlewareSignature<TMiddlewareRequest, TMiddlewareResponse>();
+            var middlewareItem = CreateItemForMiddlewareSignature<
+                TMiddlewareRequest,
+                TMiddlewareResponse
+            >();
             var contextType = typeof(IInvocationContext<TContractRequest, TContractResponse>);
 
             // Act
             var isApplicable = middlewareItem.IsApplicable(contextType);
 
             // Asser
-            Assert.That(isApplicable, Is.False, message: $"Middleware ({typeof(TMiddlewareRequest).Name} -> {typeof(TMiddlewareResponse).Name}) should NOT be applicable for contract ({typeof(TContractRequest).Name} -> {typeof(TContractResponse).Name})");
+            Assert.That(
+                isApplicable,
+                Is.False,
+                message: $"Middleware ({typeof(TMiddlewareRequest).Name} -> {typeof(TMiddlewareResponse).Name}) should NOT be applicable for contract ({typeof(TContractRequest).Name} -> {typeof(TContractResponse).Name})"
+            );
         }
 
         [Test]
@@ -103,7 +143,16 @@ namespace Ingot.Mediator.Engine.Tests.Pipeline.Internal._TestBases
             await MiddlewareItem.HandleAsync(Context, Next, CancellationToken);
 
             // Assert
-            Middleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Once, failMessage: "HandleAsync should called resolved middleware");
+            Middleware.Mock.Verify(
+                m =>
+                    m.HandleAsync(
+                        It.IsAny<IInvocationContext<TRequest, TResponse>>(),
+                        It.IsAny<Func<CancellationToken, Task>>(),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Once,
+                failMessage: "HandleAsync should called resolved middleware"
+            );
         }
 
         [Test]
@@ -120,7 +169,10 @@ namespace Ingot.Mediator.Engine.Tests.Pipeline.Internal._TestBases
             Next.Mock.Verify(m => m(It.IsAny<CancellationToken>()), Times.Once);
         }
 
-        protected abstract IMiddlewareInvocationPipelineItem CreateItemForMiddlewareSignature<TMiddlewareRequest, TMiddlewareResponse>();
+        protected abstract IMiddlewareInvocationPipelineItem CreateItemForMiddlewareSignature<
+            TMiddlewareRequest,
+            TMiddlewareResponse
+        >();
     }
 
     public class Other { }

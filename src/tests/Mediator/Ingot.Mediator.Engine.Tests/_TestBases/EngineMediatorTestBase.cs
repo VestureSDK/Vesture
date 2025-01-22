@@ -16,13 +16,19 @@ namespace Ingot.Mediator.Engine.Tests
     public abstract class EngineMediatorTestBase<TMediator> : MediatorConformanceTestBase<TMediator>
         where TMediator : IMediator
     {
-        protected void AddMiddleware<TRequest, TResponse>(int order, IInvocationMiddleware<TRequest, TResponse> middleware)
+        protected void AddMiddleware<TRequest, TResponse>(
+            int order,
+            IInvocationMiddleware<TRequest, TResponse> middleware
+        )
         {
             Middlewares.Add(middleware);
             RegisterMiddleware(order, middleware);
         }
 
-        protected abstract void RegisterMiddleware<TRequest, TResponse>(int order, IInvocationMiddleware<TRequest, TResponse> middleware);
+        protected abstract void RegisterMiddleware<TRequest, TResponse>(
+            int order,
+            IInvocationMiddleware<TRequest, TResponse> middleware
+        );
 
         [Test]
         [ConformanceTest]
@@ -51,19 +57,31 @@ namespace Ingot.Mediator.Engine.Tests
         [TestCaseSource_RequestResponse_All(int.MaxValue, 0)]
         [TestCaseSource_RequestResponse_All(int.MaxValue, 123)]
         [TestCaseSource_RequestResponse_All(int.MaxValue, int.MaxValue)]
-        public async Task HandleAndCaptureAsync_InvokesMiddlewares_InOrder<TRequest, TResponse>(TRequest request, TResponse response, int orderA, int orderB)
+        public async Task HandleAndCaptureAsync_InvokesMiddlewares_InOrder<TRequest, TResponse>(
+            TRequest request,
+            TResponse response,
+            int orderA,
+            int orderB
+        )
         {
             // Arrange
             var handler = new MockInvocationHandler<TRequest, TResponse>();
             AddHandler(handler);
 
-            var middlewaresExecuted = new List<MockMiddlewareInvocationPipelineItem<TRequest, TResponse>>();
+            var middlewaresExecuted =
+                new List<MockMiddlewareInvocationPipelineItem<TRequest, TResponse>>();
 
-            var middlewareA = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>() { Order = orderA, };
+            var middlewareA = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>()
+            {
+                Order = orderA,
+            };
             AddMiddlewareToExecutionListOnHandleAsyncInvoked(middlewareA);
             AddMiddleware(orderA, middlewareA);
 
-            var middlewareB = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>() { Order = orderB, };
+            var middlewareB = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>()
+            {
+                Order = orderB,
+            };
             AddMiddlewareToExecutionListOnHandleAsyncInvoked(middlewareB);
             AddMiddleware(orderB, middlewareB);
 
@@ -80,15 +98,29 @@ namespace Ingot.Mediator.Engine.Tests
                 Assert.That(middlewaresExecuted[middlewareBExpectedIndex], Is.EqualTo(middlewareB));
             });
 
-            void AddMiddlewareToExecutionListOnHandleAsyncInvoked(MockMiddlewareInvocationPipelineItem<TRequest, TResponse> middleware)
+            void AddMiddlewareToExecutionListOnHandleAsyncInvoked(
+                MockMiddlewareInvocationPipelineItem<TRequest, TResponse> middleware
+            )
             {
-                middleware.Mock
-                .Setup(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
-                .Returns<IInvocationContext<TRequest, TResponse>, Func<CancellationToken, Task>, CancellationToken>((context, next, cancellationtoken) =>
-                {
-                    middlewaresExecuted.Add(middleware);
-                    return next(cancellationtoken);
-                });
+                middleware
+                    .Mock.Setup(m =>
+                        m.HandleAsync(
+                            It.IsAny<IInvocationContext<TRequest, TResponse>>(),
+                            It.IsAny<Func<CancellationToken, Task>>(),
+                            It.IsAny<CancellationToken>()
+                        )
+                    )
+                    .Returns<
+                        IInvocationContext<TRequest, TResponse>,
+                        Func<CancellationToken, Task>,
+                        CancellationToken
+                    >(
+                        (context, next, cancellationtoken) =>
+                        {
+                            middlewaresExecuted.Add(middleware);
+                            return next(cancellationtoken);
+                        }
+                    );
             }
         }
 
@@ -119,19 +151,31 @@ namespace Ingot.Mediator.Engine.Tests
         [TestCaseSource_RequestResponse_All(int.MaxValue, 0)]
         [TestCaseSource_RequestResponse_All(int.MaxValue, 123)]
         [TestCaseSource_RequestResponse_All(int.MaxValue, int.MaxValue)]
-        public async Task HandleAsync_InvokesMiddlewares_InOrder<TRequest, TResponse>(TRequest request, TResponse response, int orderA, int orderB)
+        public async Task HandleAsync_InvokesMiddlewares_InOrder<TRequest, TResponse>(
+            TRequest request,
+            TResponse response,
+            int orderA,
+            int orderB
+        )
         {
             // Arrange
             var handler = new MockInvocationHandler<TRequest, TResponse>();
             AddHandler(handler);
 
-            var middlewaresExecuted = new List<MockMiddlewareInvocationPipelineItem<TRequest, TResponse>>();
+            var middlewaresExecuted =
+                new List<MockMiddlewareInvocationPipelineItem<TRequest, TResponse>>();
 
-            var middlewareA = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>() { Order = orderA, };
+            var middlewareA = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>()
+            {
+                Order = orderA,
+            };
             AddMiddlewareToExecutionListOnHandleAsyncInvoked(middlewareA);
             AddMiddleware(orderA, middlewareA);
 
-            var middlewareB = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>() { Order = orderB, };
+            var middlewareB = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>()
+            {
+                Order = orderB,
+            };
             AddMiddlewareToExecutionListOnHandleAsyncInvoked(middlewareB);
             AddMiddleware(orderB, middlewareB);
 
@@ -148,15 +192,29 @@ namespace Ingot.Mediator.Engine.Tests
                 Assert.That(middlewaresExecuted[middlewareBExpectedIndex], Is.EqualTo(middlewareB));
             });
 
-            void AddMiddlewareToExecutionListOnHandleAsyncInvoked(MockMiddlewareInvocationPipelineItem<TRequest, TResponse> middleware)
+            void AddMiddlewareToExecutionListOnHandleAsyncInvoked(
+                MockMiddlewareInvocationPipelineItem<TRequest, TResponse> middleware
+            )
             {
-                middleware.Mock
-                .Setup(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
-                .Returns<IInvocationContext<TRequest, TResponse>, Func<CancellationToken, Task>, CancellationToken>((context, next, cancellationtoken) =>
-                {
-                    middlewaresExecuted.Add(middleware);
-                    return next(cancellationtoken);
-                });
+                middleware
+                    .Mock.Setup(m =>
+                        m.HandleAsync(
+                            It.IsAny<IInvocationContext<TRequest, TResponse>>(),
+                            It.IsAny<Func<CancellationToken, Task>>(),
+                            It.IsAny<CancellationToken>()
+                        )
+                    )
+                    .Returns<
+                        IInvocationContext<TRequest, TResponse>,
+                        Func<CancellationToken, Task>,
+                        CancellationToken
+                    >(
+                        (context, next, cancellationtoken) =>
+                        {
+                            middlewaresExecuted.Add(middleware);
+                            return next(cancellationtoken);
+                        }
+                    );
             }
         }
 
@@ -187,20 +245,32 @@ namespace Ingot.Mediator.Engine.Tests
         [TestCaseSource_RequestResponse_Request(int.MaxValue, 0)]
         [TestCaseSource_RequestResponse_Request(int.MaxValue, 123)]
         [TestCaseSource_RequestResponse_Request(int.MaxValue, int.MaxValue)]
-        public async Task ExecuteAndCaptureAsync_InvokesMiddlewares_InOrder<TRequest, TResponse>(TRequest request, TResponse response, int orderA, int orderB)
+        public async Task ExecuteAndCaptureAsync_InvokesMiddlewares_InOrder<TRequest, TResponse>(
+            TRequest request,
+            TResponse response,
+            int orderA,
+            int orderB
+        )
             where TRequest : IRequest<TResponse>
         {
             // Arrange
             var handler = new MockInvocationHandler<TRequest, TResponse>();
             AddHandler(handler);
 
-            var middlewaresExecuted = new List<MockMiddlewareInvocationPipelineItem<TRequest, TResponse>>();
+            var middlewaresExecuted =
+                new List<MockMiddlewareInvocationPipelineItem<TRequest, TResponse>>();
 
-            var middlewareA = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>() { Order = orderA, };
+            var middlewareA = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>()
+            {
+                Order = orderA,
+            };
             AddMiddlewareToExecutionListOnHandleAsyncInvoked(middlewareA);
             AddMiddleware(orderA, middlewareA);
 
-            var middlewareB = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>() { Order = orderB, };
+            var middlewareB = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>()
+            {
+                Order = orderB,
+            };
             AddMiddlewareToExecutionListOnHandleAsyncInvoked(middlewareB);
             AddMiddleware(orderB, middlewareB);
 
@@ -217,15 +287,29 @@ namespace Ingot.Mediator.Engine.Tests
                 Assert.That(middlewaresExecuted[middlewareBExpectedIndex], Is.EqualTo(middlewareB));
             });
 
-            void AddMiddlewareToExecutionListOnHandleAsyncInvoked(MockMiddlewareInvocationPipelineItem<TRequest, TResponse> middleware)
+            void AddMiddlewareToExecutionListOnHandleAsyncInvoked(
+                MockMiddlewareInvocationPipelineItem<TRequest, TResponse> middleware
+            )
             {
-                middleware.Mock
-                .Setup(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
-                .Returns<IInvocationContext<TRequest, TResponse>, Func<CancellationToken, Task>, CancellationToken>((context, next, cancellationtoken) =>
-                {
-                    middlewaresExecuted.Add(middleware);
-                    return next(cancellationtoken);
-                });
+                middleware
+                    .Mock.Setup(m =>
+                        m.HandleAsync(
+                            It.IsAny<IInvocationContext<TRequest, TResponse>>(),
+                            It.IsAny<Func<CancellationToken, Task>>(),
+                            It.IsAny<CancellationToken>()
+                        )
+                    )
+                    .Returns<
+                        IInvocationContext<TRequest, TResponse>,
+                        Func<CancellationToken, Task>,
+                        CancellationToken
+                    >(
+                        (context, next, cancellationtoken) =>
+                        {
+                            middlewaresExecuted.Add(middleware);
+                            return next(cancellationtoken);
+                        }
+                    );
             }
         }
 
@@ -256,20 +340,32 @@ namespace Ingot.Mediator.Engine.Tests
         [TestCaseSource_RequestResponse_Request(int.MaxValue, 0)]
         [TestCaseSource_RequestResponse_Request(int.MaxValue, 123)]
         [TestCaseSource_RequestResponse_Request(int.MaxValue, int.MaxValue)]
-        public async Task ExecuteAsync_InvokesMiddlewares_InOrder<TRequest, TResponse>(TRequest request, TResponse response, int orderA, int orderB)
+        public async Task ExecuteAsync_InvokesMiddlewares_InOrder<TRequest, TResponse>(
+            TRequest request,
+            TResponse response,
+            int orderA,
+            int orderB
+        )
             where TRequest : IRequest<TResponse>
         {
             // Arrange
             var handler = new MockInvocationHandler<TRequest, TResponse>();
             AddHandler(handler);
 
-            var middlewaresExecuted = new List<MockMiddlewareInvocationPipelineItem<TRequest, TResponse>>();
+            var middlewaresExecuted =
+                new List<MockMiddlewareInvocationPipelineItem<TRequest, TResponse>>();
 
-            var middlewareA = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>() { Order = orderA, };
+            var middlewareA = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>()
+            {
+                Order = orderA,
+            };
             AddMiddlewareToExecutionListOnHandleAsyncInvoked(middlewareA);
             AddMiddleware(orderA, middlewareA);
 
-            var middlewareB = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>() { Order = orderB, };
+            var middlewareB = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>()
+            {
+                Order = orderB,
+            };
             AddMiddlewareToExecutionListOnHandleAsyncInvoked(middlewareB);
             AddMiddleware(orderB, middlewareB);
 
@@ -286,15 +382,29 @@ namespace Ingot.Mediator.Engine.Tests
                 Assert.That(middlewaresExecuted[middlewareBExpectedIndex], Is.EqualTo(middlewareB));
             });
 
-            void AddMiddlewareToExecutionListOnHandleAsyncInvoked(MockMiddlewareInvocationPipelineItem<TRequest, TResponse> middleware)
+            void AddMiddlewareToExecutionListOnHandleAsyncInvoked(
+                MockMiddlewareInvocationPipelineItem<TRequest, TResponse> middleware
+            )
             {
-                middleware.Mock
-                .Setup(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
-                .Returns<IInvocationContext<TRequest, TResponse>, Func<CancellationToken, Task>, CancellationToken>((context, next, cancellationtoken) =>
-                {
-                    middlewaresExecuted.Add(middleware);
-                    return next(cancellationtoken);
-                });
+                middleware
+                    .Mock.Setup(m =>
+                        m.HandleAsync(
+                            It.IsAny<IInvocationContext<TRequest, TResponse>>(),
+                            It.IsAny<Func<CancellationToken, Task>>(),
+                            It.IsAny<CancellationToken>()
+                        )
+                    )
+                    .Returns<
+                        IInvocationContext<TRequest, TResponse>,
+                        Func<CancellationToken, Task>,
+                        CancellationToken
+                    >(
+                        (context, next, cancellationtoken) =>
+                        {
+                            middlewaresExecuted.Add(middleware);
+                            return next(cancellationtoken);
+                        }
+                    );
             }
         }
 
@@ -325,20 +435,32 @@ namespace Ingot.Mediator.Engine.Tests
         [TestCaseSource_RequestResponse_Command(int.MaxValue, 0)]
         [TestCaseSource_RequestResponse_Command(int.MaxValue, 123)]
         [TestCaseSource_RequestResponse_Command(int.MaxValue, int.MaxValue)]
-        public async Task InvokeAndCaptureAsync_InvokesMiddlewares_InOrder<TRequest, TResponse>(TRequest request, TResponse response, int orderA, int orderB)
+        public async Task InvokeAndCaptureAsync_InvokesMiddlewares_InOrder<TRequest, TResponse>(
+            TRequest request,
+            TResponse response,
+            int orderA,
+            int orderB
+        )
             where TRequest : ICommand
         {
             // Arrange
             var handler = new MockInvocationHandler<TRequest, TResponse>();
             AddHandler(handler);
 
-            var middlewaresExecuted = new List<MockMiddlewareInvocationPipelineItem<TRequest, TResponse>>();
+            var middlewaresExecuted =
+                new List<MockMiddlewareInvocationPipelineItem<TRequest, TResponse>>();
 
-            var middlewareA = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>() { Order = orderA, };
+            var middlewareA = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>()
+            {
+                Order = orderA,
+            };
             AddMiddlewareToExecutionListOnHandleAsyncInvoked(middlewareA);
             AddMiddleware(orderA, middlewareA);
 
-            var middlewareB = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>() { Order = orderB, };
+            var middlewareB = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>()
+            {
+                Order = orderB,
+            };
             AddMiddlewareToExecutionListOnHandleAsyncInvoked(middlewareB);
             AddMiddleware(orderB, middlewareB);
 
@@ -355,15 +477,29 @@ namespace Ingot.Mediator.Engine.Tests
                 Assert.That(middlewaresExecuted[middlewareBExpectedIndex], Is.EqualTo(middlewareB));
             });
 
-            void AddMiddlewareToExecutionListOnHandleAsyncInvoked(MockMiddlewareInvocationPipelineItem<TRequest, TResponse> middleware)
+            void AddMiddlewareToExecutionListOnHandleAsyncInvoked(
+                MockMiddlewareInvocationPipelineItem<TRequest, TResponse> middleware
+            )
             {
-                middleware.Mock
-                .Setup(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
-                .Returns<IInvocationContext<TRequest, TResponse>, Func<CancellationToken, Task>, CancellationToken>((context, next, cancellationtoken) =>
-                {
-                    middlewaresExecuted.Add(middleware);
-                    return next(cancellationtoken);
-                });
+                middleware
+                    .Mock.Setup(m =>
+                        m.HandleAsync(
+                            It.IsAny<IInvocationContext<TRequest, TResponse>>(),
+                            It.IsAny<Func<CancellationToken, Task>>(),
+                            It.IsAny<CancellationToken>()
+                        )
+                    )
+                    .Returns<
+                        IInvocationContext<TRequest, TResponse>,
+                        Func<CancellationToken, Task>,
+                        CancellationToken
+                    >(
+                        (context, next, cancellationtoken) =>
+                        {
+                            middlewaresExecuted.Add(middleware);
+                            return next(cancellationtoken);
+                        }
+                    );
             }
         }
 
@@ -394,20 +530,32 @@ namespace Ingot.Mediator.Engine.Tests
         [TestCaseSource_RequestResponse_Command(int.MaxValue, 0)]
         [TestCaseSource_RequestResponse_Command(int.MaxValue, 123)]
         [TestCaseSource_RequestResponse_Command(int.MaxValue, int.MaxValue)]
-        public async Task InvokeAsync_InvokesMiddlewares_InOrder<TRequest, TResponse>(TRequest request, TResponse response, int orderA, int orderB)
+        public async Task InvokeAsync_InvokesMiddlewares_InOrder<TRequest, TResponse>(
+            TRequest request,
+            TResponse response,
+            int orderA,
+            int orderB
+        )
             where TRequest : ICommand
         {
             // Arrange
             var handler = new MockInvocationHandler<TRequest, TResponse>();
             AddHandler(handler);
 
-            var middlewaresExecuted = new List<MockMiddlewareInvocationPipelineItem<TRequest, TResponse>>();
+            var middlewaresExecuted =
+                new List<MockMiddlewareInvocationPipelineItem<TRequest, TResponse>>();
 
-            var middlewareA = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>() { Order = orderA, };
+            var middlewareA = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>()
+            {
+                Order = orderA,
+            };
             AddMiddlewareToExecutionListOnHandleAsyncInvoked(middlewareA);
             AddMiddleware(orderA, middlewareA);
 
-            var middlewareB = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>() { Order = orderB, };
+            var middlewareB = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>()
+            {
+                Order = orderB,
+            };
             AddMiddlewareToExecutionListOnHandleAsyncInvoked(middlewareB);
             AddMiddleware(orderB, middlewareB);
 
@@ -424,15 +572,29 @@ namespace Ingot.Mediator.Engine.Tests
                 Assert.That(middlewaresExecuted[middlewareBExpectedIndex], Is.EqualTo(middlewareB));
             });
 
-            void AddMiddlewareToExecutionListOnHandleAsyncInvoked(MockMiddlewareInvocationPipelineItem<TRequest, TResponse> middleware)
+            void AddMiddlewareToExecutionListOnHandleAsyncInvoked(
+                MockMiddlewareInvocationPipelineItem<TRequest, TResponse> middleware
+            )
             {
-                middleware.Mock
-                .Setup(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
-                .Returns<IInvocationContext<TRequest, TResponse>, Func<CancellationToken, Task>, CancellationToken>((context, next, cancellationtoken) =>
-                {
-                    middlewaresExecuted.Add(middleware);
-                    return next(cancellationtoken);
-                });
+                middleware
+                    .Mock.Setup(m =>
+                        m.HandleAsync(
+                            It.IsAny<IInvocationContext<TRequest, TResponse>>(),
+                            It.IsAny<Func<CancellationToken, Task>>(),
+                            It.IsAny<CancellationToken>()
+                        )
+                    )
+                    .Returns<
+                        IInvocationContext<TRequest, TResponse>,
+                        Func<CancellationToken, Task>,
+                        CancellationToken
+                    >(
+                        (context, next, cancellationtoken) =>
+                        {
+                            middlewaresExecuted.Add(middleware);
+                            return next(cancellationtoken);
+                        }
+                    );
             }
         }
 
@@ -463,20 +625,32 @@ namespace Ingot.Mediator.Engine.Tests
         [TestCaseSource_RequestResponse_Event(int.MaxValue, 0)]
         [TestCaseSource_RequestResponse_Event(int.MaxValue, 123)]
         [TestCaseSource_RequestResponse_Event(int.MaxValue, int.MaxValue)]
-        public async Task PublishAndCaptureAsync_InvokesMiddlewares_InOrder<TRequest, TResponse>(TRequest request, TResponse response, int orderA, int orderB)
+        public async Task PublishAndCaptureAsync_InvokesMiddlewares_InOrder<TRequest, TResponse>(
+            TRequest request,
+            TResponse response,
+            int orderA,
+            int orderB
+        )
             where TRequest : IEvent
         {
             // Arrange
             var handler = new MockInvocationHandler<TRequest, TResponse>();
             AddHandler(handler);
 
-            var middlewaresExecuted = new List<MockMiddlewareInvocationPipelineItem<TRequest, TResponse>>();
+            var middlewaresExecuted =
+                new List<MockMiddlewareInvocationPipelineItem<TRequest, TResponse>>();
 
-            var middlewareA = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>() { Order = orderA, };
+            var middlewareA = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>()
+            {
+                Order = orderA,
+            };
             AddMiddlewareToExecutionListOnHandleAsyncInvoked(middlewareA);
             AddMiddleware(orderA, middlewareA);
 
-            var middlewareB = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>() { Order = orderB, };
+            var middlewareB = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>()
+            {
+                Order = orderB,
+            };
             AddMiddlewareToExecutionListOnHandleAsyncInvoked(middlewareB);
             AddMiddleware(orderB, middlewareB);
 
@@ -493,15 +667,29 @@ namespace Ingot.Mediator.Engine.Tests
                 Assert.That(middlewaresExecuted[middlewareBExpectedIndex], Is.EqualTo(middlewareB));
             });
 
-            void AddMiddlewareToExecutionListOnHandleAsyncInvoked(MockMiddlewareInvocationPipelineItem<TRequest, TResponse> middleware)
+            void AddMiddlewareToExecutionListOnHandleAsyncInvoked(
+                MockMiddlewareInvocationPipelineItem<TRequest, TResponse> middleware
+            )
             {
-                middleware.Mock
-                .Setup(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
-                .Returns<IInvocationContext<TRequest, TResponse>, Func<CancellationToken, Task>, CancellationToken>((context, next, cancellationtoken) =>
-                {
-                    middlewaresExecuted.Add(middleware);
-                    return next(cancellationtoken);
-                });
+                middleware
+                    .Mock.Setup(m =>
+                        m.HandleAsync(
+                            It.IsAny<IInvocationContext<TRequest, TResponse>>(),
+                            It.IsAny<Func<CancellationToken, Task>>(),
+                            It.IsAny<CancellationToken>()
+                        )
+                    )
+                    .Returns<
+                        IInvocationContext<TRequest, TResponse>,
+                        Func<CancellationToken, Task>,
+                        CancellationToken
+                    >(
+                        (context, next, cancellationtoken) =>
+                        {
+                            middlewaresExecuted.Add(middleware);
+                            return next(cancellationtoken);
+                        }
+                    );
             }
         }
 
@@ -532,20 +720,32 @@ namespace Ingot.Mediator.Engine.Tests
         [TestCaseSource_RequestResponse_Event(int.MaxValue, 0)]
         [TestCaseSource_RequestResponse_Event(int.MaxValue, 123)]
         [TestCaseSource_RequestResponse_Event(int.MaxValue, int.MaxValue)]
-        public async Task PublishAsync_InvokesMiddlewares_InOrder<TRequest, TResponse>(TRequest request, TResponse response, int orderA, int orderB)
+        public async Task PublishAsync_InvokesMiddlewares_InOrder<TRequest, TResponse>(
+            TRequest request,
+            TResponse response,
+            int orderA,
+            int orderB
+        )
             where TRequest : IEvent
         {
             // Arrange
             var handler = new MockInvocationHandler<TRequest, TResponse>();
             AddHandler(handler);
 
-            var middlewaresExecuted = new List<MockMiddlewareInvocationPipelineItem<TRequest, TResponse>>();
+            var middlewaresExecuted =
+                new List<MockMiddlewareInvocationPipelineItem<TRequest, TResponse>>();
 
-            var middlewareA = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>() { Order = orderA, };
+            var middlewareA = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>()
+            {
+                Order = orderA,
+            };
             AddMiddlewareToExecutionListOnHandleAsyncInvoked(middlewareA);
             AddMiddleware(orderA, middlewareA);
 
-            var middlewareB = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>() { Order = orderB, };
+            var middlewareB = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>()
+            {
+                Order = orderB,
+            };
             AddMiddlewareToExecutionListOnHandleAsyncInvoked(middlewareB);
             AddMiddleware(orderB, middlewareB);
 
@@ -562,15 +762,29 @@ namespace Ingot.Mediator.Engine.Tests
                 Assert.That(middlewaresExecuted[middlewareBExpectedIndex], Is.EqualTo(middlewareB));
             });
 
-            void AddMiddlewareToExecutionListOnHandleAsyncInvoked(MockMiddlewareInvocationPipelineItem<TRequest, TResponse> middleware)
+            void AddMiddlewareToExecutionListOnHandleAsyncInvoked(
+                MockMiddlewareInvocationPipelineItem<TRequest, TResponse> middleware
+            )
             {
-                middleware.Mock
-                .Setup(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
-                .Returns<IInvocationContext<TRequest, TResponse>, Func<CancellationToken, Task>, CancellationToken>((context, next, cancellationtoken) =>
-                {
-                    middlewaresExecuted.Add(middleware);
-                    return next(cancellationtoken);
-                });
+                middleware
+                    .Mock.Setup(m =>
+                        m.HandleAsync(
+                            It.IsAny<IInvocationContext<TRequest, TResponse>>(),
+                            It.IsAny<Func<CancellationToken, Task>>(),
+                            It.IsAny<CancellationToken>()
+                        )
+                    )
+                    .Returns<
+                        IInvocationContext<TRequest, TResponse>,
+                        Func<CancellationToken, Task>,
+                        CancellationToken
+                    >(
+                        (context, next, cancellationtoken) =>
+                        {
+                            middlewaresExecuted.Add(middleware);
+                            return next(cancellationtoken);
+                        }
+                    );
             }
         }
     }

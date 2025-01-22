@@ -9,16 +9,21 @@ namespace Ingot.Mediator.Engine.Mocks.Pipeline.Context
     {
         private Action<object>? _contextFactorySetup;
 
-        public void SetupCreateContextFactory<TRequest, TResponse>(Action<MockInvocationContextFactory<TRequest, TResponse>>? contextFactorySetup)
+        public void SetupCreateContextFactory<TRequest, TResponse>(
+            Action<MockInvocationContextFactory<TRequest, TResponse>>? contextFactorySetup
+        )
         {
-            _contextFactorySetup = (context) => contextFactorySetup?.Invoke((MockInvocationContextFactory<TRequest, TResponse>)context);
+            _contextFactorySetup = (context) =>
+                contextFactorySetup?.Invoke(
+                    (MockInvocationContextFactory<TRequest, TResponse>)context
+                );
         }
 
         public IInvocationContextFactory CreateContextFactory<TRequest, TResponse>(object request)
         {
             var contextFactory = new MockInvocationContextFactory<TRequest, TResponse>
             {
-                Request = (TRequest)request
+                Request = (TRequest)request,
             };
 
             _contextFactorySetup?.Invoke(contextFactory);
@@ -26,14 +31,17 @@ namespace Ingot.Mediator.Engine.Mocks.Pipeline.Context
             return contextFactory;
         }
 
-        public IInvocationContext<TRequest, TResponse> CreateContextForRequest<TRequest, TResponse>(object request)
+        public IInvocationContext<TRequest, TResponse> CreateContextForRequest<TRequest, TResponse>(
+            object request
+        )
         {
             var contextFactory = CreateContextFactory<TRequest, TResponse>(request);
             return contextFactory.CreateContextForRequest<TRequest, TResponse>(request);
         }
     }
 
-    public class MockInvocationContextFactory<TContextRequest, TContextResponse> : IInvocationContextFactory
+    public class MockInvocationContextFactory<TContextRequest, TContextResponse>
+        : IInvocationContextFactory
     {
         public Mock<IInvocationContextFactory> Mock { get; } = new();
 
@@ -66,13 +74,19 @@ namespace Ingot.Mediator.Engine.Mocks.Pipeline.Context
             _request = default!;
             _managedContext = new MockInvocationContext<TContextRequest, TContextResponse>
             {
-                Request = _request
+                Request = _request,
             };
 
-            Mock.Setup(m => m.CreateContextForRequest<TContextRequest, TContextResponse>(It.IsAny<TContextRequest>()!))
+            Mock.Setup(m =>
+                    m.CreateContextForRequest<TContextRequest, TContextResponse>(
+                        It.IsAny<TContextRequest>()!
+                    )
+                )
                 .Returns(() => Context);
         }
 
-        public IInvocationContext<TRequest, TResponse> CreateContextForRequest<TRequest, TResponse>(object request) => _inner.CreateContextForRequest<TRequest, TResponse>(request);
+        public IInvocationContext<TRequest, TResponse> CreateContextForRequest<TRequest, TResponse>(
+            object request
+        ) => _inner.CreateContextForRequest<TRequest, TResponse>(request);
     }
 }

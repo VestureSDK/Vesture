@@ -5,7 +5,11 @@ using Moq;
 namespace Ingot.Mediator.Engine.Tests.Pipeline.Resolvers
 {
     [ImplementationTest]
-    public class DeferredSingletonInvocationComponentResolverTest : InvocationComponentResolverConformanceTestBase<object, DeferredSingletonInvocationComponentResolver<object>>
+    public class DeferredSingletonInvocationComponentResolverTest
+        : InvocationComponentResolverConformanceTestBase<
+            object,
+            DeferredSingletonInvocationComponentResolver<object>
+        >
     {
         public object SingletonInstance { get; set; } = new object();
 
@@ -20,7 +24,8 @@ namespace Ingot.Mediator.Engine.Tests.Pipeline.Resolvers
             Lazy = new Lazy<object>(() => Factory.Object());
         }
 
-        protected override DeferredSingletonInvocationComponentResolver<object> CreateInvocationComponentResolver() => new(Lazy);
+        protected override DeferredSingletonInvocationComponentResolver<object> CreateInvocationComponentResolver() =>
+            new(Lazy);
 
         [Test]
         public void ResolveComponent_IsSingletonInstance()

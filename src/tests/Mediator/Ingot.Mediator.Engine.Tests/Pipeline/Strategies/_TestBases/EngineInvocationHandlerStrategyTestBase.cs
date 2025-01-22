@@ -5,13 +5,18 @@ using Moq;
 
 namespace Ingot.Mediator.Engine.Tests.Pipeline.Strategies
 {
-    public abstract class EngineInvocationHandlerStrategyTestBase<TRequest, TResponse, TStrategy> :
-       InvocationHandlerStrategyConformanceTestBase<TRequest, TResponse, TStrategy>
-       where TStrategy : IInvocationHandlerStrategy<TRequest, TResponse>
+    public abstract class EngineInvocationHandlerStrategyTestBase<TRequest, TResponse, TStrategy>
+        : InvocationHandlerStrategyConformanceTestBase<TRequest, TResponse, TStrategy>
+        where TStrategy : IInvocationHandlerStrategy<TRequest, TResponse>
     {
-        protected MockInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>> Resolver { get; }
+        protected MockInvocationComponentResolver<
+            IInvocationHandler<TRequest, TResponse>
+        > Resolver { get; }
 
-        protected EngineInvocationHandlerStrategyTestBase(TRequest defaultRequest, TResponse defaultResponse)
+        protected EngineInvocationHandlerStrategyTestBase(
+            TRequest defaultRequest,
+            TResponse defaultResponse
+        )
             : base(defaultRequest, defaultResponse)
         {
             Resolver = new() { Component = Handler };

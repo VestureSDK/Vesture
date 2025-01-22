@@ -4,11 +4,11 @@ namespace Ingot.Mediator.Events
 {
     /// <summary>
     /// <para>
-    /// The <see cref="EventResponse"/> is a <see cref="System.Type"/> used as a response placeholder 
+    /// The <see cref="EventResponse"/> is a <see cref="System.Type"/> used as a response placeholder
     /// when handling a <see cref="IEvent"/> via a <see cref="IMediator"/>.
     /// </para>
     /// <para>
-    /// The <see cref="EventResponse"/> type should be used when 
+    /// The <see cref="EventResponse"/> type should be used when
     /// implementing an <see cref="IInvocationMiddleware{TRequest, TResponse}"/> for
     /// either all or specific <see cref="IEvent"/> contracts.
     /// </para>

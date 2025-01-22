@@ -1,6 +1,7 @@
 ﻿namespace Ingot.Mediator.Abstractions.Tests.Data.Internal
 {
-    public class ContractRequestResponseMediatorRequestResponseTestData : ContractRequestResponseTestData
+    public class ContractRequestResponseMediatorRequestResponseTestData
+        : ContractRequestResponseTestData
     {
         public required object MediatorRequest { get; set; }
 

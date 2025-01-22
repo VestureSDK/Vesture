@@ -5,11 +5,11 @@ namespace Ingot.Mediator.Invocation
 {
     /// <summary>
     /// <para>
-    /// The <see cref="NoResponse"/> is a <see cref="System.Type"/> used as a response placeholder 
+    /// The <see cref="NoResponse"/> is a <see cref="System.Type"/> used as a response placeholder
     /// when handling a <see cref="ICommand"/> or <see cref="IEvent"/> via a <see cref="IMediator"/>.
     /// </para>
     /// <para>
-    /// The <see cref="NoResponse"/> type should be used when 
+    /// The <see cref="NoResponse"/> type should be used when
     /// implementing an <see cref="IInvocationMiddleware{TRequest, TResponse}"/> for
     /// either any <see cref="ICommand"/> or <see cref="IEvent"/> contracts.
     /// </para>

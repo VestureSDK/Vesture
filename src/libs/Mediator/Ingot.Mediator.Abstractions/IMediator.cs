@@ -7,11 +7,11 @@ namespace Ingot.Mediator
 {
     /// <summary>
     /// <para>
-    /// An <see cref="IMediator"/> coordinates the execution of different types of contracts 
+    /// An <see cref="IMediator"/> coordinates the execution of different types of contracts
     /// such as requests, commands, and events by invoking the appropriate handlers and middlewares.
     /// </para>
     /// <para>
-    /// The mediator acts as a central point of communication in your application, 
+    /// The mediator acts as a central point of communication in your application,
     /// decoupling the components that send requests, commands, or events from those that handle them.
     /// </para>
     /// <para>
@@ -23,7 +23,7 @@ namespace Ingot.Mediator
     /// </list>
     /// </para>
     /// <para>
-    /// The mediator ensures that the right handler for each type of contract is invoked, allowing for a 
+    /// The mediator ensures that the right handler for each type of contract is invoked, allowing for a
     /// cleaner and more modular codebase by promoting loose coupling between components.
     /// </para>
     /// </summary>
@@ -35,7 +35,7 @@ namespace Ingot.Mediator
     public interface IMediator
     {
         /// <summary>
-        /// Processes the specified unmarked contract and returns the expected 
+        /// Processes the specified unmarked contract and returns the expected
         /// <typeparamref name="TResponse"/>.
         /// </summary>
         /// <typeparam name="TResponse">
@@ -48,26 +48,32 @@ namespace Ingot.Mediator
         /// <inheritdoc cref="IInvocationHandler{TRequest, TResponse}.HandleAsync(TRequest, CancellationToken)" path="/param[@name='cancellationToken']"/>
         /// </param>
         /// <returns>
-        /// A <see cref="Task{TResult}"/> representing the asynchronous operation, with 
+        /// A <see cref="Task{TResult}"/> representing the asynchronous operation, with
         /// a result of type <typeparamref name="TResponse"/>.
         /// </returns>
-        Task<TResponse> HandleAsync<TResponse>(object contract, CancellationToken cancellationToken = default);
+        Task<TResponse> HandleAsync<TResponse>(
+            object contract,
+            CancellationToken cancellationToken = default
+        );
 
         /// <summary>
-        /// Processes the specified unmarked contract and returns 
-        /// the <see cref="IInvocationContext{TResponse}"/> containing the expected <typeparamref name="TResponse"/> 
+        /// Processes the specified unmarked contract and returns
+        /// the <see cref="IInvocationContext{TResponse}"/> containing the expected <typeparamref name="TResponse"/>
         /// or any <see cref="Exception"/> that might have occurred.
         /// </summary>
         /// <returns>
-        /// A <see cref="Task{TResult}"/> representing the asynchronous operation, with 
-        /// a result of type <see cref="IInvocationContext{TResponse}"/> containing the expected 
+        /// A <see cref="Task{TResult}"/> representing the asynchronous operation, with
+        /// a result of type <see cref="IInvocationContext{TResponse}"/> containing the expected
         /// <typeparamref name="TResponse"/> or any <see cref="Exception"/> that might have occurred.
         /// </returns>
         /// <inheritdoc cref="HandleAsync{TResponse}(Object, CancellationToken)"/>
-        Task<IInvocationContext<TResponse>> HandleAndCaptureAsync<TResponse>(object contract, CancellationToken cancellationToken = default);
+        Task<IInvocationContext<TResponse>> HandleAndCaptureAsync<TResponse>(
+            object contract,
+            CancellationToken cancellationToken = default
+        );
 
         /// <summary>
-        /// Processes the specified <see cref="IRequest{TResponse}"/> contract and returns the expected 
+        /// Processes the specified <see cref="IRequest{TResponse}"/> contract and returns the expected
         /// <typeparamref name="TResponse"/>.
         /// </summary>
         /// <typeparam name="TResponse">
@@ -82,49 +88,61 @@ namespace Ingot.Mediator
         /// <returns>
         /// <inheritdoc cref="IInvocationHandler{TRequest, TResponse}.HandleAsync(TRequest, CancellationToken)" path="/returns"/>
         /// </returns>
-        Task<TResponse> ExecuteAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default);
+        Task<TResponse> ExecuteAsync<TResponse>(
+            IRequest<TResponse> request,
+            CancellationToken cancellationToken = default
+        );
 
         /// <summary>
-        /// Processes the specified <see cref="IRequest{TResponse}"/> contract and returns 
-        /// the <see cref="IInvocationContext{TResponse}"/> containing the expected <typeparamref name="TResponse"/> 
+        /// Processes the specified <see cref="IRequest{TResponse}"/> contract and returns
+        /// the <see cref="IInvocationContext{TResponse}"/> containing the expected <typeparamref name="TResponse"/>
         /// or any <see cref="Exception"/> that might have occurred.
         /// </summary>
         /// <returns>
-        /// A <see cref="Task{TResult}"/> representing the asynchronous operation, with 
-        /// a result of type <see cref="IInvocationContext{TResponse}"/> containing the expected 
+        /// A <see cref="Task{TResult}"/> representing the asynchronous operation, with
+        /// a result of type <see cref="IInvocationContext{TResponse}"/> containing the expected
         /// <typeparamref name="TResponse"/> or any <see cref="Exception"/> that might have occurred.
         /// </returns>
         /// <inheritdoc cref="ExecuteAsync{TResponse}(IRequest{TResponse}, CancellationToken)"/>
-        Task<IInvocationContext<TResponse>> ExecuteAndCaptureAsync<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default);
+        Task<IInvocationContext<TResponse>> ExecuteAndCaptureAsync<TResponse>(
+            IRequest<TResponse> request,
+            CancellationToken cancellationToken = default
+        );
 
         /// <inheritdoc cref="CommandHandler{TCommand}.HandleAsync(TCommand, CancellationToken)"/>
         Task InvokeAsync(ICommand command, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Processes the specified <see cref="ICommand"/> contract and returns the 
+        /// Processes the specified <see cref="ICommand"/> contract and returns the
         /// <see cref="IInvocationContext{TResponse}"/> containing any <see cref="Exception"/> that might have occurred.
         /// </summary>
         /// <returns>
-        /// A <see cref="Task{TResult}"/> representing the asynchronous operation, with 
-        /// a result of type <see cref="IInvocationContext{TResponse}"/> containing any 
+        /// A <see cref="Task{TResult}"/> representing the asynchronous operation, with
+        /// a result of type <see cref="IInvocationContext{TResponse}"/> containing any
         /// <see cref="Exception"/> that might have occurred.
         /// </returns>
         /// <inheritdoc cref="InvokeAsync(ICommand, CancellationToken)"/>
-        Task<IInvocationContext> InvokeAndCaptureAsync(ICommand command, CancellationToken cancellationToken = default);
+        Task<IInvocationContext> InvokeAndCaptureAsync(
+            ICommand command,
+            CancellationToken cancellationToken = default
+        );
 
         /// <inheritdoc cref="Ingot.Mediator.Events.EventHandler{TEvent}.HandleAsync(TEvent, CancellationToken)"/>
         Task PublishAsync(IEvent @event, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Processes the specified <see cref="IEvent"/> contract and returns the 
+        /// Processes the specified <see cref="IEvent"/> contract and returns the
         /// <see cref="IInvocationContext{TResponse}"/> containing any <see cref="Exception"/> that might have occurred.
         /// </summary>
         /// <returns>
-        /// A <see cref="Task{TResult}"/> representing the asynchronous operation, with 
-        /// a result of type <see cref="IInvocationContext{TResponse}"/> containing any 
+        /// A <see cref="Task{TResult}"/> representing the asynchronous operation, with
+        /// a result of type <see cref="IInvocationContext{TResponse}"/> containing any
         /// <see cref="Exception"/> that might have occurred.
         /// </returns>
         /// <inheritdoc cref="PublishAsync(IEvent, CancellationToken)"/>
-        Task<IInvocationContext> PublishAndCaptureAsync(IEvent @event, CancellationToken cancellationToken = default);
+        Task<IInvocationContext> PublishAndCaptureAsync(
+            IEvent @event,
+            CancellationToken cancellationToken = default
+        );
     }
 }

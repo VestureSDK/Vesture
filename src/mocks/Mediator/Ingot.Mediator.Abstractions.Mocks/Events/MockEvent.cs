@@ -6,8 +6,5 @@ namespace Ingot.Mediator.Mocks.Events
     /// <summary>
     /// Defines a mock <see cref="IEvent"/> contract.
     /// </summary>
-    public class MockEvent : MockContract, IEvent
-    {
-
-    }
+    public class MockEvent : MockContract, IEvent { }
 }

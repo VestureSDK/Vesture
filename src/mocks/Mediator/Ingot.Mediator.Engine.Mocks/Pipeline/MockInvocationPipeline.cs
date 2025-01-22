@@ -23,7 +23,9 @@ namespace Ingot.Mediator.Engine.Mocks.Pipeline
         public abstract ICollection<IMiddlewareInvocationPipelineItem> Middlewares { get; set; }
     }
 
-    public class MockInvocationPipeline<TRequest, TResponse> : MockInvocationPipeline, IInvocationPipeline<TResponse>
+    public class MockInvocationPipeline<TRequest, TResponse>
+        : MockInvocationPipeline,
+            IInvocationPipeline<TResponse>
     {
         public Mock<IInvocationPipeline<TResponse>> Mock { get; } = new();
 
@@ -150,39 +152,37 @@ namespace Ingot.Mediator.Engine.Mocks.Pipeline
             _request = default!;
             _response = default!;
 
-            _managedContext = new()
-            {
-                Request = _request,
-            };
+            _managedContext = new() { Request = _request };
 
-            _managedContextFactory = new()
-            {
-                Context = _managedContext,
-            };
+            _managedContextFactory = new() { Context = _managedContext };
 
             _managedPrePipelineMiddleware = new();
             _managedPreHandlerMiddleware = new();
 
-            _managedHandlerStrategy = new()
-            {
-                Response = Response
-            };
+            _managedHandlerStrategy = new() { Response = Response };
 
             RequestType = typeof(TRequest);
             ResponseType = typeof(TResponse);
 
-            Mock
-                .Setup(m => m.HandleAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()))
-                .Returns<object, CancellationToken>(async (request, cancellationToken) =>
-                {
-                    var context = ContextFactory.CreateContextForRequest<TRequest, TResponse>(request);
-                    var chainOfResponsibility = CreateMockChainOfresponsibility();
-                    await chainOfResponsibility.Invoke(context, cancellationToken);
-                    return context;
-                });
+            Mock.Setup(m => m.HandleAsync(It.IsAny<object>(), It.IsAny<CancellationToken>()))
+                .Returns<object, CancellationToken>(
+                    async (request, cancellationToken) =>
+                    {
+                        var context = ContextFactory.CreateContextForRequest<TRequest, TResponse>(
+                            request
+                        );
+                        var chainOfResponsibility = CreateMockChainOfresponsibility();
+                        await chainOfResponsibility.Invoke(context, cancellationToken);
+                        return context;
+                    }
+                );
         }
 
-        public Func<IInvocationContext<TRequest, TResponse>, CancellationToken, Task> CreateMockChainOfresponsibility()
+        public Func<
+            IInvocationContext<TRequest, TResponse>,
+            CancellationToken,
+            Task
+        > CreateMockChainOfresponsibility()
         {
             var middlewares = new List<IInvocationMiddleware<TRequest, TResponse>>();
 
@@ -195,9 +195,16 @@ namespace Ingot.Mediator.Engine.Mocks.Pipeline
                 }
             }
 
-            Func<IInvocationContext<TRequest, TResponse>, CancellationToken, Task> chain = (ctx, ct) =>
+            Func<IInvocationContext<TRequest, TResponse>, CancellationToken, Task> chain = (
+                ctx,
+                ct
+            ) =>
             {
-                return PreHandlerMiddleware.HandleAsync((IInvocationContext<object, object>)ctx, (t) => handler(ctx, t), ct);
+                return PreHandlerMiddleware.HandleAsync(
+                    (IInvocationContext<object, object>)ctx,
+                    (t) => handler(ctx, t),
+                    ct
+                );
             };
 
             // Build the chain of responsibility and return the new root func.
@@ -205,23 +212,31 @@ namespace Ingot.Mediator.Engine.Mocks.Pipeline
             {
                 var nextMiddleware = chain;
                 var item = middlewares[i];
-                chain = (ctx, ct) => item.HandleAsync(ctx, (t) => nextMiddleware.Invoke(ctx, t), ct);
+                chain = (ctx, ct) =>
+                    item.HandleAsync(ctx, (t) => nextMiddleware.Invoke(ctx, t), ct);
             }
 
             var next = chain;
             chain = (ctx, ct) =>
             {
-                return PrePipelineMiddleware.HandleAsync((IInvocationContext<object, object>)ctx, (t) => next.Invoke(ctx, t), ct);
+                return PrePipelineMiddleware.HandleAsync(
+                    (IInvocationContext<object, object>)ctx,
+                    (t) => next.Invoke(ctx, t),
+                    ct
+                );
             };
 
             return chain!;
 
 #pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-            Task handler(IInvocationContext<TRequest, TResponse> ctx, CancellationToken ct) => HandlerStrategy.HandleAsync(ctx, null, ct);
+            Task handler(IInvocationContext<TRequest, TResponse> ctx, CancellationToken ct) =>
+                HandlerStrategy.HandleAsync(ctx, null, ct);
 #pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
         }
 
-
-        public Task<IInvocationContext<TResponse>> HandleAsync(object request, CancellationToken cancellationToken) => _inner.HandleAsync(request, cancellationToken);
+        public Task<IInvocationContext<TResponse>> HandleAsync(
+            object request,
+            CancellationToken cancellationToken
+        ) => _inner.HandleAsync(request, cancellationToken);
     }
 }

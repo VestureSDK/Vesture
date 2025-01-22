@@ -3,8 +3,5 @@
     /// <summary>
     /// Defines a mock unmarked contract.
     /// </summary>
-    public class MockUnmarked : MockContract
-    {
-
-    }
+    public class MockUnmarked : MockContract { }
 }

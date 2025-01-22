@@ -86,7 +86,15 @@ namespace Ingot.Mediator.Engine.Tests.Pipeline
             await Pipeline.HandleAsync(Request!, CancellationToken);
 
             // Assert
-            HandlerStrategy.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Once);
+            HandlerStrategy.Mock.Verify(
+                m =>
+                    m.HandleAsync(
+                        It.IsAny<IInvocationContext<TRequest, TResponse>>(),
+                        It.IsAny<Func<CancellationToken, Task>>(),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Once
+            );
         }
 
         [Test]
@@ -100,7 +108,15 @@ namespace Ingot.Mediator.Engine.Tests.Pipeline
             await Pipeline.HandleAsync(Request!, CancellationToken);
 
             // Assert
-            middleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Once);
+            middleware.Mock.Verify(
+                m =>
+                    m.HandleAsync(
+                        It.IsAny<IInvocationContext<TRequest, TResponse>>(),
+                        It.IsAny<Func<CancellationToken, Task>>(),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Once
+            );
         }
 
         [Test]
@@ -113,7 +129,15 @@ namespace Ingot.Mediator.Engine.Tests.Pipeline
             await Pipeline.HandleAsync(Request!, CancellationToken);
 
             // Assert
-            PrePipelineMiddleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<Any, Any>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Once);
+            PrePipelineMiddleware.Mock.Verify(
+                m =>
+                    m.HandleAsync(
+                        It.IsAny<IInvocationContext<Any, Any>>(),
+                        It.IsAny<Func<CancellationToken, Task>>(),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Once
+            );
         }
 
         [Test]
@@ -126,7 +150,15 @@ namespace Ingot.Mediator.Engine.Tests.Pipeline
             await Pipeline.HandleAsync(Request!, CancellationToken);
 
             // Assert
-            PreHandlerMiddleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<Any, Any>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Once);
+            PreHandlerMiddleware.Mock.Verify(
+                m =>
+                    m.HandleAsync(
+                        It.IsAny<IInvocationContext<Any, Any>>(),
+                        It.IsAny<Func<CancellationToken, Task>>(),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Once
+            );
         }
 
         [Test]
@@ -134,7 +166,10 @@ namespace Ingot.Mediator.Engine.Tests.Pipeline
         {
             // Arrange
             var prePipelineMiddlewareTaskCompletionSource = new TaskCompletionSource();
-            SetupMiddlewareWithTaskCompletionSource(PrePipelineMiddleware, prePipelineMiddlewareTaskCompletionSource);
+            SetupMiddlewareWithTaskCompletionSource(
+                PrePipelineMiddleware,
+                prePipelineMiddlewareTaskCompletionSource
+            );
 
             var middlewareTaskCompletionSource = new TaskCompletionSource();
             var middleware = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>();
@@ -142,82 +177,263 @@ namespace Ingot.Mediator.Engine.Tests.Pipeline
             MiddlewareItems.Add(middleware);
 
             var preHandlerMiddlewareTaskCompletionSource = new TaskCompletionSource();
-            SetupMiddlewareWithTaskCompletionSource(PreHandlerMiddleware, preHandlerMiddlewareTaskCompletionSource);
+            SetupMiddlewareWithTaskCompletionSource(
+                PreHandlerMiddleware,
+                preHandlerMiddlewareTaskCompletionSource
+            );
 
             var handlerStrategyTaskCompletionSource = new TaskCompletionSource();
-            SetupHandlerStrategyWithTaskCompletionSource(HandlerStrategy, handlerStrategyTaskCompletionSource);
+            SetupHandlerStrategyWithTaskCompletionSource(
+                HandlerStrategy,
+                handlerStrategyTaskCompletionSource
+            );
 
             // Act / Assert
             var task = Pipeline.HandleAsync(Request!, CancellationToken);
 
-            PrePipelineMiddleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<Any, Any>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Once);
-            middleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Never);
-            PreHandlerMiddleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<Any, Any>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Never);
-            HandlerStrategy.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Never);
+            PrePipelineMiddleware.Mock.Verify(
+                m =>
+                    m.HandleAsync(
+                        It.IsAny<IInvocationContext<Any, Any>>(),
+                        It.IsAny<Func<CancellationToken, Task>>(),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Once
+            );
+            middleware.Mock.Verify(
+                m =>
+                    m.HandleAsync(
+                        It.IsAny<IInvocationContext<TRequest, TResponse>>(),
+                        It.IsAny<Func<CancellationToken, Task>>(),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Never
+            );
+            PreHandlerMiddleware.Mock.Verify(
+                m =>
+                    m.HandleAsync(
+                        It.IsAny<IInvocationContext<Any, Any>>(),
+                        It.IsAny<Func<CancellationToken, Task>>(),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Never
+            );
+            HandlerStrategy.Mock.Verify(
+                m =>
+                    m.HandleAsync(
+                        It.IsAny<IInvocationContext<TRequest, TResponse>>(),
+                        It.IsAny<Func<CancellationToken, Task>>(),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Never
+            );
 
             prePipelineMiddlewareTaskCompletionSource.SetResult();
 
-            PrePipelineMiddleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<Any, Any>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Once);
-            middleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Once);
-            PreHandlerMiddleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<Any, Any>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Never);
-            HandlerStrategy.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Never);
+            PrePipelineMiddleware.Mock.Verify(
+                m =>
+                    m.HandleAsync(
+                        It.IsAny<IInvocationContext<Any, Any>>(),
+                        It.IsAny<Func<CancellationToken, Task>>(),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Once
+            );
+            middleware.Mock.Verify(
+                m =>
+                    m.HandleAsync(
+                        It.IsAny<IInvocationContext<TRequest, TResponse>>(),
+                        It.IsAny<Func<CancellationToken, Task>>(),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Once
+            );
+            PreHandlerMiddleware.Mock.Verify(
+                m =>
+                    m.HandleAsync(
+                        It.IsAny<IInvocationContext<Any, Any>>(),
+                        It.IsAny<Func<CancellationToken, Task>>(),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Never
+            );
+            HandlerStrategy.Mock.Verify(
+                m =>
+                    m.HandleAsync(
+                        It.IsAny<IInvocationContext<TRequest, TResponse>>(),
+                        It.IsAny<Func<CancellationToken, Task>>(),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Never
+            );
 
             middlewareTaskCompletionSource.SetResult();
 
-            PrePipelineMiddleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<Any, Any>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Once);
-            middleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Once);
-            PreHandlerMiddleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<Any, Any>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Once);
-            HandlerStrategy.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Never);
+            PrePipelineMiddleware.Mock.Verify(
+                m =>
+                    m.HandleAsync(
+                        It.IsAny<IInvocationContext<Any, Any>>(),
+                        It.IsAny<Func<CancellationToken, Task>>(),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Once
+            );
+            middleware.Mock.Verify(
+                m =>
+                    m.HandleAsync(
+                        It.IsAny<IInvocationContext<TRequest, TResponse>>(),
+                        It.IsAny<Func<CancellationToken, Task>>(),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Once
+            );
+            PreHandlerMiddleware.Mock.Verify(
+                m =>
+                    m.HandleAsync(
+                        It.IsAny<IInvocationContext<Any, Any>>(),
+                        It.IsAny<Func<CancellationToken, Task>>(),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Once
+            );
+            HandlerStrategy.Mock.Verify(
+                m =>
+                    m.HandleAsync(
+                        It.IsAny<IInvocationContext<TRequest, TResponse>>(),
+                        It.IsAny<Func<CancellationToken, Task>>(),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Never
+            );
 
             preHandlerMiddlewareTaskCompletionSource.SetResult();
 
-            PrePipelineMiddleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<Any, Any>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Once);
-            middleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Once);
-            PreHandlerMiddleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<Any, Any>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Once);
-            HandlerStrategy.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Once);
+            PrePipelineMiddleware.Mock.Verify(
+                m =>
+                    m.HandleAsync(
+                        It.IsAny<IInvocationContext<Any, Any>>(),
+                        It.IsAny<Func<CancellationToken, Task>>(),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Once
+            );
+            middleware.Mock.Verify(
+                m =>
+                    m.HandleAsync(
+                        It.IsAny<IInvocationContext<TRequest, TResponse>>(),
+                        It.IsAny<Func<CancellationToken, Task>>(),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Once
+            );
+            PreHandlerMiddleware.Mock.Verify(
+                m =>
+                    m.HandleAsync(
+                        It.IsAny<IInvocationContext<Any, Any>>(),
+                        It.IsAny<Func<CancellationToken, Task>>(),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Once
+            );
+            HandlerStrategy.Mock.Verify(
+                m =>
+                    m.HandleAsync(
+                        It.IsAny<IInvocationContext<TRequest, TResponse>>(),
+                        It.IsAny<Func<CancellationToken, Task>>(),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Once
+            );
 
             handlerStrategyTaskCompletionSource.SetResult();
 
             // Cleanup
             await task;
 
-            void SetupHandlerStrategyWithTaskCompletionSource<TReq, TRes>(MockInvocationHandlerStrategy<TReq, TRes> middleware, TaskCompletionSource source)
+            void SetupHandlerStrategyWithTaskCompletionSource<TReq, TRes>(
+                MockInvocationHandlerStrategy<TReq, TRes> middleware,
+                TaskCompletionSource source
+            )
             {
-                middleware.Mock
-                    .Setup(m => m.HandleAsync(It.IsAny<IInvocationContext<TReq, TRes>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
-                    .Returns<IInvocationContext<TReq, TRes>, Func<CancellationToken, Task>, CancellationToken>(async (ctx, next, ct) =>
-                    {
-                        await source.Task;
-                    });
+                middleware
+                    .Mock.Setup(m =>
+                        m.HandleAsync(
+                            It.IsAny<IInvocationContext<TReq, TRes>>(),
+                            It.IsAny<Func<CancellationToken, Task>>(),
+                            It.IsAny<CancellationToken>()
+                        )
+                    )
+                    .Returns<
+                        IInvocationContext<TReq, TRes>,
+                        Func<CancellationToken, Task>,
+                        CancellationToken
+                    >(
+                        async (ctx, next, ct) =>
+                        {
+                            await source.Task;
+                        }
+                    );
             }
 
-            void SetupMiddlewareItemWithTaskCompletionSource<TReq, TRes>(MockMiddlewareInvocationPipelineItem<TReq, TRes> middleware, TaskCompletionSource source)
+            void SetupMiddlewareItemWithTaskCompletionSource<TReq, TRes>(
+                MockMiddlewareInvocationPipelineItem<TReq, TRes> middleware,
+                TaskCompletionSource source
+            )
             {
-                middleware.Mock
-                    .Setup(m => m.HandleAsync(It.IsAny<IInvocationContext<TReq, TRes>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
-                    .Returns<IInvocationContext<TReq, TRes>, Func<CancellationToken, Task>, CancellationToken>(async (ctx, next, ct) =>
-                    {
-                        await source.Task;
-                        await next(ct);
-                    });
+                middleware
+                    .Mock.Setup(m =>
+                        m.HandleAsync(
+                            It.IsAny<IInvocationContext<TReq, TRes>>(),
+                            It.IsAny<Func<CancellationToken, Task>>(),
+                            It.IsAny<CancellationToken>()
+                        )
+                    )
+                    .Returns<
+                        IInvocationContext<TReq, TRes>,
+                        Func<CancellationToken, Task>,
+                        CancellationToken
+                    >(
+                        async (ctx, next, ct) =>
+                        {
+                            await source.Task;
+                            await next(ct);
+                        }
+                    );
             }
 
-            void SetupMiddlewareWithTaskCompletionSource<TReq, TRes>(MockInvocationMiddleware<TReq, TRes> middleware, TaskCompletionSource source)
+            void SetupMiddlewareWithTaskCompletionSource<TReq, TRes>(
+                MockInvocationMiddleware<TReq, TRes> middleware,
+                TaskCompletionSource source
+            )
             {
-                middleware.Mock
-                    .Setup(m => m.HandleAsync(It.IsAny<IInvocationContext<TReq, TRes>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
-                    .Returns<IInvocationContext<TReq, TRes>, Func<CancellationToken, Task>, CancellationToken>(async (ctx, next, ct) =>
-                    {
-                        await source.Task;
-                        await next(ct);
-                    });
+                middleware
+                    .Mock.Setup(m =>
+                        m.HandleAsync(
+                            It.IsAny<IInvocationContext<TReq, TRes>>(),
+                            It.IsAny<Func<CancellationToken, Task>>(),
+                            It.IsAny<CancellationToken>()
+                        )
+                    )
+                    .Returns<
+                        IInvocationContext<TReq, TRes>,
+                        Func<CancellationToken, Task>,
+                        CancellationToken
+                    >(
+                        async (ctx, next, ct) =>
+                        {
+                            await source.Task;
+                            await next(ct);
+                        }
+                    );
             }
         }
 
         [Test]
         [TestCase(1, Description = "One middleware")]
         [TestCase(5, Description = "Multiple middlewares")]
-        public async Task HandleAsync_HandlerStrategyIsInvoked_WhenMiddlewaresAreRegistered(int middlewareCount)
+        public async Task HandleAsync_HandlerStrategyIsInvoked_WhenMiddlewaresAreRegistered(
+            int middlewareCount
+        )
         {
             // Arrange
             for (var i = 0; i < middlewareCount; i++)
@@ -230,22 +446,38 @@ namespace Ingot.Mediator.Engine.Tests.Pipeline
             await Pipeline.HandleAsync(Request!, CancellationToken);
 
             // Assert
-            HandlerStrategy.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Once);
+            HandlerStrategy.Mock.Verify(
+                m =>
+                    m.HandleAsync(
+                        It.IsAny<IInvocationContext<TRequest, TResponse>>(),
+                        It.IsAny<Func<CancellationToken, Task>>(),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Once
+            );
         }
 
         [Test]
         public async Task HandleAsync_MiddlewaresAreInvokedInOrder(
             [Values(int.MinValue, -123, 0, 123, int.MaxValue)] int orderA,
-            [Values(int.MinValue, -123, 0, 123, int.MaxValue)] int orderB)
+            [Values(int.MinValue, -123, 0, 123, int.MaxValue)] int orderB
+        )
         {
             // Arrange
-            var middlewaresExecuted = new List<MockMiddlewareInvocationPipelineItem<TRequest, TResponse>>();
+            var middlewaresExecuted =
+                new List<MockMiddlewareInvocationPipelineItem<TRequest, TResponse>>();
 
-            var middlewareA = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>() { Order = orderA, };
+            var middlewareA = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>()
+            {
+                Order = orderA,
+            };
             AddMiddlewareToExecutionListOnHandleAsyncInvoked(middlewareA);
             MiddlewareItems.Add(middlewareA);
 
-            var middlewareB = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>() { Order = orderB, };
+            var middlewareB = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>()
+            {
+                Order = orderB,
+            };
             AddMiddlewareToExecutionListOnHandleAsyncInvoked(middlewareB);
             MiddlewareItems.Add(middlewareB);
 
@@ -262,15 +494,29 @@ namespace Ingot.Mediator.Engine.Tests.Pipeline
                 Assert.That(middlewaresExecuted[middlewareBExpectedIndex], Is.EqualTo(middlewareB));
             });
 
-            void AddMiddlewareToExecutionListOnHandleAsyncInvoked(MockMiddlewareInvocationPipelineItem<TRequest, TResponse> middleware)
+            void AddMiddlewareToExecutionListOnHandleAsyncInvoked(
+                MockMiddlewareInvocationPipelineItem<TRequest, TResponse> middleware
+            )
             {
-                middleware.Mock
-                .Setup(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
-                .Returns<IInvocationContext<TRequest, TResponse>, Func<CancellationToken, Task>, CancellationToken>((context, next, cancellationtoken) =>
-                {
-                    middlewaresExecuted.Add(middleware);
-                    return next(cancellationtoken);
-                });
+                middleware
+                    .Mock.Setup(m =>
+                        m.HandleAsync(
+                            It.IsAny<IInvocationContext<TRequest, TResponse>>(),
+                            It.IsAny<Func<CancellationToken, Task>>(),
+                            It.IsAny<CancellationToken>()
+                        )
+                    )
+                    .Returns<
+                        IInvocationContext<TRequest, TResponse>,
+                        Func<CancellationToken, Task>,
+                        CancellationToken
+                    >(
+                        (context, next, cancellationtoken) =>
+                        {
+                            middlewaresExecuted.Add(middleware);
+                            return next(cancellationtoken);
+                        }
+                    );
             }
         }
 
@@ -278,21 +524,45 @@ namespace Ingot.Mediator.Engine.Tests.Pipeline
         public async Task HandleAsync_NotApplicableMiddlewareIsNotInvoked()
         {
             // Arrange
-            var middleware = new MockMiddlewareInvocationPipelineItem<MediatorTestData.Unrelated, MediatorTestData.Unrelated>();
+            var middleware =
+                new MockMiddlewareInvocationPipelineItem<
+                    MediatorTestData.Unrelated,
+                    MediatorTestData.Unrelated
+                >();
             MiddlewareItems.Add(middleware);
 
             // Act
             await Pipeline.HandleAsync(Request!, CancellationToken);
 
             // Assert
-            middleware.Mock.Verify(m => m.HandleAsync(It.IsAny<IInvocationContext<MediatorTestData.Unrelated, MediatorTestData.Unrelated>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()), Times.Never);
+            middleware.Mock.Verify(
+                m =>
+                    m.HandleAsync(
+                        It.IsAny<
+                            IInvocationContext<
+                                MediatorTestData.Unrelated,
+                                MediatorTestData.Unrelated
+                            >
+                        >(),
+                        It.IsAny<Func<CancellationToken, Task>>(),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Never
+            );
         }
 
         [Test]
         public void HandleAsync_DoesNotThrow_WhenHandlerStrategyThrows()
         {
             // Arrange
-            HandlerStrategy.Mock.Setup(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
+            HandlerStrategy
+                .Mock.Setup(m =>
+                    m.HandleAsync(
+                        It.IsAny<IInvocationContext<TRequest, TResponse>>(),
+                        It.IsAny<Func<CancellationToken, Task>>(),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
                 .ThrowsAsync(new Exception("sample exception"));
 
             // Act / Assert
@@ -306,7 +576,14 @@ namespace Ingot.Mediator.Engine.Tests.Pipeline
             var middleware = new MockMiddlewareInvocationPipelineItem<TRequest, TResponse>();
             MiddlewareItems.Add(middleware);
 
-            middleware.Mock.Setup(m => m.HandleAsync(It.IsAny<IInvocationContext<TRequest, TResponse>>(), It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
+            middleware
+                .Mock.Setup(m =>
+                    m.HandleAsync(
+                        It.IsAny<IInvocationContext<TRequest, TResponse>>(),
+                        It.IsAny<Func<CancellationToken, Task>>(),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
                 .ThrowsAsync(new Exception("sample exception"));
 
             // Act / Assert

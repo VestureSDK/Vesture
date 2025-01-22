@@ -30,6 +30,7 @@ jobs:
         run: dotnet test ./src/Mediator/Tests/Ingot.Mediator.Abstractions.Tests/Ingot.Mediator.Abstractions.Tests.csproj --no-build --verbosity diagnostic > ./output.txt
       - uses: actions/upload-artifact@v4
         name: "Artifact: dotnet test output"
+        if: always()
         with:
           name: test-output
           if-no-files-found: error

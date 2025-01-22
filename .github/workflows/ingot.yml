@@ -10,7 +10,7 @@ on:
 env:
   NUPKG_DiRECTORY: "./dist"
   NUPKG_PUSH_SOURCE: "https://api.nuget.org/v3/index.json"
-  NUPKG_PUSH_API_KEY: "test"
+  NUPKG_PUSH_API_KEY: "${{ secrets.NUGET_ORG_API_KEY }}"
 
 jobs:
   libs:

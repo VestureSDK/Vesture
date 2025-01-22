@@ -28,12 +28,12 @@ jobs:
         run: |
           dotnet tool restore
           dotnet ib Setup
+      - name: Linter
+        run: dotnet ib Linter
       - name: Build
         run: dotnet ib Build
       - name: Test
         run: dotnet ib Test
-      - name: Validate
-        run: dotnet ib Validate
       - name: Package
         run: |
           dotnet ib Package \

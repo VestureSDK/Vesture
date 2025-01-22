@@ -12,6 +12,13 @@ task Setup {
     # setup to a new version of the setup
 }
 
+task Linter {
+    
+    dotnet csharpier --check ./src
+    
+    assert ($LASTEXITCODE -eq 0) "Format not applied. Run dotnet csharpier ./src"
+}
+
 task Build {
     
     dotnet restore ./src --verbosity $DotnetVerbosity
@@ -29,13 +36,6 @@ task Test {
         dotnet test $_.FullName -c $BuildConfiguration --no-build --verbosity $DotnetVerbosity
         assert ($LASTEXITCODE -eq 0) "Test encountered an error"
     }    
-}
-
-task Validate {
-    
-    dotnet format ./src --verify-no-changes --no-restore --verbosity $DotnetVerbosity
-    
-    assert ($LASTEXITCODE -eq 0) "Format not applied. Run dotnet format ./src"
 }
 
 task Package {

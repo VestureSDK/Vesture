@@ -29,7 +29,9 @@ jobs:
           dotnet tool restore
           dotnet ib Setup
       - name: Build
-        run: dotnet ib Build
+        run: |
+          dotnet ib Build
+          dotnet ib Test
       - name: Test
         run: dotnet ib Test
       - name: Validate

@@ -16,8 +16,12 @@ jobs:
   libs:
     name: Libraries
     runs-on: ubuntu-latest
-    container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
+    # container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     steps:
+      - uses: actions/setup-dotnet@v4
+        name: Setup dotnet
+        with:
+          dotnet-version: '9.0.x'
       - uses: actions/checkout@v4
         name: Checkout
       - name: Setup

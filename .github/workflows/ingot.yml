@@ -31,15 +31,7 @@ jobs:
       - name: Build
         run: dotnet ib Build
       - name: Test
-        run: dotnet test ./src/Tests/Mediator/Ingot.Mediator.Abstractions.Tests/Ingot.Mediator.Abstractions.Tests.csproj --no-build --verbosity diagnostic > ./output.txt
-      - uses: actions/upload-artifact@v4
-        name: "Artifact: dotnet test output"
-        if: always()
-        with:
-          name: test-output
-          if-no-files-found: error
-          retention-days: 3
-          path: ./output.txt
+        run: dotnet ib Test
       - name: Validate
         run: dotnet ib Validate
       - name: Package

@@ -18,13 +18,9 @@ jobs:
     runs-on: ubuntu-latest
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     steps:
-      - uses: actions/setup-dotnet@v4
-        name: Setup dotnet
-        with:
-          dotnet-version: '9.0.x'
       - uses: actions/checkout@v4
-        name: Checkout
-      - name: Setup
+        name: Git Checkout
+      - name: Environment Setup
         run: |
           dotnet tool restore
           dotnet ib Setup
@@ -39,7 +35,7 @@ jobs:
           dotnet ib Package \
             -NupkgDirectory ${{ env.NUPKG_DiRECTORY }}
       - uses: actions/upload-artifact@v4
-        name: "Artifact: nuget"
+        name: "Artifact: nuget (${{ env.NUPKG_DiRECTORY }}/*.nupkg)"
         with:
           name: nuget
           if-no-files-found: error

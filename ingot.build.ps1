@@ -1,5 +1,6 @@
 param(
     $DotnetVerbosity = 'normal',
+    $BuildConfiguration = 'Release',
     $NupkgDirectory = './dist',
     $NupkgPushSource = 'https://api.nuget.org/v3/index.json',
     $NupkgPushApiKey = 'test'
@@ -17,21 +18,21 @@ task Build {
     
     assert ($LASTEXITCODE -eq 0) "Restore encountered an error"
     
-    dotnet build ./src -c Release --no-restore --verbosity $DotnetVerbosity
+    dotnet build ./src -c $BuildConfiguration --no-restore --verbosity $DotnetVerbosity
     
     assert ($LASTEXITCODE -eq 0) "Build encountered an error"
 }
 
 task Test {
 
-    dotnet test ./src --no-build --verbosity $DotnetVerbosity
+    dotnet test ./src -c $BuildConfiguration --no-build --verbosity $DotnetVerbosity
     
     assert ($LASTEXITCODE -eq 0) "Test encountered an error"
 }
 
 task Validate {
     
-    dotnet format --verify-no-changes --verbosity $DotnetVerbosity
+    dotnet format --verify-no-changes --no-restore --verbosity $DotnetVerbosity
     
     assert ($LASTEXITCODE -eq 0) "Format not applied. Run dotnet format ./src"
 }

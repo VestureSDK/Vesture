@@ -15,8 +15,8 @@ env:
 jobs:
   libs:
     name: Libraries
-    runs-on: windows-2022
-    # container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
+    runs-on: ubuntu-latest
+    container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     steps:
       - uses: actions/setup-dotnet@v4
         name: Setup dotnet

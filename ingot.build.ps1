@@ -25,9 +25,10 @@ task Build {
 
 task Test {
 
-    dotnet test ./src -c $BuildConfiguration --no-build --verbosity $DotnetVerbosity
-    
-    assert ($LASTEXITCODE -eq 0) "Test encountered an error"
+    Get-ChildItem ./src -recurse | Where-Object {$_.name -like "*Tests.csproj"} | ForEach-Object -Process { 
+        dotnet test $_.FullName -c $BuildConfiguration --no-build --verbosity $DotnetVerbosity
+        assert ($LASTEXITCODE -eq 0) "Test encountered an error"
+    }    
 }
 
 task Validate {

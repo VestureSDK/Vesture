@@ -27,7 +27,7 @@ jobs:
       - name: Build
         run: dotnet ib Build
       - name: Test
-        run: dotnet test ./src/Mediator/Tests/Ingot.Mediator.Abstractions.Tests/Ingot.Mediator.Abstractions.Tests.csproj --no-build
+        run: dotnet test ./src/Mediator/Tests/Ingot.Mediator.Abstractions.Tests/Ingot.Mediator.Abstractions.Tests.csproj --no-build --verbosity diagnostic
       - name: Validate
         run: dotnet ib Validate
       - name: Package

@@ -26,11 +26,11 @@ namespace Ingot.Mediator.Engine.Pipeline.Extensions
 
         [LoggerMessage(
             SkipEnabledCheck = true,
-            EventId = BaseEventId + 1, 
-            EventName = nameof(InvocationPipelinesCached), 
-            Level = LogLevel.Trace, 
+            EventId = BaseEventId + 1,
+            EventName = nameof(InvocationPipelinesCached),
+            Level = LogLevel.Trace,
             Message = "Invocation pipelines cached {Pipelines}")]
-        private static partial void InnerInvocationPipelineCompiled(this ILogger logger, Exception ex, 
+        private static partial void InnerInvocationPipelineCompiled(this ILogger logger, Exception ex,
             IEnumerable<string> pipelines);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -38,7 +38,7 @@ namespace Ingot.Mediator.Engine.Pipeline.Extensions
         {
             if (logger.IsEnabled(LogLevel.Trace))
             {
-                InnerInvocationPipelineCompiled(logger, 
+                InnerInvocationPipelineCompiled(logger,
                     ex: null,
                     pipelines: registeredPipelines.Select(p => $"{p.RequestType} -> {p.ResponseType}"));
             }
@@ -109,11 +109,11 @@ namespace Ingot.Mediator.Engine.Pipeline.Extensions
         {
             if (logger.IsEnabled(LogLevel.Trace))
             {
-                InnerInvocationPipelineChainMiddlewareMatches(logger, 
+                InnerInvocationPipelineChainMiddlewareMatches(logger,
                     ex: null,
-                    middlewareType: middleware.MiddlewareType, 
-                    requestType: typeof(TRequest), 
-                    responseType: typeof(TResponse), 
+                    middlewareType: middleware.MiddlewareType,
+                    requestType: typeof(TRequest),
+                    responseType: typeof(TResponse),
                     middlewareIndex: middlewares.Count);
             }
         }

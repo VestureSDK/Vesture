@@ -155,9 +155,9 @@ namespace Ingot.Mediator.Engine.Pipeline
 
             var context = _contextFactory.CreateContextForRequest<TRequest, TResponse>(request);
             await _chainOfResponsibility.Value.Invoke(context, cancellationToken);
-            
+
             _logger.InvokedPipeline<TRequest, TResponse>();
-            
+
             if (activity is not null)
             {
                 if (context.HasError)

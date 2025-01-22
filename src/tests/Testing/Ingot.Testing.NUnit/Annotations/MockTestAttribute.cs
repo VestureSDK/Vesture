@@ -1,6 +1,4 @@
-﻿using NUnit.Framework;
-
-namespace Ingot.Testing.Annotations
+﻿namespace Ingot.Testing.Annotations
 {
     /// <summary>
     /// Defines a test as being for a "mock" class

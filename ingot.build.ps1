@@ -33,7 +33,7 @@ task Test {
 
 task Validate {
     
-    dotnet format --verify-no-changes --no-restore --verbosity $DotnetVerbosity
+    dotnet format ./src --verify-no-changes --no-restore --verbosity $DotnetVerbosity
     
     assert ($LASTEXITCODE -eq 0) "Format not applied. Run dotnet format ./src"
 }

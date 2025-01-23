@@ -10,6 +10,9 @@ task Setup {
     # Do the setup of the environment and repository
     # It might also be used to migrate an existing
     # setup to a new version of the setup
+
+    # Ensures when running in containers the ownership is not dubious
+    git config --global --add safe.directory /__w/Ingot/Ingot
 }
 
 task Linter {

@@ -25,7 +25,7 @@ task Build {
     
     assert ($LASTEXITCODE -eq 0) "Restore encountered an error"
     
-    dotnet build ./src -c $BuildConfiguration --no-restore --verbosity $DotnetVerbosity
+    dotnet build ./src -c $BuildConfiguration --no-restore --verbosity $DotnetVerbosity /p:MinVerVerbosity=diagnostic
     
     assert ($LASTEXITCODE -eq 0) "Build encountered an error"
 }

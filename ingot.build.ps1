@@ -12,7 +12,8 @@ task Setup {
     # setup to a new version of the setup
 
     # Ensures when running in containers the ownership is not dubious
-    git config --global --add safe.directory /__w/Ingot/Ingot
+    $gitRootPath = git rev-parse --show-toplevel
+    git config --global --add safe.directory $gitRootPath
 }
 
 task Linter {

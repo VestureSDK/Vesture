@@ -49,7 +49,7 @@ jobs:
           name: build
           if-no-files-found: error
           retention-days: 1
-          path: ./src/**/bin/*
+          path: ./**/bin/*
       - name: Package
         run: |
           dotnet ib Package \

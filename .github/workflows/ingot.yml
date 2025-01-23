@@ -18,6 +18,11 @@ jobs:
     runs-on: ubuntu-latest
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     steps:
+      - name: Git Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: tree:0
       - uses: ./.github/actions/ingot-setup
         name: Setup
       - name: Linter
@@ -29,6 +34,11 @@ jobs:
     runs-on: ubuntu-latest
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     steps:
+      - name: Git Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: tree:0
       - uses: ./.github/actions/ingot-setup
         name: Setup
       - name: Build
@@ -58,6 +68,11 @@ jobs:
     runs-on: ubuntu-latest
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     steps:
+      - name: Git Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: tree:0
       - uses: ./.github/actions/ingot-setup
         name: Setup
       - uses: actions/download-artifact@v4
@@ -74,6 +89,11 @@ jobs:
     runs-on: ubuntu-latest
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     steps:
+      - name: Git Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: tree:0
       - uses: ./.github/actions/ingot-setup
         name: Setup
       - uses: actions/download-artifact@v4

@@ -32,6 +32,8 @@ jobs:
         run: dotnet ib Linter
       - name: Build
         run: dotnet ib Build
+      - name: MinVer
+        run: dotnet /root/.nuget/packages/minver/6.0.0/build/bin/net6.0/MinVer.dll /__w/Ingot/Ingot/src/libs/Mediator/Ingot.Mediator.Contracts --auto-increment "" --build-metadata "" --default-pre-release-identifiers "" --default-pre-release-phase "" --minimum-major-minor "" --tag-prefix "" --verbosity "diagnostic" --version-override ""
       - name: Test
         run: dotnet ib Test
       - name: Package

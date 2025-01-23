@@ -99,6 +99,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: nupkg
+          path: ${{ env.NUPKG_DiRECTORY }}
       - name: Release
         run: |
           dotnet ib Release \

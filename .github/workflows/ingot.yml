@@ -8,42 +8,79 @@ on:
       - main
 
 env:
+  INGOT_CI_RUNNER: ubuntu-latest
+  INGOT_CI_CONTAINER: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
   NUPKG_DiRECTORY: "./dist"
   NUPKG_PUSH_SOURCE: "https://api.nuget.org/v3/index.json"
   NUPKG_PUSH_API_KEY: "${{ secrets.NUGET_ORG_API_KEY }}"
 
 jobs:
-  libs:
-    name: Libraries
-    runs-on: ubuntu-latest
-    container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
+  libs-linter:
+    name: Libraries Linter
+    runs-on: ${{ env.INGOT_CI_RUNNER }}
+    container: ${{ env.INGOT_CI_CONTAINER }}
     steps:
-      - uses: actions/checkout@v4
-        name: Git Checkout
-        with:
-          fetch-depth: 0
-          filter: tree:0
-      - name: Environment Setup
-        run: |
-          dotnet tool restore
-          dotnet ib Setup
+      - uses: ./.github/actions/ingot-setup
+        name: Setup
       - name: Linter
         run: dotnet ib Linter
+
+  libs-build:
+    needs: libs-linter
+    name: Libraries Build
+    runs-on: ${{ env.INGOT_CI_RUNNER }}
+    container: ${{ env.INGOT_CI_CONTAINER }}
+    steps:
+      - uses: ./.github/actions/ingot-setup
+        name: Setup
       - name: Build
         run: dotnet ib Build
-      - name: Test
-        run: dotnet ib Test
+      - uses: actions/upload-artifact@v4
+        name: "Artifact: bin/Release"
+        with:
+          name: build
+          if-no-files-found: error
+          retention-days: 1
+          path: ./src/**/bin/*
       - name: Package
         run: |
           dotnet ib Package \
             -NupkgDirectory ${{ env.NUPKG_DiRECTORY }}
       - uses: actions/upload-artifact@v4
-        name: "Artifact: nuget (${{ env.NUPKG_DiRECTORY }}/*.nupkg)"
+        name: "Artifact: nupkg"
         with:
-          name: nuget
+          name: nupkg
           if-no-files-found: error
           retention-days: 3
           path: ${{ env.NUPKG_DiRECTORY }}/*.nupkg
+
+  libs-test:
+    needs: libs-build
+    name: Libraries Test
+    runs-on: ${{ env.INGOT_CI_RUNNER }}
+    container: ${{ env.INGOT_CI_CONTAINER }}
+    steps:
+      - uses: ./.github/actions/ingot-setup
+        name: Setup
+      - uses: actions/download-artifact@v4
+        with:
+          name: build
+      - name: Test
+        run: dotnet ib Test
+
+  libs-release:
+    needs: 
+      - libs-build
+      - libs-test
+    name: Libraries Release
+    runs-on: ${{ env.INGOT_CI_RUNNER }}
+    container: ${{ env.INGOT_CI_CONTAINER }}
+    steps:
+      - uses: ./.github/actions/ingot-setup
+        name: Setup
+      - uses: actions/download-artifact@v4
+        with:
+          name: nupkg
       - name: Release
         run: |
           dotnet ib Release \

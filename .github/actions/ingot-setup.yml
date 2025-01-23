@@ -1,0 +1,19 @@
+name: 'Ingot Setup'
+description: 'Performs Git checkout and sets up the environment for the Ingot project'
+author: 'Ingot'
+outputs:
+  message:
+    description: 'A message indicating the setup is complete.'
+runs:
+  using: 'composite'
+  steps:
+    - name: Git Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        filter: tree:0
+
+    - name: Environment Setup
+      run: |
+        dotnet tool restore
+        dotnet ib Setup

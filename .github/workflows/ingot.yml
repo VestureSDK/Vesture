@@ -8,8 +8,6 @@ on:
       - main
 
 env:
-  INGOT_CI_RUNNER: ubuntu-latest
-  INGOT_CI_CONTAINER: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
   NUPKG_DiRECTORY: "./dist"
   NUPKG_PUSH_SOURCE: "https://api.nuget.org/v3/index.json"
   NUPKG_PUSH_API_KEY: "${{ secrets.NUGET_ORG_API_KEY }}"
@@ -17,8 +15,8 @@ env:
 jobs:
   libs-linter:
     name: Libraries Linter
-    runs-on: ${{ env.INGOT_CI_RUNNER }}
-    container: ${{ env.INGOT_CI_CONTAINER }}
+    runs-on: ubuntu-latest
+    container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     steps:
       - uses: ./.github/actions/ingot-setup
         name: Setup
@@ -28,8 +26,8 @@ jobs:
   libs-build:
     needs: libs-linter
     name: Libraries Build
-    runs-on: ${{ env.INGOT_CI_RUNNER }}
-    container: ${{ env.INGOT_CI_CONTAINER }}
+    runs-on: ubuntu-latest
+    container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     steps:
       - uses: ./.github/actions/ingot-setup
         name: Setup
@@ -57,8 +55,8 @@ jobs:
   libs-test:
     needs: libs-build
     name: Libraries Test
-    runs-on: ${{ env.INGOT_CI_RUNNER }}
-    container: ${{ env.INGOT_CI_CONTAINER }}
+    runs-on: ubuntu-latest
+    container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     steps:
       - uses: ./.github/actions/ingot-setup
         name: Setup
@@ -73,8 +71,8 @@ jobs:
       - libs-build
       - libs-test
     name: Libraries Release
-    runs-on: ${{ env.INGOT_CI_RUNNER }}
-    container: ${{ env.INGOT_CI_CONTAINER }}
+    runs-on: ubuntu-latest
+    container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     steps:
       - uses: ./.github/actions/ingot-setup
         name: Setup

@@ -9,8 +9,6 @@ on:
 
 env:
   NUPKG_DiRECTORY: "./dist"
-  NUPKG_PUSH_SOURCE: "https://api.nuget.org/v3/index.json"
-  NUPKG_PUSH_API_KEY: "${{ secrets.NUGET_ORG_API_KEY }}"
 
 jobs:
   libs-linter:
@@ -100,9 +98,16 @@ jobs:
         with:
           name: nupkg
           path: ${{ env.NUPKG_DiRECTORY }}
-      - name: Release
+      - name: Release (feedz.io)
         run: |
           dotnet ib Release \
-            -NupkgDirectory ${{ env.NUPKG_DiRECTORY }} \
-            -NupkgPushSource ${{ env.NUPKG_PUSH_SOURCE }} \
-            -NupkgPushApiKey ${{ env.NUPKG_PUSH_API_KEY }}
+            -NupkgDirectory "${{ env.NUPKG_DiRECTORY }}" \
+            -NupkgPushSource "https://f.feedz.io/stfbln/ingot/nuget/index.json" \
+            -NupkgPushApiKey "${{ secrets.FEEDZ_API_KEY }}"
+      - name: Release (nuget.org)
+        if: ${{ startsWith(github.event.ref, 'refs/tags') }}
+        run: |
+          dotnet ib Release \
+            -NupkgDirectory "${{ env.NUPKG_DiRECTORY }}" \
+            -NupkgPushSource "https://api.nuget.org/v3/index.json" \
+            -NupkgPushApiKey "${{ secrets.NUGET_ORG_API_KEY }}"

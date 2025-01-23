@@ -20,6 +20,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         name: Git Checkout
+        with:
+          fetch-depth: 0
+          filter: tree:0
       - name: Environment Setup
         run: |
           dotnet tool restore

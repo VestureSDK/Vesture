@@ -23,7 +23,7 @@ jobs:
         with:
           fetch-depth: 0
           filter: tree:0
-      - uses: ./.github/actions/ingot-setup.yml
+      - uses: ./.github/actions/ingot-setup
         name: Setup
       - name: Linter
         run: dotnet ib Linter
@@ -39,7 +39,7 @@ jobs:
         with:
           fetch-depth: 0
           filter: tree:0
-      - uses: ./.github/actions/ingot-setup.yml
+      - uses: ./.github/actions/ingot-setup
         name: Setup
       - name: Build
         run: dotnet ib Build
@@ -73,7 +73,7 @@ jobs:
         with:
           fetch-depth: 0
           filter: tree:0
-      - uses: ./.github/actions/ingot-setup.yml
+      - uses: ./.github/actions/ingot-setup
         name: Setup
       - uses: actions/download-artifact@v4
         with:
@@ -94,7 +94,7 @@ jobs:
         with:
           fetch-depth: 0
           filter: tree:0
-      - uses: ./.github/actions/ingot-setup.yml
+      - uses: ./.github/actions/ingot-setup
         name: Setup
       - uses: actions/download-artifact@v4
         with:

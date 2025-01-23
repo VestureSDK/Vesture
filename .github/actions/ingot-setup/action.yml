@@ -1,13 +1,11 @@
 name: 'Ingot Setup'
 description: 'Performs Git checkout and sets up the environment for the Ingot project'
 author: 'Ingot'
-outputs:
-  message:
-    description: 'A message indicating the setup is complete.'
 runs:
   using: 'composite'
   steps:
-    - name: Environment Setup
+    - shell: pwsh
+      name: Environment Setup
       run: |
         dotnet tool restore
         dotnet ib Setup

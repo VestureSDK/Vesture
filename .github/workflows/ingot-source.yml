@@ -53,6 +53,11 @@ jobs:
         run: dotnet ib ci-src-build
       - name: Upload Build Artifacts
         uses: ./.github/actions/ingot-src/build-artifact-upload
+      - name: Restore NuGet Save
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/Directory.Packages.props') }}
 
   src-test:
     needs: src-build

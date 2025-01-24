@@ -4,6 +4,11 @@ author: 'Ingot'
 runs:
   using: 'composite'
   steps:
+    - name: Restore NuGet Cache
+      uses: actions/cache/restore@v4
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/Directory.Packages.props') }}
     - shell: pwsh
       name: Environment Setup
       run: |

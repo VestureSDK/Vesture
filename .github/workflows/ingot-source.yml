@@ -55,7 +55,7 @@ jobs:
           name: build
           if-no-files-found: error
           retention-days: 1
-          path: ./**/bin/*
+          path: ./**/[bin|obj]/*
 
   src-test:
     needs: src-build

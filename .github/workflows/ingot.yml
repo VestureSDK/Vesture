@@ -11,9 +11,9 @@ env:
   NUPKG_DiRECTORY: "./dist"
 
 jobs:
-  libs-linter:
-    name: Libraries Linter
-    runs-on: ubuntu-latest
+  src-linter:
+    name: Source Linter
+    runs-on: ubuntu-24.04
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     steps:
       - name: Git Checkout
@@ -24,12 +24,12 @@ jobs:
       - uses: ./.github/actions/ingot-setup
         name: Setup
       - name: Linter
-        run: dotnet ib Linter
+        run: dotnet ib ci-src-linter
 
-  libs-build:
-    needs: libs-linter
-    name: Libraries Build
-    runs-on: ubuntu-latest
+  src-build:
+    needs: src-linter
+    name: Source Build and Pack
+    runs-on: ubuntu-24.04
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     steps:
       - name: Git Checkout
@@ -40,7 +40,7 @@ jobs:
       - uses: ./.github/actions/ingot-setup
         name: Setup
       - name: Build
-        run: dotnet ib Build
+        run: dotnet ib ci-src-build
       - uses: actions/upload-artifact@v4
         name: "Artifact: bin/Release"
         with:
@@ -48,22 +48,11 @@ jobs:
           if-no-files-found: error
           retention-days: 1
           path: ./**/bin/*
-      - name: Package
-        run: |
-          dotnet ib Package \
-            -NupkgDirectory ${{ env.NUPKG_DiRECTORY }}
-      - uses: actions/upload-artifact@v4
-        name: "Artifact: nupkg"
-        with:
-          name: nupkg
-          if-no-files-found: error
-          retention-days: 3
-          path: ${{ env.NUPKG_DiRECTORY }}/*.nupkg
 
-  libs-test:
-    needs: libs-build
-    name: Libraries Test
-    runs-on: ubuntu-latest
+  src-test:
+    needs: src-build
+    name: Source Test
+    runs-on: ubuntu-24.04
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     steps:
       - name: Git Checkout
@@ -77,14 +66,43 @@ jobs:
         with:
           name: build
       - name: Test
-        run: dotnet ib Test
+        run: dotnet ib ci-src-test
 
-  libs-release:
+  src-pack:
+    needs: src-build
+    name: Source Pack
+    runs-on: ubuntu-24.04
+    container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: tree:0
+      - uses: ./.github/actions/ingot-setup
+        name: Setup
+      - uses: actions/download-artifact@v4
+        with:
+          name: build
+      - name: Pack
+        run: |
+          dotnet ib ci-src-pack \
+            -NupkgDirectory ${{ env.NUPKG_DiRECTORY }}
+      - uses: actions/upload-artifact@v4
+        name: "Artifact: nupkg"
+        with:
+          name: nupkg
+          if-no-files-found: error
+          retention-days: 3
+          path: ${{ env.NUPKG_DiRECTORY }}/*.nupkg
+
+  src-publish:
     needs: 
-      - libs-build
-      - libs-test
-    name: Libraries Release
-    runs-on: ubuntu-latest
+      - src-build
+      - src-pack
+      - src-test
+    name: Source Publish
+    runs-on: ubuntu-24.04
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     steps:
       - name: Git Checkout
@@ -98,16 +116,16 @@ jobs:
         with:
           name: nupkg
           path: ${{ env.NUPKG_DiRECTORY }}
-      - name: Release (feedz.io)
+      - name: Push (feedz.io)
         run: |
-          dotnet ib Release \
+          dotnet ib ci-src-publish \
             -NupkgDirectory "${{ env.NUPKG_DiRECTORY }}" \
             -NupkgPushSource "https://f.feedz.io/stfbln/ingot/nuget/index.json" \
             -NupkgPushApiKey "${{ secrets.FEEDZ_API_KEY }}"
-      - name: Release (nuget.org)
+      - name: Push (nuget.org)
         if: ${{ startsWith(github.event.ref, 'refs/tags') }}
         run: |
-          dotnet ib Release \
+          dotnet ib ci-src-publish \
             -NupkgDirectory "${{ env.NUPKG_DiRECTORY }}" \
             -NupkgPushSource "https://api.nuget.org/v3/index.json" \
             -NupkgPushApiKey "${{ secrets.NUGET_ORG_API_KEY }}"

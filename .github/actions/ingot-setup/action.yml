@@ -1,5 +1,5 @@
 name: 'Ingot Setup'
-description: 'Performs Git checkout and sets up the environment for the Ingot project'
+description: 'Sets up the environment for the Ingot project'
 author: 'Ingot'
 runs:
   using: 'composite'
@@ -8,4 +8,4 @@ runs:
       name: Environment Setup
       run: |
         dotnet tool restore
-        dotnet ib Setup
+        dotnet ib ci-env-setup

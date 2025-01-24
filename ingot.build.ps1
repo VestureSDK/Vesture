@@ -1,83 +1,108 @@
 param(
-    $DotnetVerbosity = 'normal',
-    $BuildConfiguration = 'Release',
-    $NupkgDirectory = './dist',
-    $NupkgPushSource = 'https://api.nuget.org/v3/index.json',
-    $NupkgPushApiKey = 'test'
+    [ValidateSet('q', 'quiet', 'm', 'minimal', 'n', 'normal', 'd', 'detailed', 'diag', 'diagnostic')]
+    [string] $DotnetVerbosity = 'normal',
+
+    [ValidateSet('Debug', 'Release')]
+    [string] $BuildConfiguration = 'Release',
+
+    [string] $SrcDirectory = './src',
+
+    [string] $NupkgDirectory = './dist',
+
+    [string] $NupkgPushSource = 'https://api.nuget.org/v3/index.json',
+    
+    [string] $NupkgPushApiKey = '<Set your API key with -NupkgPushApiKey parameter>'
 )
 
-task Setup {
-    # Do the setup of the environment and repository
-    # It might also be used to migrate an existing
-    # setup to a new version of the setup
+# ***************************************
+# 
+#
+#           Local Tasks
+# 
+#
+# ***************************************
+
+# Opens the IDE
+task ide {
+    & $(& "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -prerelease -latest -property productPath -format json | ConvertFrom-Json)[0].productPath $SrcDirectory/Ingot.sln -donotloadprojects
+}
+
+# Format source code
+task format src-format
+
+# Build source code
+task build ci-src-build
+
+# Test source code
+task test build, ci-src-test
+
+# Package source code as nuget package
+task pack build, ci-src-pack
+
+# ***************************************
+# 
+#
+#           CI Tasks
+# 
+#
+# ***************************************
+
+# ---------------------------------------
+# Environment Tasks
+# ---------------------------------------
+
+# Do the setup of the environment and repository
+task ci-env-setup {
 
     # Ensures when running in containers the ownership is not dubious
-    git config --global --add safe.directory $BuildRoot
+    exec { git config --global --add safe.directory $BuildRoot }
 }
 
-task Linter {
+# ---------------------------------------
+# Src Tasks
+# ---------------------------------------
+
+# Runs csharpier to fomrat the ./src files
+task ci-src-format {
     
-    dotnet csharpier --check ./src
-    
-    assert ($LASTEXITCODE -eq 0) "Format not applied. Run dotnet csharpier ./src"
+    exec { dotnet csharpier $SrcDirectory }
 }
 
-task Build {
+# Runs csharpier as a linter to validate the formatting
+# of the ./src files
+task ci-src-linter {
     
-    dotnet restore ./src --verbosity $DotnetVerbosity
-    
-    assert ($LASTEXITCODE -eq 0) "Restore encountered an error"
-    
-    dotnet build ./src -c $BuildConfiguration --no-restore --verbosity $DotnetVerbosity
-    
-    assert ($LASTEXITCODE -eq 0) "Build encountered an error"
+    exec { dotnet csharpier --check $SrcDirectory }
 }
 
-task Test {
+# Builds the ./src code
+task ci-src-build {
+    
+    exec { dotnet restore $SrcDirectory --verbosity $DotnetVerbosity }
+    exec { dotnet build $SrcDirectory -c $BuildConfiguration --no-restore --verbosity $DotnetVerbosity }
+}
 
-    Get-ChildItem ./src -recurse | Where-Object {$_.name -like "*Tests.csproj"} | ForEach-Object -Process { 
-        dotnet test $_.FullName -c $BuildConfiguration --no-build --verbosity $DotnetVerbosity
-        assert ($LASTEXITCODE -eq 0) "Test encountered an error"
+# Tests the built ./src code
+task ci-src-test {
+
+    Get-ChildItem $SrcDirectory -recurse | Where-Object {$_.name -like "*Tests.csproj"} | ForEach-Object -Process { 
+        exec { dotnet test $_.FullName -c $BuildConfiguration --no-build --verbosity $DotnetVerbosity }
     }    
 }
 
-task Package {
+# Packages the built ./src code
+# into nuget packages *.nupkg
+task ci-src-pack {
     
-    dotnet pack ./src --no-build --output $NupkgDirectory --verbosity $DotnetVerbosity
+    exec { dotnet pack $SrcDirectory --no-build --output $NupkgDirectory --verbosity $DotnetVerbosity }
+}
+
+# Publishes the packaged *.nupkg
+task ci-src-publish {    
     
-    assert ($LASTEXITCODE -eq 0) "Pack nuget packages encountered an error"
-}
-
-task Release {    
-    
-    Get-ChildItem "$($NupkgDirectory)/*.nupkg" | ForEach-Object -Process { dotnet nuget push "$($NupkgDirectory)/$($_.Name)" --api-key $NupkgPushApiKey --source $NupkgPushSource --skip-duplicate }
-
-    assert ($LASTEXITCODE -eq 0) "Push nuget packages encountered an error"
-}
-
-
-task Src {
-    & $(& "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -prerelease -latest -property productPath -format json | ConvertFrom-Json)[0].productPath ./src/Ingot.sln -donotloadprojects
-}
-
-task Src-Full {
-    ./src/Ingot.sln
-}
-
-task Src-Clean {
-    dotnet clean ./src --verbosity detailed
-}
-
-task Src-Format {
-    dotnet format ./src --verbosity detailed
-}
-
-task Src-Restore {
-    dotnet restore ./src --verbosity detailed
-}
-
-task Src-Build {
-    dotnet build ./src --verbosity detailed
+    Get-ChildItem "$($NupkgDirectory)/*.nupkg" | ForEach-Object -Process { 
+        exec { dotnet nuget push "$($NupkgDirectory)/$($_.Name)" --api-key $NupkgPushApiKey --source $NupkgPushSource --skip-duplicate }
+    }
 }
 
 task Docs-Clean {

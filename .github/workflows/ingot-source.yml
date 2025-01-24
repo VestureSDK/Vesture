@@ -68,7 +68,7 @@ jobs:
         name: Setup
       - uses: actions/download-artifact@v4
         with:
-          name: build
+          name: source-built
       - name: Test
         run: dotnet ib ci-src-test
 
@@ -84,7 +84,7 @@ jobs:
         name: Setup
       - uses: actions/download-artifact@v4
         with:
-          name: build
+          name: source-built
       - name: Pack
         run: |
           dotnet ib ci-src-pack \

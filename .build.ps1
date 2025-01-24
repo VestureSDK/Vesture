@@ -22,24 +22,27 @@ param(
 #
 # ***************************************
 
-# Opens the IDE
+# Synopsis: Runs formatting all the way to packing the source code
+task . format, ci-src-linter, pack
+
+# Synopsis: Opens Visual Studio with no projects loaded
 task ide {
     & $(& "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -prerelease -latest -property productPath -format json | ConvertFrom-Json)[0].productPath $SrcDirectory/Ingot.sln -donotloadprojects
 }
 
-# Format source code
+# Synopsis: Format source code
 task format {
     
     exec { dotnet csharpier $SrcDirectory }
 }
 
-# Build source code
+# Synopsis: Builds source code
 task build ci-src-build
 
-# Test source code
+# Synopsis: Tests source code
 task test build, ci-src-test
 
-# Package source code as nuget package
+# Synopsis: Packages source code as nuget package
 task pack build, ci-src-pack
 
 # ***************************************
@@ -54,7 +57,7 @@ task pack build, ci-src-pack
 # Environment Tasks
 # ---------------------------------------
 
-# Do the setup of the environment and repository
+# Synopsis: [CI Specific] Do the setup of the environment and repository
 task ci-env-setup {
 
     # Ensures when running in containers the ownership is not dubious
@@ -65,26 +68,25 @@ task ci-env-setup {
 # Src Tasks
 # ---------------------------------------
 
-# Runs csharpier as a linter to validate the formatting
-# of the ./src files
+# Synopsis: [CI Specific] Runs csharpier as a linter to validate the formatting of the ./src files
 task ci-src-linter {
     
     exec { dotnet csharpier --check $SrcDirectory }
 }
 
-# Restores the ./src code
+# Synopsis: [CI Specific] Restores the ./src code
 task ci-src-restore {
     
     exec { dotnet restore $SrcDirectory --verbosity $DotnetVerbosity }
 }
 
-# Builds the ./src code
+# Synopsis: [CI Specific] Builds the ./src code
 task ci-src-build ci-src-restore, {
     
     exec { dotnet build $SrcDirectory -c $BuildConfiguration --no-restore --verbosity $DotnetVerbosity }
 }
 
-# Tests the built ./src code
+# Synopsis: [CI Specific] Tests the built ./src code
 task ci-src-test ci-src-restore, {
 
     Get-ChildItem $SrcDirectory -recurse | Where-Object {$_.name -like "*Tests.csproj"} | ForEach-Object -Process { 
@@ -92,14 +94,13 @@ task ci-src-test ci-src-restore, {
     }    
 }
 
-# Packages the built ./src code
-# into nuget packages *.nupkg
+# Synopsis: [CI Specific] Packages the built ./src code into nuget packages *.nupkg
 task ci-src-pack ci-src-restore, {
     
     exec { dotnet pack $SrcDirectory --no-build --output $NupkgDirectory --verbosity $DotnetVerbosity }
 }
 
-# Publishes the packaged *.nupkg
+# Synopsis: [CI Specific] Publishes the packaged *.nupkg
 task ci-src-publish {    
     
     Get-ChildItem "$($NupkgDirectory)/*.nupkg" | ForEach-Object -Process { 

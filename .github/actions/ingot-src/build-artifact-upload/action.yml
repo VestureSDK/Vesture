@@ -7,14 +7,7 @@ runs:
     - name: "Artifact Upload: bin"
       uses: actions/upload-artifact@v4
       with:
-        name: build-bin
+        name: build
         if-no-files-found: error
         retention-days: 1
         path: ./**/bin/*
-    - name: "Artifact Upload: obj"
-      uses: actions/upload-artifact@v4
-      with:
-        name: build-obj
-        if-no-files-found: error
-        retention-days: 1
-        path: ./**/obj/*

@@ -7,8 +7,4 @@ runs:
     - name: "Artifact Download: bin"
       uses: actions/download-artifact@v4
       with:
-        name: build-bin
-    - name: "Artifact Download: obj"
-      uses: actions/download-artifact@v4
-      with:
-        name: build-obj
+        name: build

@@ -1,0 +1,20 @@
+name: 'Ingot Build Artifact Upload'
+description: 'Sets up the environment for the Ingot project'
+author: 'Ingot'
+runs:
+  using: 'composite'
+  steps:
+    - name: "Artifact Upload: bin"
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-bin
+        if-no-files-found: error
+        retention-days: 1
+        path: ./**/bin/*
+    - name: "Artifact Upload: obj"
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-obj
+        if-no-files-found: error
+        retention-days: 1
+        path: ./**/obj/*

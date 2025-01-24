@@ -1,0 +1,14 @@
+name: 'Ingot Build Artifact Download'
+description: 'Sets up the environment for the Ingot project'
+author: 'Ingot'
+runs:
+  using: 'composite'
+  steps:
+    - name: "Artifact Download: bin"
+      uses: actions/download-artifact@v4
+      with:
+        name: build-bin
+    - name: "Artifact Download: obj"
+      uses: actions/download-artifact@v4
+      with:
+        name: build-obj

@@ -43,18 +43,12 @@ jobs:
           # Ensures MinVer finds what it needs
           fetch-depth: 0
           filter: tree:0
-      - uses: ./.github/actions/ingot-setup
-        name: Setup
+      - name: Setup
+        uses: ./.github/actions/ingot-setup
       - name: Build
         run: dotnet ib ci-src-build
-      - uses: actions/upload-artifact@v4
-        name: "Artifact: bin/Release"
-        with:
-          name: source-built
-          if-no-files-found: error
-          retention-days: 1
-          path: ./src/*
-          include-hidden-files: true
+      - name: Upload Build Artifacts
+        uses: ./.github/actions/ingot-src/build-artifact-upload
 
   src-test:
     needs: src-build
@@ -66,9 +60,8 @@ jobs:
         uses: actions/checkout@v4
       - uses: ./.github/actions/ingot-setup
         name: Setup
-      - uses: actions/download-artifact@v4
-        with:
-          name: source-built
+      - name: Download Build Artifacts
+        uses: ./.github/actions/ingot-src/build-artifact-download
       - name: Test
         run: dotnet ib ci-src-test
 
@@ -82,9 +75,8 @@ jobs:
         uses: actions/checkout@v4
       - uses: ./.github/actions/ingot-setup
         name: Setup
-      - uses: actions/download-artifact@v4
-        with:
-          name: source-built
+      - name: Download Build Artifacts
+        uses: ./.github/actions/ingot-src/build-artifact-download
       - name: Pack
         run: |
           dotnet ib ci-src-pack \

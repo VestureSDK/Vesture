@@ -1,18 +1,26 @@
-name: Ingot
+name: Ingot Source
 on:
   push:
+    paths:
+      - 'src/**'
+      - '.github/**'
+      - 'ingot.build.ps1'
     branches:
       - main
   pull_request:
+    paths:
+      - 'src/**'
+      - '.github/**'
+      - 'ingot.build.ps1'
     branches:
-      - main
+      - '*'
 
 env:
   NUPKG_DiRECTORY: "./dist"
 
 jobs:
   src-linter:
-    name: Source Linter
+    name: Linter
     runs-on: ubuntu-24.04
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     steps:
@@ -28,7 +36,7 @@ jobs:
 
   src-build:
     needs: src-linter
-    name: Source Build and Pack
+    name: Build
     runs-on: ubuntu-24.04
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     steps:
@@ -51,7 +59,7 @@ jobs:
 
   src-test:
     needs: src-build
-    name: Source Test
+    name: Test
     runs-on: ubuntu-24.04
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     steps:
@@ -70,7 +78,7 @@ jobs:
 
   src-pack:
     needs: src-build
-    name: Source Pack
+    name: Pack
     runs-on: ubuntu-24.04
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     steps:
@@ -101,7 +109,7 @@ jobs:
       - src-build
       - src-pack
       - src-test
-    name: Source Publish
+    name: Publish
     runs-on: ubuntu-24.04
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     steps:

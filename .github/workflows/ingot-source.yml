@@ -19,6 +19,7 @@ jobs:
   src-linter:
     name: Linter
     runs-on: ubuntu-24.04
+    container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     steps:
       - name: Git Checkout
         uses: actions/checkout@v4
@@ -31,6 +32,7 @@ jobs:
     needs: src-linter
     name: Build
     runs-on: ubuntu-24.04
+    container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     steps:
       - name: Git Checkout
         uses: actions/checkout@v4
@@ -49,6 +51,7 @@ jobs:
     needs: src-build
     name: Test
     runs-on: ubuntu-24.04
+    container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     steps:
       - name: Git Checkout
         uses: actions/checkout@v4
@@ -63,6 +66,7 @@ jobs:
     needs: src-build
     name: Pack
     runs-on: ubuntu-24.04
+    container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     env:
       NUPKG_DiRECTORY_OUTPUT: "./dist/nuget"
     steps:
@@ -91,6 +95,7 @@ jobs:
       - src-test
     name: Publish (feedz.io)
     runs-on: ubuntu-24.04
+    container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     env:
       NUPKG_DiRECTORY_OUTPUT: "./dist/nuget"
     steps:
@@ -111,6 +116,7 @@ jobs:
       - src-test
     name: Publish (nuget.org)
     runs-on: ubuntu-24.04
+    container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     env:
       NUPKG_DiRECTORY_OUTPUT: "./dist/nuget"
     steps:

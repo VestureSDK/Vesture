@@ -28,7 +28,10 @@ task ide {
 }
 
 # Format source code
-task format src-format
+task format {
+    
+    exec { dotnet csharpier $SrcDirectory }
+}
 
 # Build source code
 task build ci-src-build
@@ -62,12 +65,6 @@ task ci-env-setup {
 # Src Tasks
 # ---------------------------------------
 
-# Runs csharpier to fomrat the ./src files
-task ci-src-format {
-    
-    exec { dotnet csharpier $SrcDirectory }
-}
-
 # Runs csharpier as a linter to validate the formatting
 # of the ./src files
 task ci-src-linter {
@@ -82,13 +79,13 @@ task ci-src-restore {
 }
 
 # Builds the ./src code
-task ci-src-build ci-src-restore {
+task ci-src-build ci-src-restore, {
     
     exec { dotnet build $SrcDirectory -c $BuildConfiguration --no-restore --verbosity $DotnetVerbosity }
 }
 
 # Tests the built ./src code
-task ci-src-test ci-src-restore {
+task ci-src-test ci-src-restore, {
 
     Get-ChildItem $SrcDirectory -recurse | Where-Object {$_.name -like "*Tests.csproj"} | ForEach-Object -Process { 
         exec { dotnet test $_.FullName -c $BuildConfiguration --no-build --verbosity $DotnetVerbosity }
@@ -97,7 +94,7 @@ task ci-src-test ci-src-restore {
 
 # Packages the built ./src code
 # into nuget packages *.nupkg
-task ci-src-pack ci-src-restore {
+task ci-src-pack ci-src-restore, {
     
     exec { dotnet pack $SrcDirectory --no-build --output $NupkgDirectory --verbosity $DotnetVerbosity }
 }

@@ -39,6 +39,10 @@ jobs:
     steps:
       - name: Git Checkout
         uses: actions/checkout@v4
+        with:
+          # Ensures MinVer finds what it needs
+          fetch-depth: 0
+          filter: tree:0
       - uses: ./.github/actions/ingot-setup
         name: Setup
       - name: Build
@@ -46,12 +50,11 @@ jobs:
       - uses: actions/upload-artifact@v4
         name: "Artifact: bin/Release"
         with:
-          name: build
+          name: source-built
           if-no-files-found: error
           retention-days: 1
-          path: |
-            ./**/bin/*
-            ./**/obj/*
+          path: ./src/*
+          include-hidden-files: true
 
   src-test:
     needs: src-build
@@ -61,10 +64,6 @@ jobs:
     steps:
       - name: Git Checkout
         uses: actions/checkout@v4
-        with:
-          # Ensures MinVer finds what it needs
-          fetch-depth: 0
-          filter: tree:0
       - uses: ./.github/actions/ingot-setup
         name: Setup
       - uses: actions/download-artifact@v4
@@ -95,7 +94,7 @@ jobs:
         with:
           name: nupkg
           if-no-files-found: error
-          retention-days: 3
+          retention-days: 7
           path: ${{ env.NUPKG_DiRECTORY }}/*.nupkg
 
   src-publish:
@@ -108,9 +107,6 @@ jobs:
     steps:
       - name: Git Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          filter: tree:0
       - uses: ./.github/actions/ingot-setup
         name: Setup
       - uses: actions/download-artifact@v4

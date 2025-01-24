@@ -89,11 +89,12 @@ jobs:
           retention-days: 7
           path: ${{ env.NUPKG_DiRECTORY }}/*.nupkg
 
-  src-publish:
+  src-publish-feedz:
+    if: ${{ !startsWith(github.event.ref, 'refs/tags') }}
     needs:
       - src-pack
       - src-test
-    name: Publish
+    name: Publish (feedz.io)
     runs-on: ubuntu-24.04
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     steps:
@@ -105,14 +106,31 @@ jobs:
         with:
           name: nupkg
           path: ${{ env.NUPKG_DiRECTORY }}
-      - name: Push (feedz.io)
+      - name: Push
         run: |
           dotnet ib ci-src-publish \
             -NupkgDirectory "${{ env.NUPKG_DiRECTORY }}" \
             -NupkgPushSource "https://f.feedz.io/stfbln/ingot/nuget/index.json" \
             -NupkgPushApiKey "${{ secrets.FEEDZ_API_KEY }}"
-      - name: Push (nuget.org)
-        if: ${{ startsWith(github.event.ref, 'refs/tags') }}
+
+  src-publish-nuget-org:
+    if: ${{ startsWith(github.event.ref, 'refs/tags') }}
+    needs:
+      - src-pack
+      - src-test
+    name: Publish (nuget.org)
+    runs-on: ubuntu-24.04
+    container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v4
+      - uses: ./.github/actions/ingot-setup
+        name: Setup
+      - uses: actions/download-artifact@v4
+        with:
+          name: nupkg
+          path: ${{ env.NUPKG_DiRECTORY }}
+      - name: Push
         run: |
           dotnet ib ci-src-publish \
             -NupkgDirectory "${{ env.NUPKG_DiRECTORY }}" \

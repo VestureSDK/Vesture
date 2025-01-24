@@ -31,7 +31,7 @@ task ide {
 task format src-format
 
 # Build source code
-task build ci-src-restore, ci-src-build
+task build ci-src-build
 
 # Test source code
 task test build, ci-src-test
@@ -82,13 +82,13 @@ task ci-src-restore {
 }
 
 # Builds the ./src code
-task ci-src-build {
+task ci-src-build ci-src-restore {
     
     exec { dotnet build $SrcDirectory -c $BuildConfiguration --no-restore --verbosity $DotnetVerbosity }
 }
 
 # Tests the built ./src code
-task ci-src-test {
+task ci-src-test ci-src-restore {
 
     Get-ChildItem $SrcDirectory -recurse | Where-Object {$_.name -like "*Tests.csproj"} | ForEach-Object -Process { 
         exec { dotnet test $_.FullName -c $BuildConfiguration --no-build --verbosity $DotnetVerbosity }
@@ -97,7 +97,7 @@ task ci-src-test {
 
 # Packages the built ./src code
 # into nuget packages *.nupkg
-task ci-src-pack {
+task ci-src-pack ci-src-restore {
     
     exec { dotnet pack $SrcDirectory --no-build --output $NupkgDirectory --verbosity $DotnetVerbosity }
 }

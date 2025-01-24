@@ -28,6 +28,6 @@ runs:
       run: |
         dotnet ib ci-src-publish \
           -NupkgDirectory "${{ inputs.nuget-artifact-directory }}" \
-          -NupkgPushSource "#{{ inputs.nuget-source }}" \
+          -NupkgPushSource "${{ inputs.nuget-source }}" \
           -NupkgPushApiKey "${{ inputs.nuget-api-key }}"
   

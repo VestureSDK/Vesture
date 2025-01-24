@@ -25,6 +25,7 @@ jobs:
     name: Linter
     runs-on: ubuntu-24.04
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
+    timeout-minutes: 3
     steps:
       - name: Git Checkout
         uses: actions/checkout@v4
@@ -38,6 +39,7 @@ jobs:
     name: Build
     runs-on: ubuntu-24.04
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
+    timeout-minutes: 5
     steps:
       - name: Git Checkout
         uses: actions/checkout@v4
@@ -57,6 +59,7 @@ jobs:
     name: Test
     runs-on: ubuntu-24.04
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
+    timeout-minutes: 5
     steps:
       - name: Git Checkout
         uses: actions/checkout@v4
@@ -72,6 +75,7 @@ jobs:
     name: Pack
     runs-on: ubuntu-24.04
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
+    timeout-minutes: 3
     env:
       NUPKG_DiRECTORY_OUTPUT: "./dist/nuget"
     steps:
@@ -101,6 +105,8 @@ jobs:
     name: Publish (feedz.io)
     runs-on: ubuntu-24.04
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
+    cancel-timeout-minutes: 5
+    timeout-minutes: 5
     env:
       NUPKG_DiRECTORY_OUTPUT: "./dist/nuget"
     steps:
@@ -122,6 +128,8 @@ jobs:
     name: Publish (nuget.org)
     runs-on: ubuntu-24.04
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
+    cancel-timeout-minutes: 5
+    timeout-minutes: 5
     env:
       NUPKG_DiRECTORY_OUTPUT: "./dist/nuget"
     steps:

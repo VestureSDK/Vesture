@@ -101,18 +101,13 @@ jobs:
     steps:
       - name: Git Checkout
         uses: actions/checkout@v4
-      - uses: ./.github/actions/ingot-setup
-        name: Setup
-      - uses: actions/download-artifact@v4
-        with:
-          name: nupkg
-          path: ${{ env.NUPKG_DiRECTORY_OUTPUT }}
+      - name: Setup
+        uses: ./.github/actions/ingot-setup
       - name: Push
-        run: |
-          dotnet ib ci-src-publish \
-            -NupkgDirectory "${{ env.NUPKG_DiRECTORY_OUTPUT }}" \
-            -NupkgPushSource "https://f.feedz.io/stfbln/ingot/nuget/index.json" \
-            -NupkgPushApiKey "${{ secrets.FEEDZ_API_KEY }}"
+        uses: ./.github/actions/ingot-src/publish-package
+        with:
+          nuget-source: "https://f.feedz.io/stfbln/ingot/nuget/index.json"
+          nuget-api-key: "${{ secrets.FEEDZ_API_KEY }}"
 
   src-publish-nuget-org:
     if: ${{ startsWith(github.event.ref, 'refs/tags') }}
@@ -127,15 +122,10 @@ jobs:
     steps:
       - name: Git Checkout
         uses: actions/checkout@v4
-      - uses: ./.github/actions/ingot-setup
-        name: Setup
-      - uses: actions/download-artifact@v4
-        with:
-          name: nupkg
-          path: ${{ env.NUPKG_DiRECTORY_OUTPUT }}
+      - name: Setup
+        uses: ./.github/actions/ingot-setup
       - name: Push
-        run: |
-          dotnet ib ci-src-publish \
-            -NupkgDirectory "${{ env.NUPKG_DiRECTORY_OUTPUT }}" \
-            -NupkgPushSource "https://api.nuget.org/v3/index.json" \
-            -NupkgPushApiKey "${{ secrets.NUGET_ORG_API_KEY }}"
+        uses: ./.github/actions/ingot-src/publish-package
+        with:
+          nuget-source: "https://api.nuget.org/v3/index.json"
+          nuget-api-key: "${{ secrets.NUGET_ORG_API_KEY }}"

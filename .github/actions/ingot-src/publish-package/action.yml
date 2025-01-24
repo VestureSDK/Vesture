@@ -1,0 +1,25 @@
+name: 'Ingot Build Artifact Upload'
+description: 'Sets up the environment for the Ingot project'
+author: 'Ingot'
+inputs:
+  nuget-source:
+    description: 'Nuget feed source'
+    required: true
+  nuget-api-key:
+    description: 'Nuget API key'
+    required: true
+runs:
+  env:
+    NUPKG_DiRECTORY_OUTPUT: "./dist/nuget"
+  using: 'composite'
+  steps:
+    - uses: actions/download-artifact@v4
+      with:
+        name: nupkg
+        path: ${{ env.NUPKG_DiRECTORY_OUTPUT }}
+    - name: Push
+      run: |
+        dotnet ib ci-src-publish \
+          -NupkgDirectory "${{ env.NUPKG_DiRECTORY_OUTPUT }}" \
+          -NupkgPushSource "#{{ inputs.nuget-source }}" \
+          -NupkgPushApiKey "${{ inputs.nuget-api-key }}"

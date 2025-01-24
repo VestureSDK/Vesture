@@ -4,13 +4,24 @@ author: 'Ingot'
 runs:
   using: 'composite'
   steps:
-    - name: Restore NuGet Cache
+    - id: nuget-cache
+      name: Restore NuGet Cache
       uses: actions/cache/restore@v4
       with:
         path: ~/.nuget/packages
         key: ${{ runner.os }}-nuget-${{ hashFiles('**/Directory.Packages.props') }}
-    - shell: pwsh
+    - shell: sh
       name: Environment Setup
       run: |
         dotnet tool restore
         dotnet ib ci-env-setup
+    - shell: sh
+      name: Nuget Src Restore
+      if: steps.nuget-cache.outputs.cache-hit != 'true'
+      run: dotnet ib ci-src-restore
+    - name: Save NuGet Cache
+      uses: actions/cache/save@v4
+      if: steps.nuget-cache.outputs.cache-hit != 'true'
+      with:
+        path: ~/.nuget/packages
+        key: ${{ steps.nuget-cache.outputs.cache-primary-key }}

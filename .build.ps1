@@ -31,7 +31,7 @@ task ide {
 task format src-format
 
 # Build source code
-task build ci-src-build
+task build ci-src-restore, ci-src-build
 
 # Test source code
 task test build, ci-src-test
@@ -75,18 +75,21 @@ task ci-src-linter {
     exec { dotnet csharpier --check $SrcDirectory }
 }
 
+# Restores the ./src code
+task ci-src-restore {
+    
+    exec { dotnet restore $SrcDirectory --verbosity $DotnetVerbosity }
+}
+
 # Builds the ./src code
 task ci-src-build {
     
-    exec { dotnet restore $SrcDirectory --verbosity $DotnetVerbosity }
     exec { dotnet build $SrcDirectory -c $BuildConfiguration --no-restore --verbosity $DotnetVerbosity }
 }
 
 # Tests the built ./src code
 task ci-src-test {
 
-    exec { dotnet restore $SrcDirectory --verbosity $DotnetVerbosity }
-    
     Get-ChildItem $SrcDirectory -recurse | Where-Object {$_.name -like "*Tests.csproj"} | ForEach-Object -Process { 
         exec { dotnet test $_.FullName -c $BuildConfiguration --no-build --verbosity $DotnetVerbosity }
     }    
@@ -96,7 +99,6 @@ task ci-src-test {
 # into nuget packages *.nupkg
 task ci-src-pack {
     
-    exec { dotnet restore $SrcDirectory --verbosity $DotnetVerbosity }
     exec { dotnet pack $SrcDirectory --no-build --output $NupkgDirectory --verbosity $DotnetVerbosity }
 }
 

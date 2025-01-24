@@ -8,18 +8,25 @@ inputs:
   nuget-api-key:
     description: 'Nuget API key'
     required: true
+  nuget-artifact-name:
+    description: 'The name of the nuget artifact to download'
+    required: false
+    default: "nupkg"
+  nuget-artifact-directory:
+    description: 'The directory where to download the nuget artifact'
+    required: false
+    default: "./dist/nuget"
 runs:
-  env:
-    NUPKG_DiRECTORY_OUTPUT: "./dist/nuget"
   using: 'composite'
   steps:
     - uses: actions/download-artifact@v4
       with:
-        name: nupkg
-        path: ${{ env.NUPKG_DiRECTORY_OUTPUT }}
+        name: ${{ inputs.nuget-artifact-name }}
+        path: ${{ inputs.nuget-artifact-directory }}
     - name: Push
       run: |
         dotnet ib ci-src-publish \
-          -NupkgDirectory "${{ env.NUPKG_DiRECTORY_OUTPUT }}" \
+          -NupkgDirectory "${{ inputs.nuget-artifact-directory }}" \
           -NupkgPushSource "#{{ inputs.nuget-source }}" \
           -NupkgPushApiKey "${{ inputs.nuget-api-key }}"
+  

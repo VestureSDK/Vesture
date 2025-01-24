@@ -24,7 +24,7 @@ runs:
         name: ${{ inputs.nuget-artifact-name }}
         path: ${{ inputs.nuget-artifact-directory }}
     - name: Push
-      shell: pwsh
+      shell: sh
       run: |
         dotnet ib ci-src-publish \
           -NupkgDirectory "${{ inputs.nuget-artifact-directory }}" \

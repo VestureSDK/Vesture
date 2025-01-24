@@ -85,6 +85,8 @@ task ci-src-build {
 # Tests the built ./src code
 task ci-src-test {
 
+    exec { dotnet restore $SrcDirectory --verbosity $DotnetVerbosity }
+    
     Get-ChildItem $SrcDirectory -recurse | Where-Object {$_.name -like "*Tests.csproj"} | ForEach-Object -Process { 
         exec { dotnet test $_.FullName -c $BuildConfiguration --no-build --verbosity $DotnetVerbosity }
     }    
@@ -94,6 +96,7 @@ task ci-src-test {
 # into nuget packages *.nupkg
 task ci-src-pack {
     
+    exec { dotnet restore $SrcDirectory --verbosity $DotnetVerbosity }
     exec { dotnet pack $SrcDirectory --no-build --output $NupkgDirectory --verbosity $DotnetVerbosity }
 }
 

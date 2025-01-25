@@ -11,8 +11,47 @@ param(
 
     [string] $NupkgPushSource = 'https://api.nuget.org/v3/index.json',
     
-    [string] $NupkgPushApiKey = '<Set your API key with -NupkgPushApiKey parameter>'
+    [string] $NupkgPushApiKey = '<Set your API key with -NupkgPushApiKey parameter>',
+
+    [bool] $Force = $False
 )
+
+# ***************************************
+# 
+#
+#           Shell Setup
+# 
+#
+# ***************************************
+
+# Set output rendering to use ANSI code
+if ($PsStyle)
+{
+    $PsStyle.OutputRendering = "Ansi";
+}
+
+# Helper variables
+$pwshPsEdition = "Core";
+$pwshCommand = "pwsh";
+$pwshLabel = "PowerShell Core (${pwshCommand})";
+
+Enter-Build {
+
+    # Warns the user the setup is not finished if they
+    # have not restarted their program with pwsh as default shell
+    if (-Not ($BuildTask -eq "setup"))
+    {
+        if (-Not ($PSVersionTable.PSEdition -eq $pwshPsEdition))
+        {
+            Write-Build Yellow (
+                "---------------------------------------------------------------------- `n" +
+                "WARNING: ${pwshLabel} enabled but not active. `n" +
+                "Ensure to refresh environment variables by restarting your program. `n" +
+                "---------------------------------------------------------------------- `n"
+            );
+        }
+    }
+}
 
 # ***************************************
 # 
@@ -22,18 +61,110 @@ param(
 #
 # ***************************************
 
-# Synopsis: Runs formatting all the way to packing the source code
+# Synopsis: `dotnet ib setup` Runs the initial setup for the repo
+task setup {
+
+    # Enable PowerShell Core usage to ensure 
+    # users benefit from modern features and
+    # consistent experience accross platforms
+    Write-Build Magenta "Enabling use of ${pwshLabel}...";
+    
+    if ($PSVersionTable.PSEdition -eq $pwshPsEdition)
+    {
+        Write-Build Green "${pwshLabel} already enabled.";
+    }
+    else
+    {
+        # Invoke-Build supports using "pwsh" as default
+        # instead of using --pwsh for every command. See:
+        # https://github.com/nightroman/Invoke-Build/issues/219
+        $pwshEnvScope = [System.EnvironmentVariableTarget]::User;
+        $pwshEnvKey = "pwsh";
+        $pwshEnvValue = "pwsh";
+
+        # If there is already the environment variable setup, the
+        # user has already passed through the setup (see below).
+        $pwshEnv = [System.Environment]::GetEnvironmentVariable($pwshEnvKey, $pwshEnvScope);
+        if ($pwshEnv -eq $pwshEnvValue)
+        {
+            Write-Build Yellow (
+                "WARNING: ${pwshLabel} enabled but not active. `n" +
+                "Ensure to refresh environment variables by restarting your program."
+            );
+        }
+        else
+        {
+            Write-Build DarkGray "Checking ${pwshLabel} availability on your system...";
+            if (Get-Command $pwshCommand -errorAction SilentlyContinue)
+            {
+                Write-Build DarkGray "${pwshLabel} is available on your system";
+
+                Write-Build DarkGray "Setting environment variable '${pwshEnvKey}=${pwshEnvValue}' on scope ${pwshEnvScope}...";
+                [System.Environment]::SetEnvironmentVariable($pwshEnvKey, $pwshEnvValue, $pwshEnvScope);
+                
+                Write-Build Yellow (
+                    "WARNING: ${pwshLabel} enabled but not active. `n" +
+                    "Ensure to refresh environment variables by restarting your program."
+                );
+            }
+            else
+            {
+                Write-Build Yellow ( 
+                    "WARNING: ${pwshLabel} not available in your system. `n" +
+                    "You should install ${pwshLabel} to ensure consistent experience " +
+                    "across different platforms and on the CI. `n" +
+                    "See https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows " +
+                    "for more details on how to install PowerShell Core."
+                );
+            }
+        }
+    }
+}
+
+# Synopsis: `dotnet ib` Runs formatting all the way to packing the source code
 task . format, ci-src-linter, pack
 
-# Synopsis: Opens Visual Studio with no projects loaded
+# Synopsis: `dotnet ib ide` Opens Visual Studio with no projects loaded
 task ide {
-    & $(& "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -prerelease -latest -property productPath -format json | ConvertFrom-Json)[0].productPath $SrcDirectory/Ingot.sln -donotloadprojects
+
+    Write-Build Magenta "Searching Visual Studio installation...";
+
+    $programFilesx86 = (Get-ChildItem "env:ProgramFiles(x86)").Value;
+    $vsWherePath = "${programFilesx86}\Microsoft Visual Studio\Installer\vswhere.exe";
+    if (-Not (Test-Path $vsWherePath))
+    {
+        Write-Error ( 
+            "ERROR: vswhere ('${vsWherePath}') not found. `n" +
+            "Could not determine Visual Studio location."
+        );
+    }
+    
+    Write-Build DarkGray "Invoking vswhere ('${vsWherePath}') to determine Visual Studio location...";
+    $vsWhereOutput = exec { & $vsWherePath -prerelease -latest -property productPath -format json }
+    $vsPath = ($vsWhereOutput | ConvertFrom-Json)[0].productPath;
+    if (-Not (Test-Path $vsPath ))
+    {
+        Write-Error "ERROR: vswhere ('${vsWherePath}') returned an invalid Visual Studio location (${vsPath})";
+    }
+    
+    Write-Build Green "Found Visual Studio installation (${vsPath})";
+        
+    Write-Build Magenta "Opening Visual Studio...";
+
+    $slnFilePath = "${SrcDirectory}/Ingot.sln";
+    Write-Build DarkGray "Invoking Visual Studio (${vsPath}) to open Ingot solution (${slnFilePath})";
+    exec { & $vsPath $slnFilePath -donotloadprojects }
 }
 
 # Synopsis: Format source code
 task format {
+
+    Write-Build Magenta "Formatting ${SrcDirectory} source code...";
     
+    Write-Build DarkGray "Invoking csharpier on source directory (${SrcDirectory})";
     exec { dotnet csharpier $SrcDirectory }
+
+    Write-Build Green "Successfully formatted source code";
 }
 
 # Synopsis: Builds source code
@@ -60,47 +191,88 @@ task pack build, ci-src-pack
 # Synopsis: [CI Specific] Do the setup of the environment and repository
 task ci-env-setup {
 
+    if (-Not (Test-Path env:CI) -And -Not $Force)
+    {
+        Write-Error (
+            "${BuildTask} should be run only on CI. `n" +
+            "To test this task locally, specify '-Force 1' to force its execution."
+        );
+    }
+    elseif (-Not (Test-Path env:CI))
+    {
+        Write-Build Yellow (
+            "---------------------------------------------------------------------- `n" +
+            "WARNING: ${BuildTask} should be run only on CI. `n" +
+            "You have specified '-Force 1' to forcefully run this task. `n" +
+            "---------------------------------------------------------------------- `n"
+        );
+    }
+
     # Ensures when running in containers the ownership is not dubious
+    Write-Build Magenta "Adding git repository to safe.directory...";
+    
+    Write-Build DarkGray "Invoking git to add '${BuildRoot}' as a safe.directory...";
     exec { git config --global --add safe.directory $BuildRoot }
 
-    # Creates the config file
-    if ($env:GITHUB_ACTIONS)
-    {
-        $configDirectoryPath = "./dist/ib";
-        $configFilePath = "$($configDirectoryPath)/config.env";
+    Write-Build Green "Successfully added git repository to safe.directory";
 
-        Write-Host "Running on GITHUB_ACTIONS, creating $($configFilePath)";
-        New-Item -ItemType Directory -Force -Path $configDirectoryPath
-        
+    # GitHub actions specific setup
+    if (-Not (Test-Path env:GITHUB_ACTIONS))
+    {
+        Write-Build DarkGray "Not running on GitHub actions, skipping GitHub actions setup.";
+    }
+    else
+    {
+        # To ease handling of configuration within GitHub
+        # actions, the configuration of this invoke-build
+        # is exposed via environment variables to be re-used
+        # within the .yml workflow or action files
+
+        Write-Build Magenta "Appending Ingot environment variables to GitHub environment...";
+
         if(-Not $env:INGOT_DOTNETVERBOSITY)
         {
-            'echo "INGOT_DOTNETVERBOSITY='+$($DotnetVerbosity)+'" >> $GITHUB_ENV' >> $configFilePath
+            $value = "INGOT_DOTNETVERBOSITY='${DotnetVerbosity}'";
+            Write-Build DarkGray "Appending ${value} to GitHub environment...";
+            echo "${value}" >> $GITHUB_ENV;
         }
         
         if(-Not $env:INGOT_BUILDCONFIGURATION)
         {
-            'echo "INGOT_BUILDCONFIGURATION='+$($BuildConfiguration)+'" >> $GITHUB_ENV' >> $configFilePath
+            $value = "INGOT_BUILDCONFIGURATION='${BuildConfiguration}'";
+            Write-Build DarkGray "Appending ${value} to GitHub environment...";
+            echo "${value}" >> $GITHUB_ENV;
         }
         
         if(-Not $env:INGOT_SRCDIRECTORY)
         {
-            'echo "INGOT_SRCDIRECTORY='+$($SrcDirectory)+'" >> $GITHUB_ENV' >> $configFilePath
+            $value = "INGOT_SRCDIRECTORY='${SrcDirectory}'";
+            Write-Build DarkGray "Appending ${value} to GitHub environment...";
+            echo "${value}" >> $env:GITHUB_ENV;
         }
         
         if(-Not $env:INGOT_SRCRELEASEGLOB)
         {
-            'echo "INGOT_SRCRELEASEGLOB=./**/bin/*" >> $GITHUB_ENV' >> $configFilePath
+            $value = "INGOT_SRCRELEASEGLOB='./**/bin/*'";
+            Write-Build DarkGray "Appending ${value} to GitHub environment...";
+            echo "${value}" >> $env:GITHUB_ENV;
         }
         
         if(-Not $env:INGOT_NUPKGDIRECTORY)
         {
-            'echo "INGOT_NUPKGDIRECTORY='+$($NupkgDirectory)+'" >> $GITHUB_ENV' >> $configFilePath
+            $value = "INGOT_NUPKGDIRECTORY='${NupkgDirectory}'";
+            Write-Build DarkGray "Appending ${value} to GitHub environment...";
+            echo "${value}" >> $env:GITHUB_ENV;
         }
         
         if(-Not $env:INGOT_NUPKGGLOB)
         {
-            'echo "INGOT_NUPKGGLOB=./**/*.nupkg" >> $GITHUB_ENV' >> $configFilePath
+            $value = "INGOT_NUPKGGLOB='./**/*.nupkg'";
+            Write-Build DarkGray "Appending ${value} to GitHub environment...";
+            echo "${value}" >> $env:GITHUB_ENV;
         }
+
+        Write-Build Green "Appended Ingot environment variables to GitHub environment successfully";
     }
 }
 

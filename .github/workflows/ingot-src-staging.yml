@@ -23,6 +23,21 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+
+  test-minver:
+    runs-on: ubuntu-24.04
+    container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v4
+      - name: Setup
+        uses: ./.github/actions/ingot-setup
+      - name: MinVer
+        run: |
+          dotnet minver -v d
+        env:
+          MinVerDefaultPreReleaseIdentifiers: alpha.0.${{ github.run_id }}.${{ github.run_attempt}}
+
   build-test-validate:
     name: Source
     uses: stfbln/ingot/.github/workflows/ingot-src-build-test-validate.yml@main

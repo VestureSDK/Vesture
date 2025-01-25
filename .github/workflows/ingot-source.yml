@@ -48,7 +48,7 @@ jobs:
           fetch-depth: 0
           filter: tree:0
       - name: Setup
-        uses: stfbln/Ingot/.github/actions/ingot-setup@${{ github.ref_name }}
+        uses: stfbln/Ingot/.github/actions/ingot-setup
       - name: Build
         run: dotnet ib ci-src-build
       - name: Upload Build Artifacts

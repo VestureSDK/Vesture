@@ -236,7 +236,8 @@ task ci-env-setup {
         }
 
         Write-Build DarkGray "Getting original GitHub environment file content...";
-        Ingot-GetFileContent -File $env:GITHUB_ENV;
+        $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw;
+        Ingot-PrintFileContent -File $env:GITHUB_ENV -Content $githubEnvironmentContent;
 
         Ingot-GitHub-AppendMissingVariable -Key "INGOT_DOTNETVERBOSITY" -Value $DotnetVerbosity;
         Ingot-GitHub-AppendMissingVariable -Key "INGOT_BUILDCONFIGURATION" -Value $BuildConfiguration;
@@ -332,21 +333,18 @@ task Docs Docs-Clean, Docs-Build, Docs-Serve
 #
 # ***************************************
 
-function Ingot-GetFileContent {
+function Ingot-PrintFileContent {
 
     param (
-        $File
+        $File,
+        $Content
     )
 
-    $fileContent = Get-Content $File -Raw;
-    
     Write-Build DarkGray (
         "`n`nFile: ${File} `n" +
         "----------- `n" +
-        $fileContent + "`n" +
+        ${Content} + "`n" +
         "----------- `n`n");
-    
-    return $fileContent;
 }
 
 function Ingot-GitHub-AppendMissingVariable {
@@ -367,7 +365,8 @@ function Ingot-GitHub-AppendMissingVariable {
         echo "${kvp}" >> $env:GITHUB_ENV;
         
         Write-Build DarkGray "Getting GitHub environment file content after append...";
-        $githubEnvironmentContent = Ingot-GetFileContent -File $env:GITHUB_ENV;
+        $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw;
+        Ingot-PrintFileContent -File $env:GITHUB_ENV -Content $githubEnvironmentContent;
         
         Write-Build DarkGray "Validating variable ${Key} append to GitHub environment...";
         

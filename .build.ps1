@@ -7,7 +7,7 @@ param(
 
     [string] $SrcDirectory = './src',
 
-    [string] $NupkgDirectory = './dist',
+    [string] $NupkgDirectory = './dist/nuget',
 
     [string] $NupkgPushSource = 'https://api.nuget.org/v3/index.json',
     

@@ -1,19 +1,13 @@
 name: 'Ingot Build Artifact Download'
 description: 'Sets up the environment for the Ingot project'
 author: 'Ingot'
-inputs:
-  build-artifact-name:
-    description: 'The name of the build artifact to upload'
-    default: 'build'
-    required: false
 runs:
   using: 'composite'
   steps:
     - name: "Artifact Download: bin"
       uses: actions/download-artifact@v4
       with:
-        name: "${{ inputs.build-artifact-name }}"
-        path: ./
+        name: build
     - name: "List files Downloaded"
       shell: sh
       run: find . -wholename ./**/bin/*

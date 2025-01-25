@@ -1,15 +1,6 @@
 name: 'Ingot Build Artifact Upload'
 description: 'Sets up the environment for the Ingot project'
 author: 'Ingot'
-inputs:
-  build-artifact-name:
-    description: 'The name of the build artifact to upload'
-    default: 'build'
-    required: false
-outputs:
-  build-artifact-name:
-    description: 'The name of the build artifact to download'
-    value: ${{ steps.set-action-output.outputs.build-artifact-name }}
 runs:
   using: 'composite'
   steps:
@@ -19,11 +10,7 @@ runs:
     - name: "Artifact Upload: bin"
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ inputs.build-artifact-name }}
+        name: build
         if-no-files-found: error
         retention-days: 1
         path: ./**/bin/*
-    - name: Set Action Output
-      id: set-action-output
-      shell: sh
-      run: echo "build-artifact-name=${{ inputs.build-artifact-name }}" >> $GITHUB_OUTPUT

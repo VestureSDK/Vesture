@@ -65,8 +65,6 @@ jobs:
         name: Setup
       - name: Download Build Artifacts
         uses: ./.github/actions/ingot-src/build-artifact-download
-        with:
-          build-artifact-name: '${{ needs.src-build.outputs.build-artifact-name }}'
       - name: Test
         run: dotnet ib ci-src-test
 
@@ -85,8 +83,6 @@ jobs:
         name: Setup
       - name: Download Build Artifacts
         uses: ./.github/actions/ingot-src/build-artifact-download
-        with:
-          build-artifact-name: '${{ needs.src-build.outputs.build-artifact-name }}'
       - name: Pack
         run: |
           dotnet ib ci-src-pack \

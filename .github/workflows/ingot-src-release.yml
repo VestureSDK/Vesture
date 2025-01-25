@@ -5,6 +5,9 @@ on:
     tags:
       - '*'
 
+env:
+  MinVerDefaultPreReleaseIdentifiers: alpha.0.${{ github.ref_name }}
+
 jobs:
   build-test-validate:
     name: Source

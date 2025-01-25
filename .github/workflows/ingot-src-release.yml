@@ -7,13 +7,14 @@ on:
 
 jobs:
   build-test-validate:
+    name: Source
     uses: stfbln/ingot/.github/workflows/ingot-src-build-test-validate.yml@main
 
   src-publish-nuget-org:
     if: ${{ startsWith(github.event.ref, 'refs/tags') }}
     needs:
       - build-test-validate
-    name: Publish (nuget.org)
+    name: Source / Publish (nuget.org)
     runs-on: ubuntu-24.04
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     cancel-timeout-minutes: 5

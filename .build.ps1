@@ -70,13 +70,27 @@ task ci-env-setup {
         $configFilePath = "$($configDirectoryPath)/config.env";
 
         Write-Host "Running on GITHUB_ACTIONS, creating $($configFilePath)";
-
         New-Item -ItemType Directory -Force -Path $configDirectoryPath
-
-        'echo "INGOT_DOTNETVERBOSITY='+$($DotnetVerbosity)+'" >> $GITHUB_ENV' >> $configFilePath
-        'echo "INGOT_BUILDCONFIGURATION='+$($BuildConfiguration)+'" >> $GITHUB_ENV' >> $configFilePath
-        'echo "INGOT_SRCDIRECTORY='+$($SrcDirectory)+'" >> $GITHUB_ENV' >> $configFilePath
-        'echo "INGOT_NUPKGDIRECTORY='+$($NupkgDirectory)+'" >> $GITHUB_ENV' >> $configFilePath
+        
+        if(-Not $env:INGOT_DOTNETVERBOSITY)
+        {
+            'echo "INGOT_DOTNETVERBOSITY='+$($DotnetVerbosity)+'" >> $GITHUB_ENV' >> $configFilePath
+        }
+        
+        if(-Not $env:INGOT_BUILDCONFIGURATION)
+        {
+            'echo "INGOT_BUILDCONFIGURATION='+$($BuildConfiguration)+'" >> $GITHUB_ENV' >> $configFilePath
+        }
+        
+        if(-Not $env:INGOT_SRCDIRECTORY)
+        {
+            'echo "INGOT_SRCDIRECTORY='+$($SrcDirectory)+'" >> $GITHUB_ENV' >> $configFilePath
+        }
+        
+        if(-Not $env:INGOT_NUPKGDIRECTORY)
+        {
+            'echo "INGOT_NUPKGDIRECTORY='+$($NupkgDirectory)+'" >> $GITHUB_ENV' >> $configFilePath
+        }
     }
 }
 

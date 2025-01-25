@@ -21,17 +21,18 @@ runs:
       run: |
         dotnet tool restore
         dotnet ib ci-env-setup
-
-    - shell: sh
-      run: |
-        cat ./dist/ib/config.env
         . ./dist/ib/config.env
-        echo $GITHUB_ENV
-        cat $GITHUB_ENV
+
+    # Displays the INGOT_ environment variables
+    # from sourcing the ./dist/ib/config.env file
+    - shell: sh
+      name: Debug Ingot Environment Variables
+      run: env | grep '^INGOT_' || echo "No INGOT_ variables found"
 
     - shell: sh
-      name: Print IB Config
-      run: env | grep '^INGOT_' || echo "No INGOT_ variables found"
+      run: echo "${TEST}"
+      env:
+        TEST: $INGOT_SRCDIRECTORY
 
     # Restores the necessary nuget packages
     # In order to create a relevant nuget cache

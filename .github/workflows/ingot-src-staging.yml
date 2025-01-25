@@ -1,4 +1,4 @@
-name: Ingot Source
+name: Ingot Source (Staging)
 
 on:
   push:

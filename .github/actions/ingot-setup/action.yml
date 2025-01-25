@@ -27,9 +27,6 @@ runs:
     - shell: sh
       name: Environment Setup
       run: |
-        echo "test=a" >> $GITHUB_ENV
-        cat $GITHUB_ENV
-        printenv
         dotnet tool restore
         dotnet ib ci-env-setup
 

@@ -229,40 +229,23 @@ task ci-env-setup {
         # within the .yml workflow or action files
 
         Write-Build Magenta "Appending Ingot environment variables to GitHub environment...";
-
-        Write-Build DarkGray "Getting original GitHub environment file content...";
         
         if (-Not (Test-Path $env:GITHUB_ENV))
         {
-            Write-Build DarkGray "GitHub environment file $($env:GITHUB_ENV) not found";
-            Write-Build DarkGray "Creating GitHub environment file $($env:GITHUB_ENV) ...";
-            echo "SAMPLE_ENVIRONMENT_VARIABLE=SAMPLE" >> $GITHUB_ENV;
+            Write-Error "GitHub environment file $($env:GITHUB_ENV) not found";
         }
+        
+        Write-Build DarkGray "Getting original GitHub environment file content...";
 
         $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw
         Write-Build DarkGray $githubEnvironmentContent;
-
-        if (-Not $githubEnvironmentContent)
-        {
-            Write-Build DarkGray "GitHub environment file $($env:GITHUB_ENV) is empty";
-            Write-Build DarkGray "Appending sample environment variable SAMPLE_ENVIRONMENT_VARIABLE...";
-            echo "SAMPLE_ENVIRONMENT_VARIABLE=SAMPLE" >> $GITHUB_ENV;
-            echo "SAMPLE_ENVIRONMENT_VARIABLE=SAMPLE" >> $GITHUB_ENV;
-            echo "SAMPLE_ENVIRONMENT_VARIABLE=SAMPLE" >> $GITHUB_ENV;
-            echo "SAMPLE_ENVIRONMENT_VARIABLE=SAMPLE" >> $GITHUB_ENV;
-            echo "SAMPLE_ENVIRONMENT_VARIABLE=SAMPLE" >> $GITHUB_ENV;
-
-            Write-Build DarkGray "Getting GitHub environment file content after append...";
-            $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw
-            Write-Build DarkGray $githubEnvironmentContent;
-        }
 
         if(-Not $env:INGOT_DOTNETVERBOSITY)
         {
             $variable = "INGOT_DOTNETVERBOSITY";
             $value = "${variable}=${DotnetVerbosity}";
             Write-Build DarkGray "Appending ${value} to GitHub environment...";
-            echo "${value}" >> $GITHUB_ENV;
+            echo "${value}" >> $env:GITHUB_ENV;
             
             Write-Build DarkGray "Getting GitHub environment file content after append...";
 
@@ -286,7 +269,7 @@ task ci-env-setup {
             $variable = "INGOT_BUILDCONFIGURATION";
             $value = "${variable}=${BuildConfiguration}";
             Write-Build DarkGray "Appending ${value} to GitHub environment...";
-            echo "${value}" >> $GITHUB_ENV;
+            echo "${value}" >> $env:GITHUB_ENV;
             
             Write-Build DarkGray "Getting GitHub environment file content after append...";
 

@@ -25,7 +25,7 @@ runs:
 
     - shell: sh
       name: Print IB Config
-      run: echo "${!INGOT_*}"
+      run: env | grep '^INGOT_'
 
     # Restores the necessary nuget packages
     # In order to create a relevant nuget cache

@@ -65,10 +65,10 @@ task ci-env-setup {
 
     # Creates the config file
     New-Item -ItemType Directory -Force -Path ./dist/ib
-    "INGOT_DOTNETVERBOSITY=${DotnetVerbosity}" >> ./dist/ib/config.env
-    "INGOT_BUILDCONFIGURATION=${BuildConfiguration}" >> ./dist/ib/config.env
-    "INGOT_SRCDIRECTORY=${SrcDirectory}" >> ./dist/ib/config.env
-    "INGOT_NUPKGDIRECTORY=${NupkgDirectory}" >> ./dist/ib/config.env
+    "export INGOT_DOTNETVERBOSITY=${DotnetVerbosity}" >> ./dist/ib/config.env
+    "export INGOT_BUILDCONFIGURATION=${BuildConfiguration}" >> ./dist/ib/config.env
+    "export INGOT_SRCDIRECTORY=${SrcDirectory}" >> ./dist/ib/config.env
+    "export INGOT_NUPKGDIRECTORY=${NupkgDirectory}" >> ./dist/ib/config.env
 }
 
 # ---------------------------------------

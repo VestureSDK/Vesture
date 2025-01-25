@@ -2,10 +2,6 @@ name: 'Ingot Build Artifact Upload'
 description: 'Sets up the environment for the Ingot project'
 author: 'Ingot'
 inputs:
-  build-artifact-path:
-    description: 'The path of the build artifact files'
-    default: './**/bin/*'
-    required: false
   build-artifact-name:
     description: 'The name of the build artifact to upload'
     default: 'build'
@@ -23,7 +19,7 @@ runs:
         name: ${{ inputs.build-artifact-name }}
         if-no-files-found: error
         retention-days: 1
-        path: ${{ inputs.build-artifact-path }}
+        path: ./**/bin/*
     - name: Set Action Output
       id: set-action-output
       shell: sh

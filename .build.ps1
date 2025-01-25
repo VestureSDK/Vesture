@@ -335,6 +335,15 @@ task ci-src-pack ci-src-restore, {
     Write-Build Magenta "Cleaning output directory ${NupkgDirectory}...`n";
 
     Write-Build DarkGray "Getting output directory ${NupkgDirectory} existing items...";
+    if (-Not (Test-Path $NupkgDirectory))
+    {
+        Write-Build DarkGray "Output directory ${NupkgDirectory} does not exist";
+
+        Write-Build DarkGray "Creating output directory ${NupkgDirectory}...";
+        New-Item -ItemType Directory -Force -Path $NupkgDirectory
+        Write-Build DarkGray "Created output directory ${NupkgDirectory}";
+    }
+
     $previoulsyCreatedFiles = Get-ChildItem $NupkgDirectory -recurse;
     
     Write-Build DarkGray "Found $($previoulsyCreatedFiles.Count) items already in output directory ${NupkgDirectory}";

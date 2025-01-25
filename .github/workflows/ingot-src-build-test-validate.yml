@@ -50,7 +50,9 @@ jobs:
       - name: Build
         run: dotnet ib ci-src-build
       - name: Upload Build Artifacts
-        uses: ./.github/actions/ingot-src/build-artifact-upload
+        uses: ./.github/actions/ingot-src/build-artifacts
+        with:
+          type: upload
 
   src-test:
     needs: src-build
@@ -64,7 +66,9 @@ jobs:
       - uses: ./.github/actions/ingot-setup
         name: Setup
       - name: Download Build Artifacts
-        uses: ./.github/actions/ingot-src/build-artifact-download
+        uses: ./.github/actions/ingot-src/build-artifacts
+        with:
+          type: download
       - name: Test
         run: dotnet ib ci-src-test
 
@@ -82,7 +86,9 @@ jobs:
       - uses: ./.github/actions/ingot-setup
         name: Setup
       - name: Download Build Artifacts
-        uses: ./.github/actions/ingot-src/build-artifact-download
+        uses: ./.github/actions/ingot-src/build-artifacts
+        with:
+          type: download
       - name: Pack
         run: |
           dotnet ib ci-src-pack \

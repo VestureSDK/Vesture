@@ -16,7 +16,7 @@ on:
     outputs:
       nuget-artifact-name:
         description: 'The name of the nuget artifact to download'
-        value: ${{ jobs.example_job.outputs.output1 }}
+        value: ${{ jobs.src-pack.outputs.nuget-artifact-name }}
 
 jobs:
   src-linter:
@@ -65,6 +65,8 @@ jobs:
         name: Setup
       - name: Download Build Artifacts
         uses: ./.github/actions/ingot-src/build-artifact-download
+        with:
+          build-artifact-name: '${{ needs.src-build.outputs.build-artifact-name }}'
       - name: Test
         run: dotnet ib ci-src-test
 
@@ -74,8 +76,8 @@ jobs:
     runs-on: ubuntu-24.04
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     timeout-minutes: 3
-    env:
-      NUPKG_DiRECTORY_OUTPUT: "./dist/nuget"
+    outputs:
+      nuget-artifact-name: ${{ steps.set-workflow-output.outputs.nuget-artifact-name }}
     steps:
       - name: Git Checkout
         uses: actions/checkout@v4
@@ -83,6 +85,8 @@ jobs:
         name: Setup
       - name: Download Build Artifacts
         uses: ./.github/actions/ingot-src/build-artifact-download
+        with:
+          build-artifact-name: '${{ needs.src-build.outputs.build-artifact-name }}'
       - name: Pack
         run: |
           dotnet ib ci-src-pack \
@@ -95,4 +99,5 @@ jobs:
           retention-days: 7
           path: ${{ inputs.nuget-artifact-directory }}/*.nupkg
       - name: Set Workflow Output
+        id: set-workflow-output
         run: echo "nuget-artifact-name=${{ inputs.nuget-artifact-name }}" >> $GITHUB_OUTPUT

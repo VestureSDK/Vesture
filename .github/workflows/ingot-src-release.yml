@@ -2,34 +2,18 @@ name: Ingot Source
 
 on:
   push:
-    tags-ignore:
-      - '**'
-    paths:
-      - 'src/**'
-      - '.github/**'
-      - '.build.ps1'
-    branches:
-      - main
-  pull_request:
-    paths:
-      - 'src/**'
-      - '.github/**'
-      - '.build.ps1'
-    branches:
+    tags:
       - '*'
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
 
 jobs:
   build-test-validate:
     uses: stfbln/ingot/.github/workflows/ingot-src-build-test-validate.yml@main
 
-  src-publish-feedz:
+  src-publish-nuget-org:
+    if: ${{ startsWith(github.event.ref, 'refs/tags') }}
     needs:
       - build-test-validate
-    name: Publish (feedz.io)
+    name: Publish (nuget.org)
     runs-on: ubuntu-24.04
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     cancel-timeout-minutes: 5
@@ -45,5 +29,5 @@ jobs:
         uses: ./.github/actions/ingot-src/publish-package
         with:
           nuget-artifact-name: ${{ needs.build-test-validate.outputs.nuget-artifact-name }}
-          nuget-source: "https://f.feedz.io/stfbln/ingot/nuget/index.json"
-          nuget-api-key: "${{ secrets.FEEDZ_API_KEY }}"
+          nuget-source: "https://api.nuget.org/v3/index.json"
+          nuget-api-key: "${{ secrets.NUGET_ORG_API_KEY }}"

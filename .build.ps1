@@ -231,9 +231,26 @@ task ci-env-setup {
         Write-Build Magenta "Appending Ingot environment variables to GitHub environment...";
 
         Write-Build DarkGray "Getting original GitHub environment file content...";
+        
+        if (-Not (Test-Path $env:GITHUB_ENV))
+        {
+            Write-Build DarkGray "GitHub environment file $($env:GITHUB_ENV) not found";
+            Write-Build DarkGray "Creating GitHub environment file $($env:GITHUB_ENV) ...";
+            echo "SAMPLE_ENVIRONMENT_VARIABLE=SAMPLE" >> $GITHUB_ENV;
+        }
 
         $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw
         Write-Build DarkGray $githubEnvironmentContent;
+
+        if (-Not $githubEnvironmentContent)
+        {
+            Write-Build DarkGray "GitHub environment file $($env:GITHUB_ENV) is empty";
+            Write-Build DarkGray "Appending sample environment variable...";
+            echo "SAMPLE_ENVIRONMENT_VARIABLE=SAMPLE" >> $GITHUB_ENV;
+
+            Write-Build DarkGray "Getting GitHub environment file content after append...";
+            $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw
+        }
 
         if(-Not $env:INGOT_DOTNETVERBOSITY)
         {

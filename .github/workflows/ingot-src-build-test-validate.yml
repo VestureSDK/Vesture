@@ -38,8 +38,6 @@ jobs:
     runs-on: ubuntu-24.04
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     timeout-minutes: 5
-    env:
-      MinVerDefaultPreReleaseIdentifiers: alpha.0.${{ github.run_id }}.${{ github.run_attempt}}
     steps:
       - name: Git Checkout
         uses: actions/checkout@v4
@@ -51,6 +49,8 @@ jobs:
         uses: ./.github/actions/ingot-setup
       - name: Build
         run: dotnet ib ci-src-build
+        env:
+          MinVerDefaultPreReleaseIdentifiers: alpha.0.${{ github.run_id }}.${{ github.run_attempt}}
       - name: Upload Build Artifacts
         uses: ./.github/actions/ingot-src/build-artifacts
         with:

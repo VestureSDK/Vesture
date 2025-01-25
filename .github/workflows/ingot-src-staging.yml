@@ -26,7 +26,7 @@ jobs:
 
   build-test-validate:
     name: Source
-    uses: stfbln/ingot/.github/workflows/ingot-src-build-test-validate.yml@main
+    uses: stfbln/ingot/.github/workflows/ingot-src-build-test-validate.yml@nuget-package-with-branch-suffix
 
   src-publish-feedz:
     needs:

@@ -24,7 +24,7 @@ runs:
       name: "List Files To Upload"
       shell: sh
       # path to list should match artifact path
-      run: find . -wholename './dist/nuget/*.nupkg'
+      run: find . -wholename './**/*.nupkg'
 
     # Upload the artifact
     - if: ${{ inputs.type == 'upload' }}
@@ -35,7 +35,7 @@ runs:
         name: nupkg
         if-no-files-found: error
         retention-days: 1
-        path: ./dist/nuget/*.nupkg
+        path: ./**/*.nupkg
 
     # -----------------------------------
     # Download
@@ -57,4 +57,4 @@ runs:
       name: "List files Downloaded"
       shell: sh
       # path to list should match artifact path
-      run: find . -wholename './dist/nuget/*.nupkg'
+      run: find . -wholename './**/*.nupkg'

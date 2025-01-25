@@ -5,6 +5,14 @@ runs:
   using: 'composite'
   steps:
 
+    # Checkout the git repo
+    - name: Git Checkout
+      uses: actions/checkout@v4
+        with:
+          # Ensures MinVer finds what it needs
+          fetch-depth: 0
+          filter: tree:0
+
     # Attempts to restore the nuget cache to speed up
     # the dotnet tools and subsequent nuget restore
     - id: nuget-cache

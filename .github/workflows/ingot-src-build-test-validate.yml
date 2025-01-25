@@ -13,9 +13,7 @@ jobs:
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     timeout-minutes: 3
     steps:
-      - name: Git Checkout
-        uses: actions/checkout@v4
-      - uses: ./.github/actions/ingot-setup
+      - uses: stfbln/ingot/.github/actions/ingot-setup@main
         name: Setup
       - name: Linter
         run: dotnet ib ci-src-linter

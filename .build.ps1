@@ -250,6 +250,7 @@ task ci-env-setup {
 
             Write-Build DarkGray "Getting GitHub environment file content after append...";
             $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw
+            Write-Build DarkGray $githubEnvironmentContent;
         }
 
         if(-Not $env:INGOT_DOTNETVERBOSITY)

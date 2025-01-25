@@ -283,19 +283,34 @@ task ci-env-setup {
 # Synopsis: [CI Specific] Runs csharpier as a linter to validate the formatting of the ./src files
 task ci-src-linter {
     
+    Write-Build Magenta "Validating source code format...";
+    
+    Write-Build DarkGray "Invoking csharpier check on source directory (${SrcDirectory})";
     exec { dotnet csharpier --check $SrcDirectory }
+
+    Write-Build Green "Successfully validated source code format";
 }
 
 # Synopsis: [CI Specific] Restores the ./src code
 task ci-src-restore {
     
+    Write-Build Magenta "Restoring nuget dependencies...";
+
+    Write-Build DarkGray "Invoking dotnet restore on source directory (${SrcDirectory})";
     exec { dotnet restore $SrcDirectory --verbosity $DotnetVerbosity }
+
+    Write-Build Green "Successfully restored nuget dependencies";
 }
 
 # Synopsis: [CI Specific] Builds the ./src code
 task ci-src-build ci-src-restore, {
     
+    Write-Build Magenta "Building source code...";
+    
+    Write-Build DarkGray "Invoking dotnet build on source directory (${SrcDirectory})";
     exec { dotnet build $SrcDirectory -c $BuildConfiguration --no-restore --verbosity $DotnetVerbosity }
+
+    Write-Build Green "Successfully built source code";
 }
 
 # Synopsis: [CI Specific] Tests the built ./src code

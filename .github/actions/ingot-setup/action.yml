@@ -29,7 +29,6 @@ runs:
       run: |
         dotnet tool restore
         dotnet ib ci-env-setup
-        . ./dist/ib/config.env
 
     # Displays the INGOT_ environment variables
     # from sourcing the ./dist/ib/config.env file

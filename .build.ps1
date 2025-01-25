@@ -239,7 +239,7 @@ task ci-env-setup {
         $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw
         Write-Build DarkGray (
             "`nFile: $($env:GITHUB_ENV): `n " +
-            "----------- `n"
+            "----------- `n" +
             $githubEnvironmentContent + "`n");
 
         if(-Not $env:INGOT_DOTNETVERBOSITY)
@@ -253,7 +253,7 @@ task ci-env-setup {
             $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw
             Write-Build DarkGray (
                 "`nFile: $($env:GITHUB_ENV): `n " +
-                "----------- `n"
+                "----------- `n" +
                 $githubEnvironmentContent + "`n");
             
             Write-Build DarkGray "Validating variable ${variable} append to GitHub environment...";
@@ -279,7 +279,7 @@ task ci-env-setup {
             $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw
             Write-Build DarkGray (
                 "`nFile: $($env:GITHUB_ENV): `n " +
-                "----------- `n"
+                "----------- `n" +
                 $githubEnvironmentContent + "`n");
             
             Write-Build DarkGray "Validating variable ${variable} append to GitHub environment...";
@@ -305,7 +305,7 @@ task ci-env-setup {
             $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw
             Write-Build DarkGray (
                 "`nFile: $($env:GITHUB_ENV): `n " +
-                "----------- `n"
+                "----------- `n" +
                 $githubEnvironmentContent + "`n");
             
             Write-Build DarkGray "Validating variable ${variable} append to GitHub environment...";
@@ -331,7 +331,7 @@ task ci-env-setup {
             $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw
             Write-Build DarkGray (
                 "`nFile: $($env:GITHUB_ENV): `n " +
-                "----------- `n"
+                "----------- `n" +
                 $githubEnvironmentContent + "`n");
             
             Write-Build DarkGray "Validating variable ${variable} append to GitHub environment...";
@@ -357,7 +357,7 @@ task ci-env-setup {
             $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw
             Write-Build DarkGray (
                 "`nFile: $($env:GITHUB_ENV): `n " +
-                "----------- `n"
+                "----------- `n" +
                 $githubEnvironmentContent + "`n");
             
             Write-Build DarkGray "Validating variable ${variable} append to GitHub environment...";
@@ -383,7 +383,7 @@ task ci-env-setup {
             $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw
             Write-Build DarkGray (
                 "`nFile: $($env:GITHUB_ENV): `n " +
-                "----------- `n"
+                "----------- `n" +
                 $githubEnvironmentContent + "`n");
             
             Write-Build DarkGray "Validating variable ${variable} append to GitHub environment...";

@@ -87,9 +87,19 @@ task ci-env-setup {
             'echo "INGOT_SRCDIRECTORY='+$($SrcDirectory)+'" >> $GITHUB_ENV' >> $configFilePath
         }
         
+        if(-Not $env:INGOT_SRCRELEASEGLOB)
+        {
+            'echo "INGOT_SRCRELEASEGLOB=./**/bin/*" >> $GITHUB_ENV' >> $configFilePath
+        }
+        
         if(-Not $env:INGOT_NUPKGDIRECTORY)
         {
             'echo "INGOT_NUPKGDIRECTORY='+$($NupkgDirectory)+'" >> $GITHUB_ENV' >> $configFilePath
+        }
+        
+        if(-Not $env:INGOT_NUPKGGLOB)
+        {
+            'echo "INGOT_NUPKGGLOB=./**/*.nupkg" >> $GITHUB_ENV' >> $configFilePath
         }
     }
 }

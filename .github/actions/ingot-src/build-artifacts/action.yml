@@ -23,8 +23,7 @@ runs:
     - if: ${{ inputs.type == 'upload' }}
       name: "List Files To Upload"
       shell: sh
-      # path to list should match artifact path
-      run: find . -wholename './**/bin/*'
+      run: find . -wholename '${{ env.INGOT_SRCRELEASEGLOB }}'
 
     # Upload the artifact
     - if: ${{ inputs.type == 'upload' }}
@@ -35,7 +34,7 @@ runs:
         name: build
         if-no-files-found: error
         retention-days: 1
-        path: ./**/bin/*
+        path: ${{ env.INGOT_SRCRELEASEGLOB }}
 
     # -----------------------------------
     # Download
@@ -56,5 +55,4 @@ runs:
     - if: ${{ inputs.type == 'download' }}
       name: "List files Downloaded"
       shell: sh
-      # path to list should match artifact path
-      run: find . -wholename './**/bin/*'
+      run: find . -wholename '${{ env.INGOT_SRCRELEASEGLOB }}'

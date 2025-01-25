@@ -29,11 +29,6 @@ runs:
       name: Debug Ingot Environment Variables
       run: env | grep '^INGOT_' || echo "No INGOT_ variables found"
 
-    - shell: sh
-      run: echo "${TEST}"
-      env:
-        TEST: ${{ env.INGOT_SRCDIRECTORY }}
-
     # Restores the necessary nuget packages
     # In order to create a relevant nuget cache
     - if: steps.nuget-cache.outputs.cache-hit != 'true'

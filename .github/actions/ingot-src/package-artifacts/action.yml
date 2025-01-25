@@ -23,8 +23,7 @@ runs:
     - if: ${{ inputs.type == 'upload' }}
       name: "List Files To Upload"
       shell: sh
-      # path to list should match artifact path
-      run: find . -wholename './**/*.nupkg'
+      run: find . -wholename '${{ env.INGOT_NUPKGGLOB }}'
 
     # Upload the artifact
     - if: ${{ inputs.type == 'upload' }}
@@ -35,7 +34,7 @@ runs:
         name: nupkg
         if-no-files-found: error
         retention-days: 1
-        path: ./**/*.nupkg
+        path: ${{ env.INGOT_NUPKGGLOB }}
 
     # -----------------------------------
     # Download
@@ -57,4 +56,4 @@ runs:
       name: "List files Downloaded"
       shell: sh
       # path to list should match artifact path
-      run: find . -wholename './**/*.nupkg'
+      run: find . -wholename '${{ env.INGOT_NUPKGGLOB }}'

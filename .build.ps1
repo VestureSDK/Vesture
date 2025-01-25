@@ -64,11 +64,21 @@ task ci-env-setup {
     exec { git config --global --add safe.directory $BuildRoot }
 
     # Creates the config file
-    New-Item -ItemType Directory -Force -Path ./dist/ib
-    "export INGOT_DOTNETVERBOSITY=${DotnetVerbosity}" >> ./dist/ib/config.env
-    "export INGOT_BUILDCONFIGURATION=${BuildConfiguration}" >> ./dist/ib/config.env
-    "export INGOT_SRCDIRECTORY=${SrcDirectory}" >> ./dist/ib/config.env
-    "export INGOT_NUPKGDIRECTORY=${NupkgDirectory}" >> ./dist/ib/config.env
+    if ($env:GITHUB_ACTIONS)
+    {
+        $configDirectoryPath = "./dist/ib";
+        $configFilePath = "$($configDirectoryPath)/config.env";
+
+        Write-Host "Running on GITHUB_ACTIONS, creating $($configFilePath)";
+
+        New-Item -ItemType Directory -Force -Path $configDirectoryPath
+
+        'echo "INGOT_DOTNETVERBOSITY=${DotnetVerbosity}" >> "$GITHUB_ENV"' >> $configFilePath
+        'echo "INGOT_DOTNETVERBOSITY=${DotnetVerbosity} >> "$GITHUB_ENV"' >> $configFilePath
+        'echo "INGOT_BUILDCONFIGURATION=${BuildConfiguration} >> "$GITHUB_ENV"' >> $configFilePath
+        'echo "INGOT_SRCDIRECTORY=${SrcDirectory} >> "$GITHUB_ENV"' >> $configFilePath
+        'echo "INGOT_NUPKGDIRECTORY=${NupkgDirectory} >> "$GITHUB_ENV"' >> $configFilePath
+    }
 }
 
 # ---------------------------------------

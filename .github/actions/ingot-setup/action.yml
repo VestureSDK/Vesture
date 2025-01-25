@@ -8,8 +8,8 @@ runs:
     # Checkout the git repo
     - name: Git Checkout
       uses: actions/checkout@v4
+        # Ensures MinVer finds what it needs
         with:
-          # Ensures MinVer finds what it needs
           fetch-depth: '0'
           filter: 'tree:0'
 

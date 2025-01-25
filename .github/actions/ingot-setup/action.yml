@@ -4,27 +4,41 @@ author: 'Ingot'
 runs:
   using: 'composite'
   steps:
+
+    # Attempts to restore the nuget cache to speed up
+    # the dotnet tools and subsequent nuget restore
     - id: nuget-cache
       name: Restore NuGet Cache
       uses: actions/cache/restore@v4
       with:
         path: ~/.nuget/packages
         key: ${{ runner.os }}-nuget-${{ hashFiles('**/global.json', '**/Directory.Packages.props', '**/dotnet-tools.json', '**/nuget.config') }}
+    
+    # Restores dotnet tools and run the 
+    # environment setup via invoke-build
     - shell: sh
       name: Environment Setup
       run: |
         dotnet tool restore
         dotnet ib ci-env-setup
-    - shell: sh
+
+    # Restores the necessary nuget packages
+    # In order to create a relevant nuget cache
+    - if: steps.nuget-cache.outputs.cache-hit != 'true'
+      shell: sh
       name: Nuget Src Restore
-      if: steps.nuget-cache.outputs.cache-hit != 'true'
       run: dotnet ib ci-src-restore
-    - name: Save NuGet Cache
+
+    # Saves the nuget cache created so subsequent
+    # jobs can benefit from a restored cache
+    - if: steps.nuget-cache.outputs.cache-hit != 'true'
+      name: Save NuGet Cache
       uses: actions/cache/save@v4
-      if: steps.nuget-cache.outputs.cache-hit != 'true'
       with:
         path: ~/.nuget/packages
         key: ${{ steps.nuget-cache.outputs.cache-primary-key }}
+
+    # Prints MinVer information to ease debugging
     - shell: sh
       name: MinVer Debug
       run: dotnet minver -v d

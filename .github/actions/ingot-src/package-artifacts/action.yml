@@ -1,5 +1,5 @@
-name: 'Ingot Build Artifact'
-description: 'Upload/Download Ingot build artifact'
+name: 'Ingot Package Artifact'
+description: 'Upload/Download Ingot package artifact'
 author: 'Ingot'
 inputs:
   type:
@@ -24,18 +24,18 @@ runs:
       name: "List Files To Upload"
       shell: sh
       # path to list should match artifact path
-      run: find . -wholename ./**/bin/*
+      run: find . -wholename ./dist/nuget/*.nupkg
 
     # Upload the artifact
     - if: ${{ inputs.type == 'upload' }}
-      name: "Artifact Upload: bin"
+      name: "Artifact Upload"
       uses: actions/upload-artifact@v4
       with:
         # Name needs to match in the download section
-        name: build
+        name: nupkg
         if-no-files-found: error
         retention-days: 1
-        path: ./**/bin/*
+        path: ./dist/nuget/*.nupkg
 
     # -----------------------------------
     # Download
@@ -43,13 +43,13 @@ runs:
 
     # Download the artifact
     - if: ${{ inputs.type == 'download' }}
-      name: "Artifact Download: bin"
+      name: "Artifact Download"
       uses: actions/download-artifact@v4
       with:
         # Name needs to match in the upload section
         # Do not specify a path to ensure the restore
         # puts the files in their original location
-        name: build
+        name: nupkg
 
     # Lists the downloaded files for
     # debugging mostly
@@ -57,4 +57,4 @@ runs:
       name: "List files Downloaded"
       shell: sh
       # path to list should match artifact path
-      run: find . -wholename ./**/bin/*
+      run: find . -wholename ./dist/nuget/*.nupkg

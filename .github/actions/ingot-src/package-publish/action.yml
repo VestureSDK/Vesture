@@ -8,26 +8,17 @@ inputs:
   nuget-api-key:
     description: 'Nuget API key'
     required: true
-  nuget-artifact-name:
-    description: 'The name of the nuget artifact to download'
-    required: false
-    default: "nupkg"
-  nuget-artifact-directory:
-    description: 'The directory where to download the nuget artifact'
-    required: false
-    default: "./dist/nuget"
 runs:
   using: 'composite'
   steps:
-    - uses: actions/download-artifact@v4
+    - name: Download Package Artifacts
+      uses: ./.github/actions/ingot-src/package-artifacts
       with:
-        name: ${{ inputs.nuget-artifact-name }}
-        path: ${{ inputs.nuget-artifact-directory }}
+        type: download
     - name: Push
       shell: sh
       run: |
         dotnet ib ci-src-publish \
-          -NupkgDirectory "${{ inputs.nuget-artifact-directory }}" \
           -NupkgPushSource "${{ inputs.nuget-source }}" \
           -NupkgPushApiKey "${{ inputs.nuget-api-key }}"
   

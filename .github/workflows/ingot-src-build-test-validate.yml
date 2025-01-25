@@ -1,22 +1,7 @@
 name: Ingot Source Build/Test/Validate
 
 on:
-  workflow_call:
-    inputs:
-      nuget-artifact-name:
-        description: 'The name of the nuget artifact to upload'
-        required: false
-        default: "nupkg"
-        type: string
-      nuget-artifact-directory:
-        description: 'The directory where to upload the nuget artifact'
-        required: false
-        default: "./dist/nuget"
-        type: string
-    outputs:
-      nuget-artifact-name:
-        description: 'The name of the nuget artifact to download'
-        value: ${{ jobs.src-pack.outputs.nuget-artifact-name }}
+  workflow_call: {}
 
 env:
   MinVerDefaultPreReleaseIdentifiers: alpha.0.${{ github.run_id }}.${{ github.run_attempt}}
@@ -81,8 +66,6 @@ jobs:
     runs-on: ubuntu-24.04
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     timeout-minutes: 3
-    outputs:
-      nuget-artifact-name: ${{ steps.set-workflow-output.outputs.nuget-artifact-name }}
     steps:
       - name: Git Checkout
         uses: actions/checkout@v4
@@ -97,16 +80,8 @@ jobs:
         with:
           type: download
       - name: Pack
-        run: |
-          dotnet ib ci-src-pack \
-            -NupkgDirectory ${{ inputs.nuget-artifact-directory }}
-      - uses: actions/upload-artifact@v4
-        name: "Artifact: nupkg"
+        run: dotnet ib ci-src-pack
+      - name: Upload Package Artifacts
+        uses: ./.github/actions/ingot-src/package-artifacts
         with:
-          name: ${{ inputs.nuget-artifact-name }}
-          if-no-files-found: error
-          retention-days: 7
-          path: ${{ inputs.nuget-artifact-directory }}/*.nupkg
-      - name: Set Workflow Output
-        id: set-workflow-output
-        run: echo "nuget-artifact-name=${{ inputs.nuget-artifact-name }}" >> $GITHUB_OUTPUT
+          type: upload

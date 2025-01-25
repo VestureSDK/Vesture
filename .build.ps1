@@ -245,8 +245,10 @@ task ci-env-setup {
         if (-Not $githubEnvironmentContent)
         {
             Write-Build DarkGray "GitHub environment file $($env:GITHUB_ENV) is empty";
-            Write-Build DarkGray "Appending sample environment variable...";
+            Write-Build DarkGray "Appending sample environment variable SAMPLE_ENVIRONMENT_VARIABLE...";
             echo "SAMPLE_ENVIRONMENT_VARIABLE=SAMPLE" >> $GITHUB_ENV;
+
+            Start-Sleep -Seconds 5
 
             Write-Build DarkGray "Getting GitHub environment file content after append...";
             $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw

@@ -13,6 +13,7 @@ runs:
       uses: actions/download-artifact@v4
       with:
         name: "${{ inputs.build-artifact-name }}"
+        path: ./
     - name: "List files Downloaded"
       shell: sh
       run: find . -wholename ./**/bin/*

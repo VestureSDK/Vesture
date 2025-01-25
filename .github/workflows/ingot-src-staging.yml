@@ -23,7 +23,7 @@ concurrency:
 jobs:
   build-test-validate:
     name: Build/Test/Validate
-    uses: .github/workflows/ingot-src/ingot-src-build-test-validate.yml
+    uses: stfbln/ingot/.github/workflows/ingot-src/ingot-src-build-test-validate.yml@main
 
   src-publish-feedz:
     needs:

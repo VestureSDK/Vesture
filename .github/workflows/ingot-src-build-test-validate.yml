@@ -17,9 +17,6 @@ on:
       nuget-artifact-name:
         description: 'The name of the nuget artifact to download'
         value: ${{ jobs.src-pack.outputs.nuget-artifact-name }}
-        
-env:
-  MinVerDefaultPreReleaseIdentifiers: alpha.0.${{ github.run_id }}.${{ github.run_attempt}}
 
 jobs:
   src-linter:
@@ -41,6 +38,8 @@ jobs:
     runs-on: ubuntu-24.04
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     timeout-minutes: 5
+    env:
+      MinVerDefaultPreReleaseIdentifiers: alpha.0.${{ github.run_id }}.${{ github.run_attempt}}
     steps:
       - name: Git Checkout
         uses: actions/checkout@v4

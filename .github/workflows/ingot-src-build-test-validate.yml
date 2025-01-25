@@ -18,6 +18,9 @@ on:
         description: 'The name of the nuget artifact to download'
         value: ${{ jobs.src-pack.outputs.nuget-artifact-name }}
 
+env:
+  MinVerDefaultPreReleaseIdentifiers: alpha.0.${{ github.run_id }}.${{ github.run_attempt}}
+
 jobs:
   src-linter:
     name: Linter
@@ -47,15 +50,8 @@ jobs:
           filter: tree:0
       - name: Setup
         uses: ./.github/actions/ingot-setup
-      - name: MinVer
-        run: |
-          dotnet minver -v t
-        env:
-          MinVerDefaultPreReleaseIdentifiers: alpha.0.${{ github.run_id }}.${{ github.run_attempt}}
       - name: Build
         run: dotnet ib ci-src-build
-        env:
-          MinVerDefaultPreReleaseIdentifiers: alpha.0.${{ github.run_id }}.${{ github.run_attempt}}
       - name: Upload Build Artifacts
         uses: ./.github/actions/ingot-src/build-artifacts
         with:
@@ -90,6 +86,10 @@ jobs:
     steps:
       - name: Git Checkout
         uses: actions/checkout@v4
+        with:
+          # Ensures MinVer finds what it needs
+          fetch-depth: 0
+          filter: tree:0
       - uses: ./.github/actions/ingot-setup
         name: Setup
       - name: Download Build Artifacts

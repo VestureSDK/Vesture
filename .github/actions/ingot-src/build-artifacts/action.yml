@@ -24,7 +24,7 @@ runs:
       name: "List Files To Upload"
       shell: sh
       # path to list should match artifact path
-      run: find . -wholename ./**/bin/*
+      run: find . -wholename './**/bin/*'
 
     # Upload the artifact
     - if: ${{ inputs.type == 'upload' }}
@@ -57,4 +57,4 @@ runs:
       name: "List files Downloaded"
       shell: sh
       # path to list should match artifact path
-      run: find . -wholename ./**/bin/*
+      run: find . -wholename './**/bin/*'

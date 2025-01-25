@@ -11,10 +11,15 @@ inputs:
 runs:
   using: 'composite'
   steps:
+
+    # Downloads the package artifact
     - name: Download Package Artifacts
       uses: ./.github/actions/ingot-src/package-artifacts
       with:
         type: download
+    
+    # Pushes the nuget package to the defined
+    # source using the specified API key
     - name: Push
       shell: sh
       run: |

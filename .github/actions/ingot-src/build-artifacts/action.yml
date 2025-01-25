@@ -11,11 +11,11 @@ runs:
 
     # Upload section
     - name: "List Files To Upload"
-      if: ${{ inputs.type == "upload" }}
+      if: ${{ inputs.type == 'upload' }}
       shell: sh
       run: find . -wholename ./**/bin/*
     - name: "Artifact Upload: bin"
-      if: ${{ inputs.type == "upload" }}
+      if: ${{ inputs.type == 'upload' }}
       uses: actions/upload-artifact@v4
       with:
         name: build
@@ -25,11 +25,11 @@ runs:
     
     # Download section
     - name: "Artifact Download: bin"
-      if: ${{ inputs.type == "download" }}
+      if: ${{ inputs.type == 'download' }}
       uses: actions/download-artifact@v4
       with:
         name: build
     - name: "List files Downloaded"
-      if: ${{ inputs.type == "download" }}
+      if: ${{ inputs.type == 'download' }}
       shell: sh
       run: find . -wholename ./**/bin/*

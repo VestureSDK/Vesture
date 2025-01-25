@@ -230,81 +230,156 @@ task ci-env-setup {
 
         Write-Build Magenta "Appending Ingot environment variables to GitHub environment...";
 
-        # The variables that should be added to GitHub environment
-        $variablesAdded = @();
-
-        if(-Not $env:INGOT_DOTNETVERBOSITY)
-        {
-            $variablesAdded += "INGOT_DOTNETVERBOSITY";
-            $value = "INGOT_DOTNETVERBOSITY=${DotnetVerbosity}";
-            Write-Build DarkGray "Appending ${value} to GitHub environment...";
-            echo "${value}" >> $GITHUB_ENV;
-        }
-        
-        if(-Not $env:INGOT_BUILDCONFIGURATION)
-        {
-            $variablesAdded += "INGOT_BUILDCONFIGURATION";
-            $value = "INGOT_BUILDCONFIGURATION=${BuildConfiguration}";
-            Write-Build DarkGray "Appending ${value} to GitHub environment...";
-            echo "${value}" >> $GITHUB_ENV;
-        }
-        
-        if(-Not $env:INGOT_SRCDIRECTORY)
-        {
-            $variablesAdded += "INGOT_SRCDIRECTORY";
-            $value = "INGOT_SRCDIRECTORY=${SrcDirectory}";
-            Write-Build DarkGray "Appending ${value} to GitHub environment...";
-            echo "${value}" >> $env:GITHUB_ENV;
-        }
-        
-        if(-Not $env:INGOT_SRCRELEASEGLOB)
-        {
-            $variablesAdded += "INGOT_SRCRELEASEGLOB";
-            $value = "INGOT_SRCRELEASEGLOB=./**/bin/*";
-            Write-Build DarkGray "Appending ${value} to GitHub environment...";
-            echo "${value}" >> $env:GITHUB_ENV;
-        }
-        
-        if(-Not $env:INGOT_NUPKGDIRECTORY)
-        {
-            $variablesAdded += "INGOT_NUPKGDIRECTORY";
-            $value = "INGOT_NUPKGDIRECTORY=${NupkgDirectory}";
-            Write-Build DarkGray "Appending ${value} to GitHub environment...";
-            echo "${value}" >> $env:GITHUB_ENV;
-        }
-        
-        if(-Not $env:INGOT_NUPKGGLOB)
-        {
-            $variablesAdded += "INGOT_NUPKGGLOB";
-            $value = "INGOT_NUPKGGLOB=./**/*.nupkg";
-            Write-Build DarkGray "Appending ${value} to GitHub environment...";
-            echo "${value}" >> $env:GITHUB_ENV;
-        }
-
-        Write-Build Green "Appended Ingot environment variables to GitHub environment successfully";
-
-        Write-Build Magenta "Validating GitHub environment...";
-
-        Write-Build DarkGray "Getting GitHub environment file content...";
+        Write-Build DarkGray "Getting original GitHub environment file content...";
 
         $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw
         Write-Build DarkGray $githubEnvironmentContent;
 
-        foreach($variableAdded in $variablesAdded)
+        if(-Not $env:INGOT_DOTNETVERBOSITY)
         {
-            Write-Build DarkGray "Checking if GitHub environment file content contains variable ${variableAdded}...";
+            $variable = "INGOT_DOTNETVERBOSITY";
+            $value = "${variable}=${DotnetVerbosity}";
+            Write-Build DarkGray "Appending ${value} to GitHub environment...";
+            echo "${value}" >> $GITHUB_ENV;
+            
+            Write-Build DarkGray "Getting GitHub environment file content after append...";
 
-            if ($githubEnvironmentContent -Match $variableAdded)
+            $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw
+            Write-Build DarkGray $githubEnvironmentContent;
+            
+            Write-Build DarkGray "Validating variable ${variable} append to GitHub environment...";
+            
+            if ($githubEnvironmentContent -Match $variable)
             {
-                Write-Build Green "Found expected variable ${variableAdded} in GitHub environment";
+                Write-Build Green "Variable ${variable} appended successfully to GitHub environment";
             }
             else
             {
-                Write-Error "${variableAdded} not found in GitHub environment"
+                Write-Error "${variable} not found in GitHub environment"
             }
         }
         
-        Write-Build Magenta "Validated GitHub environment";
+        if(-Not $env:INGOT_BUILDCONFIGURATION)
+        {
+            $variable = "INGOT_BUILDCONFIGURATION";
+            $value = "${variable}=${BuildConfiguration}";
+            Write-Build DarkGray "Appending ${value} to GitHub environment...";
+            echo "${value}" >> $GITHUB_ENV;
+            
+            Write-Build DarkGray "Getting GitHub environment file content after append...";
+
+            $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw
+            Write-Build DarkGray $githubEnvironmentContent;
+            
+            Write-Build DarkGray "Validating variable ${variable} append to GitHub environment...";
+            
+            if ($githubEnvironmentContent -Match $variable)
+            {
+                Write-Build Green "Variable ${variable} appended successfully to GitHub environment";
+            }
+            else
+            {
+                Write-Error "${variable} not found in GitHub environment"
+            }
+        }
+        
+        if(-Not $env:INGOT_SRCDIRECTORY)
+        {
+            $variable += "INGOT_SRCDIRECTORY";
+            $value = "${variable}=${SrcDirectory}";
+            Write-Build DarkGray "Appending ${value} to GitHub environment...";
+            echo "${value}" >> $env:GITHUB_ENV;
+            
+            Write-Build DarkGray "Getting GitHub environment file content after append...";
+
+            $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw
+            Write-Build DarkGray $githubEnvironmentContent;
+            
+            Write-Build DarkGray "Validating variable ${variable} append to GitHub environment...";
+            
+            if ($githubEnvironmentContent -Match $variable)
+            {
+                Write-Build Green "Variable ${variable} appended successfully to GitHub environment";
+            }
+            else
+            {
+                Write-Error "${variable} not found in GitHub environment"
+            }
+        }
+        
+        if(-Not $env:INGOT_SRCRELEASEGLOB)
+        {
+            $variable += "INGOT_SRCRELEASEGLOB";
+            $value = "${variable}=./**/bin/*";
+            Write-Build DarkGray "Appending ${value} to GitHub environment...";
+            echo "${value}" >> $env:GITHUB_ENV;
+            
+            Write-Build DarkGray "Getting GitHub environment file content after append...";
+
+            $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw
+            Write-Build DarkGray $githubEnvironmentContent;
+            
+            Write-Build DarkGray "Validating variable ${variable} append to GitHub environment...";
+            
+            if ($githubEnvironmentContent -Match $variable)
+            {
+                Write-Build Green "Variable ${variable} appended successfully to GitHub environment";
+            }
+            else
+            {
+                Write-Error "${variable} not found in GitHub environment"
+            }
+        }
+        
+        if(-Not $env:INGOT_NUPKGDIRECTORY)
+        {
+            $variable += "INGOT_NUPKGDIRECTORY";
+            $value = "${variable}=${NupkgDirectory}";
+            Write-Build DarkGray "Appending ${value} to GitHub environment...";
+            echo "${value}" >> $env:GITHUB_ENV;
+            
+            Write-Build DarkGray "Getting GitHub environment file content after append...";
+
+            $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw
+            Write-Build DarkGray $githubEnvironmentContent;
+            
+            Write-Build DarkGray "Validating variable ${variable} append to GitHub environment...";
+            
+            if ($githubEnvironmentContent -Match $variable)
+            {
+                Write-Build Green "Variable ${variable} appended successfully to GitHub environment";
+            }
+            else
+            {
+                Write-Error "${variable} not found in GitHub environment"
+            }
+        }
+        
+        if(-Not $env:INGOT_NUPKGGLOB)
+        {
+            $variable += "INGOT_NUPKGGLOB";
+            $value = "${variable}=./**/*.nupkg";
+            Write-Build DarkGray "Appending ${value} to GitHub environment...";
+            echo "${value}" >> $env:GITHUB_ENV;
+            
+            Write-Build DarkGray "Getting GitHub environment file content after append...";
+
+            $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw
+            Write-Build DarkGray $githubEnvironmentContent;
+            
+            Write-Build DarkGray "Validating variable ${variable} append to GitHub environment...";
+            
+            if ($githubEnvironmentContent -Match $variable)
+            {
+                Write-Build Green "Variable ${variable} appended successfully to GitHub environment";
+            }
+            else
+            {
+                Write-Error "${variable} not found in GitHub environment"
+            }
+        }
+
+        Write-Build Green "Appended Ingot environment variables to GitHub environment successfully";
     }
 }
 

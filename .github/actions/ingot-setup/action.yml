@@ -9,7 +9,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: ~/.nuget/packages
-        key: ${{ runner.os }}-nuget-${{ hashFiles('**/Directory.Packages.props') }}
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/global.json', '**/Directory.Packages.props', '**/dotnet-tools.json') }}
     - shell: sh
       name: Environment Setup
       run: |
@@ -25,3 +25,6 @@ runs:
       with:
         path: ~/.nuget/packages
         key: ${{ steps.nuget-cache.outputs.cache-primary-key }}
+    - shell: sh
+      name: MinVer Debug
+      run: dotnet minver -v d

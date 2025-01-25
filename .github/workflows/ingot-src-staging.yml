@@ -23,6 +23,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+
   build-test-validate:
     name: Source
     uses: stfbln/ingot/.github/workflows/ingot-src-build-test-validate.yml@main
@@ -35,8 +36,6 @@ jobs:
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     cancel-timeout-minutes: 5
     timeout-minutes: 5
-    env:
-      NUPKG_DiRECTORY_OUTPUT: "./dist/nuget"
     steps:
       - name: Git Checkout
         uses: actions/checkout@v4

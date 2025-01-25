@@ -7,14 +7,22 @@ on:
     paths:
       - 'src/**'
       - '.github/**'
-      - '.build.ps1'
+      - '**/.build.ps1'
+      - '**/global.json'
+      - '**/dotnet-tools.json'
+      - '**/nuget.config'
+      - '**/*.props'
     branches:
       - main
   pull_request:
     paths:
       - 'src/**'
       - '.github/**'
-      - '.build.ps1'
+      - '**/.build.ps1'
+      - '**/global.json'
+      - '**/dotnet-tools.json'
+      - '**/nuget.config'
+      - '**/*.props'
     branches:
       - '*'
 

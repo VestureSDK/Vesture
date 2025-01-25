@@ -236,7 +236,7 @@ task ci-env-setup {
         }
 
         Write-Build DarkGray "Getting original GitHub environment file content...";
-        Ingot-PrintFileContent -File $env:GITHUB_ENV;
+        Ingot-GetFileContent -File $env:GITHUB_ENV;
 
         if(-Not $env:INGOT_DOTNETVERBOSITY)
         {
@@ -355,7 +355,7 @@ task Docs Docs-Clean, Docs-Build, Docs-Serve
 #
 # ***************************************
 
-function Ingot-PrintFileContent {
+function Ingot-GetFileContent {
 
     param (
         $File
@@ -366,6 +366,8 @@ function Ingot-PrintFileContent {
         "`nFile: ${File} `n " +
         "----------- `n" +
         $fileContent + "`n");
+
+    return $fileContent;
 }
 
 function Ingot-GitHub-AppendVariable {
@@ -380,7 +382,7 @@ function Ingot-GitHub-AppendVariable {
     echo "${kvp}" >> $env:GITHUB_ENV;
     
     Write-Build DarkGray "Getting GitHub environment file content after append...";
-    Ingot-PrintFileContent -File $env:GITHUB_ENV;
+    $githubEnvironmentContent = Ingot-GetFileContent -File $env:GITHUB_ENV;
     
     Write-Build DarkGray "Validating variable ${Key} append to GitHub environment...";
     

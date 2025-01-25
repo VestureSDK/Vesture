@@ -62,6 +62,13 @@ task ci-env-setup {
 
     # Ensures when running in containers the ownership is not dubious
     exec { git config --global --add safe.directory $BuildRoot }
+
+    # Creates the config file
+    New-Item -ItemType Directory -Force -Path ./dist/ib
+    "INGOT_DOTNETVERBOSITY=${DotnetVerbosity}" >> ./dist/ib/config.env
+    "INGOT_BUILDCONFIGURATION=${BuildConfiguration}" >> ./dist/ib/config.env
+    "INGOT_SRCDIRECTORY=${SrcDirectory}" >> ./dist/ib/config.env
+    "INGOT_NUPKGDIRECTORY=${NupkgDirectory}" >> ./dist/ib/config.env
 }
 
 # ---------------------------------------

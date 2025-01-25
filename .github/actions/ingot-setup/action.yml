@@ -21,6 +21,11 @@ runs:
       run: |
         dotnet tool restore
         dotnet ib ci-env-setup
+        source ./dist/ib/config.env
+
+    - shell: sh
+      name: Print IB Config
+      run: echo "${!INGOT_*}"
 
     # Restores the necessary nuget packages
     # In order to create a relevant nuget cache

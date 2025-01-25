@@ -30,6 +30,10 @@ jobs:
     steps:
       - name: Git Checkout
         uses: actions/checkout@v4
+        with:
+          # Ensures MinVer finds what it needs
+          fetch-depth: 0
+          filter: tree:0
       - name: Setup
         uses: ./.github/actions/ingot-setup
       - name: MinVer

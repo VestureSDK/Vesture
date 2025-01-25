@@ -20,10 +20,8 @@ jobs:
     cancel-timeout-minutes: 5
     timeout-minutes: 5
     steps:
-      - name: Git Checkout
-        uses: actions/checkout@v4
-      - name: Setup
-        uses: ./.github/actions/ingot-setup
+      - uses: stfbln/ingot/.github/actions/ingot-setup@main
+        name: Setup
       - name: Push
         uses: ./.github/actions/ingot-src/package-publish
         with:

@@ -25,14 +25,8 @@ jobs:
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     timeout-minutes: 5
     steps:
-      - name: Git Checkout
-        uses: actions/checkout@v4
-        with:
-          # Ensures MinVer finds what it needs
-          fetch-depth: 0
-          filter: tree:0
-      - name: Setup
-        uses: ./.github/actions/ingot-setup
+      - uses: stfbln/ingot/.github/actions/ingot-setup@main
+        name: Setup
       - name: Build
         run: dotnet ib ci-src-build
       - name: Upload Build Artifacts
@@ -47,9 +41,7 @@ jobs:
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     timeout-minutes: 5
     steps:
-      - name: Git Checkout
-        uses: actions/checkout@v4
-      - uses: ./.github/actions/ingot-setup
+      - uses: stfbln/ingot/.github/actions/ingot-setup@main
         name: Setup
       - name: Download Build Artifacts
         uses: ./.github/actions/ingot-src/build-artifacts
@@ -65,13 +57,7 @@ jobs:
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     timeout-minutes: 3
     steps:
-      - name: Git Checkout
-        uses: actions/checkout@v4
-        with:
-          # Ensures MinVer finds what it needs
-          fetch-depth: 0
-          filter: tree:0
-      - uses: ./.github/actions/ingot-setup
+      - uses: stfbln/ingot/.github/actions/ingot-setup@main
         name: Setup
       - name: Download Build Artifacts
         uses: ./.github/actions/ingot-src/build-artifacts

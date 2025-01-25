@@ -21,7 +21,7 @@ runs:
       run: |
         dotnet tool restore
         dotnet ib ci-env-setup
-        source ./dist/ib/config.env
+        . ./dist/ib/config.env
 
     - shell: sh
       name: Print IB Config

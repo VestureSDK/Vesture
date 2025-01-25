@@ -338,12 +338,14 @@ function Ingot-GetFileContent {
         $File
     )
 
-    $fileContent = Get-Content $File -Raw
+    $fileContent = Get-Content $File -Raw;
+    
     Write-Build DarkGray (
-        "`nFile: ${File} `n " +
+        "`n`nFile: ${File} `n" +
         "----------- `n" +
-        $fileContent + "`n");
-
+        $fileContent + "`n" +
+        "----------- `n`n");
+    
     return $fileContent;
 }
 

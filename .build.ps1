@@ -234,11 +234,13 @@ task ci-env-setup {
         {
             Write-Error "GitHub environment file $($env:GITHUB_ENV) not found";
         }
-        
-        Write-Build DarkGray "Getting original GitHub environment file content...";
 
+        Write-Build DarkGray "Getting original GitHub environment file content...";
         $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw
-        Write-Build DarkGray $githubEnvironmentContent;
+        Write-Build DarkGray (
+            "`nFile: $($env:GITHUB_ENV): `n " +
+            "----------- `n"
+            $githubEnvironmentContent + "`n");
 
         if(-Not $env:INGOT_DOTNETVERBOSITY)
         {
@@ -248,9 +250,11 @@ task ci-env-setup {
             echo "${value}" >> $env:GITHUB_ENV;
             
             Write-Build DarkGray "Getting GitHub environment file content after append...";
-
             $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw
-            Write-Build DarkGray $githubEnvironmentContent;
+            Write-Build DarkGray (
+                "`nFile: $($env:GITHUB_ENV): `n " +
+                "----------- `n"
+                $githubEnvironmentContent + "`n");
             
             Write-Build DarkGray "Validating variable ${variable} append to GitHub environment...";
             
@@ -272,9 +276,11 @@ task ci-env-setup {
             echo "${value}" >> $env:GITHUB_ENV;
             
             Write-Build DarkGray "Getting GitHub environment file content after append...";
-
             $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw
-            Write-Build DarkGray $githubEnvironmentContent;
+            Write-Build DarkGray (
+                "`nFile: $($env:GITHUB_ENV): `n " +
+                "----------- `n"
+                $githubEnvironmentContent + "`n");
             
             Write-Build DarkGray "Validating variable ${variable} append to GitHub environment...";
             
@@ -290,15 +296,17 @@ task ci-env-setup {
         
         if(-Not $env:INGOT_SRCDIRECTORY)
         {
-            $variable += "INGOT_SRCDIRECTORY";
+            $variable = "INGOT_SRCDIRECTORY";
             $value = "${variable}=${SrcDirectory}";
             Write-Build DarkGray "Appending ${value} to GitHub environment...";
             echo "${value}" >> $env:GITHUB_ENV;
             
             Write-Build DarkGray "Getting GitHub environment file content after append...";
-
             $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw
-            Write-Build DarkGray $githubEnvironmentContent;
+            Write-Build DarkGray (
+                "`nFile: $($env:GITHUB_ENV): `n " +
+                "----------- `n"
+                $githubEnvironmentContent + "`n");
             
             Write-Build DarkGray "Validating variable ${variable} append to GitHub environment...";
             
@@ -314,15 +322,17 @@ task ci-env-setup {
         
         if(-Not $env:INGOT_SRCRELEASEGLOB)
         {
-            $variable += "INGOT_SRCRELEASEGLOB";
+            $variable = "INGOT_SRCRELEASEGLOB";
             $value = "${variable}=./**/bin/*";
             Write-Build DarkGray "Appending ${value} to GitHub environment...";
             echo "${value}" >> $env:GITHUB_ENV;
             
             Write-Build DarkGray "Getting GitHub environment file content after append...";
-
             $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw
-            Write-Build DarkGray $githubEnvironmentContent;
+            Write-Build DarkGray (
+                "`nFile: $($env:GITHUB_ENV): `n " +
+                "----------- `n"
+                $githubEnvironmentContent + "`n");
             
             Write-Build DarkGray "Validating variable ${variable} append to GitHub environment...";
             
@@ -338,15 +348,17 @@ task ci-env-setup {
         
         if(-Not $env:INGOT_NUPKGDIRECTORY)
         {
-            $variable += "INGOT_NUPKGDIRECTORY";
+            $variable = "INGOT_NUPKGDIRECTORY";
             $value = "${variable}=${NupkgDirectory}";
             Write-Build DarkGray "Appending ${value} to GitHub environment...";
             echo "${value}" >> $env:GITHUB_ENV;
             
             Write-Build DarkGray "Getting GitHub environment file content after append...";
-
             $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw
-            Write-Build DarkGray $githubEnvironmentContent;
+            Write-Build DarkGray (
+                "`nFile: $($env:GITHUB_ENV): `n " +
+                "----------- `n"
+                $githubEnvironmentContent + "`n");
             
             Write-Build DarkGray "Validating variable ${variable} append to GitHub environment...";
             
@@ -362,15 +374,17 @@ task ci-env-setup {
         
         if(-Not $env:INGOT_NUPKGGLOB)
         {
-            $variable += "INGOT_NUPKGGLOB";
+            $variable = "INGOT_NUPKGGLOB";
             $value = "${variable}=./**/*.nupkg";
             Write-Build DarkGray "Appending ${value} to GitHub environment...";
             echo "${value}" >> $env:GITHUB_ENV;
             
             Write-Build DarkGray "Getting GitHub environment file content after append...";
-
             $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw
-            Write-Build DarkGray $githubEnvironmentContent;
+            Write-Build DarkGray (
+                "`nFile: $($env:GITHUB_ENV): `n " +
+                "----------- `n"
+                $githubEnvironmentContent + "`n");
             
             Write-Build DarkGray "Validating variable ${variable} append to GitHub environment...";
             

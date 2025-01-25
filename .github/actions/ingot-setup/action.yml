@@ -30,12 +30,6 @@ runs:
         dotnet tool restore
         dotnet ib ci-env-setup
 
-    # Displays the INGOT_ environment variables
-    # from sourcing the ./dist/ib/config.env file
-    - shell: sh
-      name: Debug Ingot Environment Variables
-      run: env | grep '^INGOT_' || echo "No INGOT_ variables found"
-
     # Restores the necessary nuget packages
     # In order to create a relevant nuget cache
     - if: steps.nuget-cache.outputs.cache-hit != 'true'
@@ -51,8 +45,3 @@ runs:
       with:
         path: '~/.nuget/packages'
         key: ${{ steps.nuget-cache.outputs.cache-primary-key }}
-
-    # Prints MinVer information to ease debugging
-    - shell: sh
-      name: MinVer Debug
-      run: dotnet minver -v d

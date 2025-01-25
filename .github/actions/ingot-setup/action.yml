@@ -10,8 +10,8 @@ runs:
       uses: actions/checkout@v4
         with:
           # Ensures MinVer finds what it needs
-          fetch-depth: 0
-          filter: tree:0
+          fetch-depth: '0'
+          filter: 'tree:0'
 
     # Attempts to restore the nuget cache to speed up
     # the dotnet tools and subsequent nuget restore
@@ -19,8 +19,8 @@ runs:
       name: Restore NuGet Cache
       uses: actions/cache/restore@v4
       with:
-        path: ~/.nuget/packages
-        key: ${{ runner.os }}-nuget-${{ hashFiles('**/global.json', '**/Directory.Packages.props', '**/dotnet-tools.json', '**/nuget.config') }}
+        path: '~/.nuget/packages'
+        key: "${{ runner.os }}-nuget-${{ hashFiles('**/global.json', '**/Directory.Packages.props', '**/dotnet-tools.json', '**/nuget.config') }}"
     
     # Restores dotnet tools and run the 
     # environment setup via invoke-build
@@ -50,7 +50,7 @@ runs:
       name: Save NuGet Cache
       uses: actions/cache/save@v4
       with:
-        path: ~/.nuget/packages
+        path: '~/.nuget/packages'
         key: ${{ steps.nuget-cache.outputs.cache-primary-key }}
 
     # Prints MinVer information to ease debugging

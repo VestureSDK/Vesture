@@ -34,7 +34,7 @@ jobs:
         uses: ./.github/actions/ingot-setup
       - name: MinVer
         run: |
-          dotnet minver -v d
+          dotnet minver -v t
         env:
           MinVerDefaultPreReleaseIdentifiers: alpha.0.${{ github.run_id }}.${{ github.run_attempt}}
 

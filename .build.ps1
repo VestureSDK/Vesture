@@ -255,7 +255,7 @@ task ci-env-setup {
     Write-Build DarkGray "Invoking minver...";
     exec { dotnet minver -v d }
 
-    Write-Build Yellow "Invoked minver successfully, manual validation of version required";
+    Write-Build Yellow "WARNING: Invoked minver successfully, manual validation of version required";
 }
 
 # ---------------------------------------
@@ -298,23 +298,74 @@ task ci-src-build ci-src-restore, {
 # Synopsis: [CI Specific] Tests the built ./src code
 task ci-src-test ci-src-restore, {
 
-    Get-ChildItem $SrcDirectory -recurse | Where-Object {$_.name -like "*Tests.csproj"} | ForEach-Object -Process { 
+    Ingot-EnsureBuildRan
+
+    Write-Build Magenta "Searching for test projects...";
+
+    $testProjectsFilter = "*Tests.csproj";
+    Write-Build DarkGray "Getting ${SrcDirectory} projects matching filter '${testProjectsFilter}'...";
+    $testProjects = Get-ChildItem $SrcDirectory -recurse | Where-Object {$_.name -like $testProjectsFilter};
+
+    if ($testProjects.Count -eq 0)
+    {
+        Write-Error "No ${SrcDirectory} projects matching filter '${testProjectsFilter}' found";
+    }
+
+    Write-Build Green "Found $($testProjects.Count) test projects: ";
+    $testProjects | ForEach-Object -Process {
+        Write-Build DarkGray "    - $($_.FullName)";
+    }
+
+    $testProjects | ForEach-Object -Process {
+
+        Write-Build Magenta "Running tests declared in $($_.FullName) ...";
+
+        Write-Build DarkGray "Invoking dotnet test on csproj ($($_.FullName))...";
         exec { dotnet test $_.FullName -c $BuildConfiguration --no-build --verbosity $DotnetVerbosity }
+        
+        Write-Build Green "Successfully ran tests declared in $($_.FullName)";
     }    
 }
 
 # Synopsis: [CI Specific] Packages the built ./src code into nuget packages *.nupkg
 task ci-src-pack ci-src-restore, {
     
+    Ingot-EnsureBuildRan
+    
+    Write-Build Magenta "Cleaning output directory ${NupkgDirectory}...`n";
+
+    Write-Build DarkGray "Getting output directory ${NupkgDirectory} existing items...";
+    $previoulsyCreatedFiles = Get-ChildItem $NupkgDirectory -recurse;
+    
+    Write-Build DarkGray "Found $($previoulsyCreatedFiles.Count) items already in output directory ${NupkgDirectory}";
+    $previoulsyCreatedFiles | ForEach-Object -Process {
+        Write-Build DarkGray "    - $($_.FullName)";
+    }
+
+    Write-Build DarkGray "Deleting existing items in output directory ${NupkgDirectory}...";
+    $previoulsyCreatedFiles | Remove-Item -Recurse -Force
+    
+    Write-Build Green "Successfully deleted $($previoulsyCreatedFiles.Count) items already in output directory ${NupkgDirectory}`n";
+
+    Write-Build Magenta "Creating nuget packages...`n";
+
+    Write-Build DarkGray "Invoking dotnet pack on source directory (${SrcDirectory})...";
     exec { dotnet pack $SrcDirectory --no-build --output $NupkgDirectory --verbosity $DotnetVerbosity }
+
+    Ingot-ValidateNugetPackages
 }
 
 # Synopsis: [CI Specific] Publishes the packaged *.nupkg
-task ci-src-publish {    
+task ci-src-publish {
     
-    Get-ChildItem "$($NupkgDirectory)/*.nupkg" | ForEach-Object -Process { 
-        exec { dotnet nuget push "$($NupkgDirectory)/$($_.Name)" --api-key $NupkgPushApiKey --source $NupkgPushSource --skip-duplicate }
-    }
+    Ingot-ValidateNugetPackages
+
+    Write-Build Magenta "Pushing nuget packages to ${NupkgPushSource}...`n";
+
+    Write-Build DarkGray "Invoking dotnet nuget push for nuget directory (${NupkgDirectory}) to source ${NupkgPushSource}...";
+    exec { dotnet nuget push "$($NupkgDirectory)/*.nupkg" --api-key $NupkgPushApiKey --source $NupkgPushSource --skip-duplicate }
+    
+    Write-Build Green "Successfully pushed nuget packages to ${NupkgPushSource}`n";
 }
 
 task Docs-Clean {
@@ -387,4 +438,62 @@ function Ingot-GitHub-AppendMissingVariable {
             Write-Error "${Key} not found in GitHub environment"
         }
     }
+}
+
+function Ingot-EnsureBuildRan {
+
+    Write-Build Magenta "Ensuring build has been ran with configuration ${BuildConfiguration}...";
+    
+    $buildDllFilter = "*bin*${BuildConfiguration}*";
+    Write-Build DarkGray "Getting ${SrcDirectory} files matching filter '${buildDllFilter}'...";
+    $buildDllFiles = Get-ChildItem $SrcDirectory -recurse | Where-Object {$_.FullName -like $buildDllFilter};
+
+    if ($buildDllFiles.Count -eq 0)
+    {
+        Write-Error "No ${SrcDirectory} files matching filter '${buildDllFilter}' found";
+    }
+
+    Write-Build Green "Found $($buildDllFiles.Count) ${BuildConfiguration} build related files: ";
+    $buildDllFiles | ForEach-Object -Process {
+        Write-Build DarkGray "    - $($_.FullName)";
+    }
+}
+
+function Ingot-ValidateNugetPackages {
+
+    Write-Build Magenta "Validating nuget packages...`n";
+
+    $nupkgFilter = "*.nupkg";
+    Write-Build DarkGray "Getting ${NupkgDirectory} nuget packages matching filter '${nupkgFilter}'...";
+    $nupkgFiles = Get-ChildItem $NupkgDirectory -recurse | Where-Object {$_.name -like $nupkgFilter};
+
+    if ($nupkgFiles.Count -eq 0)
+    {
+        Write-Error "No ${NupkgDirectory} nuget packages matching filter '${nupkgFilter}' found";
+    }
+
+    Write-Build DarkGray "Found $($nupkgFiles.Count) nuget packages: ";
+    $nupkgFiles | ForEach-Object -Process {
+        Write-Build DarkGray "    - $($_.FullName)";
+    }
+    Write-Build DarkGray "";
+
+    Write-Build DarkGray "Invoking dotnet minver to retrieve the expected version...";
+    $expectedVersion = exec { dotnet minver -v d }
+
+    Write-Build DarkGray "Successfully retrieve expected version ${expectedVersion}`n";
+
+    $nupkgFiles | ForEach-Object -Process {
+        
+        if ($_.FullName -like "*${expectedVersion}.nupkg")
+        {
+            Write-Build Green "Nuget package $($_.FullName) matches expected version ${expectedVersion}";
+        }
+        else
+        {
+            Write-Error "Nuget package $($_.FullName) does not match expected version ${expectedVersion}";
+        }
+    }
+
+    Write-Build DarkGray "";
 }

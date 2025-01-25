@@ -73,11 +73,11 @@ task ci-env-setup {
 
         New-Item -ItemType Directory -Force -Path $configDirectoryPath
 
-        'echo "INGOT_DOTNETVERBOSITY=${DotnetVerbosity}" >> ''$GITHUB_ENV''' >> $configFilePath
-        'echo "INGOT_DOTNETVERBOSITY=${DotnetVerbosity} >> ''$GITHUB_ENV''' >> $configFilePath
-        'echo "INGOT_BUILDCONFIGURATION=${BuildConfiguration} >> ''$GITHUB_ENV''' >> $configFilePath
-        'echo "INGOT_SRCDIRECTORY=${SrcDirectory} >> ''$GITHUB_ENV''' >> $configFilePath
-        'echo "INGOT_NUPKGDIRECTORY=${NupkgDirectory} >> ''$GITHUB_ENV''' >> $configFilePath
+        'echo "INGOT_DOTNETVERBOSITY=${DotnetVerbosity}" >> $GITHUB_ENV' >> $configFilePath
+        'echo "INGOT_DOTNETVERBOSITY=${DotnetVerbosity} >> $GITHUB_ENV' >> $configFilePath
+        'echo "INGOT_BUILDCONFIGURATION=${BuildConfiguration} >> $GITHUB_ENV' >> $configFilePath
+        'echo "INGOT_SRCDIRECTORY=${SrcDirectory} >> $GITHUB_ENV' >> $configFilePath
+        'echo "INGOT_NUPKGDIRECTORY=${NupkgDirectory} >> $GITHUB_ENV' >> $configFilePath
     }
 }
 

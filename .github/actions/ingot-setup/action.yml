@@ -25,5 +25,6 @@ runs:
       with:
         path: ~/.nuget/packages
         key: ${{ steps.nuget-cache.outputs.cache-primary-key }}
-    - name: MinVer Debug
+    - shell: sh
+      name: MinVer Debug
       run: dotnet minver -v d

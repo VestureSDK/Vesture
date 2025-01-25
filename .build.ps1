@@ -238,35 +238,12 @@ task ci-env-setup {
         Write-Build DarkGray "Getting original GitHub environment file content...";
         Ingot-GetFileContent -File $env:GITHUB_ENV;
 
-        if(-Not $env:INGOT_DOTNETVERBOSITY)
-        {
-            Ingot-GitHub-AppendVariable -Key "INGOT_DOTNETVERBOSITY" -Value $DotnetVerbosity;
-        }
-        
-        if(-Not $env:INGOT_BUILDCONFIGURATION)
-        {
-            Ingot-GitHub-AppendVariable -Key "INGOT_BUILDCONFIGURATION" -Value $BuildConfiguration;
-        }
-        
-        if(-Not $env:INGOT_SRCDIRECTORY)
-        {
-            Ingot-GitHub-AppendVariable -Key "INGOT_SRCDIRECTORY" -Value $SrcDirectory;
-        }
-        
-        if(-Not $env:INGOT_SRCRELEASEGLOB)
-        {
-            Ingot-GitHub-AppendVariable -Key "INGOT_SRCRELEASEGLOB" -Value "./**/bin/*";
-        }
-        
-        if(-Not $env:INGOT_NUPKGDIRECTORY)
-        {
-            Ingot-GitHub-AppendVariable -Key "INGOT_NUPKGDIRECTORY" -Value $NupkgDirectory;
-        }
-        
-        if(-Not $env:INGOT_NUPKGGLOB)
-        {
-            Ingot-GitHub-AppendVariable -Key "INGOT_NUPKGGLOB" -Value "./**/*.nupkg";
-        }
+        Ingot-GitHub-AppendMissingVariable -Key "INGOT_DOTNETVERBOSITY" -Value $DotnetVerbosity;
+        Ingot-GitHub-AppendMissingVariable -Key "INGOT_BUILDCONFIGURATION" -Value $BuildConfiguration;
+        Ingot-GitHub-AppendMissingVariable -Key "INGOT_SRCDIRECTORY" -Value $SrcDirectory;
+        Ingot-GitHub-AppendMissingVariable -Key "INGOT_SRCRELEASEGLOB" -Value "./**/bin/*";
+        Ingot-GitHub-AppendMissingVariable -Key "INGOT_NUPKGDIRECTORY" -Value $NupkgDirectory;
+        Ingot-GitHub-AppendMissingVariable -Key "INGOT_NUPKGGLOB" -Value "./**/*.nupkg";
 
         Write-Build Green "Appended Ingot environment variables to GitHub environment successfully";
     }
@@ -370,28 +347,35 @@ function Ingot-GetFileContent {
     return $fileContent;
 }
 
-function Ingot-GitHub-AppendVariable {
+function Ingot-GitHub-AppendMissingVariable {
 
     param (
         $Key,
         $Value
     )
 
-    $kvp = "${Key}=${Value}";
-    Write-Build DarkGray "Appending ${kvp} to GitHub environment...";
-    echo "${kvp}" >> $env:GITHUB_ENV;
-    
-    Write-Build DarkGray "Getting GitHub environment file content after append...";
-    $githubEnvironmentContent = Ingot-GetFileContent -File $env:GITHUB_ENV;
-    
-    Write-Build DarkGray "Validating variable ${Key} append to GitHub environment...";
-    
-    if ($githubEnvironmentContent -Match $Key)
+    if(Test-Path "env:${Key}")
     {
-        Write-Build Green "Variable ${Key} appended successfully to GitHub environment";
+        Write-Build DarkGray "Variable ${Key} already available in GitHub environment";
     }
     else
     {
-        Write-Error "${Key} not found in GitHub environment"
+        $kvp = "${Key}=${Value}";
+        Write-Build DarkGray "Appending ${kvp} to GitHub environment...";
+        echo "${kvp}" >> $env:GITHUB_ENV;
+        
+        Write-Build DarkGray "Getting GitHub environment file content after append...";
+        $githubEnvironmentContent = Ingot-GetFileContent -File $env:GITHUB_ENV;
+        
+        Write-Build DarkGray "Validating variable ${Key} append to GitHub environment...";
+        
+        if ($githubEnvironmentContent -Match $Key)
+        {
+            Write-Build Green "Variable ${Key} appended successfully to GitHub environment";
+        }
+        else
+        {
+            Write-Error "${Key} not found in GitHub environment"
+        }
     }
 }

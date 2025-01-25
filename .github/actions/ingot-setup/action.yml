@@ -32,7 +32,7 @@ runs:
     - shell: sh
       run: echo "${TEST}"
       env:
-        TEST: $INGOT_SRCDIRECTORY
+        TEST: ${{ env.INGOT_SRCDIRECTORY }}
 
     # Restores the necessary nuget packages
     # In order to create a relevant nuget cache

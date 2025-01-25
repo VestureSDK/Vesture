@@ -21,7 +21,13 @@ runs:
       run: |
         dotnet tool restore
         dotnet ib ci-env-setup
+
+    - shell: sh
+      run: |
+        cat ./dist/ib/config.env
         . ./dist/ib/config.env
+        echo $GITHUB_ENV
+        cat $GITHUB_ENV
 
     - shell: sh
       name: Print IB Config

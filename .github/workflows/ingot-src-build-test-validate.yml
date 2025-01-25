@@ -7,10 +7,12 @@ on:
         description: 'The name of the nuget artifact to upload'
         required: false
         default: "nupkg"
+        type: string
       nuget-artifact-directory:
         description: 'The directory where to upload the nuget artifact'
         required: false
         default: "./dist/nuget"
+        type: string
     outputs:
       nuget-artifact-name:
         description: 'The name of the nuget artifact to download'

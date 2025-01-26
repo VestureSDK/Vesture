@@ -167,7 +167,7 @@ Enter-Build {
 task setup ci-github-setup, tool-ib-setup, tool-nuget-setup, tool-minver-validate
 
 # Synopsis: full flow (format > build > test > publish)
-task full format, src-linter, publish
+task full format, src-linter, src-build, src-test, publish
 
 # Synopsis: Opens ./src/Ingot.sln in Visual Studio
 task ide tool-visual-studio-open

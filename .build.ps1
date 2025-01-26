@@ -166,8 +166,8 @@ Enter-Build {
 # Synopsis: Runs the initial setup for the repo
 task setup ci-github-setup, tool-ib-setup, tool-nuget-setup, tool-minver-validate
 
-# Synopsis: e2e local flow
-task . format, src-linter, publish
+# Synopsis: full flow (format > build > test > publish)
+task full format, src-linter, publish
 
 # Synopsis: Opens ./src/Ingot.sln in Visual Studio
 task ide tool-visual-studio-open
@@ -178,13 +178,13 @@ task format src-format
 # Synopsis: Builds source code
 task build src-build
 
-# Synopsis: Tests source code
+# Synopsis: Tests source code (build > test)
 task test build, src-test
 
 # Synopsis: Packages source code
-task pack build, src-pack
+task pack src-pack
 
-# Synopsis: Packages source code
+# Synopsis: Publishes packages (pack > publish)
 task publish pack, src-publish-local, src-publish-remote
 
 # ***************************************
@@ -339,6 +339,7 @@ task tool-minver-validate {
     }
 }
 
+# Synopsis: [Specific] Configures nuget for local feed
 task tool-nuget-setup -If(-Not (Ingot-IsOnCi)) {
 
     Write-Build Magenta "Creating NuGet config file...";
@@ -375,11 +376,11 @@ task tool-nuget-setup -If(-Not (Ingot-IsOnCi)) {
     Write-Build DarkGray "Invoking dotnet nuget to set '${nugetDefaultPushSourceKey}' to ${nugetLocalFeedValue} ...";
     exec { dotnet nuget config set --configfile $nugetConfigFile $nugetDefaultPushSourceKey $nugetLocalFeedValue }
     Write-Build DarkGray "Successfully set nuget '${nugetDefaultPushSourceKey}' to ${nugetLocalFeedValue} ...";
-    
-    Write-Build Green "Successfully set local NuGet push source";
 
     $nugetConfigContent = Get-Content $nugetConfigFile -Raw;
     Ingot-PrintFileContent -File $nugetConfigFile -Content $nugetConfigContent;
+    
+    Write-Build Green "Successfully set local NuGet push source";
 }
 
 # Synopsis: [Specific] Opens ./src/Ingot.sln in Visual Studio

@@ -3,9 +3,6 @@ name: Ingot Source Build/Test/Validate
 on:
   workflow_call: {}
 
-env:
-  MinVerDefaultPreReleaseIdentifiers: alpha.0.${{ github.run_id }}.${{ github.run_attempt}}
-
 jobs:
   src-linter:
     name: Linter

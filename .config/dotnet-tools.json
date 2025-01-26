@@ -43,6 +43,13 @@
         "dotnet-coverage"
       ],
       "rollForward": false
+    },
+    "dotnet-trx": {
+      "version": "0.4.5",
+      "commands": [
+        "trx"
+      ],
+      "rollForward": false
     }
   }
 }

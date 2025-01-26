@@ -903,7 +903,10 @@ task src-test src-test-clean, src-test-coverage-clean, src-build-validate, src-r
         $codeCoverageOutputFile = "${TestResultDirectory}/$($_.BaseName)";
 
         Ingot-Write-Debug "Invoking 'dotnet test' on '$($_.FullName)'`nand collecting code coverage to '${codeCoverageOutputFile}'...";
-        exec { dotnet test $_.FullName -c $BuildConfiguration --no-build --verbosity $DotnetVerbosity --results-directory $codeCoverageOutputFile --collect:"Code Coverage" }
+        exec { 
+            dotnet test $_.FullName -c $BuildConfiguration --no-build --verbosity $DotnetVerbosity --results-directory $codeCoverageOutputFile --collect "Code Coverage" --logger "trx"; 
+            dotnet trx --output;
+        }
         Ingot-Write-Info "Successfully invoked 'dotnet test' on '$($_.FullName)'";
         
         Ingot-Write-StepEnd-Success "Successfully ran tests declared in '$($_.Name)'";

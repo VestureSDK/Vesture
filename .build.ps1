@@ -377,6 +377,9 @@ task tool-nuget-setup -If(-Not (Ingot-IsOnCi)) {
     Write-Build DarkGray "Successfully set nuget '${nugetDefaultPushSourceKey}' to ${nugetLocalFeedValue} ...";
     
     Write-Build Green "Successfully set local NuGet push source";
+
+    $nugetConfigContent = Get-Content $nugetConfigFile -Raw;
+    Ingot-PrintFileContent -File $nugetConfigFile -Content $nugetConfigContent;
 }
 
 # Synopsis: [Specific] Opens ./src/Ingot.sln in Visual Studio

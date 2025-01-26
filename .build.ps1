@@ -9,9 +9,9 @@ param(
 
     [string] $NupkgDirectory = './dist/nuget',
 
-    [string] $NupkgPushSource = 'https://api.nuget.org/v3/index.json',
+    [string] $NupkgPushSource,
     
-    [string] $NupkgPushApiKey = '<Set your API key with -NupkgPushApiKey parameter>',
+    [string] $NupkgPushApiKey,
 
     [bool] $Force = $False
 )
@@ -139,7 +139,7 @@ Enter-Build {
     }
 
     # Set MinVer default configuration
-    $env:MinVerDefaultPreReleaseIdentifiers = "alpha.0.$($(Get-Date).Ticks)";
+    $env:MinVerDefaultPreReleaseIdentifiers = "alpha.0";
     
     if (Ingot-IsOnGitHub)
     {
@@ -164,10 +164,10 @@ Enter-Build {
 # ***************************************
 
 # Synopsis: Runs the initial setup for the repo
-task setup ci-github-setup, tool-ib-setup, tool-minver-validate
+task setup ci-github-setup, tool-ib-setup, tool-nuget-setup, tool-minver-validate
 
 # Synopsis: e2e local flow
-task . format, src-linter, pack
+task . format, src-linter, publish
 
 # Synopsis: Opens ./src/Ingot.sln in Visual Studio
 task ide tool-visual-studio-open
@@ -183,6 +183,9 @@ task test build, src-test
 
 # Synopsis: Packages source code
 task pack build, src-pack
+
+# Synopsis: Packages source code
+task publish pack, src-publish-local, src-publish-remote
 
 # ***************************************
 # 
@@ -334,6 +337,46 @@ task tool-minver-validate {
     {
         Write-Build Green "MinVer outputed version ${version} most likely indicating a proper setup"
     }
+}
+
+task tool-nuget-setup -If(-Not (Ingot-IsOnCi)) {
+
+    Write-Build Magenta "Creating NuGet config file...";
+
+    $nugetConfigFile = "./nuget.config";
+    if (Test-Path $nugetConfigFile)
+    {
+        Remove-Item $nugetConfigFile -Force;
+    }
+
+    Write-Build DarkGray "Creating empty NuGet config file ${nugetConfigFile}...";
+    '<configuration></configuration>' > $nugetConfigFile;
+    
+    Write-Build Green "Created NuGet config file successfully";
+
+    Write-Build Magenta "Adding local NuGet source...";
+
+    $nugetLocalFeedName = "ingot-local-feed";
+    $nugetLocalFeedValue = "${BuildRoot}/dist/local-nuget-feed";
+
+    Write-Build DarkGray "Invoking dotnet nuget to remove source ${nugetLocalFeedName}...";
+    dotnet nuget remove source --configfile $nugetConfigFile $nugetLocalFeedName > $null;
+    Write-Build DarkGray "Removed dotnet nuget source ${nugetLocalFeedName}";
+
+    Write-Build DarkGray "Invoking dotnet nuget to add source ${nugetLocalFeedName} (${nugetLocalFeedValue})...";
+    exec { dotnet nuget add source --configfile $nugetConfigFile --name $nugetLocalFeedName $nugetLocalFeedValue }
+    Write-Build DarkGray "Successfully added nuget source ${nugetLocalFeedName} (${nugetLocalFeedValue})...";
+    
+    Write-Build Green "Successfully added local NuGet source";
+
+    Write-Build Magenta "Setting local NuGet push source...";
+
+    $nugetDefaultPushSourceKey = "defaultPushSource";
+    Write-Build DarkGray "Invoking dotnet nuget to set '${nugetDefaultPushSourceKey}' to ${nugetLocalFeedValue} ...";
+    exec { dotnet nuget config set --configfile $nugetConfigFile $nugetDefaultPushSourceKey $nugetLocalFeedValue }
+    Write-Build DarkGray "Successfully set nuget '${nugetDefaultPushSourceKey}' to ${nugetLocalFeedValue} ...";
+    
+    Write-Build Green "Successfully set local NuGet push source";
 }
 
 # Synopsis: [Specific] Opens ./src/Ingot.sln in Visual Studio
@@ -544,8 +587,55 @@ task src-pack src-build-validate, src-restore, src-pack-clean, {
 
 }, src-pack-validate
 
-# Synopsis: [Specific] Publishes the packaged *.nupkg
-task src-publish src-pack-validate, {
+# Synopsis: [Specific] Publishes the packaged *.nupkg to a local feed
+task src-publish-local -If(-Not (Ingot-IsOnCi)) tool-nuget-setup, src-pack-validate, {
+
+    Write-Build Magenta "Retrieving nuget local push source...`n";
+
+    Write-Build DarkGray "Invoking dotnet nuget config to get 'defaultPushSource'";
+    $nugetLocalSource = exec { dotnet nuget config get "defaultPushSource" };
+    
+    if (-Not $nugetLocalSource)
+    {
+        Write-Error "Could not retrieve nuget local push source";
+    }
+
+    Write-Build Green "Successfully retrieved local push source '${nugetLocalSource}'`n";
+
+    Write-Build Magenta "Pushing nuget packages to ${nugetLocalSource}...`n";
+
+    if (-Not (Test-Path $nugetLocalSource))
+    {
+        Write-Build DarkGray "${nugetLocalSource} does not exist";
+
+        Write-Build DarkGray "Creating ${nugetLocalSource}...";
+        New-Item -ItemType Directory -Force -Path $nugetLocalSource
+        
+        Write-Build Green "Successfully created ${nugetLocalSource}";
+    }
+
+    $nupkgFilter = "*.nupkg";
+    Write-Build DarkGray "Getting ${NupkgDirectory} nuget packages matching filter '${nupkgFilter}'...";
+    $nupkgFiles = Get-ChildItem $NupkgDirectory -recurse | Where-Object {$_.name -like $nupkgFilter};
+
+    $nupkgFiles | ForEach-Object -Process {
+        
+        $localFeedFilePath = "${nugetLocalSource}/$($_.Name)";
+        if (Test-Path $localFeedFilePath)
+        {
+            Write-Build DarkGray "Removing existing file ${localFeedFilePath}...";
+            Remove-Item $localFeedFilePath;
+        }
+
+        Write-Build DarkGray "Invoking dotnet nuget push for nuget $($_.FullName) to source ${NupkgPushSource}...";
+        exec { dotnet nuget push $_.FullName }
+        
+        Write-Build Green "Successfully pushed nuget package $($_.FullName) to source ${NupkgPushSource}`n";
+    }
+}
+
+# Synopsis: [Specific] Publishes the packaged *.nupkg to a remote feed
+task src-publish-remote -If(($NupkgPushSource) -And ($NupkgPushApiKey)) src-pack-validate, {
     
     Write-Build Magenta "Pushing nuget packages to ${NupkgPushSource}...`n";
 

@@ -203,7 +203,7 @@ function Ingot-Write-FileLookup-End {
     }
 
     Ingot-Write-Info "Found $($Files.Count) files matching filter '${FileFilter}' in directory '${Directory}'"
-    if ($Files.Count > 0)
+    if (-Not ($Files.Count -eq 0))
     {
         $Files | ForEach-Object -Process {
             Ingot-Write-Debug "    - $($_.FullName)";
@@ -354,14 +354,14 @@ function Ingot-MergeCodeCoverage {
     Ingot-Write-StepEnd-Success "Successfully merged tests code coverage files into 1 '${OutputFormat}' file";
 }
 
-function Ingot-Get-CodeCoverageReport-Path {
+function Ingot-Get-CodeCoverageReport-DirectoryPath {
     
     param (
         $ReportType
     )
 
     $testCoverageCoberturaMergedFile = "${TestCoverageDirectory}/${TestCoverageCoberturaFileName}";
-    return "${TestCoverageReportDirectory}/${testCoverageReportType}";
+    return "${TestCoverageReportDirectory}/${ReportType}";
 }
 
 function Ingot-GenerateCodeCoverageReport
@@ -375,7 +375,7 @@ function Ingot-GenerateCodeCoverageReport
     $testCoverageCoberturaMergedFile = "${TestCoverageDirectory}/${TestCoverageCoberturaFileName}";
     $testCoverageReportAssemblyFilter = "-*.Mocks;-*.Tests;-*.Testing.*";
 
-    $testCoverageReportFileDirectory = Ingot-Get-CodeCoverageReport-Path -ReportType $ReportType;
+    $testCoverageReportFileDirectory = Ingot-Get-CodeCoverageReport-DirectoryPath -ReportType $ReportType;
     Write-Build DarkGray "Invoking 'reportgenerator' to create '${ReportType}' code coverage report`nin ${testCoverageReportFileDirectory}...";
     exec { dotnet reportgenerator -reports:$testCoverageCoberturaMergedFile -targetdir:$testCoverageReportFileDirectory -reporttypes:"${ReportType}" -assemblyfilters:"${testCoverageReportAssemblyFilter}" }
 
@@ -596,7 +596,9 @@ task ci-github-src-test-coverage-summary -If (Ingot-IsOnGitHub) {
     }
     Ingot-Write-Info "GitHub action summary file exists '$($env:GITHUB_STEP_SUMMARY)'";
 
-    $testCoverageReportFile = Ingot-Get-CodeCoverageReport-Path -ReportType $reportType;
+    $testCoverageReportDirectory = Ingot-Get-CodeCoverageReport-DirectoryPath -ReportType $reportType;
+    $testCoverageReportFile = "${testCoverageReportDirectory}/SummaryGithub.md";
+    
     $markdownSummaryContent = Get-Content $testCoverageReportFile -Raw;
     Ingot-Write-FileContent -File $testCoverageReportFile -Content $markdownSummaryContent;
     echo "${markdownSummaryContent}" >> $env:GITHUB_STEP_SUMMARY

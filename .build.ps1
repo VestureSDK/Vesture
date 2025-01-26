@@ -9,6 +9,12 @@ param(
 
     [string] $NupkgDirectory = './dist/nuget',
 
+    [string] $TestResultDirectory = './dist/test-result',
+
+    [string] $TestCoverageDirectory = './dist/test-coverage',
+
+    [string] $TestCoverageReportDirectory = './dist/test-coverage/report',
+
     [string] $NupkgPushSource,
     
     [string] $NupkgPushApiKey,
@@ -242,6 +248,16 @@ task ci-github-setup -If (Ingot-IsOnGitHub) {
 
         Write-Build Green "Appended Ingot environment variables to GitHub environment successfully";
     }
+}
+
+# Synopsis: [Specific] GitHub actions code coverage summary
+task ci-github-src-test-coverage-summary -If (Ingot-IsOnGitHub) {
+
+    $testCoverageReportType = "MarkdownSummary";
+    $testCoverageReportFile = "${TestCoverageReportDirectory}/${testCoverageReportType}/Summary.md";
+
+    $markdownSummaryContent = Get-Content -File $testCoverageReportFile -Raw;
+    echo "${markdownSummaryContent}" >> $env:GITHUB_STEP_SUMMARY
 }
 
 # ---------------------------------------
@@ -483,8 +499,36 @@ task src-build src-restore, {
     Write-Build Green "Successfully built source code";
 }, src-build-validate
 
+task src-test-clean {
+
+    Write-Build Magenta "Cleaning output directory ${TestResultDirectory}...`n";
+
+    Write-Build DarkGray "Getting output directory ${TestResultDirectory} existing items...";
+    if (-Not (Test-Path $TestResultDirectory))
+    {
+        Write-Build DarkGray "Output directory ${TestResultDirectory} does not exist";
+
+        Write-Build DarkGray "Creating output directory ${TestResultDirectory}...";
+        New-Item -ItemType Directory -Force -Path $TestResultDirectory
+        Write-Build DarkGray "Created output directory ${TestResultDirectory}";
+    }
+
+    $previoulsyCreatedFiles = Get-ChildItem $TestResultDirectory -recurse;
+    
+    Write-Build DarkGray "Found $($previoulsyCreatedFiles.Count) items already in output directory ${TestResultDirectory}";
+    $previoulsyCreatedFiles | ForEach-Object -Process {
+        Write-Build DarkGray "    - $($_.FullName)";
+    }
+    
+    Write-Build DarkGray "Deleting existing items in output directory ${TestResultDirectory}...";
+    $parentDirectoryItem = Get-Item $TestResultDirectory;
+    $previoulsyCreatedFiles | Where-Object { $_.Parent.FullName -eq $parentDirectoryItem.FullName } | Remove-Item -Recurse -Force;
+
+    Write-Build Green "Successfully deleted $($previoulsyCreatedFiles.Count) items already in output directory ${TestResultDirectory}`n";
+}
+
 # Synopsis: [Specific] Tests the built ./src code
-task src-test src-build-validate, src-restore, {
+task src-test src-test-clean, src-test-coverage-clean, src-build-validate, src-restore, {
 
     Write-Build Magenta "Searching for test projects...";
 
@@ -507,11 +551,134 @@ task src-test src-build-validate, src-restore, {
         Write-Build Magenta "Running tests declared in $($_.FullName) ...";
 
         Write-Build DarkGray "Invoking dotnet test on csproj ($($_.FullName))...";
-        exec { dotnet test $_.FullName -c $BuildConfiguration --no-build --verbosity $DotnetVerbosity }
+        exec { dotnet test $_.FullName -c $BuildConfiguration --no-build --verbosity $DotnetVerbosity --results-directory "${TestResultDirectory}/$($_.BaseName)" --collect:"Code Coverage" }
         
         Write-Build Green "Successfully ran tests declared in $($_.FullName)";
-    }    
+    }
+}, src-test-coverage
+
+task src-test-coverage-clean {
+
+    Write-Build Magenta "Cleaning output directory ${TestCoverageDirectory}...`n";
+
+    Write-Build DarkGray "Getting output directory ${TestCoverageDirectory} existing items...";
+    if (-Not (Test-Path $TestCoverageDirectory))
+    {
+        Write-Build DarkGray "Output directory ${TestCoverageDirectory} does not exist";
+
+        Write-Build DarkGray "Creating output directory ${TestCoverageDirectory}...";
+        New-Item -ItemType Directory -Force -Path $TestCoverageDirectory
+        Write-Build DarkGray "Created output directory ${TestCoverageDirectory}";
+    }
+
+    $previoulsyCreatedFiles = Get-ChildItem $TestCoverageDirectory -recurse;
+    
+    Write-Build DarkGray "Found $($previoulsyCreatedFiles.Count) items already in output directory ${TestCoverageDirectory}";
+    $previoulsyCreatedFiles | ForEach-Object -Process {
+        Write-Build DarkGray "    - $($_.FullName)";
+    }
+    
+    Write-Build DarkGray "Deleting existing items in output directory ${TestCoverageDirectory}...";
+    $previoulsyCreatedFiles | Remove-Item -Recurse -Force;
+
+    Write-Build Green "Successfully deleted $($previoulsyCreatedFiles.Count) items already in output directory ${TestCoverageDirectory}`n";
 }
+
+task src-test-coverage {
+
+    Write-Build Magenta "Retrieving test coverage reports...";
+
+    $testCoveragesFilter = "*.coverage";
+    Write-Build DarkGray "Getting ${TestResultDirectory} test coverages matching filter '${testCoveragesFilter}'...";
+    $testCoverages = Get-ChildItem $TestResultDirectory -Recurse -Filter ${testCoveragesFilter};
+
+    if ($testCoverages.Count -eq 0)
+    {
+        Write-Error "No ${TestResultDirectory} test coverages matching filter '${testCoveragesFilter}' found";
+    }
+
+    Write-Build Green "Found $($testCoverages.Count) test coverages: ";
+    $testCoverages | ForEach-Object -Process {
+        Write-Build DarkGray "    - $($_.FullName)";
+    }
+
+    Write-Build Magenta "Merging test coverages";
+    
+    if (-Not (Test-Path $TestCoverageDirectory))
+    {
+        Write-Build DarkGray "Output directory ${TestCoverageDirectory} does not exist";
+
+        Write-Build DarkGray "Creating output directory ${TestCoverageDirectory}...";
+        New-Item -ItemType Directory -Force -Path $TestCoverageDirectory
+        Write-Build DarkGray "Created output directory ${TestCoverageDirectory}";
+    }
+
+    $testCoverageMergedFile = "${TestCoverageDirectory}/test-result.coverage";
+    Write-Build DarkGray "Invoking dotnet coverage to create merged coverage file ${testCoverageMergedFile}...";
+    exec { dotnet dotnet-coverage merge --output ${testCoverageMergedFile} --output-format "coverage" $testCoverages }
+    
+    if (-Not (Test-Path $testCoverageMergedFile))
+    {
+        Write-Error "Merged coverage file ${testCoverageMergedFile} not found after merging";
+    }
+    else
+    {
+        Write-Build Green "Successfully merge test coverages into ${testCoverageMergedFile}";
+    }
+
+    $testCoverageCoberturaMergedFile = "${TestCoverageDirectory}/test-result.cobertura.coverage";
+    Write-Build DarkGray "Invoking dotnet coverage to create merged coverage file ${testCoverageCoberturaMergedFile}...";
+    exec { dotnet dotnet-coverage merge --output ${testCoverageCoberturaMergedFile} --output-format "cobertura" $testCoverages }
+    
+    if (-Not (Test-Path $testCoverageCoberturaMergedFile))
+    {
+        Write-Error "Merged coverage file ${testCoverageCoberturaMergedFile} not found after merging";
+    }
+    else
+    {
+        Write-Build Green "Successfully merge test coverages into ${testCoverageCoberturaMergedFile}";
+    }
+
+    Write-Build Magenta "Creating test coverage report";
+    
+    $testCoverageReportAssemblyFilter = "-*.Mocks;-*.Tests;-*.Testing.*";
+
+    $testCoverageReportType = "Html";
+    $testCoverageReportFileDirectory = "${TestCoverageReportDirectory}/${testCoverageReportType}";
+    Write-Build DarkGray "Invoking dotnet reportgenerator to create ${testCoverageReportType} test coverage report in ${testCoverageReportFileDirectory}...";
+    exec { dotnet reportgenerator -reports:$testCoverageCoberturaMergedFile -targetdir:$testCoverageReportFileDirectory -reporttypes:"${testCoverageReportType}" -assemblyfilters:"${testCoverageReportAssemblyFilter}" }
+
+    if (-Not (Test-Path $testCoverageReportFileDirectory))
+    {
+        Write-Error "Merged coverage report int ${testCoverageReportFileDirectory} not found";
+    }
+
+    Write-Build Green "Successfully created ${testCoverageReportType} test coverage report";
+
+    $testCoverageReportType = "JsonSummary";
+    $testCoverageReportFileDirectory = "${TestCoverageReportDirectory}/${testCoverageReportType}";
+    Write-Build DarkGray "Invoking dotnet reportgenerator to create ${testCoverageReportType} test coverage report in ${testCoverageReportFileDirectory}...";
+    exec { dotnet reportgenerator -reports:$testCoverageCoberturaMergedFile -targetdir:$testCoverageReportFileDirectory -reporttypes:"${testCoverageReportType}" -assemblyfilters:"${testCoverageReportAssemblyFilter}" }
+
+    if (-Not (Test-Path $testCoverageReportFileDirectory))
+    {
+        Write-Error "Merged coverage report int ${testCoverageReportFileDirectory} not found";
+    }
+
+    Write-Build Green "Successfully created ${testCoverageReportType} test coverage report";
+
+    $testCoverageReportType = "MarkdownSummary";
+    $testCoverageReportFileDirectory = "${TestCoverageReportDirectory}/${testCoverageReportType}";
+    Write-Build DarkGray "Invoking dotnet reportgenerator to create ${testCoverageReportType} test coverage report in ${testCoverageReportFileDirectory}...";
+    exec { dotnet reportgenerator -reports:$testCoverageCoberturaMergedFile -targetdir:$testCoverageReportFileDirectory -reporttypes:"${testCoverageReportType}" -assemblyfilters:"${testCoverageReportAssemblyFilter}" }
+
+    if (-Not (Test-Path $testCoverageReportFileDirectory))
+    {
+        Write-Error "Merged coverage report int ${testCoverageReportFileDirectory} not found";
+    }
+
+    Write-Build Green "Successfully created ${testCoverageReportType} test coverage report";
+}, ci-github-src-test-coverage-summary
 
 # Synopsis: [Specific] Cleans the nuget output folder
 task src-pack-clean {

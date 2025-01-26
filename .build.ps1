@@ -256,7 +256,8 @@ task ci-github-src-test-coverage-summary -If (Ingot-IsOnGitHub) {
     $testCoverageReportType = "MarkdownSummary";
     $testCoverageReportFile = "${TestCoverageReportDirectory}/${testCoverageReportType}/Summary.md";
 
-    $markdownSummaryContent = Get-Content -File $testCoverageReportFile -Raw;
+    $markdownSummaryContent = Get-Content $testCoverageReportFile -Raw;
+    Ingot-PrintFileContent -File $testCoverageReportFile -Content $markdownSummaryContent;
     echo "${markdownSummaryContent}" >> $env:GITHUB_STEP_SUMMARY
 }
 

@@ -19,6 +19,70 @@ param(
 # ***************************************
 # 
 #
+#           Functions
+# 
+#
+# ***************************************
+
+function Ingot-IsOnGitHub {
+    return Test-Path env:GITHUB_ACTIONS;
+}
+
+function Ingot-IsOnCi {
+    return ((Test-Path env:CI) -or (Ingot-IsOnGitHub));
+}
+
+function Ingot-PrintFileContent {
+
+    param (
+        $File,
+        $Content
+    )
+
+    Write-Build DarkGray (
+        "`n`nFile: ${File} `n" +
+        "----------- `n" +
+        ${Content} + "`n" +
+        "----------- `n`n");
+}
+
+function Ingot-GitHub-AppendMissingVariable {
+
+    param (
+        $Key,
+        $Value
+    )
+
+    if(Test-Path "env:${Key}")
+    {
+        Write-Build DarkGray "Variable ${Key} already available in GitHub environment";
+    }
+    else
+    {
+        $kvp = "${Key}=${Value}";
+        Write-Build DarkGray "Appending ${kvp} to GitHub environment...";
+        echo "${kvp}" >> $env:GITHUB_ENV;
+        
+        Write-Build DarkGray "Getting GitHub environment file content after append...";
+        $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw;
+        Ingot-PrintFileContent -File $env:GITHUB_ENV -Content $githubEnvironmentContent;
+        
+        Write-Build DarkGray "Validating variable ${Key} append to GitHub environment...";
+        
+        if ($githubEnvironmentContent -Match $Key)
+        {
+            Write-Build Green "Variable ${Key} appended successfully to GitHub environment";
+        }
+        else
+        {
+            Write-Error "${Key} not found in GitHub environment"
+        }
+    }
+}
+
+# ***************************************
+# 
+#
 #           Shell Setup
 # 
 #
@@ -35,6 +99,14 @@ $pwshPsEdition = "Core";
 $pwshCommand = "pwsh";
 $pwshLabel = "PowerShell Core (${pwshCommand})";
 
+# ***************************************
+# 
+#
+#           Invoke Build Hooks
+# 
+#
+# ***************************************
+
 Enter-Build {
 
     # Warns the user the setup is not finished if they
@@ -43,13 +115,43 @@ Enter-Build {
     {
         if (-Not ($PSVersionTable.PSEdition -eq $pwshPsEdition))
         {
-            Write-Build Yellow (
-                "---------------------------------------------------------------------- `n" +
-                "WARNING: ${pwshLabel} enabled but not active. `n" +
-                "Ensure to refresh environment variables by restarting your program. `n" +
-                "---------------------------------------------------------------------- `n"
-            );
+            if (Ingot-IsOnCi)
+            {
+                Write-Error (
+                    "`n---------------------------------------------------------------------- `n" +
+                    "${pwshLabel} enabled but not active. `n" +
+                    "To ensure consistency between all environment, you must use`n" +
+                    "Invoke-Build with ${pwshLabel} either by using --pwsh option`n" +
+                    "or by setting environment variable 'pwsh=pwsh' .`n" +
+                    "---------------------------------------------------------------------- `n"
+                );
+            }
+            else
+            {
+                Write-Build Yellow (
+                    "---------------------------------------------------------------------- `n" +
+                    "WARNING: ${pwshLabel} enabled but not active. `n" +
+                    "Ensure to refresh environment variables by restarting your program. `n" +
+                    "---------------------------------------------------------------------- `n"
+                );
+            }
         }
+    }
+
+    # Set MinVer default configuration
+    $env:MinVerDefaultPreReleaseIdentifiers = "alpha.0.$($(Get-Date).Ticks)";
+    
+    if (Ingot-IsOnGitHub)
+    {
+        Write-Build Cyan (
+            "---------------------------------------------------------------------- `n" +
+            "INFO: GitHub actions context detected.`n" +
+            "GitHub specific behaviors are enabled.`n" +
+            "---------------------------------------------------------------------- `n"
+        )
+        
+        # Set MinVer configuration specifically for GitHub
+        $env:MinVerDefaultPreReleaseIdentifiers = "alpha.0.$($env:GITHUB_RUN_ID).$($env:GITHUB_RUN_NUMBER)";
     }
 }
 
@@ -61,8 +163,90 @@ Enter-Build {
 #
 # ***************************************
 
-# Synopsis: `dotnet ib setup` Runs the initial setup for the repo
-task setup {
+# Synopsis: Runs the initial setup for the repo
+task setup tool-ib-setup, tool-minver-validate
+
+# Synopsis: e2e local flow
+task . format, src-linter, pack
+
+# Synopsis: Opens ./src/Ingot.sln in Visual Studio
+task ide tool-visual-studio-open
+
+# Synopsis: Format source code
+task format src-format
+
+# Synopsis: Builds source code
+task build src-build
+
+# Synopsis: Tests source code
+task test build, src-test
+
+# Synopsis: Packages source code
+task pack build, src-pack
+
+# ***************************************
+# 
+#
+#           Specific Tasks
+# 
+#
+# ***************************************
+
+# ---------------------------------------
+# CI Tasks
+# ---------------------------------------
+
+# Synopsis: [Specific] GitHub actions specific setup
+task ci-github-setup -If (Ingot-IsOnGitHub) {
+
+    # Ensures when running in containers the ownership is not dubious
+    Write-Build Magenta "Adding git repository to safe.directory...";
+        
+    Write-Build DarkGray "Invoking git to add '${BuildRoot}' as a safe.directory...";
+    exec { git config --global --add safe.directory $BuildRoot }
+
+    Write-Build Green "Successfully added git repository to safe.directory";
+
+    # GitHub actions specific setup
+    if (-Not (Test-Path env:GITHUB_ACTIONS))
+    {
+        Write-Build DarkGray "Not running on GitHub actions, skipping GitHub actions setup.";
+    }
+    else
+    {
+        # To ease handling of configuration within GitHub
+        # actions, the configuration of this invoke-build
+        # is exposed via environment variables to be re-used
+        # within the .yml workflow or action files
+
+        Write-Build Magenta "Appending Ingot environment variables to GitHub environment...";
+        
+        if (-Not (Test-Path $env:GITHUB_ENV))
+        {
+            Write-Error "GitHub environment file $($env:GITHUB_ENV) not found";
+        }
+
+        Write-Build DarkGray "Getting original GitHub environment file content...";
+        $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw;
+        Ingot-PrintFileContent -File $env:GITHUB_ENV -Content $githubEnvironmentContent;
+
+        Ingot-GitHub-AppendMissingVariable -Key "INGOT_DOTNETVERBOSITY" -Value $DotnetVerbosity;
+        Ingot-GitHub-AppendMissingVariable -Key "INGOT_BUILDCONFIGURATION" -Value $BuildConfiguration;
+        Ingot-GitHub-AppendMissingVariable -Key "INGOT_SRCDIRECTORY" -Value $SrcDirectory;
+        Ingot-GitHub-AppendMissingVariable -Key "INGOT_SRCRELEASEGLOB" -Value "./**/bin/*";
+        Ingot-GitHub-AppendMissingVariable -Key "INGOT_NUPKGDIRECTORY" -Value $NupkgDirectory;
+        Ingot-GitHub-AppendMissingVariable -Key "INGOT_NUPKGGLOB" -Value "./**/*.nupkg";
+
+        Write-Build Green "Appended Ingot environment variables to GitHub environment successfully";
+    }
+}
+
+# ---------------------------------------
+# Tools Tasks
+# ---------------------------------------
+
+# Synopsis: [Specific] Configures Invoke-Build to use pwsh by default
+task tool-ib-setup -If(-Not (Ingot-IsOnCi)) {
 
     # Enable PowerShell Core usage to ensure 
     # users benefit from modern features and
@@ -121,11 +305,39 @@ task setup {
     }
 }
 
-# Synopsis: `dotnet ib` Runs formatting all the way to packing the source code
-task . format, ci-src-linter, pack
+# Synopsis: [Specific] Ensures minver is correctly setup
+task tool-minver-validate {
 
-# Synopsis: `dotnet ib ide` Opens Visual Studio with no projects loaded
-task ide {
+    Write-Build Magenta "Validating MinVer...";
+
+    Write-Build DarkGray "Invoking minver...";
+    $version = exec { dotnet minver -v d }
+
+    if ($version -like "0.0.0-alpha.0*")
+    {
+        if ($Force)
+        {
+            Write-Build Yellow (
+                "WARNING: MinVer outputed version ${version} most likely indicating a wrong setup.`n" +
+                "You have set '-Force 1' thus bypassing this validation."
+            );   
+        }
+        else
+        {
+            Write-Error (
+                "MinVer outputed version ${version} most likely indicating a wrong setup.`n" +
+                "specify '-Force 1' to bypass this validation."
+            );
+        }
+    }
+    else
+    {
+        Write-Build Green "MinVer outputed version ${version} most likely indicating a proper setup"
+    }
+}
+
+# Synopsis: [Specific] Opens ./src/Ingot.sln in Visual Studio
+task tool-visual-studio-open {
 
     Write-Build Magenta "Searching Visual Studio installation...";
 
@@ -156,9 +368,13 @@ task ide {
     exec { & $vsPath $slnFilePath -donotloadprojects }
 }
 
-# Synopsis: Format source code
-task format {
+# ---------------------------------------
+# Src Tasks
+# ---------------------------------------
 
+# Synopsis: [Specific] Runs csharpier to format the ./src files
+task src-format {
+    
     Write-Build Magenta "Formatting ${SrcDirectory} source code...";
     
     Write-Build DarkGray "Invoking csharpier on source directory (${SrcDirectory})";
@@ -167,103 +383,8 @@ task format {
     Write-Build Green "Successfully formatted source code";
 }
 
-# Synopsis: Builds source code
-task build ci-src-build
-
-# Synopsis: Tests source code
-task test build, ci-src-test
-
-# Synopsis: Packages source code as nuget package
-task pack build, ci-src-pack
-
-# ***************************************
-# 
-#
-#           CI Tasks
-# 
-#
-# ***************************************
-
-# ---------------------------------------
-# Environment Tasks
-# ---------------------------------------
-
-# Synopsis: [CI Specific] Do the setup of the environment and repository
-task ci-env-setup {
-
-    if (-Not (Test-Path env:CI) -And -Not $Force)
-    {
-        Write-Error (
-            "${BuildTask} should be run only on CI. `n" +
-            "To test this task locally, specify '-Force 1' to force its execution."
-        );
-    }
-    elseif (-Not (Test-Path env:CI))
-    {
-        Write-Build Yellow (
-            "---------------------------------------------------------------------- `n" +
-            "WARNING: ${BuildTask} should be run only on CI. `n" +
-            "You have specified '-Force 1' to forcefully run this task. `n" +
-            "---------------------------------------------------------------------- `n"
-        );
-    }
-
-    # Ensures when running in containers the ownership is not dubious
-    Write-Build Magenta "Adding git repository to safe.directory...";
-    
-    Write-Build DarkGray "Invoking git to add '${BuildRoot}' as a safe.directory...";
-    exec { git config --global --add safe.directory $BuildRoot }
-
-    Write-Build Green "Successfully added git repository to safe.directory";
-
-    # GitHub actions specific setup
-    if (-Not (Test-Path env:GITHUB_ACTIONS))
-    {
-        Write-Build DarkGray "Not running on GitHub actions, skipping GitHub actions setup.";
-    }
-    else
-    {
-        # To ease handling of configuration within GitHub
-        # actions, the configuration of this invoke-build
-        # is exposed via environment variables to be re-used
-        # within the .yml workflow or action files
-
-        Write-Build Magenta "Appending Ingot environment variables to GitHub environment...";
-        
-        if (-Not (Test-Path $env:GITHUB_ENV))
-        {
-            Write-Error "GitHub environment file $($env:GITHUB_ENV) not found";
-        }
-
-        Write-Build DarkGray "Getting original GitHub environment file content...";
-        $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw;
-        Ingot-PrintFileContent -File $env:GITHUB_ENV -Content $githubEnvironmentContent;
-
-        Ingot-GitHub-AppendMissingVariable -Key "INGOT_DOTNETVERBOSITY" -Value $DotnetVerbosity;
-        Ingot-GitHub-AppendMissingVariable -Key "INGOT_BUILDCONFIGURATION" -Value $BuildConfiguration;
-        Ingot-GitHub-AppendMissingVariable -Key "INGOT_SRCDIRECTORY" -Value $SrcDirectory;
-        Ingot-GitHub-AppendMissingVariable -Key "INGOT_SRCRELEASEGLOB" -Value "./**/bin/*";
-        Ingot-GitHub-AppendMissingVariable -Key "INGOT_NUPKGDIRECTORY" -Value $NupkgDirectory;
-        Ingot-GitHub-AppendMissingVariable -Key "INGOT_NUPKGGLOB" -Value "./**/*.nupkg";
-
-        Write-Build Green "Appended Ingot environment variables to GitHub environment successfully";
-    }
-
-    # Showing Minver information for debugging purpose
-    Write-Build Magenta "Checking MinVer...";
-
-    Write-Build DarkGray "Invoking minver...";
-    exec { dotnet minver -v d }
-
-    Write-Build Yellow "WARNING: Invoked minver successfully, manual validation of version required";
-}
-
-# ---------------------------------------
-# Src Tasks
-# ---------------------------------------
-
-# Synopsis: [CI Specific] Runs csharpier as a linter to validate the formatting of the ./src files
-task ci-src-linter {
+# Synopsis: [Specific] Runs csharpier as a linter to validate the formatting of the ./src files
+task src-linter {
     
     Write-Build Magenta "Validating source code format...";
     
@@ -273,8 +394,8 @@ task ci-src-linter {
     Write-Build Green "Successfully validated source code format";
 }
 
-# Synopsis: [CI Specific] Restores the ./src code
-task ci-src-restore {
+# Synopsis: [Specific] Restores the ./src code
+task src-restore {
     
     Write-Build Magenta "Restoring nuget dependencies...";
 
@@ -284,8 +405,28 @@ task ci-src-restore {
     Write-Build Green "Successfully restored nuget dependencies";
 }
 
-# Synopsis: [CI Specific] Builds the ./src code
-task ci-src-build ci-src-restore, {
+# Synopsis: [Specific] Validates the built ./src code
+task src-build-validate {
+
+    Write-Build Magenta "Ensuring build has been ran with configuration ${BuildConfiguration}...";
+    
+    $buildDllFilter = "*bin*${BuildConfiguration}*";
+    Write-Build DarkGray "Getting ${SrcDirectory} files matching filter '${buildDllFilter}'...";
+    $buildDllFiles = Get-ChildItem $SrcDirectory -recurse | Where-Object {$_.FullName -like $buildDllFilter};
+
+    if ($buildDllFiles.Count -eq 0)
+    {
+        Write-Error "No ${SrcDirectory} files matching filter '${buildDllFilter}' found";
+    }
+
+    Write-Build Green "Found $($buildDllFiles.Count) ${BuildConfiguration} build related files: ";
+    $buildDllFiles | ForEach-Object -Process {
+        Write-Build DarkGray "    - $($_.FullName)";
+    }
+}
+
+# Synopsis: [Specific] Builds the ./src code
+task src-build src-restore, {
     
     Write-Build Magenta "Building source code...";
     
@@ -293,12 +434,10 @@ task ci-src-build ci-src-restore, {
     exec { dotnet build $SrcDirectory -c $BuildConfiguration --no-restore --verbosity $DotnetVerbosity }
 
     Write-Build Green "Successfully built source code";
-}
+}, src-build-validate
 
-# Synopsis: [CI Specific] Tests the built ./src code
-task ci-src-test ci-src-restore, {
-
-    Ingot-EnsureBuildRan
+# Synopsis: [Specific] Tests the built ./src code
+task src-test src-build-validate, src-restore, {
 
     Write-Build Magenta "Searching for test projects...";
 
@@ -327,11 +466,9 @@ task ci-src-test ci-src-restore, {
     }    
 }
 
-# Synopsis: [CI Specific] Packages the built ./src code into nuget packages *.nupkg
-task ci-src-pack ci-src-restore, {
-    
-    Ingot-EnsureBuildRan
-    
+# Synopsis: [Specific] Cleans the nuget output folder
+task src-pack-clean {
+
     Write-Build Magenta "Cleaning output directory ${NupkgDirectory}...`n";
 
     Write-Build DarkGray "Getting output directory ${NupkgDirectory} existing items...";
@@ -355,120 +492,10 @@ task ci-src-pack ci-src-restore, {
     $previoulsyCreatedFiles | Remove-Item -Recurse -Force
     
     Write-Build Green "Successfully deleted $($previoulsyCreatedFiles.Count) items already in output directory ${NupkgDirectory}`n";
-
-    Write-Build Magenta "Creating nuget packages...`n";
-
-    Write-Build DarkGray "Invoking dotnet pack on source directory (${SrcDirectory})...";
-    exec { dotnet pack $SrcDirectory --no-build --output $NupkgDirectory --verbosity $DotnetVerbosity }
-
-    Ingot-ValidateNugetPackages
 }
 
-# Synopsis: [CI Specific] Publishes the packaged *.nupkg
-task ci-src-publish {
-    
-    Ingot-ValidateNugetPackages
-
-    Write-Build Magenta "Pushing nuget packages to ${NupkgPushSource}...`n";
-
-    Write-Build DarkGray "Invoking dotnet nuget push for nuget directory (${NupkgDirectory}) to source ${NupkgPushSource}...";
-    exec { dotnet nuget push "$($NupkgDirectory)/*.nupkg" --api-key $NupkgPushApiKey --source $NupkgPushSource --skip-duplicate }
-    
-    Write-Build Green "Successfully pushed nuget packages to ${NupkgPushSource}`n";
-}
-
-task Docs-Clean {
-    REmove-Item -Force -Recurse ./docs/docs/Mediator/References -ErrorAction SilentlyContinue
-    REmove-Item -Force -Recurse ./docs/docs/Mediator/Advanced/References -ErrorAction SilentlyContinue
-    REmove-Item -Force -Recurse ./docs/_site -ErrorAction SilentlyContinue
-}
-
-task Docs-Build {
-    dotnet docfx ./docs/docfx.json
-}
-
-task Docs-Serve {
-    dotnet docfx serve ./docs/_site --open-browser
-}
-
-task Docs Docs-Clean, Docs-Build, Docs-Serve
-
-# ***************************************
-# 
-#
-#           Functions
-# 
-#
-# ***************************************
-
-function Ingot-PrintFileContent {
-
-    param (
-        $File,
-        $Content
-    )
-
-    Write-Build DarkGray (
-        "`n`nFile: ${File} `n" +
-        "----------- `n" +
-        ${Content} + "`n" +
-        "----------- `n`n");
-}
-
-function Ingot-GitHub-AppendMissingVariable {
-
-    param (
-        $Key,
-        $Value
-    )
-
-    if(Test-Path "env:${Key}")
-    {
-        Write-Build DarkGray "Variable ${Key} already available in GitHub environment";
-    }
-    else
-    {
-        $kvp = "${Key}=${Value}";
-        Write-Build DarkGray "Appending ${kvp} to GitHub environment...";
-        echo "${kvp}" >> $env:GITHUB_ENV;
-        
-        Write-Build DarkGray "Getting GitHub environment file content after append...";
-        $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw;
-        Ingot-PrintFileContent -File $env:GITHUB_ENV -Content $githubEnvironmentContent;
-        
-        Write-Build DarkGray "Validating variable ${Key} append to GitHub environment...";
-        
-        if ($githubEnvironmentContent -Match $Key)
-        {
-            Write-Build Green "Variable ${Key} appended successfully to GitHub environment";
-        }
-        else
-        {
-            Write-Error "${Key} not found in GitHub environment"
-        }
-    }
-}
-
-function Ingot-EnsureBuildRan {
-
-    Write-Build Magenta "Ensuring build has been ran with configuration ${BuildConfiguration}...";
-    
-    $buildDllFilter = "*bin*${BuildConfiguration}*";
-    Write-Build DarkGray "Getting ${SrcDirectory} files matching filter '${buildDllFilter}'...";
-    $buildDllFiles = Get-ChildItem $SrcDirectory -recurse | Where-Object {$_.FullName -like $buildDllFilter};
-
-    if ($buildDllFiles.Count -eq 0)
-    {
-        Write-Error "No ${SrcDirectory} files matching filter '${buildDllFilter}' found";
-    }
-
-    Write-Build Green "Found $($buildDllFiles.Count) ${BuildConfiguration} build related files: ";
-    $buildDllFiles | ForEach-Object -Process {
-        Write-Build DarkGray "    - $($_.FullName)";
-    }
-}
-
-function Ingot-ValidateNugetPackages {
+# Synopsis: [Specific] Validates the nuget packages
+task src-pack-validate {
 
     Write-Build Magenta "Validating nuget packages...`n";
 
@@ -506,3 +533,40 @@ function Ingot-ValidateNugetPackages {
 
     Write-Build DarkGray "";
 }
+
+# Synopsis: [Specific] Packages the built ./src code into nuget packages *.nupkg
+task src-pack src-build-validate, src-restore, src-pack-clean, {
+    
+    Write-Build Magenta "Creating nuget packages...`n";
+
+    Write-Build DarkGray "Invoking dotnet pack on source directory (${SrcDirectory})...";
+    exec { dotnet pack $SrcDirectory --no-build --output $NupkgDirectory --verbosity $DotnetVerbosity }
+
+}, src-pack-validate
+
+# Synopsis: [Specific] Publishes the packaged *.nupkg
+task src-publish src-pack-validate, {
+    
+    Write-Build Magenta "Pushing nuget packages to ${NupkgPushSource}...`n";
+
+    Write-Build DarkGray "Invoking dotnet nuget push for nuget directory (${NupkgDirectory}) to source ${NupkgPushSource}...";
+    exec { dotnet nuget push "$($NupkgDirectory)/*.nupkg" --api-key $NupkgPushApiKey --source $NupkgPushSource --skip-duplicate }
+    
+    Write-Build Green "Successfully pushed nuget packages to ${NupkgPushSource}`n";
+}
+
+task Docs-Clean {
+    REmove-Item -Force -Recurse ./docs/docs/Mediator/References -ErrorAction SilentlyContinue
+    REmove-Item -Force -Recurse ./docs/docs/Mediator/Advanced/References -ErrorAction SilentlyContinue
+    REmove-Item -Force -Recurse ./docs/_site -ErrorAction SilentlyContinue
+}
+
+task Docs-Build {
+    dotnet docfx ./docs/docfx.json
+}
+
+task Docs-Serve {
+    dotnet docfx serve ./docs/_site --open-browser
+}
+
+task Docs Docs-Clean, Docs-Build, Docs-Serve

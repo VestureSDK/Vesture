@@ -28,14 +28,14 @@ runs:
       name: Environment Setup
       run: |
         dotnet tool restore
-        dotnet ib ci-env-setup
+        dotnet ib setup
 
     # Restores the necessary nuget packages
     # In order to create a relevant nuget cache
     - if: steps.nuget-cache.outputs.cache-hit != 'true'
       shell: sh
       name: Nuget Src Restore
-      run: dotnet ib ci-src-restore
+      run: dotnet ib src-restore
 
     # Saves the nuget cache created so subsequent
     # jobs can benefit from a restored cache

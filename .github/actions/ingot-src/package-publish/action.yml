@@ -23,7 +23,7 @@ runs:
     - name: Push
       shell: sh
       run: |
-        dotnet ib ci-src-publish \
+        dotnet ib src-publish \
           -NupkgPushSource "${{ inputs.nuget-source }}" \
           -NupkgPushApiKey "${{ inputs.nuget-api-key }}"
   

@@ -18,13 +18,6 @@ runs:
     # Upload
     # -----------------------------------
 
-    # Lists the files that will be uploaded
-    # for debugging mostly
-    - if: ${{ inputs.type == 'upload' }}
-      name: "List Files To Upload"
-      shell: sh
-      run: find . -wholename '${{ env.INGOT_SRCRELEASEGLOB }}'
-
     # Upload the artifact
     - if: ${{ inputs.type == 'upload' }}
       name: "Artifact Upload: bin"
@@ -49,10 +42,3 @@ runs:
         # Do not specify a path to ensure the restore
         # puts the files in their original location
         name: build
-
-    # Lists the downloaded files for
-    # debugging mostly
-    - if: ${{ inputs.type == 'download' }}
-      name: "List files Downloaded"
-      shell: sh
-      run: find . -wholename '${{ env.INGOT_SRCRELEASEGLOB }}'

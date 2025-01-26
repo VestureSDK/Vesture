@@ -16,7 +16,7 @@ jobs:
       - uses: stfbln/ingot/.github/actions/ingot-setup@main
         name: Setup
       - name: Linter
-        run: dotnet ib ci-src-linter
+        run: dotnet ib src-linter
 
   src-build:
     needs: src-linter
@@ -28,7 +28,7 @@ jobs:
       - uses: stfbln/ingot/.github/actions/ingot-setup@main
         name: Setup
       - name: Build
-        run: dotnet ib ci-src-build
+        run: dotnet ib src-build
       - name: Upload Build Artifacts
         uses: ./.github/actions/ingot-src/build-artifacts
         with:
@@ -48,7 +48,7 @@ jobs:
         with:
           type: download
       - name: Test
-        run: dotnet ib ci-src-test
+        run: dotnet ib src-test
 
   src-pack:
     needs: src-build
@@ -64,7 +64,7 @@ jobs:
         with:
           type: download
       - name: Pack
-        run: dotnet ib ci-src-pack
+        run: dotnet ib src-pack
       - name: Upload Package Artifacts
         uses: ./.github/actions/ingot-src/package-artifacts
         with:

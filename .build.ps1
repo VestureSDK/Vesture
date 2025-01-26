@@ -203,8 +203,11 @@ function Ingot-Write-FileLookup-End {
     }
 
     Ingot-Write-Info "Found $($Files.Count) files matching filter '${FileFilter}' in directory '${Directory}'"
-    $Files | ForEach-Object -Process {
-        Ingot-Write-Debug "    - $($_.FullName)";
+    if ($Files.Count > 0)
+    {
+        $Files | ForEach-Object -Process {
+            Ingot-Write-Debug "    - $($_.FullName)";
+        }
     }
 }
 

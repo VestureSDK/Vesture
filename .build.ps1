@@ -164,7 +164,7 @@ Enter-Build {
 # ***************************************
 
 # Synopsis: Runs the initial setup for the repo
-task setup tool-ib-setup, tool-minver-validate
+task setup ci-github-setup, tool-ib-setup, tool-minver-validate
 
 # Synopsis: e2e local flow
 task . format, src-linter, pack

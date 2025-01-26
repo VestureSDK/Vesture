@@ -905,11 +905,24 @@ task src-test src-test-clean, src-test-coverage-clean, src-build-validate, src-r
         Ingot-Write-Debug "Invoking 'dotnet test' on '$($_.FullName)'`nand collecting code coverage to '${codeCoverageOutputFile}'...";
         exec { 
             dotnet test $_.FullName -c $BuildConfiguration --no-build --verbosity $DotnetVerbosity --results-directory $codeCoverageOutputFile --collect "Code Coverage" --logger "trx"; 
-            dotnet trx --output;
+            dotnet trx --output --gh-summary false;
         }
         Ingot-Write-Info "Successfully invoked 'dotnet test' on '$($_.FullName)'";
         
         Ingot-Write-StepEnd-Success "Successfully ran tests declared in '$($_.Name)'";
+        
+        Ingot-Write-StepStart "Validating run of '$($_.Name)' created trx file...";
+        
+        $directory = "${codeCoverageOutputFile}";
+        $fileFilter = "*.trx";
+
+        Ingot-Write-FileLookup-Start -FileFilter $fileFilter -Directory $directory;
+        $trxs = Get-ChildItem $directory -File -Recurse | Where-Object {$_.FullName -like $fileFilter};
+        Ingot-Write-FileLookup-End -FileFilter $fileFilter -Directory $directory -Files $trxs;
+        
+        Ingot-Ensure-FileLookup-NotEmpty -FileFilter $fileFilter -Directory $directory -Files $trxs;
+
+        Ingot-Write-StepEnd-Success "Successfully validated run of '$($_.Name)' created trx file";
         
         Ingot-Write-StepStart "Validating run of '$($_.Name)' collected code coverage...";
         
@@ -924,6 +937,24 @@ task src-test src-test-clean, src-test-coverage-clean, src-build-validate, src-r
 
         Ingot-Write-StepEnd-Success "Successfully validated run of '$($_.Name)' collected code coverage";
     }
+
+    Ingot-Write-StepStart "Generating test result summary...";
+
+    $summaryFile = "${TestResultDirectory}/summary.md";
+
+    Ingot-Write-Debug "Invoking 'liquid' to generate test result summary '${codeCoverageOutputFile}' from trx files...";
+    exec { dotnet liquid --inputs "File=${TestResultDirectory}/**.trx;Format=Trx" --output-file "${summaryFile}"; }
+    Ingot-Write-Info "Successfully invoked 'liquid' to generate test result summary";
+
+    $fileFilter = "summary.md";
+    $directory = "${TestResultDirectory}";
+
+    Ingot-Write-FileLookup-Start -FileFilter $fileFilter -Directory $directory;
+    $summary = Get-ChildItem $directory -File -Recurse | Where-Object {$_.Name -like $fileFilter};
+    Ingot-Write-FileLookup-End -FileFilter $fileFilter -Directory $directory -Files $summary;
+
+    Ingot-Write-StepStart "Successfully generated test result summary";
+
 }, src-test-coverage
 
 task src-test-coverage-clean {

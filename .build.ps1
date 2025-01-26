@@ -844,7 +844,7 @@ task src-build-validate {
     Ingot-Write-StepStart "Validating '${BuildConfiguration}' source build exists...";
     
     $directory = "${SrcDirectory}";
-    $fileFilter = "*libs\*\bin\${BuildConfiguration}\*.dll";
+    $fileFilter = "*libs[\/]*[\/]bin[\/]${BuildConfiguration}[\/]*.dll";
 
     Ingot-Write-FileLookup-Start -FileFilter $fileFilter -Directory $directory;
     $files = Get-ChildItem $directory -File -Recurse | Where-Object {$_.FullName -like $fileFilter};

@@ -942,8 +942,12 @@ task src-test src-test-clean, src-test-coverage-clean, src-build-validate, src-r
 
     $summaryFile = "${TestResultDirectory}/summary.md";
 
+    
     Ingot-Write-Debug "Invoking 'liquid' to generate test result summary '${codeCoverageOutputFile}' from trx files...";
-    exec { dotnet liquid --inputs "File=${TestResultDirectory}/**.trx;Format=Trx" --output-file "${summaryFile}"; }
+    
+    Ingot-Write-Warning ("Test result summary currently not supported, it's not you, its' us.") -AsCard $True;
+    # exec { dotnet liquid --inputs "File=${TestResultDirectory}/**.trx;Format=Trx" --output-file "${summaryFile}"; }
+    
     Ingot-Write-Info "Successfully invoked 'liquid' to generate test result summary";
 
     $fileFilter = "summary.md";

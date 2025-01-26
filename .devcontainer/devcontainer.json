@@ -4,7 +4,8 @@
 	"name": "Ingot",
 
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/dotnet/sdk:9.0.102-noble"
+	// Use the same image as the CI to ensure reproducibility
+	"image": "mcr.microsoft.com/dotnet/sdk:9.0.102-noble",
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
@@ -18,11 +19,11 @@
 	// }
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "dotnet restore",
+	"postStartCommand":  "dotnet tool restore && dotnet ib setup",
 
 	// Configure tool-specific properties.
 	// "customizations": {},
 
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-	// "remoteUser": "root"
+	"remoteUser": "root"
 }

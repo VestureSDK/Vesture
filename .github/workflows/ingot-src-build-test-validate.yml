@@ -65,7 +65,7 @@ jobs:
         with:
           type: download
       - name: Test Coverage
-        run: dotnet ib src-test-coverage
+        run: dotnet ib src-coverage
       - name: Upload Coverage Artifacts
         uses: ./.github/actions/ingot-src/coverage-artifacts
         with:

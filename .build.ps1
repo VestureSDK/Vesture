@@ -534,7 +534,7 @@ Exit-Build {
 task setup ci-github-setup, tool-ib-setup, tool-nuget-setup, tool-minver-validate
 
 # Synopsis: full flow (format > build > test > coverage > publish)
-task full format, src-linter, src-build, src-test, src-test-coverage, publish
+task full format, src-linter, src-build, src-test, src-coverage, publish
 
 # Synopsis: Opens ./src/Ingot.sln in Visual Studio
 task ide tool-visual-studio-open
@@ -546,7 +546,7 @@ task format src-format
 task build src-build
 
 # Synopsis: Tests source code (build > test > coverage)
-task test build, src-test, src-test-coverage
+task test build, src-test, src-coverage
 
 # Synopsis: Packages source code
 task pack src-pack
@@ -643,7 +643,7 @@ task ci-github-src-test-result-summary -If (Ingot-IsOnGitHub) {
 }
 
 # Synopsis: [Specific] GitHub actions code coverage summary
-task ci-github-src-test-coverage-summary -If (Ingot-IsOnGitHub) {
+task ci-github-src-coverage-summary -If (Ingot-IsOnGitHub) {
 
     $reportType = "MarkdownSummaryGithub";
 
@@ -936,6 +936,7 @@ task src-build src-restore, {
     Ingot-Write-StepEnd-Success "Successfully built '${BuildConfiguration}' source";
 }, src-build-validate
 
+# Synopsis: [Specific] Cleans the test result outputs
 task src-test-clean {
 
     Ingot-Write-StepStart "Cleaning test result directory...";
@@ -946,9 +947,9 @@ task src-test-clean {
 }
 
 # Synopsis: [Specific] Tests the built ./src code
-task src-test src-test-clean, src-test-coverage-clean, src-build-validate, src-restore, ?src-test-core, ci-github-src-test-result-summary
+task src-test src-test-clean, src-coverage-clean, src-build-validate, src-restore, ?src-test-core, src-test-finally
 
-# Synopsis: [Specific] Tests the built ./src code
+# Synopsis: [Specific] Core task of task flow src-test
 task src-test-core {
 
     # Allows to fail the build even if some
@@ -1031,7 +1032,11 @@ task src-test-core {
 
 }
 
-task src-test-coverage-clean {
+# Synopsis: [Specific] Finally task of task flow src-test
+task src-test-finally ci-github-src-test-result-summary
+
+# Synopsis: [Specific] Cleans the code coverage outputs
+task src-coverage-clean {
 
     Ingot-Write-StepStart "Cleaning code coverage directory...";
 
@@ -1040,7 +1045,8 @@ task src-test-coverage-clean {
     Ingot-Write-StepEnd-Success "Successfully cleant code coverage directory";
 }
 
-task src-test-coverage {
+# Synopsis: [Specific] Generates code coverage reports
+task src-coverage {
 
     Ingot-Write-StepStart "Retrieving tests code coverage...";
 
@@ -1061,7 +1067,7 @@ task src-test-coverage {
 
     Ingot-GenerateCodeCoverageReport -ReportType "Html";
     Ingot-GenerateCodeCoverageReport -ReportType "JsonSummary";
-}, ci-github-src-test-coverage-summary
+}, ci-github-src-coverage-summary
 
 # Synopsis: [Specific] Cleans the nuget output folder
 task src-pack-clean {

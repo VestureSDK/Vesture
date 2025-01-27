@@ -96,6 +96,12 @@ namespace Ingot.Mediator.Engine.Tests
         }
 
         [Test]
+        public void FailOnPurposeForTesting()
+        {
+            Assert.Fail("For testing purpose");
+        }
+
+        [Test]
         public void Ctor_ArgumentNullException_IfLoggerIsNull()
         {
             // Arrange

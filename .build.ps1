@@ -509,8 +509,8 @@ Exit-BuildJob {
 # Synopsis: Runs the initial setup for the repo
 task setup ci-github-setup, tool-ib-setup, tool-nuget-setup, tool-minver-validate
 
-# Synopsis: full flow (format > build > test > publish)
-task full format, src-linter, src-build, src-test, publish
+# Synopsis: full flow (format > build > test > coverage > publish)
+task full format, src-linter, src-build, src-test, src-test-coverage, publish
 
 # Synopsis: Opens ./src/Ingot.sln in Visual Studio
 task ide tool-visual-studio-open
@@ -521,8 +521,8 @@ task format src-format
 # Synopsis: Builds source code
 task build src-build
 
-# Synopsis: Tests source code (build > test)
-task test build, src-test
+# Synopsis: Tests source code (build > test > coverage)
+task test build, src-test, src-test-coverage
 
 # Synopsis: Packages source code
 task pack src-pack
@@ -572,6 +572,12 @@ task ci-github-setup -If (Ingot-IsOnGitHub) {
     Ingot-GitHub-AppendMissingVariable -Key "INGOT_SRCRELEASEGLOB" -Value "./**/bin/*";
     Ingot-GitHub-AppendMissingVariable -Key "INGOT_NUPKGDIRECTORY" -Value $NupkgDirectory;
     Ingot-GitHub-AppendMissingVariable -Key "INGOT_NUPKGGLOB" -Value "./**/*.nupkg";
+    
+    Ingot-GitHub-AppendMissingVariable -Key "INGOT_TESTRESULTDIRECTORY" -Value $TestResultDirectory;
+    Ingot-GitHub-AppendMissingVariable -Key "INGOT_TESTRESULTGLOB" -Value "**/test-result/*";
+
+    Ingot-GitHub-AppendMissingVariable -Key "INGOT_COVERAGEDIRECTORY" -Value $TestCoverageDirectory;
+    Ingot-GitHub-AppendMissingVariable -Key "INGOT_COVERAGEGLOB" -Value "**/test-coverage/*";
 
     # Set GitHub specific MinVer config
     Ingot-GitHub-AppendMissingVariable -Key "MinVerDefaultPreReleaseIdentifiers" -Value "alpha.0.$($env:GITHUB_RUN_ID).$($env:GITHUB_RUN_NUMBER)";
@@ -959,7 +965,7 @@ task src-test src-test-clean, src-test-coverage-clean, src-build-validate, src-r
 
     Ingot-Write-StepStart "Successfully generated test result summary";
 
-}, src-test-coverage
+}
 
 task src-test-coverage-clean {
 

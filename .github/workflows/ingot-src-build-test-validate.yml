@@ -46,6 +46,30 @@ jobs:
           type: download
       - name: Test
         run: dotnet ib src-test
+      - name: Upload Test Result Artifacts
+        uses: ./.github/actions/ingot-src/test-artifacts
+        with:
+          type: upload
+
+  src-coverage:
+    needs: src-test
+    name: Coverage
+    runs-on: ubuntu-24.04
+    container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
+    timeout-minutes: 3
+    steps:
+      - uses: stfbln/ingot/.github/actions/ingot-setup@main
+        name: Setup
+      - name: Upload Test Result Artifacts
+        uses: ./.github/actions/ingot-src/test-artifacts
+        with:
+          type: download
+      - name: Test Coverage
+        run: dotnet ib src-test-coverage
+      - name: Upload Coverage Artifacts
+        uses: ./.github/actions/ingot-src/coverage-artifacts
+        with:
+          type: upload
 
   src-pack:
     needs: src-build

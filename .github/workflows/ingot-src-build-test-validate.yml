@@ -46,7 +46,8 @@ jobs:
           type: download
       - name: Test
         run: dotnet ib src-test
-      - name: Upload Test Result Artifacts
+      - if: '!cancelled()'
+        name: Upload Test Result Artifacts
         uses: ./.github/actions/ingot-src/test-artifacts
         with:
           type: upload
@@ -61,7 +62,7 @@ jobs:
     steps:
       - uses: stfbln/ingot/.github/actions/ingot-setup@main
         name: Setup
-      - name: Upload Test Result Artifacts
+      - name: Download Test Result Artifacts
         uses: ./.github/actions/ingot-src/test-artifacts
         with:
           type: download

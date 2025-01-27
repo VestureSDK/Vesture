@@ -39,6 +39,10 @@ jobs:
     timeout-minutes: 5
     permissions:
       pull-requests: write
+      attestations: write
+      discussions: write
+      contents: read
+      statuses: read
     steps:
       - uses: stfbln/ingot/.github/actions/ingot-setup@main
         name: Setup
@@ -58,7 +62,7 @@ jobs:
 
   src-coverage:
     needs: src-test
-    if: ${{ !cancelled() && (needs.src-test.result == 'success' || needs.src-test.result == 'skipped') }}
+    if: ${{ !cancelled() && (needs.src-test.result == 'success' || needs.src-test.result == 'failure') }}
     name: Coverage
     runs-on: ubuntu-24.04
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble

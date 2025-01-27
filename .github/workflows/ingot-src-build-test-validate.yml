@@ -46,6 +46,8 @@ jobs:
           type: download
       - name: Test
         run: dotnet ib src-test
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - if: '!cancelled()'
         name: Upload Test Result Artifacts
         uses: ./.github/actions/ingot-src/test-artifacts

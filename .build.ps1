@@ -599,6 +599,19 @@ task ci-github-setup -If (Ingot-IsOnGitHub) {
     Ingot-Write-Info "Successfully invoked 'trx'";
 
     Ingot-Write-StepEnd-Success "Successfully installed 'trx'";
+    
+    # dotnet-trx depends on gh to post the PR comments
+    Ingot-Write-StepStart "Installing 'gh'...";
+    
+    Ingot-Write-Debug "Invoking 'apt-get' to install 'gh'...";
+    exec { apt-get update -qq && apt-get install gh -qq }
+    Ingot-Write-Info "Successfully installed 'gh' via 'apt-get'";
+
+    Ingot-Write-Debug "Invoking 'gh' to validate installation...";
+    exec { gh --version }
+    Ingot-Write-Info "Successfully invoked 'gh'";
+
+    Ingot-Write-StepEnd-Success "Successfully installed 'gh'";
 
     # To ease handling of configuration within GitHub
     # actions, the configuration of this invoke-build

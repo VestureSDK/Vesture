@@ -94,7 +94,7 @@ namespace Ingot.Mediator.Engine.Tests
 
             MiddlewareItems.Add(item);
         }
-        
+
         [Test]
         public void Ctor_ArgumentNullException_IfLoggerIsNull()
         {

@@ -1,0 +1,4 @@
+{
+    // Ensures the end of file matches csharpier formatting
+    "files.eol": "\n"
+}

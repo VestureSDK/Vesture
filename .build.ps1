@@ -604,7 +604,7 @@ task ci-github-setup -If (Ingot-IsOnGitHub) {
     Ingot-Write-StepStart "Installing 'gh'...";
     
     Ingot-Write-Debug "Invoking 'apt-get' to install 'gh'...";
-    exec { apt-get update -qq && apt-get install gh -qq }
+    exec { apt-get update -qq; apt-get install gh -qq }
     Ingot-Write-Info "Successfully installed 'gh' via 'apt-get'";
 
     Ingot-Write-Debug "Invoking 'gh' to validate installation...";

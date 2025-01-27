@@ -583,6 +583,41 @@ task ci-github-setup -If (Ingot-IsOnGitHub) {
     Ingot-GitHub-AppendMissingVariable -Key "MinVerDefaultPreReleaseIdentifiers" -Value "alpha.0.$($env:GITHUB_RUN_ID).$($env:GITHUB_RUN_NUMBER)";
 }
 
+# Synopsis: [Specific] GitHub actions test result summary
+task ci-github-src-test-result-summary -If (Ingot-IsOnGitHub) {
+
+    Ingot-Write-StepStart "Adding test results to GitHub action summary...";
+
+    Ingot-Write-Debug "Ensuring GitHub action summary file exists...";
+    if ((-Not ($env:GITHUB_STEP_SUMMARY)) -Or (-Not (Test-Path $env:GITHUB_STEP_SUMMARY)))
+    {
+        Ingot-Write-Error (
+            "GitHub action summary file '$($env:GITHUB_STEP_SUMMARY)' not found`n" +
+            "or GITHUB_STEP_SUMMARY environment variable undefined"
+        );
+    }
+    Ingot-Write-Info "GitHub action summary file exists '$($env:GITHUB_STEP_SUMMARY)'";
+
+    Ingot-Write-Debug "Getting GitHub action summary before invoking 'trx'...";
+    $actionSummaryContent = Get-Content $env:GITHUB_STEP_SUMMARY -Raw;
+    Ingot-Write-FileContent -File $env:GITHUB_STEP_SUMMARY -Content $actionSummaryContent;
+
+    Ingot-Write-Debug "Invoking 'trx' to publish test results...";
+    exec { dotnet trx --path $TestResultDirectory }
+    Ingot-Write-Info "Successfully invoked 'trx' to publish test results";
+
+    Ingot-Write-Debug "Getting GitHub action summary after invoking 'trx'...";
+    $actionSummaryContentAfter = Get-Content $env:GITHUB_STEP_SUMMARY -Raw;
+    Ingot-Write-FileContent -File $env:GITHUB_STEP_SUMMARY -Content $actionSummaryContentAfter;
+
+    if ($actionSummaryContent -eq $actionSummaryContentAfter)
+    {
+        Ingot-Write-Error "GitHub action summary not updated with test results summary"
+    }
+
+    Ingot-Write-StepEnd-Success "Successfully added test results to GitHub action summary";
+}
+
 # Synopsis: [Specific] GitHub actions code coverage summary
 task ci-github-src-test-coverage-summary -If (Ingot-IsOnGitHub) {
 
@@ -909,10 +944,7 @@ task src-test src-test-clean, src-test-coverage-clean, src-build-validate, src-r
         $codeCoverageOutputFile = "${TestResultDirectory}/$($_.BaseName)";
 
         Ingot-Write-Debug "Invoking 'dotnet test' on '$($_.FullName)'`nand collecting code coverage to '${codeCoverageOutputFile}'...";
-        exec { 
-            dotnet test $_.FullName -c $BuildConfiguration --no-build --verbosity $DotnetVerbosity --results-directory $codeCoverageOutputFile --collect "Code Coverage" --logger "trx"; 
-            dotnet trx --output --gh-summary false;
-        }
+        exec { dotnet test $_.FullName -c $BuildConfiguration --no-build --verbosity $DotnetVerbosity --results-directory $codeCoverageOutputFile --collect "Code Coverage" --logger "trx"; }
         Ingot-Write-Info "Successfully invoked 'dotnet test' on '$($_.FullName)'";
         
         Ingot-Write-StepEnd-Success "Successfully ran tests declared in '$($_.Name)'";
@@ -965,7 +997,7 @@ task src-test src-test-clean, src-test-coverage-clean, src-build-validate, src-r
 
     Ingot-Write-StepStart "Successfully generated test result summary";
 
-}
+}, ci-github-src-test-result-summary
 
 task src-test-coverage-clean {
 

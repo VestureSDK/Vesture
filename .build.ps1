@@ -591,7 +591,7 @@ task ci-github-setup -If (Ingot-IsOnGitHub) {
     Ingot-Write-StepStart "Installing 'trx'...";
     
     Ingot-Write-Debug "Invoking 'dotnet tool' to install 'dotnet-trx'...";
-    exec { dotnet tool install --global dotnet-trx }
+    exec { dotnet tool install --local dotnet-trx }
     Ingot-Write-Info "Successfully installed 'dotnet-trx' in 'dotnet tool'";
 
     Ingot-Write-Debug "Invoking 'trx' to validate installation...";

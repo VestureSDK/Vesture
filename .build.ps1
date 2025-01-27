@@ -586,6 +586,20 @@ task ci-github-setup -If (Ingot-IsOnGitHub) {
 
     Ingot-Write-StepEnd-Success "Successfully added Ingot to git safe directories";
 
+    # Installs dotnet-trx to benefit from test results PR 
+    # and summary within GitHub Actions directly
+    Ingot-Write-StepStart "Installing 'trx'...";
+    
+    Ingot-Write-Debug "Invoking 'dotnet tool' to install 'dotnet-trx'...";
+    exec { dotnet tool install --global dotnet-trx }
+    Ingot-Write-Info "Successfully installed 'dotnet-trx' in 'dotnet tool'";
+
+    Ingot-Write-Debug "Invoking 'trx' to validate installation...";
+    exec { dotnet trx --version }
+    Ingot-Write-Info "Successfully invoked 'trx'";
+
+    Ingot-Write-StepEnd-Success "Successfully installed 'trx'";
+
     # To ease handling of configuration within GitHub
     # actions, the configuration of this invoke-build
     # is exposed via environment variables to be re-used

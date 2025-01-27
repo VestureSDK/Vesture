@@ -37,6 +37,8 @@ jobs:
     runs-on: ubuntu-24.04
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     timeout-minutes: 5
+    permissions:
+      pull-requests: write
     steps:
       - uses: stfbln/ingot/.github/actions/ingot-setup@main
         name: Setup
@@ -47,7 +49,7 @@ jobs:
       - name: Test
         run: dotnet ib src-test
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
       - if: '!cancelled()'
         name: Upload Test Result Artifacts
         uses: ./.github/actions/ingot-src/test-artifacts
@@ -55,8 +57,8 @@ jobs:
           type: upload
 
   src-coverage:
-    if: '!cancelled()' 
     needs: src-test
+    if: ${{ !cancelled() && (needs.src-test.result == 'success' || needs.src-test.result == 'skipped') }}
     name: Coverage
     runs-on: ubuntu-24.04
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble

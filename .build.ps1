@@ -262,7 +262,7 @@ function Ingot-GitHub-AppendMissingVariable {
         }
         else
         {
-            Write-Error "Ingot environment variable '${Key}' not found in GitHub environment"
+            throw Ingot-Error "Ingot environment variable '${Key}' not found in GitHub environment"
         }
     }
 }
@@ -505,7 +505,6 @@ Exit-BuildJob {
     Write-Build DarkGray "";
 }
 
-$propagateErrorsToBuild;
 Exit-Build {
 
     if ($propagateErrorsToBuild -And (-Not (${*}.Errors.Count -eq 0)))
@@ -522,16 +521,6 @@ Exit-Build {
         Write-Error "Task flow '${BuildTask}' failed";
     }
 }
-
-
-task a { 
-    Write-Build Green "A"; 
-    $script:propagateErrorsToBuild=$True; 
-}
-task b { throw "test 1" }
-task c { Write-Build Green "A"; }
-task d { throw "test 2" }
-task e a,?b,c,?d
 
 # ***************************************
 # 

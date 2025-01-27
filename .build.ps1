@@ -100,8 +100,8 @@ function Ingot-Write-Warning {
         $Content,
         $AsCard
     )
-    
-    Ingot-Write-Build -Color Yellow -Content "WARNING: ${Content}" -AsCard $AsCard;
+
+    Ingot-Write-Build -Color Yellow -Content $Content -AsCard $AsCard;
 }
 
 function Ingot-Write-Success {
@@ -114,20 +114,20 @@ function Ingot-Write-Success {
     Ingot-Write-Build -Color Green -Content $Content -AsCard $AsCard;
 }
 
-function Ingot-Write-Error {
+function Ingot-Error {
 
     param (
         $Content
     )
     
-    Ingot-Write-Build -Color Red -Content (
+    $errorInfo = (
         "`n`u{2717}  ERROR (exit 1)`n" +
         "----------------------------------------------------------------------`n" +
         "${Content}`n`n" +
         "Kindly check logs for more details.`n"
-    ) -AsCard $False;
+    );
 
-    exit 1;
+    return $errorInfo;
 }
 
 function Ingot-Write-StepStart {
@@ -227,7 +227,7 @@ function Ingot-GitHub-AppendMissingVariable {
     Ingot-Write-Debug "Ensuring GitHub environment file exists...";
     if ((-Not ($env:GITHUB_ENV)) -Or (-Not (Test-Path $env:GITHUB_ENV)))
     {
-        Ingot-Write-Error (
+        throw Ingot-Error (
             "GitHub environment file '$($env:GITHUB_ENV)' not found`n" +
             "or GITHUB_ENV environment variable undefined"
         );
@@ -277,7 +277,7 @@ function Ingot-Ensure-FileLookup-NotEmpty
 
     if ($Files.Count -eq 0)
     {
-        Ingot-Write-Error "No files matching filter '${FileFilter}' in directory '${Directory}'";
+        throw Ingot-Error "No files matching filter '${FileFilter}' in directory '${Directory}'";
     }
 }
 
@@ -469,7 +469,7 @@ Enter-Build {
         {
             if (Ingot-IsOnCi)
             {
-                Ingot-Write-Error (
+                throw Ingot-Error (
                     "${pwshLabel} enabled but not active`n" +
                     "To ensure consistency between all environment, you must use`n" +
                     "Invoke-Build with ${pwshLabel} either by using --pwsh option`n" +
@@ -493,10 +493,45 @@ Enter-Build {
     Write-Build DarkGray "";
 }
 
-Exit-BuildJob {
+Enter-BuildJob {
+    
     # Allows for nicer output
     Write-Build DarkGray "";
 }
+
+Exit-BuildJob {
+    
+    # Allows for nicer output
+    Write-Build DarkGray "";
+}
+
+$propagateErrorsToBuild;
+Exit-Build {
+
+    if ($propagateErrorsToBuild -And (-Not (${*}.Errors.Count -eq 0)))
+    {
+        $msg = ("`n`nTask flow '${BuildTask}' is not allowed to failed and encountered some errors");
+        ${*}.Errors | ForEach-Object -Process {
+            $msg += "`n----------------------------------------------------------------------`n"
+            $msg += "`n'$($_.Task.Name)':`n" +
+            "$($_.Error)";
+        }
+
+        $msg += "`n----------------------------------------------------------------------`n"
+        Ingot-Write-Build -Color Red -Content $msg;
+        Write-Error "Task flow '${BuildTask}' failed";
+    }
+}
+
+
+task a { 
+    Write-Build Green "A"; 
+    $script:propagateErrorsToBuild=$True; 
+}
+task b { throw "test 1" }
+task c { Write-Build Green "A"; }
+task d { throw "test 2" }
+task e a,?b,c,?d
 
 # ***************************************
 # 
@@ -591,7 +626,7 @@ task ci-github-src-test-result-summary -If (Ingot-IsOnGitHub) {
     Ingot-Write-Debug "Ensuring GitHub action summary file exists...";
     if ((-Not ($env:GITHUB_STEP_SUMMARY)) -Or (-Not (Test-Path $env:GITHUB_STEP_SUMMARY)))
     {
-        Ingot-Write-Error (
+        throw Ingot-Error (
             "GitHub action summary file '$($env:GITHUB_STEP_SUMMARY)' not found`n" +
             "or GITHUB_STEP_SUMMARY environment variable undefined"
         );
@@ -612,7 +647,7 @@ task ci-github-src-test-result-summary -If (Ingot-IsOnGitHub) {
 
     if ($actionSummaryContent -eq $actionSummaryContentAfter)
     {
-        Ingot-Write-Error "GitHub action summary not updated with test results summary"
+        throw Ingot-Error "GitHub action summary not updated with test results summary"
     }
 
     Ingot-Write-StepEnd-Success "Successfully added test results to GitHub action summary";
@@ -630,7 +665,7 @@ task ci-github-src-test-coverage-summary -If (Ingot-IsOnGitHub) {
     Ingot-Write-Debug "Ensuring GitHub action summary file exists...";
     if ((-Not ($env:GITHUB_STEP_SUMMARY)) -Or (-Not (Test-Path $env:GITHUB_STEP_SUMMARY)))
     {
-        Ingot-Write-Error (
+        throw Ingot-Error (
             "GitHub action summary file '$($env:GITHUB_STEP_SUMMARY)' not found`n" +
             "or GITHUB_STEP_SUMMARY environment variable undefined"
         );
@@ -732,7 +767,7 @@ task tool-minver-validate {
         }
         else
         {
-            Ingot-Write-Error (
+            throw Ingot-Error (
                 "MinVer computed version '${version}' most likely indicates a wrong setup.`n" +
                 "specify '-Force 1' to bypass this validation."
             );
@@ -756,7 +791,7 @@ task tool-nuget-setup -If(-Not (Ingot-IsOnCi)) {
         Remove-Item $nugetConfigFile -Force;
         if (Test-Path $nugetConfigFile)
         {
-            Ingot-Write-Error "Failed to create NuGet config file '${nugetConfigFile}'";
+            throw Ingot-Error "Failed to create NuGet config file '${nugetConfigFile}'";
         }
         Ingot-Write-Info "Deleted existing NuGet config file '${nugetConfigFile}'";
     }
@@ -765,7 +800,7 @@ task tool-nuget-setup -If(-Not (Ingot-IsOnCi)) {
     '<configuration></configuration>' > $nugetConfigFile;
     if (-Not (Test-Path $nugetConfigFile))
     {
-        Ingot-Write-Error "Failed to create NuGet config file '${nugetConfigFile}'";
+        throw Ingot-Error "Failed to create NuGet config file '${nugetConfigFile}'";
     }
     Ingot-Write-Info "Created empty NuGet config file '${nugetConfigFile}'";
 
@@ -811,7 +846,7 @@ task tool-visual-studio-open {
     Ingot-Write-Debug "Validating vswhere.exe '${vsWherePath}' exists..."
     if (-Not (Test-Path $vsWherePath))
     {
-        Ingot-Write-Error ( 
+        throw Ingot-Error ( 
             "vswhere.exe '${vsWherePath}' not found. `n" +
             "Could not determine Visual Studio location."
         );
@@ -829,7 +864,7 @@ task tool-visual-studio-open {
     Ingot-Write-Debug "Validating Visual Studio installation path '${vsPath}'...";
     if (-Not (Test-Path $vsPath ))
     {
-        Ingot-Write-Error "vswhere.exe returned an invalid Visual Studio installation path`n'${vsPath}'";
+        throw Ingot-Error "vswhere.exe returned an invalid Visual Studio installation path`n'${vsPath}'";
     }
 
     Ingot-Write-StepEnd-Success "Successfully found Visual Studio installation";
@@ -922,7 +957,15 @@ task src-test-clean {
 }
 
 # Synopsis: [Specific] Tests the built ./src code
-task src-test src-test-clean, src-test-coverage-clean, src-build-validate, src-restore, {
+task src-test src-test-clean, src-test-coverage-clean, src-build-validate, src-restore, ?src-test-core, ci-github-src-test-result-summary
+
+# Synopsis: [Specific] Tests the built ./src code
+task src-test-core {
+
+    # Allows to fail the build even if some
+    # tasks in the flow are allowed to fail
+    # to continue subsequent tasks
+    $script:propagateErrorsToBuild=$True;
 
     Ingot-Write-StepStart "Getting test projects...";
 
@@ -997,7 +1040,7 @@ task src-test src-test-clean, src-test-coverage-clean, src-build-validate, src-r
 
     Ingot-Write-StepStart "Successfully generated test result summary";
 
-}, ci-github-src-test-result-summary
+}
 
 task src-test-coverage-clean {
 

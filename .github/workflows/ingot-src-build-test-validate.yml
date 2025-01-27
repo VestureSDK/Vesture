@@ -52,6 +52,7 @@ jobs:
           type: upload
 
   src-coverage:
+    if: '!cancelled()' 
     needs: src-test
     name: Coverage
     runs-on: ubuntu-24.04

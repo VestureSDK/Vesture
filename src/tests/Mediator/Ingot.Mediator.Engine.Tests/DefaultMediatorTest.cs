@@ -94,7 +94,10 @@ namespace Ingot.Mediator.Engine.Tests
 
             MiddlewareItems.Add(item);
         }
-
+        [Test]
+        public void A(){
+            Assert.Fail("fail me");
+        }
         [Test]
         public void Ctor_ArgumentNullException_IfLoggerIsNull()
         {

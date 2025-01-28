@@ -10,16 +10,32 @@
 # Environment
 # ---------------------------------------
 
-function Ingot-IsOnGitHub {
-    return Test-Path env:GITHUB_ACTIONS;
+# Synposis: Adds an execution environment to '$script:ExecutionEnvironments'
+function Add-ExecutionEnvironment {
+    
+    param (
+        $Name,
+        $Enabled
+    )
+
+    $executionEnvironment = [pscustomobject]@{
+        Name = $Name;
+        Enabled = $Enabled;
+    };
+
+    $script:ExecutionEnvironments += @($executionEnvironment);
 }
 
 function Ingot-IsOnCi {
-    return ((Test-Path env:CI) -or (Ingot-IsOnGitHub));
+    return Test-Path env:CI;
 }
 
 function Ingot-IsOnLocal {
     return -Not (Ingot-IsOnCi);
+}
+
+function Test-Shell-Is-Pwsh {
+    return ($PSVersionTable.PSEdition -eq "Core");
 }
 
 # ---------------------------------------

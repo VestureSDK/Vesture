@@ -24,8 +24,26 @@ param(
     [bool] $Force = $False
 )
 
-# Imports other ps1 files
+# ***************************************
+# 
+#
+#      Shell and Script Setup
+# 
+#
+# ***************************************
+
+# Imports helper file
 . "${BuildRoot}/build/ingot.ib.helpers.ps1";
+
+# Set output rendering to use ANSI code
+if ($PsStyle)
+{
+    $PsStyle.OutputRendering = "Ansi";
+}
+
+# Adds the default execution environments
+Add-ExecutionEnvironment -Name "Local" -Enabled $(Ingot-IsOnLocal);
+Add-ExecutionEnvironment -Name "CI" -Enabled $(Ingot-IsOnCi);
 
 # ***************************************
 # 
@@ -151,25 +169,6 @@ function Ingot-GenerateCodeCoverageReport
 # ***************************************
 # 
 #
-#           Shell Setup
-# 
-#
-# ***************************************
-
-# Set output rendering to use ANSI code
-if ($PsStyle)
-{
-    $PsStyle.OutputRendering = "Ansi";
-}
-
-# Helper variables
-$pwshPsEdition = "Core";
-$pwshCommand = "pwsh";
-$pwshLabel = "PowerShell Core (${pwshCommand})";
-
-# ***************************************
-# 
-#
 #           Invoke Build Hooks
 # 
 #
@@ -180,79 +179,36 @@ Enter-Build {
     # Prints environment information
     Ingot-Write-StepStart "Detecting exection environment..."
     
-    Ingot-Write-Build -Color DarkGray (
-        "Environment Detection:`n" +
-        "----------------------------------"
-    )
-
-    if (Ingot-IsOnLocal)
-    {
-        Ingot-Write-Build -Color Green "`u{2713} .......... Local Environment";
-    }
-    else
-    {
-        Ingot-Write-Build -Color Gray "`u{25A2} ........... Local Environment";
-    }
-
-    if (Ingot-IsOnCi)
-    {
-        Ingot-Write-Build -Color Green "`u{2713} .............. CI Environment";
-    }
-    else
-    {
-        Ingot-Write-Build -Color Gray  "`u{25A2} .............. CI Environment";
-    }
-
-    if (Ingot-IsOnGitHub)
-    {
-        Ingot-Write-Build -Color Green "`u{2713} .. GitHub Actions Environment";
-    }
-    else
-    {
-        Ingot-Write-Build -Color Gray  "`u{25A2} .. GitHub Actions Environment";
-    }
-
-    Ingot-Write-Build -Color DarkGray (
-        "----------------------------------"
-    )
-
-    if (Ingot-IsOnCi)
-    {
-        Ingot-Write-StepEnd-Warning "CI environment detected. Specific local tasks will be skipped."
-    }
-    else
-    {
-        Ingot-Write-StepEnd-Warning "Local environment detected. Specific CI tasks will be skipped."
-    }
+    $script:ExecutionEnvironments | Format-Table;
     
     # Warns the user the setup is not finished if they
     # have not restarted their program with pwsh as default shell
     if (-Not ($BuildTask -eq "setup"))
     {
-        Ingot-Write-StepStart "Detecting use of ${pwshLabel}..."
+        Ingot-Write-StepStart "Detecting use of PowerShell Core (pwsh)..."
 
-        if (-Not ($PSVersionTable.PSEdition -eq $pwshPsEdition))
+        if (-Not (Test-Shell-Is-Pwsh))
         {
             if (Ingot-IsOnCi)
             {
                 throw Ingot-Error (
-                    "${pwshLabel} enabled but not active`n" +
+                    "PowerShell Core (pwsh) enabled but not active`n" +
                     "To ensure consistency between all environment, you must use`n" +
-                    "Invoke-Build with ${pwshLabel} either by using --pwsh option`n" +
+                    "Invoke-Build with PowerShell Core (pwsh) either by using --pwsh option`n" +
                     "or by setting environment variable 'pwsh=pwsh'"
                 );
             }
             else
             {
                 Ingot-Write-StepEnd-Warning (
-                    "${pwshLabel} enabled but not active`n" +
+                    "PowerShell Core (pwsh) enabled but not active`n" +
                     "Ensure to refresh environment variables by restarting your program"
                 );
             }
         }
         else
         {
-            Ingot-Write-StepEnd-Success "${pwshLabel} in use";
+            Ingot-Write-StepEnd-Success "PowerShell Core (pwsh) in use";
         }
     }
 
@@ -296,49 +252,84 @@ Exit-Build {
 #
 # ***************************************
 
+# Setup
+# ---------------------------------------
 # Synopsis: Runs the initial setup for the repo
 task setup `
-    ci-github-setup, `
-    tool-ib-setup, `
-    tool-nuget-setup, `
-    tool-minver-validate
+    ci-setup-before, `
+    ?ci-setup, `
+    ci-setup-finally
 
+# Full
+# ---------------------------------------
 # Synopsis: full flow (format > build > test > coverage > publish)
 task full `
     format, `
-    src-linter, `
-    src-build, `
-    src-test, `
-    src-coverage, `
+    linter, `
+    build, `
+    test, `
+    coverage, `
     publish
-
+    
+# IDE
+# ---------------------------------------
 # Synopsis: Opens ./src/Ingot.sln in Visual Studio
 task ide `
     tool-visual-studio-open
 
+# Format
+# ---------------------------------------
 # Synopsis: Format source code
 task format `
     src-format
 
+# Linter
+# ---------------------------------------
+# Synopsis: Format source code
+task linter `
+    ci-linter-before, `
+    ?ci-linter, `
+    ci-linter-finally
+
+# Build
+# ---------------------------------------
 # Synopsis: Builds source code
 task build `
-    src-build
+    ci-build-before, `
+    ?ci-build, `
+    ci-build-finally
 
+# Test
+# ---------------------------------------
 # Synopsis: Tests source code (build > test > coverage)
 task test `
-    build, `
-    src-test, `
-    src-coverage
+    ci-test-before, `
+    ?ci-test, `
+    ci-test-finally
 
+# Coverage
+# ---------------------------------------
+# Synopsis: Generates code coverage report
+task coverage `
+    ci-coverage-before, `
+    ?ci-coverage, `
+    ci-coverage-finally
+
+# Pack
+# ---------------------------------------
 # Synopsis: Packages source code
 task pack `
-    src-pack
+    ci-pack-before, `
+    ?ci-pack, `
+    ci-pack-finally
 
+# Publish
+# ---------------------------------------
 # Synopsis: Publishes packages (pack > publish)
 task publish `
-    pack, `
-    src-publish-local, `
-    src-publish-remote
+    ci-publish-before, `
+    ?ci-publish, `
+    ci-publish-finally
 
 # ***************************************
 # 
@@ -349,140 +340,69 @@ task publish `
 # ***************************************
 
 # ---------------------------------------
-# CI Tasks
+# Flow Tasks
 # ---------------------------------------
 
-# Synopsis: [Specific] GitHub actions specific setup
-task ci-github-setup -If (Ingot-IsOnGitHub) {
+# Setup
+# ---------------------------------------
+task ci-setup-before -If($False) { }
+task ci-setup-finally -If($False) { }
 
-    # Ensures when running in containers 
-    # the ownership is not dubious
-    Ingot-Write-StepStart "Adding Ingot to git safe directories...";
-        
-    Ingot-Write-Debug "Ensuring root directory '${BuildRoot}' is a git repository...";
-    if (-Not (Test-Path "${BuildRoot}/.git"))
-    {
-        Write-Error "Root directory '${BuildRoot}' is not a git repository";
-    }
-    Ingot-Write-Info "Root directory '${BuildRoot}' is a git repository";
+task ci-setup `
+    tool-ib-setup, `
+    tool-nuget-setup, `
+    tool-minver-validate, `
+    src-restore
 
-    Ingot-Write-Debug "Invoking 'git' to add root directory '${BuildRoot}' to git safe directories...";
-    exec { git config --global --add safe.directory $BuildRoot }
-    Ingot-Write-Info "Added root directory '${BuildRoot}' to git safe directories";
-
-    Ingot-Write-StepEnd-Success "Successfully added Ingot to git safe directories";
-
-    # Installs dotnet-trx to benefit from test results PR 
-    # and summary within GitHub Actions directly
-    Ingot-Write-StepStart "Installing 'trx'...";
+# Linter
+# ---------------------------------------
+task ci-linter-before -If($False) { }
+task ci-linter-finally -If($False) { }
     
-    Ingot-Write-Debug "Invoking 'dotnet tool' to install 'dotnet-trx'...";
-    exec { dotnet tool install --local dotnet-trx }
-    Ingot-Write-Info "Successfully installed 'dotnet-trx' in 'dotnet tool'";
+task ci-linter `
+    src-linter
 
-    Ingot-Write-Debug "Invoking 'trx' to validate installation...";
-    exec { dotnet trx --version }
-    Ingot-Write-Info "Successfully invoked 'trx'";
+# Linter
+# ---------------------------------------
+task ci-build-before -If($False) { }
+task ci-build-finally -If($False) { }
 
-    Ingot-Write-StepEnd-Success "Successfully installed 'trx'";
+task ci-build `
+    src-build
+
+# Test
+# ---------------------------------------
+task ci-test-before -If($False) { }
+task ci-test-finally -If($False) { }
+
+task ci-test `
+    src-test
     
-    # dotnet-trx depends on gh to post the PR comments
-    Ingot-Write-StepStart "Installing 'gh'...";
-    
-    Ingot-Write-Debug "Invoking 'apt-get' to install 'gh'...";
-    exec { apt-get update -qq; apt-get install gh -qq }
-    Ingot-Write-Info "Successfully installed 'gh' via 'apt-get'";
+# Coverage
+# ---------------------------------------
+task ci-coverage-before -If($False) { }
+task ci-coverage-finally -If($False) { }
 
-    Ingot-Write-Debug "Invoking 'gh' to validate installation...";
-    exec { gh --version }
-    Ingot-Write-Info "Successfully invoked 'gh'";
+task ci-coverage `
+    src-coverage
 
-    Ingot-Write-StepEnd-Success "Successfully installed 'gh'";
+# Pack
+# ---------------------------------------
+task ci-pack-before -If($False) { }
+task ci-pack-finally -If($False) { }
 
-    # To ease handling of configuration within GitHub
-    # actions, the configuration of this invoke-build
-    # is exposed via environment variables to be re-used
-    # within the .yml workflow or action files
-    Ingot-GitHub-AppendMissingVariable -Key "INGOT_DOTNETVERBOSITY" -Value $DotnetVerbosity;
-    Ingot-GitHub-AppendMissingVariable -Key "INGOT_BUILDCONFIGURATION" -Value $BuildConfiguration;
-    Ingot-GitHub-AppendMissingVariable -Key "INGOT_SRCDIRECTORY" -Value $SrcDirectory;
-    Ingot-GitHub-AppendMissingVariable -Key "INGOT_SRCRELEASEGLOB" -Value "./**/bin/*";
-    Ingot-GitHub-AppendMissingVariable -Key "INGOT_NUPKGDIRECTORY" -Value $NupkgDirectory;
-    Ingot-GitHub-AppendMissingVariable -Key "INGOT_NUPKGGLOB" -Value "./**/*.nupkg";
-    
-    Ingot-GitHub-AppendMissingVariable -Key "INGOT_TESTRESULTDIRECTORY" -Value $TestResultDirectory;
-    Ingot-GitHub-AppendMissingVariable -Key "INGOT_TESTRESULTGLOB" -Value "**/test-result/*";
+task ci-pack `
+    src-pack
 
-    Ingot-GitHub-AppendMissingVariable -Key "INGOT_COVERAGEDIRECTORY" -Value $TestCoverageDirectory;
-    Ingot-GitHub-AppendMissingVariable -Key "INGOT_COVERAGEGLOB" -Value "**/test-coverage/*";
+# Publish
+# ---------------------------------------
+task ci-publish-before -If($False) { }
+task ci-publish-finally -If($False) { }
 
-    # Set GitHub specific MinVer config
-    Ingot-GitHub-AppendMissingVariable -Key "MinVerDefaultPreReleaseIdentifiers" -Value "alpha.0.$($env:GITHUB_RUN_ID).$($env:GITHUB_RUN_NUMBER)";
-}
-
-# Synopsis: [Specific] GitHub actions test result summary
-task ci-github-src-test-result-summary -If (Ingot-IsOnGitHub) {
-
-    Ingot-Write-StepStart "Adding test results to GitHub action summary...";
-
-    Ingot-Write-Debug "Ensuring GitHub action summary file exists...";
-    if ((-Not ($env:GITHUB_STEP_SUMMARY)) -Or (-Not (Test-Path $env:GITHUB_STEP_SUMMARY)))
-    {
-        throw Ingot-Error (
-            "GitHub action summary file '$($env:GITHUB_STEP_SUMMARY)' not found`n" +
-            "or GITHUB_STEP_SUMMARY environment variable undefined"
-        );
-    }
-    Ingot-Write-Info "GitHub action summary file exists '$($env:GITHUB_STEP_SUMMARY)'";
-
-    Ingot-Write-Debug "Getting GitHub action summary before invoking 'trx'...";
-    $actionSummaryContent = Get-Content $env:GITHUB_STEP_SUMMARY -Raw;
-    Ingot-Write-FileContent -File $env:GITHUB_STEP_SUMMARY -Content $actionSummaryContent;
-
-    Ingot-Write-Debug "Invoking 'trx' to publish test results...";
-    exec { dotnet trx --path $TestResultDirectory }
-    Ingot-Write-Info "Successfully invoked 'trx' to publish test results";
-
-    Ingot-Write-Debug "Getting GitHub action summary after invoking 'trx'...";
-    $actionSummaryContentAfter = Get-Content $env:GITHUB_STEP_SUMMARY -Raw;
-    Ingot-Write-FileContent -File $env:GITHUB_STEP_SUMMARY -Content $actionSummaryContentAfter;
-
-    if ($actionSummaryContent -eq $actionSummaryContentAfter)
-    {
-        throw Ingot-Error "GitHub action summary not updated with test results summary"
-    }
-
-    Ingot-Write-StepEnd-Success "Successfully added test results to GitHub action summary";
-}
-
-# Synopsis: [Specific] GitHub actions code coverage summary
-task ci-github-src-coverage-summary -If (Ingot-IsOnGitHub) {
-
-    $reportType = "MarkdownSummaryGithub";
-
-    Ingot-GenerateCodeCoverageReport -ReportType $reportType;
-    
-    Ingot-Write-StepStart "Adding code coverage report to GitHub action summary...";
-
-    Ingot-Write-Debug "Ensuring GitHub action summary file exists...";
-    if ((-Not ($env:GITHUB_STEP_SUMMARY)) -Or (-Not (Test-Path $env:GITHUB_STEP_SUMMARY)))
-    {
-        throw Ingot-Error (
-            "GitHub action summary file '$($env:GITHUB_STEP_SUMMARY)' not found`n" +
-            "or GITHUB_STEP_SUMMARY environment variable undefined"
-        );
-    }
-    Ingot-Write-Info "GitHub action summary file exists '$($env:GITHUB_STEP_SUMMARY)'";
-
-    $testCoverageReportDirectory = Ingot-Get-CodeCoverageReport-DirectoryPath -ReportType $reportType;
-    $testCoverageReportFile = "${testCoverageReportDirectory}/SummaryGithub.md";
-    
-    $markdownSummaryContent = Get-Content $testCoverageReportFile -Raw;
-    Ingot-Write-FileContent -File $testCoverageReportFile -Content $markdownSummaryContent;
-    echo "${markdownSummaryContent}" >> $env:GITHUB_STEP_SUMMARY
-    
-    Ingot-Write-StepEnd-Success "Successfully added code coverage report to GitHub action summary";
-}
+task ci-publish `
+    src-pack-validate, `
+    src-publish-local, `
+    src-publish-remote
 
 # ---------------------------------------
 # Tools Tasks
@@ -494,11 +414,11 @@ task tool-ib-setup -If(-Not (Ingot-IsOnCi)) {
     # Enable PowerShell Core usage to ensure 
     # users benefit from modern features and
     # consistent experience accross platforms
-    Ingot-Write-StepStart "Enabling use of ${pwshLabel}...";
+    Ingot-Write-StepStart "Enabling use of PowerShell Core (pwsh)...";
     
-    if ($PSVersionTable.PSEdition -eq $pwshPsEdition)
+    if (Test-Shell-Is-Pwsh)
     {
-        Ingot-Write-StepEnd-Success "${pwshLabel} already enabled";
+        Ingot-Write-StepEnd-Success "PowerShell Core (pwsh) already enabled";
     }
     else
     {
@@ -515,30 +435,30 @@ task tool-ib-setup -If(-Not (Ingot-IsOnCi)) {
         if ($pwshEnv -eq $pwshEnvValue)
         {
             Ingot-Write-StepEnd-Warning (
-                "${pwshLabel} enabled but not active. `n" +
+                "PowerShell Core (pwsh) enabled but not active. `n" +
                 "Ensure to refresh environment variables by restarting your program."
             );
         }
         else
         {
-            Ingot-Write-Debug "Checking ${pwshLabel} availability locally...";
-            if (Get-Command $pwshCommand -errorAction SilentlyContinue)
+            Ingot-Write-Debug "Checking PowerShell Core (pwsh) availability locally...";
+            if (Get-Command "pwsh" -errorAction SilentlyContinue)
             {
-                Ingot-Write-Debug "${pwshLabel} is available locally";
+                Ingot-Write-Debug "PowerShell Core (pwsh) is available locally";
 
                 Ingot-Write-Debug "Setting environment variable '${pwshEnvKey}=${pwshEnvValue}' on scope ${pwshEnvScope}...";
                 [System.Environment]::SetEnvironmentVariable($pwshEnvKey, $pwshEnvValue, $pwshEnvScope);
                 
                 Ingot-Write-StepEnd-Warning (
-                    "${pwshLabel} enabled but not active. `n" +
+                    "PowerShell Core (pwsh) enabled but not active. `n" +
                     "Ensure to refresh environment variables by restarting your program."
                 );
             }
             else
             {
                 Ingot-Write-StepEnd-Warning ( 
-                    "${pwshLabel} not available in your system. `n" +
-                    "You should install ${pwshLabel} to ensure consistent experience across different platforms and on the CI.`n" +
+                    "PowerShell Core (pwsh) not available in your system. `n" +
+                    "You should install PowerShell Core (pwsh) to ensure consistent experience across different platforms and on the CI.`n" +
                     "See https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows " +
                     "for more details on how to install PowerShell Core."
                 );
@@ -695,7 +615,7 @@ task src-format {
     Ingot-Write-Info "Successfully invoked 'csharpier' on source directory '${SrcDirectory}";
 
     Ingot-Write-StepEnd-Success "Successfully formatted source code";
-}
+}, src-linter
 
 # Synopsis: [Specific] Runs csharpier as a linter to validate the formatting of the ./src files
 task src-linter {
@@ -738,8 +658,9 @@ task src-build-validate {
 }
 
 # Synopsis: [Specific] Builds the ./src code
-task src-build src-restore, {
-    
+task src-build `
+    src-restore, `
+{
     Ingot-Write-StepStart "Building '${BuildConfiguration}' source...";
 
     Ingot-Write-Debug "Invoking 'dotnet build' to build '${SrcDirectory}' with configuration '${BuildConfiguration}'...";
@@ -747,7 +668,8 @@ task src-build src-restore, {
     Ingot-Write-Info "Successfully invoked 'dotnet build' to build '${SrcDirectory}' with configuration '${BuildConfiguration}'";
 
     Ingot-Write-StepEnd-Success "Successfully built '${BuildConfiguration}' source";
-}, src-build-validate
+}, `
+    src-build-validate
 
 # Synopsis: [Specific] Cleans the test result outputs
 task src-test-clean {
@@ -760,11 +682,12 @@ task src-test-clean {
 }
 
 # Synopsis: [Specific] Tests the built ./src code
-task src-test src-test-clean, src-coverage-clean, src-build-validate, src-restore, ?src-test-core, src-test-finally
-
-# Synopsis: [Specific] Core task of task flow src-test
-task src-test-core {
-
+task src-test `
+    src-test-clean, 
+    src-coverage-clean, `
+    src-build-validate, `
+    src-restore, `
+{
     # Allows to fail the build even if some
     # tasks in the flow are allowed to fail
     # to continue subsequent tasks
@@ -845,9 +768,6 @@ task src-test-core {
 
 }
 
-# Synopsis: [Specific] Finally task of task flow src-test
-task src-test-finally ci-github-src-test-result-summary
-
 # Synopsis: [Specific] Cleans the code coverage outputs
 task src-coverage-clean {
 
@@ -880,7 +800,7 @@ task src-coverage {
 
     Ingot-GenerateCodeCoverageReport -ReportType "Html";
     Ingot-GenerateCodeCoverageReport -ReportType "JsonSummary";
-}, ci-github-src-coverage-summary
+}
 
 # Synopsis: [Specific] Cleans the nuget output folder
 task src-pack-clean {
@@ -951,18 +871,25 @@ task src-pack-validate {
 }
 
 # Synopsis: [Specific] Packages the built ./src code into nuget packages *.nupkg
-task src-pack src-build-validate, src-restore, src-pack-clean, {
+task src-pack `
+    src-build-validate, `
+    src-restore, `
+    src-pack-clean, `
+{
     
     Write-Build Magenta "Creating nuget packages...`n";
 
     Write-Build DarkGray "Invoking dotnet pack on source directory (${SrcDirectory})...";
     exec { dotnet pack $SrcDirectory --no-build --output $NupkgDirectory --verbosity $DotnetVerbosity }
 
-}, src-pack-validate
+}, `
+    src-pack-validate
 
 # Synopsis: [Specific] Publishes the packaged *.nupkg to a local feed
-task src-publish-local -If(-Not (Ingot-IsOnCi)) tool-nuget-setup, src-pack-validate, {
-
+task src-publish-local -If(-Not (Ingot-IsOnCi)) `
+    tool-nuget-setup, `
+    src-pack-validate, `
+{
     Write-Build Magenta "Retrieving nuget local push source...`n";
 
     Write-Build DarkGray "Invoking dotnet nuget config to get 'defaultPushSource'";
@@ -1008,8 +935,9 @@ task src-publish-local -If(-Not (Ingot-IsOnCi)) tool-nuget-setup, src-pack-valid
 }
 
 # Synopsis: [Specific] Publishes the packaged *.nupkg to a remote feed
-task src-publish-remote -If(($NupkgPushSource) -And ($NupkgPushApiKey)) src-pack-validate, {
-    
+task src-publish-remote -If(($NupkgPushSource) -And ($NupkgPushApiKey)) `
+    src-pack-validate, `
+{    
     Write-Build Magenta "Pushing nuget packages to ${NupkgPushSource}...`n";
 
     Write-Build DarkGray "Invoking dotnet nuget push for nuget directory (${NupkgDirectory}) to source ${NupkgPushSource}...";
@@ -1033,3 +961,6 @@ task Docs-Serve {
 }
 
 task Docs Docs-Clean, Docs-Build, Docs-Serve
+
+# Imports extension files
+. "${BuildRoot}/build/ingot.ib.github.ps1";

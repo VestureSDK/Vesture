@@ -43,6 +43,8 @@ jobs:
       discussions: write
       contents: read
       statuses: read
+      issues: read
+      checks: write
     steps:
       - uses: stfbln/ingot/.github/actions/ingot-setup@main
         name: Setup

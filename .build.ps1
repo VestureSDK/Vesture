@@ -177,7 +177,7 @@ function Ingot-GenerateCodeCoverageReport
 Enter-Build {
 
     # Prints environment information
-    Ingot-Write-StepStart "Detecting exection environment..."
+    Ingot-Write-StepStart "Detecting execution environment..."
     
     $script:ExecutionEnvironments | Format-Table;
     
@@ -262,13 +262,14 @@ task setup `
 
 # Full
 # ---------------------------------------
-# Synopsis: full flow (format > build > test > coverage > publish)
+# Synopsis: full flow (format > linter >build > test > coverage > pack > publish)
 task full `
     format, `
     linter, `
     build, `
     test, `
     coverage, `
+    pack, `
     publish
     
 # IDE
@@ -325,7 +326,7 @@ task pack `
 
 # Publish
 # ---------------------------------------
-# Synopsis: Publishes packages (pack > publish)
+# Synopsis: Publishes packages either locally or remotely if you specify ApiKey and Source
 task publish `
     ci-publish-before, `
     ?ci-publish, `
@@ -340,64 +341,63 @@ task publish `
 # ***************************************
 
 # ---------------------------------------
-# Flow Tasks
+# CI Tasks
 # ---------------------------------------
 
 # Setup
 # ---------------------------------------
-task ci-setup-before -If($False) { }
-task ci-setup-finally -If($False) { }
+task ci-setup-before -If($False)
+task ci-setup-finally -If($False) 
 
 task ci-setup `
     tool-ib-setup, `
     tool-nuget-setup, `
-    tool-minver-validate, `
-    src-restore
+    tool-minver-validate
 
 # Linter
 # ---------------------------------------
-task ci-linter-before -If($False) { }
-task ci-linter-finally -If($False) { }
+task ci-linter-before -If($False) 
+task ci-linter-finally -If($False) 
     
 task ci-linter `
     src-linter
 
 # Linter
 # ---------------------------------------
-task ci-build-before -If($False) { }
-task ci-build-finally -If($False) { }
+task ci-build-before -If($False) 
+task ci-build-finally -If($False) 
 
 task ci-build `
     src-build
 
 # Test
 # ---------------------------------------
-task ci-test-before -If($False) { }
-task ci-test-finally -If($False) { }
+task ci-test-before -If($False) 
+task ci-test-finally -If($False) 
 
 task ci-test `
     src-test
     
 # Coverage
 # ---------------------------------------
-task ci-coverage-before -If($False) { }
-task ci-coverage-finally -If($False) { }
+task ci-coverage-before -If($False) 
+task ci-coverage-finally -If($False) 
 
 task ci-coverage `
     src-coverage
 
 # Pack
 # ---------------------------------------
-task ci-pack-before -If($False) { }
-task ci-pack-finally -If($False) { }
+task ci-pack-before -If($False) 
+task ci-pack-finally -If($False) 
 
 task ci-pack `
     src-pack
 
 # Publish
 # ---------------------------------------
-task ci-publish-before -If($False) { }
-task ci-publish-finally -If($False) { }
+task ci-publish-before -If($False) 
+task ci-publish-finally -If($False) 
 
 task ci-publish `
     src-pack-validate, `

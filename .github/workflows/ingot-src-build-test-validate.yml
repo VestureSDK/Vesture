@@ -84,7 +84,7 @@ jobs:
   src-coverage:
     needs: src-test
     if: ${{ !cancelled() && (needs.src-test.result == 'success' || needs.src-test.result == 'failure') }}
-    name: Coverage
+    name: Coverage Report
     runs-on: ubuntu-24.04
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     timeout-minutes: 3

@@ -109,33 +109,6 @@ task ci-github-setup -If (Ingot-IsOnGitHub) {
 
     Ingot-Write-StepEnd-Success "Successfully added Ingot to git safe directories";
 
-    # Installs dotnet-trx to benefit from test results PR 
-    # and summary within GitHub Actions directly
-    Ingot-Write-StepStart "Installing 'trx'...";
-    
-    Ingot-Write-Debug "Invoking 'dotnet tool' to install 'dotnet-trx'...";
-    exec { dotnet tool install --local dotnet-trx }
-    Ingot-Write-Info "Successfully installed 'dotnet-trx' in 'dotnet tool'";
-
-    Ingot-Write-Debug "Invoking 'trx' to validate installation...";
-    exec { dotnet trx --version }
-    Ingot-Write-Info "Successfully invoked 'trx'";
-
-    Ingot-Write-StepEnd-Success "Successfully installed 'trx'";
-    
-    # dotnet-trx depends on gh to post the PR comments
-    Ingot-Write-StepStart "Installing 'gh'...";
-    
-    Ingot-Write-Debug "Invoking 'apt-get' to install 'gh'...";
-    exec { apt-get update -qq; apt-get install gh -qq }
-    Ingot-Write-Info "Successfully installed 'gh' via 'apt-get'";
-
-    Ingot-Write-Debug "Invoking 'gh' to validate installation...";
-    exec { gh --version }
-    Ingot-Write-Info "Successfully invoked 'gh'";
-
-    Ingot-Write-StepEnd-Success "Successfully installed 'gh'";
-
     # To ease handling of configuration within GitHub
     # actions, the configuration of this invoke-build
     # is exposed via environment variables to be re-used
@@ -155,41 +128,6 @@ task ci-github-setup -If (Ingot-IsOnGitHub) {
 
     # Set GitHub specific MinVer config
     Ingot-GitHub-AppendMissingVariable -Key "MinVerDefaultPreReleaseIdentifiers" -Value "alpha.0.$($env:GITHUB_RUN_ID).$($env:GITHUB_RUN_NUMBER)";
-}
-
-# Synopsis: [Specific] GitHub actions test result summary
-task ci-github-src-test-result-summary -If (Ingot-IsOnGitHub) {
-
-    Ingot-Write-StepStart "Adding test results to GitHub action summary...";
-
-    Ingot-Write-Debug "Ensuring GitHub action summary file exists...";
-    if ((-Not ($env:GITHUB_STEP_SUMMARY)) -Or (-Not (Test-Path $env:GITHUB_STEP_SUMMARY)))
-    {
-        throw Ingot-Error (
-            "GitHub action summary file '$($env:GITHUB_STEP_SUMMARY)' not found`n" +
-            "or GITHUB_STEP_SUMMARY environment variable undefined"
-        );
-    }
-    Ingot-Write-Info "GitHub action summary file exists '$($env:GITHUB_STEP_SUMMARY)'";
-
-    Ingot-Write-Debug "Getting GitHub action summary before invoking 'trx'...";
-    $actionSummaryContent = Get-Content $env:GITHUB_STEP_SUMMARY -Raw;
-    Ingot-Write-FileContent -File $env:GITHUB_STEP_SUMMARY -Content $actionSummaryContent;
-
-    Ingot-Write-Debug "Invoking 'trx' to publish test results...";
-    exec { dotnet trx --path $TestResultDirectory }
-    Ingot-Write-Info "Successfully invoked 'trx' to publish test results";
-
-    Ingot-Write-Debug "Getting GitHub action summary after invoking 'trx'...";
-    $actionSummaryContentAfter = Get-Content $env:GITHUB_STEP_SUMMARY -Raw;
-    Ingot-Write-FileContent -File $env:GITHUB_STEP_SUMMARY -Content $actionSummaryContentAfter;
-
-    if ($actionSummaryContent -eq $actionSummaryContentAfter)
-    {
-        throw Ingot-Error "GitHub action summary not updated with test results summary"
-    }
-
-    Ingot-Write-StepEnd-Success "Successfully added test results to GitHub action summary";
 }
 
 # Synopsis: [Specific] GitHub actions code coverage summary
@@ -228,10 +166,6 @@ task ci-github-src-coverage-summary -If (Ingot-IsOnGitHub) {
 # Setup
 # ---------------------------------------
 task ci-setup-before ci-github-setup
-
-# Test
-# ---------------------------------------
-task ci-test-finally ci-github-src-test-result-summary
 
 # Coverage
 # ---------------------------------------

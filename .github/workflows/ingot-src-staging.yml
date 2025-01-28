@@ -34,7 +34,7 @@ jobs:
 
   build-test-validate:
     name: Source
-    uses: stfbln/ingot/.github/workflows/ingot-src-build-test-validate.yml@add-code-coverage
+    uses: stfbln/ingot/.github/workflows/ingot-src-build-test-validate.yml@main
 
   src-publish-feedz:
     needs:

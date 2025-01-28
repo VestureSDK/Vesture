@@ -9,6 +9,14 @@ param(
 
     [string] $NupkgDirectory = './dist/nuget',
 
+    [string] $TestResultDirectory = './dist/test-result',
+
+    [string] $TestCoverageDirectory = './dist/test-coverage',
+
+    [string] $TestCoverageCoberturaFileName = 'test-result.cobertura.coverage',
+
+    [string] $TestCoverageReportDirectory = './dist/test-coverage/report',
+
     [string] $NupkgPushSource,
     
     [string] $NupkgPushApiKey,
@@ -19,32 +27,35 @@ param(
 # ***************************************
 # 
 #
+#      Shell and Script Setup
+# 
+#
+# ***************************************
+
+# Imports helper file
+. "${BuildRoot}/build/ingot.ib.helpers.ps1";
+
+# Set output rendering to use ANSI code
+if ($PsStyle)
+{
+    $PsStyle.OutputRendering = "Ansi";
+}
+
+# Adds the default execution environments
+Add-ExecutionEnvironment -Name "Local" -Enabled $(Ingot-IsOnLocal);
+Add-ExecutionEnvironment -Name "CI" -Enabled $(Ingot-IsOnCi);
+
+# ***************************************
+# 
+#
 #           Functions
 # 
 #
 # ***************************************
 
-function Ingot-IsOnGitHub {
-    return Test-Path env:GITHUB_ACTIONS;
-}
-
-function Ingot-IsOnCi {
-    return ((Test-Path env:CI) -or (Ingot-IsOnGitHub));
-}
-
-function Ingot-PrintFileContent {
-
-    param (
-        $File,
-        $Content
-    )
-
-    Write-Build DarkGray (
-        "`n`nFile: ${File} `n" +
-        "----------- `n" +
-        ${Content} + "`n" +
-        "----------- `n`n");
-}
+# ---------------------------------------
+# Functional
+# ---------------------------------------
 
 function Ingot-GitHub-AppendMissingVariable {
 
@@ -53,51 +64,107 @@ function Ingot-GitHub-AppendMissingVariable {
         $Value
     )
 
+    Ingot-Write-StepStart "Appending Ingot environment variable '${Key}' to GitHub environment";
+
+    Ingot-Write-Debug "Ensuring GitHub environment file exists...";
+    if ((-Not ($env:GITHUB_ENV)) -Or (-Not (Test-Path $env:GITHUB_ENV)))
+    {
+        throw Ingot-Error (
+            "GitHub environment file '$($env:GITHUB_ENV)' not found`n" +
+            "or GITHUB_ENV environment variable undefined"
+        );
+    }
+    Ingot-Write-Info "GitHub environment file exists '$($env:GITHUB_ENV)'";
+    
+    $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw;
+    Ingot-Write-FileContent -File $env:GITHUB_ENV -Content $githubEnvironmentContent;
+
+    Ingot-Write-Debug "Checking if Ingot environment variable '${Key}' needs to be appended to GitHub environment";
     if(Test-Path "env:${Key}")
     {
-        Write-Build DarkGray "Variable ${Key} already available in GitHub environment";
+        Ingot-Write-Info "Ingot environment variable '${Key}' already present in GitHub environment";
     }
     else
     {
+        Ingot-Write-Info "Ingot environment variable '${Key}' is not present in GitHub environment";
+
         $kvp = "${Key}=${Value}";
-        Write-Build DarkGray "Appending ${kvp} to GitHub environment...";
-        echo "${kvp}" >> $env:GITHUB_ENV;
         
-        Write-Build DarkGray "Getting GitHub environment file content after append...";
+        Ingot-Write-Debug "Appending Ingot environment variable '${Key}' to GitHub environment...";
+        "${kvp}" >> $env:GITHUB_ENV;
+        Ingot-Write-Info "Appended Ingot environment variable '${Key}' to GitHub environment";
+
         $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw;
-        Ingot-PrintFileContent -File $env:GITHUB_ENV -Content $githubEnvironmentContent;
+        Ingot-Write-FileContent -File $env:GITHUB_ENV -Content $githubEnvironmentContent;
         
-        Write-Build DarkGray "Validating variable ${Key} append to GitHub environment...";
-        
+        Ingot-Write-Debug "Validating Ingot environment variable '${Key}' appended to GitHub environment...";
         if ($githubEnvironmentContent -Match $Key)
         {
-            Write-Build Green "Variable ${Key} appended successfully to GitHub environment";
+            Ingot-Write-StepEnd-Success "Successfully appended Ingot environment variable '${Key}' to GitHub environment";
         }
         else
         {
-            Write-Error "${Key} not found in GitHub environment"
+            throw Ingot-Error "Ingot environment variable '${Key}' not found in GitHub environment"
         }
     }
 }
 
-# ***************************************
-# 
-#
-#           Shell Setup
-# 
-#
-# ***************************************
+function Ingot-MergeCodeCoverage {
 
-# Set output rendering to use ANSI code
-if ($PsStyle)
-{
-    $PsStyle.OutputRendering = "Ansi";
+    param (
+        $OutputFormat,
+        $OutputFileName,
+        $TestCoverageFiles
+    )
+
+    Ingot-Write-StepStart "Merging tests code coverage files into 1 '${OutputFormat}' file...";
+    
+    Ingot-Create-Directory -Directory $TestCoverageDirectory;
+
+    $testCoverageMergedFile = "${TestCoverageDirectory}/${OutputFileName}";
+    Ingot-Write-Debug "Invoking 'dotnet-coverage' to merge $($TestCoverageFiles.Count) tests code coverage files`ninto '${testCoverageMergedFile}' with format '${OutputFormat}'...";
+    exec { dotnet dotnet-coverage merge --output $testCoverageMergedFile --output-format "${OutputFormat}" $TestCoverageFiles }
+    Ingot-Write-Info "Invoked successfully 'dotnet-coverage' to merge $($TestCoverageFiles.Count) tests code coverage files`ninto '${testCoverageMergedFile}' with format '${OutputFormat}'";
+
+    $directory = "${TestCoverageDirectory}";
+    $fileFilter = "${OutputFileName}";
+
+    Ingot-Write-FileLookup-Start -FileFilter $fileFilter -Directory $directory;
+    $codeCoverages = Get-ChildItem $directory -File -Recurse | Where-Object {$_.Name -like $fileFilter};
+    Ingot-Write-FileLookup-End -FileFilter $fileFilter -Directory $directory -Files $codeCoverages;
+            
+    Ingot-Ensure-FileLookup-NotEmpty -FileFilter $fileFilter -Directory $directory -Files $codeCoverages;
+
+    Ingot-Write-StepEnd-Success "Successfully merged tests code coverage files into 1 '${OutputFormat}' file";
 }
 
-# Helper variables
-$pwshPsEdition = "Core";
-$pwshCommand = "pwsh";
-$pwshLabel = "PowerShell Core (${pwshCommand})";
+function Ingot-Get-CodeCoverageReport-DirectoryPath {
+    
+    param (
+        $ReportType
+    )
+
+    $testCoverageCoberturaMergedFile = "${TestCoverageDirectory}/${TestCoverageCoberturaFileName}";
+    return "${TestCoverageReportDirectory}/${ReportType}";
+}
+
+function Ingot-GenerateCodeCoverageReport
+{
+    param (
+        $ReportType
+    )
+    
+    Ingot-Write-StepStart "Creating code coverage report '${ReportType}'...";
+
+    $testCoverageCoberturaMergedFile = "${TestCoverageDirectory}/${TestCoverageCoberturaFileName}";
+    $testCoverageReportAssemblyFilter = "-*.Mocks;-*.Tests;-*.Testing.*";
+
+    $testCoverageReportFileDirectory = Ingot-Get-CodeCoverageReport-DirectoryPath -ReportType $ReportType;
+    Write-Build DarkGray "Invoking 'reportgenerator' to create '${ReportType}' code coverage report`nin ${testCoverageReportFileDirectory}...";
+    exec { dotnet reportgenerator -reports:$testCoverageCoberturaMergedFile -targetdir:$testCoverageReportFileDirectory -reporttypes:"${ReportType}" -assemblyfilters:"${testCoverageReportAssemblyFilter}" }
+
+    Ingot-Write-StepEnd-Success "Successfully created code coverage report '${ReportType}'";
+}
 
 # ***************************************
 # 
@@ -109,49 +176,71 @@ $pwshLabel = "PowerShell Core (${pwshCommand})";
 
 Enter-Build {
 
+    # Prints environment information
+    Ingot-Write-StepStart "Detecting execution environment..."
+    
+    $script:ExecutionEnvironments | Format-Table;
+    
     # Warns the user the setup is not finished if they
     # have not restarted their program with pwsh as default shell
     if (-Not ($BuildTask -eq "setup"))
     {
-        if (-Not ($PSVersionTable.PSEdition -eq $pwshPsEdition))
+        Ingot-Write-StepStart "Detecting use of PowerShell Core (pwsh)..."
+
+        if (-Not (Test-Shell-Is-Pwsh))
         {
             if (Ingot-IsOnCi)
             {
-                Write-Error (
-                    "`n---------------------------------------------------------------------- `n" +
-                    "${pwshLabel} enabled but not active. `n" +
+                throw Ingot-Error (
+                    "PowerShell Core (pwsh) enabled but not active`n" +
                     "To ensure consistency between all environment, you must use`n" +
-                    "Invoke-Build with ${pwshLabel} either by using --pwsh option`n" +
-                    "or by setting environment variable 'pwsh=pwsh' .`n" +
-                    "---------------------------------------------------------------------- `n"
+                    "Invoke-Build with PowerShell Core (pwsh) either by using --pwsh option`n" +
+                    "or by setting environment variable 'pwsh=pwsh'"
                 );
             }
             else
             {
-                Write-Build Yellow (
-                    "---------------------------------------------------------------------- `n" +
-                    "WARNING: ${pwshLabel} enabled but not active. `n" +
-                    "Ensure to refresh environment variables by restarting your program. `n" +
-                    "---------------------------------------------------------------------- `n"
+                Ingot-Write-StepEnd-Warning (
+                    "PowerShell Core (pwsh) enabled but not active`n" +
+                    "Ensure to refresh environment variables by restarting your program"
                 );
             }
         }
+        else
+        {
+            Ingot-Write-StepEnd-Success "PowerShell Core (pwsh) in use";
+        }
     }
 
-    # Set MinVer default configuration
-    $env:MinVerDefaultPreReleaseIdentifiers = "alpha.0";
+    Write-Build DarkGray "";
+}
+
+Enter-BuildJob {
     
-    if (Ingot-IsOnGitHub)
+    # Allows for nicer output
+    Write-Build DarkGray "";
+}
+
+Exit-BuildJob {
+    
+    # Allows for nicer output
+    Write-Build DarkGray "";
+}
+
+Exit-Build {
+
+    if ($propagateErrorsToBuild -And (-Not (${*}.Errors.Count -eq 0)))
     {
-        Write-Build Cyan (
-            "---------------------------------------------------------------------- `n" +
-            "INFO: GitHub actions context detected.`n" +
-            "GitHub specific behaviors are enabled.`n" +
-            "---------------------------------------------------------------------- `n"
-        )
-        
-        # Set MinVer configuration specifically for GitHub
-        $env:MinVerDefaultPreReleaseIdentifiers = "alpha.0.$($env:GITHUB_RUN_ID).$($env:GITHUB_RUN_NUMBER)";
+        $msg = ("`n`nTask flow '${BuildTask}' is not allowed to failed and encountered some errors");
+        ${*}.Errors | ForEach-Object -Process {
+            $msg += "`n----------------------------------------------------------------------`n"
+            $msg += "`n'$($_.Task.Name)':`n" +
+            "$($_.Error)";
+        }
+
+        $msg += "`n----------------------------------------------------------------------`n"
+        Ingot-Write-Build -Color Red -Content $msg;
+        Write-Error "Task flow '${BuildTask}' failed";
     }
 }
 
@@ -163,29 +252,85 @@ Enter-Build {
 #
 # ***************************************
 
+# Setup
+# ---------------------------------------
 # Synopsis: Runs the initial setup for the repo
-task setup ci-github-setup, tool-ib-setup, tool-nuget-setup, tool-minver-validate
+task setup `
+    ci-setup-before, `
+    ?ci-setup, `
+    ci-setup-finally
 
-# Synopsis: full flow (format > build > test > publish)
-task full format, src-linter, src-build, src-test, publish
-
+# Full
+# ---------------------------------------
+# Synopsis: full flow (format > linter >build > test > coverage > pack > publish)
+task full `
+    format, `
+    linter, `
+    build, `
+    test, `
+    coverage, `
+    pack, `
+    publish
+    
+# IDE
+# ---------------------------------------
 # Synopsis: Opens ./src/Ingot.sln in Visual Studio
-task ide tool-visual-studio-open
+task ide `
+    tool-visual-studio-open
 
+# Format
+# ---------------------------------------
 # Synopsis: Format source code
-task format src-format
+task format `
+    src-format
 
+# Linter
+# ---------------------------------------
+# Synopsis: Format source code
+task linter `
+    ci-linter-before, `
+    ?ci-linter, `
+    ci-linter-finally
+
+# Build
+# ---------------------------------------
 # Synopsis: Builds source code
-task build src-build
+task build `
+    ci-build-before, `
+    ?ci-build, `
+    ci-build-finally
 
-# Synopsis: Tests source code (build > test)
-task test build, src-test
+# Test
+# ---------------------------------------
+# Synopsis: Tests source code (build > test > coverage)
+task test `
+    ci-test-before, `
+    ?ci-test, `
+    ci-test-finally
 
+# Coverage
+# ---------------------------------------
+# Synopsis: Generates code coverage report
+task coverage `
+    ci-coverage-before, `
+    ?ci-coverage, `
+    ci-coverage-finally
+
+# Pack
+# ---------------------------------------
 # Synopsis: Packages source code
-task pack src-pack
+task pack `
+    ci-pack-before, `
+    ?ci-pack, `
+    ci-pack-finally
 
-# Synopsis: Publishes packages (pack > publish)
-task publish pack, src-publish-local, src-publish-remote
+# Publish
+# ---------------------------------------
+# Synopsis: Publishes packages either locally or remotely if you specify ApiKey and Source
+task publish `
+    ci-publish-before, `
+    ?ci-publish, `
+    ci-publish-finally
 
 # ***************************************
 # 
@@ -199,50 +344,65 @@ task publish pack, src-publish-local, src-publish-remote
 # CI Tasks
 # ---------------------------------------
 
-# Synopsis: [Specific] GitHub actions specific setup
-task ci-github-setup -If (Ingot-IsOnGitHub) {
+# Setup
+# ---------------------------------------
+task ci-setup-before -If($False)
+task ci-setup-finally -If($False) 
 
-    # Ensures when running in containers the ownership is not dubious
-    Write-Build Magenta "Adding git repository to safe.directory...";
-        
-    Write-Build DarkGray "Invoking git to add '${BuildRoot}' as a safe.directory...";
-    exec { git config --global --add safe.directory $BuildRoot }
+task ci-setup `
+    tool-ib-setup, `
+    tool-nuget-setup, `
+    tool-minver-validate
 
-    Write-Build Green "Successfully added git repository to safe.directory";
+# Linter
+# ---------------------------------------
+task ci-linter-before -If($False) 
+task ci-linter-finally -If($False) 
+    
+task ci-linter `
+    src-linter
 
-    # GitHub actions specific setup
-    if (-Not (Test-Path env:GITHUB_ACTIONS))
-    {
-        Write-Build DarkGray "Not running on GitHub actions, skipping GitHub actions setup.";
-    }
-    else
-    {
-        # To ease handling of configuration within GitHub
-        # actions, the configuration of this invoke-build
-        # is exposed via environment variables to be re-used
-        # within the .yml workflow or action files
+# Linter
+# ---------------------------------------
+task ci-build-before -If($False) 
+task ci-build-finally -If($False) 
 
-        Write-Build Magenta "Appending Ingot environment variables to GitHub environment...";
-        
-        if (-Not (Test-Path $env:GITHUB_ENV))
-        {
-            Write-Error "GitHub environment file $($env:GITHUB_ENV) not found";
-        }
+task ci-build `
+    src-build
 
-        Write-Build DarkGray "Getting original GitHub environment file content...";
-        $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw;
-        Ingot-PrintFileContent -File $env:GITHUB_ENV -Content $githubEnvironmentContent;
+# Test
+# ---------------------------------------
+task ci-test-before -If($False) 
+task ci-test-finally -If($False) 
 
-        Ingot-GitHub-AppendMissingVariable -Key "INGOT_DOTNETVERBOSITY" -Value $DotnetVerbosity;
-        Ingot-GitHub-AppendMissingVariable -Key "INGOT_BUILDCONFIGURATION" -Value $BuildConfiguration;
-        Ingot-GitHub-AppendMissingVariable -Key "INGOT_SRCDIRECTORY" -Value $SrcDirectory;
-        Ingot-GitHub-AppendMissingVariable -Key "INGOT_SRCRELEASEGLOB" -Value "./**/bin/*";
-        Ingot-GitHub-AppendMissingVariable -Key "INGOT_NUPKGDIRECTORY" -Value $NupkgDirectory;
-        Ingot-GitHub-AppendMissingVariable -Key "INGOT_NUPKGGLOB" -Value "./**/*.nupkg";
+task ci-test `
+    src-test
+    
+# Coverage
+# ---------------------------------------
+task ci-coverage-before -If($False) 
+task ci-coverage-finally -If($False) 
 
-        Write-Build Green "Appended Ingot environment variables to GitHub environment successfully";
-    }
-}
+task ci-coverage `
+    src-coverage
+
+# Pack
+# ---------------------------------------
+task ci-pack-before -If($False) 
+task ci-pack-finally -If($False) 
+
+task ci-pack `
+    src-pack
+
+# Publish
+# ---------------------------------------
+task ci-publish-before -If($False) 
+task ci-publish-finally -If($False) 
+
+task ci-publish `
+    src-pack-validate, `
+    src-publish-local, `
+    src-publish-remote
 
 # ---------------------------------------
 # Tools Tasks
@@ -254,11 +414,11 @@ task tool-ib-setup -If(-Not (Ingot-IsOnCi)) {
     # Enable PowerShell Core usage to ensure 
     # users benefit from modern features and
     # consistent experience accross platforms
-    Write-Build Magenta "Enabling use of ${pwshLabel}...";
+    Ingot-Write-StepStart "Enabling use of PowerShell Core (pwsh)...";
     
-    if ($PSVersionTable.PSEdition -eq $pwshPsEdition)
+    if (Test-Shell-Is-Pwsh)
     {
-        Write-Build Green "${pwshLabel} already enabled.";
+        Ingot-Write-StepEnd-Success "PowerShell Core (pwsh) already enabled";
     }
     else
     {
@@ -274,32 +434,31 @@ task tool-ib-setup -If(-Not (Ingot-IsOnCi)) {
         $pwshEnv = [System.Environment]::GetEnvironmentVariable($pwshEnvKey, $pwshEnvScope);
         if ($pwshEnv -eq $pwshEnvValue)
         {
-            Write-Build Yellow (
-                "WARNING: ${pwshLabel} enabled but not active. `n" +
+            Ingot-Write-StepEnd-Warning (
+                "PowerShell Core (pwsh) enabled but not active. `n" +
                 "Ensure to refresh environment variables by restarting your program."
             );
         }
         else
         {
-            Write-Build DarkGray "Checking ${pwshLabel} availability on your system...";
-            if (Get-Command $pwshCommand -errorAction SilentlyContinue)
+            Ingot-Write-Debug "Checking PowerShell Core (pwsh) availability locally...";
+            if (Get-Command "pwsh" -errorAction SilentlyContinue)
             {
-                Write-Build DarkGray "${pwshLabel} is available on your system";
+                Ingot-Write-Debug "PowerShell Core (pwsh) is available locally";
 
-                Write-Build DarkGray "Setting environment variable '${pwshEnvKey}=${pwshEnvValue}' on scope ${pwshEnvScope}...";
+                Ingot-Write-Debug "Setting environment variable '${pwshEnvKey}=${pwshEnvValue}' on scope ${pwshEnvScope}...";
                 [System.Environment]::SetEnvironmentVariable($pwshEnvKey, $pwshEnvValue, $pwshEnvScope);
                 
-                Write-Build Yellow (
-                    "WARNING: ${pwshLabel} enabled but not active. `n" +
+                Ingot-Write-StepEnd-Warning (
+                    "PowerShell Core (pwsh) enabled but not active. `n" +
                     "Ensure to refresh environment variables by restarting your program."
                 );
             }
             else
             {
-                Write-Build Yellow ( 
-                    "WARNING: ${pwshLabel} not available in your system. `n" +
-                    "You should install ${pwshLabel} to ensure consistent experience " +
-                    "across different platforms and on the CI. `n" +
+                Ingot-Write-StepEnd-Warning ( 
+                    "PowerShell Core (pwsh) not available in your system. `n" +
+                    "You should install PowerShell Core (pwsh) to ensure consistent experience across different platforms and on the CI.`n" +
                     "See https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows " +
                     "for more details on how to install PowerShell Core."
                 );
@@ -311,108 +470,135 @@ task tool-ib-setup -If(-Not (Ingot-IsOnCi)) {
 # Synopsis: [Specific] Ensures minver is correctly setup
 task tool-minver-validate {
 
-    Write-Build Magenta "Validating MinVer...";
+    Ingot-Write-StepStart "Validating MinVer version...";
 
-    Write-Build DarkGray "Invoking minver...";
+    Ingot-Write-Debug "Invoking 'minver' to compute version...";
     $version = exec { dotnet minver -v d }
+    Ingot-Write-Info "Retrieved MinVer computed version '${version}'";
 
-    if ($version -like "0.0.0-alpha.0*")
+    $minverDefaultVersion = "0.0.0-alpha.0";
+    Ingot-Write-Debug "Validating MinVer computed version '${version}' is not the default fallback '${minverDefaultVersion}'";
+    if ($version -like "${minverDefaultVersion}*")
     {
         if ($Force)
         {
-            Write-Build Yellow (
-                "WARNING: MinVer outputed version ${version} most likely indicating a wrong setup.`n" +
-                "You have set '-Force 1' thus bypassing this validation."
+            Ingot-Write-StepEnd-Warning (
+                "MinVer computed version '${version}' most likely indicates a wrong setup.`n" +
+                "You have set '-Force 1' to bypass the MinVer version validation."
             );   
         }
         else
         {
-            Write-Error (
-                "MinVer outputed version ${version} most likely indicating a wrong setup.`n" +
+            throw Ingot-Error (
+                "MinVer computed version '${version}' most likely indicates a wrong setup.`n" +
                 "specify '-Force 1' to bypass this validation."
             );
         }
     }
     else
     {
-        Write-Build Green "MinVer outputed version ${version} most likely indicating a proper setup"
+        Ingot-Write-StepEnd-Success "MinVer computed version '${version}' most likely indicates a proper setup"
     }
 }
 
 # Synopsis: [Specific] Configures nuget for local feed
 task tool-nuget-setup -If(-Not (Ingot-IsOnCi)) {
 
-    Write-Build Magenta "Creating NuGet config file...";
+    Ingot-Write-StepStart "Creating NuGet config file...";
 
     $nugetConfigFile = "./nuget.config";
     if (Test-Path $nugetConfigFile)
     {
+        Ingot-Write-Debug "NuGet config file '${nugetConfigFile}' exists already. Deleting it...";
         Remove-Item $nugetConfigFile -Force;
+        if (Test-Path $nugetConfigFile)
+        {
+            throw Ingot-Error "Failed to create NuGet config file '${nugetConfigFile}'";
+        }
+        Ingot-Write-Info "Deleted existing NuGet config file '${nugetConfigFile}'";
     }
 
-    Write-Build DarkGray "Creating empty NuGet config file ${nugetConfigFile}...";
+    Ingot-Write-Debug "Creating empty NuGet config file '${nugetConfigFile}'...";
     '<configuration></configuration>' > $nugetConfigFile;
-    
-    Write-Build Green "Created NuGet config file successfully";
+    if (-Not (Test-Path $nugetConfigFile))
+    {
+        throw Ingot-Error "Failed to create NuGet config file '${nugetConfigFile}'";
+    }
+    Ingot-Write-Info "Created empty NuGet config file '${nugetConfigFile}'";
 
-    Write-Build Magenta "Adding local NuGet source...";
+    $nugetConfigContent = Get-Content $nugetConfigFile -Raw;
+    Ingot-Write-FileContent -File $nugetConfigFile -Content $nugetConfigContent;
+
+    Ingot-Write-StepEnd-Success "Successfully created NuGet config file";
+
+    Ingot-Write-StepStart "Adding local NuGet source...";
 
     $nugetLocalFeedName = "ingot-local-feed";
     $nugetLocalFeedValue = "${BuildRoot}/dist/local-nuget-feed";
 
-    Write-Build DarkGray "Invoking dotnet nuget to remove source ${nugetLocalFeedName}...";
-    dotnet nuget remove source --configfile $nugetConfigFile $nugetLocalFeedName > $null;
-    Write-Build DarkGray "Removed dotnet nuget source ${nugetLocalFeedName}";
-
-    Write-Build DarkGray "Invoking dotnet nuget to add source ${nugetLocalFeedName} (${nugetLocalFeedValue})...";
+    Ingot-Write-Debug "Invoking 'dotnet nuget' to add local NuGet source '${nugetLocalFeedName}' (${nugetLocalFeedValue})...";
     exec { dotnet nuget add source --configfile $nugetConfigFile --name $nugetLocalFeedName $nugetLocalFeedValue }
-    Write-Build DarkGray "Successfully added nuget source ${nugetLocalFeedName} (${nugetLocalFeedValue})...";
-    
-    Write-Build Green "Successfully added local NuGet source";
-
-    Write-Build Magenta "Setting local NuGet push source...";
-
-    $nugetDefaultPushSourceKey = "defaultPushSource";
-    Write-Build DarkGray "Invoking dotnet nuget to set '${nugetDefaultPushSourceKey}' to ${nugetLocalFeedValue} ...";
-    exec { dotnet nuget config set --configfile $nugetConfigFile $nugetDefaultPushSourceKey $nugetLocalFeedValue }
-    Write-Build DarkGray "Successfully set nuget '${nugetDefaultPushSourceKey}' to ${nugetLocalFeedValue} ...";
+    Ingot-Write-Info "Successfully added local NuGet source '${nugetLocalFeedName}' (${nugetLocalFeedValue})";
 
     $nugetConfigContent = Get-Content $nugetConfigFile -Raw;
-    Ingot-PrintFileContent -File $nugetConfigFile -Content $nugetConfigContent;
+    Ingot-Write-FileContent -File $nugetConfigFile -Content $nugetConfigContent;
     
-    Write-Build Green "Successfully set local NuGet push source";
+    Ingot-Write-StepEnd-Success "Successfully added local NuGet source";
+
+    Ingot-Write-StepStart "Setting local NuGet push source...";
+
+    $nugetDefaultPushSourceKey = "defaultPushSource";
+    Ingot-Write-Debug "Invoking 'dotnet nuget' to set NuGet configuration '${nugetDefaultPushSourceKey}' (${nugetLocalFeedValue})...";
+    exec { dotnet nuget config set --configfile $nugetConfigFile $nugetDefaultPushSourceKey $nugetLocalFeedValue }
+    Ingot-Write-Info "Successfully set NuGet configuration '${nugetDefaultPushSourceKey}' (${nugetLocalFeedValue})";
+
+    $nugetConfigContent = Get-Content $nugetConfigFile -Raw;
+    Ingot-Write-FileContent -File $nugetConfigFile -Content $nugetConfigContent;
+    
+    Ingot-Write-StepEnd-Success "Successfully set local NuGet push source";
 }
 
 # Synopsis: [Specific] Opens ./src/Ingot.sln in Visual Studio
 task tool-visual-studio-open {
 
-    Write-Build Magenta "Searching Visual Studio installation...";
+    Ingot-Write-StepStart "Searching Visual Studio installation...";
 
     $programFilesx86 = (Get-ChildItem "env:ProgramFiles(x86)").Value;
     $vsWherePath = "${programFilesx86}\Microsoft Visual Studio\Installer\vswhere.exe";
+    Ingot-Write-Debug "Validating vswhere.exe '${vsWherePath}' exists..."
     if (-Not (Test-Path $vsWherePath))
     {
-        Write-Error ( 
-            "ERROR: vswhere ('${vsWherePath}') not found. `n" +
+        throw Ingot-Error ( 
+            "vswhere.exe '${vsWherePath}' not found. `n" +
             "Could not determine Visual Studio location."
         );
     }
     
-    Write-Build DarkGray "Invoking vswhere ('${vsWherePath}') to determine Visual Studio location...";
+    Ingot-Write-Debug "Invoking vswhere.exe to determine Visual Studio installation path...";
     $vsWhereOutput = exec { & $vsWherePath -prerelease -latest -property productPath -format json }
+    Ingot-Write-Info "Successfully invoked vswhere.exe"
+    Ingot-Write-Debug "vswhere.exe invocation output:`n${vsWhereOutput}";
+    
+    Ingot-Write-Debug "Parsing vswhere.exe output to find Visual Studio installation path...";
     $vsPath = ($vsWhereOutput | ConvertFrom-Json)[0].productPath;
+    Ingot-Write-Info "Parsed vswhere.exe output into Visual Studio installation path '${vsPath}'";
+
+    Ingot-Write-Debug "Validating Visual Studio installation path '${vsPath}'...";
     if (-Not (Test-Path $vsPath ))
     {
-        Write-Error "ERROR: vswhere ('${vsWherePath}') returned an invalid Visual Studio location (${vsPath})";
+        throw Ingot-Error "vswhere.exe returned an invalid Visual Studio installation path`n'${vsPath}'";
     }
+
+    Ingot-Write-StepEnd-Success "Successfully found Visual Studio installation";
     
-    Write-Build Green "Found Visual Studio installation (${vsPath})";
-        
-    Write-Build Magenta "Opening Visual Studio...";
+    Ingot-Write-StepStart "Opening Visual Studio...";
 
     $slnFilePath = "${SrcDirectory}/Ingot.sln";
-    Write-Build DarkGray "Invoking Visual Studio (${vsPath}) to open Ingot solution (${slnFilePath})";
+    Ingot-Write-Debug "Invoking Visual Studio to open Ingot solution '${slnFilePath}'...";
     exec { & $vsPath $slnFilePath -donotloadprojects }
+    Ingot-Write-Info "Invoked Visual Studio successfully";
+
+    Ingot-Write-StepEnd-Success "Successfully opened Visual Studio";
 }
 
 # ---------------------------------------
@@ -422,95 +608,198 @@ task tool-visual-studio-open {
 # Synopsis: [Specific] Runs csharpier to format the ./src files
 task src-format {
     
-    Write-Build Magenta "Formatting ${SrcDirectory} source code...";
-    
-    Write-Build DarkGray "Invoking csharpier on source directory (${SrcDirectory})";
-    exec { dotnet csharpier $SrcDirectory }
+    Ingot-Write-StepStart "Formatting source code...";
 
-    Write-Build Green "Successfully formatted source code";
-}
+    Ingot-Write-Debug "Invoking 'csharpier' on source directory '${SrcDirectory}'...";
+    exec { dotnet csharpier --loglevel "Debug" $SrcDirectory }
+    Ingot-Write-Info "Successfully invoked 'csharpier' on source directory '${SrcDirectory}";
+
+    Ingot-Write-StepEnd-Success "Successfully formatted source code";
+}, src-linter
 
 # Synopsis: [Specific] Runs csharpier as a linter to validate the formatting of the ./src files
 task src-linter {
     
-    Write-Build Magenta "Validating source code format...";
+    Ingot-Write-StepStart "Validating source code format...";
     
-    Write-Build DarkGray "Invoking csharpier check on source directory (${SrcDirectory})...";
-    exec { dotnet csharpier --check $SrcDirectory }
+    Ingot-Write-Debug "Invoking 'csharpier' on source directory '${SrcDirectory}'...";
+    exec { dotnet csharpier --check --loglevel "Debug" $SrcDirectory }
+    Ingot-Write-Info "Successfully invoked 'csharpier' on source directory '${SrcDirectory}";
 
-    Write-Build Green "Successfully validated source code format";
+    Ingot-Write-StepEnd-Success "Successfully validated source code format";
 }
 
 # Synopsis: [Specific] Restores the ./src code
 task src-restore {
     
-    Write-Build Magenta "Restoring nuget dependencies...";
+    Ingot-Write-StepStart "Restoring nuget dependencies...";
 
-    Write-Build DarkGray "Invoking dotnet restore on source directory (${SrcDirectory})...";
+    Ingot-Write-Debug "Invoking 'dotnet restore' on source directory '${SrcDirectory}'...";
     exec { dotnet restore $SrcDirectory --verbosity $DotnetVerbosity }
+    Ingot-Write-Info "Successfully invoked 'dotnet restore' on source directory '${SrcDirectory}";
 
-    Write-Build Green "Successfully restored nuget dependencies";
+    Ingot-Write-StepEnd-Success "Successfully restored nuget dependencies";
 }
 
 # Synopsis: [Specific] Validates the built ./src code
 task src-build-validate {
 
-    Write-Build Magenta "Ensuring build has been ran with configuration ${BuildConfiguration}...";
+    Ingot-Write-StepStart "Validating '${BuildConfiguration}' source build exists...";
     
-    $buildDllFilter = "*bin*${BuildConfiguration}*";
-    Write-Build DarkGray "Getting ${SrcDirectory} files matching filter '${buildDllFilter}'...";
-    $buildDllFiles = Get-ChildItem $SrcDirectory -recurse | Where-Object {$_.FullName -like $buildDllFilter};
+    $directory = "${SrcDirectory}";
+    $fileFilter = "*libs[\/]*[\/]bin[\/]${BuildConfiguration}[\/]*.dll";
 
-    if ($buildDllFiles.Count -eq 0)
-    {
-        Write-Error "No ${SrcDirectory} files matching filter '${buildDllFilter}' found";
-    }
-
-    Write-Build Green "Found $($buildDllFiles.Count) ${BuildConfiguration} build related files: ";
-    $buildDllFiles | ForEach-Object -Process {
-        Write-Build DarkGray "    - $($_.FullName)";
-    }
+    Ingot-Write-FileLookup-Start -FileFilter $fileFilter -Directory $directory;
+    $files = Get-ChildItem $directory -File -Recurse | Where-Object {$_.FullName -like $fileFilter};
+    Ingot-Write-FileLookup-End -FileFilter $fileFilter -Directory $directory -Files $files;
+    
+    Ingot-Ensure-FileLookup-NotEmpty -FileFilter $fileFilter -Directory $directory -Files $files;
+    Ingot-Write-StepEnd-Success "Successfully validated '${BuildConfiguration}' source build exists"
 }
 
 # Synopsis: [Specific] Builds the ./src code
-task src-build src-restore, {
-    
-    Write-Build Magenta "Building source code...";
-    
-    Write-Build DarkGray "Invoking dotnet build on source directory (${SrcDirectory})...";
-    exec { dotnet build $SrcDirectory -c $BuildConfiguration --no-restore --verbosity $DotnetVerbosity }
+task src-build `
+    src-restore, `
+{
+    Ingot-Write-StepStart "Building '${BuildConfiguration}' source...";
 
-    Write-Build Green "Successfully built source code";
-}, src-build-validate
+    Ingot-Write-Debug "Invoking 'dotnet build' to build '${SrcDirectory}' with configuration '${BuildConfiguration}'...";
+    exec { dotnet build $SrcDirectory -c $BuildConfiguration --no-restore --verbosity $DotnetVerbosity }
+    Ingot-Write-Info "Successfully invoked 'dotnet build' to build '${SrcDirectory}' with configuration '${BuildConfiguration}'";
+
+    Ingot-Write-StepEnd-Success "Successfully built '${BuildConfiguration}' source";
+}, `
+    src-build-validate
+
+# Synopsis: [Specific] Cleans the test result outputs
+task src-test-clean {
+
+    Ingot-Write-StepStart "Cleaning test result directory...";
+
+    Ingot-Delete-Directory -Directory $TestResultDirectory;
+
+    Ingot-Write-StepEnd-Success "Successfully cleant test result directory";
+}
 
 # Synopsis: [Specific] Tests the built ./src code
-task src-test src-build-validate, src-restore, {
+task src-test `
+    src-test-clean, 
+    src-coverage-clean, `
+    src-build-validate, `
+    src-restore, `
+{
+    # Allows to fail the build even if some
+    # tasks in the flow are allowed to fail
+    # to continue subsequent tasks
+    $script:propagateErrorsToBuild=$True;
 
-    Write-Build Magenta "Searching for test projects...";
+    Ingot-Write-StepStart "Getting test projects...";
 
-    $testProjectsFilter = "*Tests.csproj";
-    Write-Build DarkGray "Getting ${SrcDirectory} projects matching filter '${testProjectsFilter}'...";
-    $testProjects = Get-ChildItem $SrcDirectory -recurse | Where-Object {$_.name -like $testProjectsFilter};
+    $directory = "${SrcDirectory}";
+    $fileFilter = "*Tests.csproj";
 
-    if ($testProjects.Count -eq 0)
-    {
-        Write-Error "No ${SrcDirectory} projects matching filter '${testProjectsFilter}' found";
-    }
+    Ingot-Write-FileLookup-Start -FileFilter $fileFilter -Directory $directory;
+    $testProjects = Get-ChildItem $directory -File -Recurse | Where-Object {$_.FullName -like $fileFilter};
+    Ingot-Write-FileLookup-End -FileFilter $fileFilter -Directory $directory -Files $testProjects;
+    
+    Ingot-Ensure-FileLookup-NotEmpty -FileFilter $fileFilter -Directory $directory -Files $testProjects;
 
-    Write-Build Green "Found $($testProjects.Count) test projects: ";
+    Ingot-Write-StepEnd-Success "Successfully found $($testProjects.Count) test projects";
+
     $testProjects | ForEach-Object -Process {
-        Write-Build DarkGray "    - $($_.FullName)";
-    }
 
-    $testProjects | ForEach-Object -Process {
+        Ingot-Write-StepStart "Running tests declared in '$($_.Name)'...";
 
-        Write-Build Magenta "Running tests declared in $($_.FullName) ...";
+        $codeCoverageOutputFile = "${TestResultDirectory}/$($_.BaseName)";
 
-        Write-Build DarkGray "Invoking dotnet test on csproj ($($_.FullName))...";
-        exec { dotnet test $_.FullName -c $BuildConfiguration --no-build --verbosity $DotnetVerbosity }
+        Ingot-Write-Debug "Invoking 'dotnet test' on '$($_.FullName)'`nand collecting code coverage to '${codeCoverageOutputFile}'...";
+        exec { dotnet test $_.FullName -c $BuildConfiguration --no-build --verbosity $DotnetVerbosity --results-directory $codeCoverageOutputFile --collect "Code Coverage" --logger "trx"; }
+        Ingot-Write-Info "Successfully invoked 'dotnet test' on '$($_.FullName)'";
         
-        Write-Build Green "Successfully ran tests declared in $($_.FullName)";
-    }    
+        Ingot-Write-StepEnd-Success "Successfully ran tests declared in '$($_.Name)'";
+        
+        Ingot-Write-StepStart "Validating run of '$($_.Name)' created trx file...";
+        
+        $directory = "${codeCoverageOutputFile}";
+        $fileFilter = "*.trx";
+
+        Ingot-Write-FileLookup-Start -FileFilter $fileFilter -Directory $directory;
+        $trxs = Get-ChildItem $directory -File -Recurse | Where-Object {$_.FullName -like $fileFilter};
+        Ingot-Write-FileLookup-End -FileFilter $fileFilter -Directory $directory -Files $trxs;
+        
+        Ingot-Ensure-FileLookup-NotEmpty -FileFilter $fileFilter -Directory $directory -Files $trxs;
+
+        Ingot-Write-StepEnd-Success "Successfully validated run of '$($_.Name)' created trx file";
+        
+        Ingot-Write-StepStart "Validating run of '$($_.Name)' collected code coverage...";
+        
+        $directory = "${codeCoverageOutputFile}";
+        $fileFilter = "*.coverage";
+
+        Ingot-Write-FileLookup-Start -FileFilter $fileFilter -Directory $directory;
+        $codeCoverages = Get-ChildItem $directory -File -Recurse | Where-Object {$_.FullName -like $fileFilter};
+        Ingot-Write-FileLookup-End -FileFilter $fileFilter -Directory $directory -Files $codeCoverages;
+        
+        Ingot-Ensure-FileLookup-NotEmpty -FileFilter $fileFilter -Directory $directory -Files $codeCoverages;
+
+        Ingot-Write-StepEnd-Success "Successfully validated run of '$($_.Name)' collected code coverage";
+    }
+
+    Ingot-Write-StepStart "Generating test result summary...";
+
+    $summaryFile = "${TestResultDirectory}/summary.md";
+
+    
+    Ingot-Write-Debug "Invoking 'liquid' to generate test result summary '${codeCoverageOutputFile}' from trx files...";
+    
+    Ingot-Write-Warning ("Test result summary currently not supported, it's not you, its' us.") -AsCard $True;
+    # exec { dotnet liquid --inputs "File=${TestResultDirectory}/**.trx;Format=Trx" --output-file "${summaryFile}"; }
+    
+    Ingot-Write-Info "Successfully invoked 'liquid' to generate test result summary";
+
+    $fileFilter = "summary.md";
+    $directory = "${TestResultDirectory}";
+
+    Ingot-Write-FileLookup-Start -FileFilter $fileFilter -Directory $directory;
+    $summary = Get-ChildItem $directory -File -Recurse | Where-Object {$_.Name -like $fileFilter};
+    Ingot-Write-FileLookup-End -FileFilter $fileFilter -Directory $directory -Files $summary;
+
+    Ingot-Write-StepStart "Successfully generated test result summary";
+
+}
+
+# Synopsis: [Specific] Cleans the code coverage outputs
+task src-coverage-clean {
+
+    Ingot-Write-StepStart "Cleaning code coverage directory...";
+
+    Ingot-Delete-Directory -Directory $TestCoverageDirectory;
+
+    Ingot-Write-StepEnd-Success "Successfully cleant code coverage directory";
+}
+
+# Synopsis: [Specific] Generates code coverage reports
+task src-coverage {
+
+    Ingot-Write-StepStart "Retrieving tests code coverage...";
+
+    $directory = "${TestResultDirectory}";
+    $fileFilter = "*.coverage";
+
+    Ingot-Write-FileLookup-Start -FileFilter $fileFilter -Directory $directory;
+    $testsCodeCoverage = Get-ChildItem $directory -File -Recurse | Where-Object {$_.FullName -like $fileFilter};
+    Ingot-Write-FileLookup-End -FileFilter $fileFilter -Directory $directory -Files $testsCodeCoverage;
+    
+    Ingot-Ensure-FileLookup-NotEmpty -FileFilter $fileFilter -Directory $directory -Files $testsCodeCoverage;
+
+    Ingot-Write-StepEnd-Success "Successfully found $($testsCodeCoverage.Count) tests code coverage";
+
+    Ingot-MergeCodeCoverage -OutputFormat "coverage" -OutputFileName "test-result.coverage" -TestCoverageFiles $testsCodeCoverage;
+    
+    Ingot-MergeCodeCoverage -OutputFormat "cobertura" -OutputFileName $TestCoverageCoberturaFileName -TestCoverageFiles $testsCodeCoverage;
+
+    Ingot-GenerateCodeCoverageReport -ReportType "Html";
+    Ingot-GenerateCodeCoverageReport -ReportType "JsonSummary";
 }
 
 # Synopsis: [Specific] Cleans the nuget output folder
@@ -582,18 +871,25 @@ task src-pack-validate {
 }
 
 # Synopsis: [Specific] Packages the built ./src code into nuget packages *.nupkg
-task src-pack src-build-validate, src-restore, src-pack-clean, {
+task src-pack `
+    src-build-validate, `
+    src-restore, `
+    src-pack-clean, `
+{
     
     Write-Build Magenta "Creating nuget packages...`n";
 
     Write-Build DarkGray "Invoking dotnet pack on source directory (${SrcDirectory})...";
     exec { dotnet pack $SrcDirectory --no-build --output $NupkgDirectory --verbosity $DotnetVerbosity }
 
-}, src-pack-validate
+}, `
+    src-pack-validate
 
 # Synopsis: [Specific] Publishes the packaged *.nupkg to a local feed
-task src-publish-local -If(-Not (Ingot-IsOnCi)) tool-nuget-setup, src-pack-validate, {
-
+task src-publish-local -If(-Not (Ingot-IsOnCi)) `
+    tool-nuget-setup, `
+    src-pack-validate, `
+{
     Write-Build Magenta "Retrieving nuget local push source...`n";
 
     Write-Build DarkGray "Invoking dotnet nuget config to get 'defaultPushSource'";
@@ -639,8 +935,9 @@ task src-publish-local -If(-Not (Ingot-IsOnCi)) tool-nuget-setup, src-pack-valid
 }
 
 # Synopsis: [Specific] Publishes the packaged *.nupkg to a remote feed
-task src-publish-remote -If(($NupkgPushSource) -And ($NupkgPushApiKey)) src-pack-validate, {
-    
+task src-publish-remote -If(($NupkgPushSource) -And ($NupkgPushApiKey)) `
+    src-pack-validate, `
+{    
     Write-Build Magenta "Pushing nuget packages to ${NupkgPushSource}...`n";
 
     Write-Build DarkGray "Invoking dotnet nuget push for nuget directory (${NupkgDirectory}) to source ${NupkgPushSource}...";
@@ -664,3 +961,6 @@ task Docs-Serve {
 }
 
 task Docs Docs-Clean, Docs-Build, Docs-Serve
+
+# Imports extension files
+. "${BuildRoot}/build/ingot.ib.github.ps1";

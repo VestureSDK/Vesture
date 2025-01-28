@@ -13,7 +13,7 @@ jobs:
       - uses: stfbln/ingot/.github/actions/ingot-setup@main
         name: Setup
       - name: Linter
-        run: dotnet ib src-linter
+        run: dotnet ib linter
 
   src-build:
     needs: src-linter
@@ -25,7 +25,7 @@ jobs:
       - uses: stfbln/ingot/.github/actions/ingot-setup@main
         name: Setup
       - name: Build
-        run: dotnet ib src-build
+        run: dotnet ib build
       - name: Upload Build Artifacts
         uses: ./.github/actions/ingot-src/build-artifacts
         with:
@@ -45,7 +45,62 @@ jobs:
         with:
           type: download
       - name: Test
-        run: dotnet ib src-test
+        run: dotnet ib test
+      - if: '!cancelled()'
+        name: Upload Test Result Artifacts
+        uses: ./.github/actions/ingot-src/test-artifacts
+        with:
+          type: upload
+
+  src-test-report:
+    needs: src-test
+    if: ${{ !cancelled() && (needs.src-test.result == 'success' || needs.src-test.result == 'failure') }}
+    name: Test Report
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    permissions:
+      contents: read
+      issues: read
+      checks: write
+      pull-requests: write
+    steps:
+      # Checkout the git repo
+      - name: Git Checkout
+        uses: actions/checkout@v4
+        with:
+          # Ensures MinVer finds what it needs
+          fetch-depth: '0'
+          filter: 'tree:0'
+      - name: Download Test Result Artifacts
+        uses: ./.github/actions/ingot-src/test-artifacts
+        with:
+          type: download
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          files: ./**/*.trx
+
+          
+  src-coverage:
+    needs: src-test
+    if: ${{ !cancelled() && (needs.src-test.result == 'success' || needs.src-test.result == 'failure') }}
+    name: Coverage Report
+    runs-on: ubuntu-24.04
+    container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
+    timeout-minutes: 3
+    steps:
+      - uses: stfbln/ingot/.github/actions/ingot-setup@main
+        name: Setup
+      - name: Download Test Result Artifacts
+        uses: ./.github/actions/ingot-src/test-artifacts
+        with:
+          type: download
+      - name: Test Coverage
+        run: dotnet ib coverage
+      - name: Upload Coverage Artifacts
+        uses: ./.github/actions/ingot-src/coverage-artifacts
+        with:
+          type: upload
 
   src-pack:
     needs: src-build
@@ -61,7 +116,7 @@ jobs:
         with:
           type: download
       - name: Pack
-        run: dotnet ib src-pack
+        run: dotnet ib pack
       - name: Upload Package Artifacts
         uses: ./.github/actions/ingot-src/package-artifacts
         with:

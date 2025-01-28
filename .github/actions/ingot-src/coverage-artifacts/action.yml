@@ -1,0 +1,44 @@
+name: 'Ingot Coverage Artifact'
+description: 'Upload/Download Ingot coverage artifact'
+author: 'Ingot'
+inputs:
+  type:
+    description: 'The type of artifact action, either upload or download'
+    required: true
+runs:
+  using: 'composite'
+  steps:
+
+    # We pass through one action to download/upload
+    # since using inputs/outputs alters the way the
+    # artifacts are downloaded and results in the
+    # wrong path on artifact restore
+
+    # -----------------------------------
+    # Upload
+    # -----------------------------------
+
+    # Upload the artifact
+    - if: ${{ inputs.type == 'upload' }}
+      name: "Artifact Upload: coverage"
+      uses: actions/upload-artifact@v4
+      with:
+        # Name needs to match in the download section
+        name: coverage
+        if-no-files-found: error
+        retention-days: 1
+        path: ${{ env.INGOT_COVERAGEGLOB }}
+
+    # -----------------------------------
+    # Download
+    # -----------------------------------
+
+    # Download the artifact
+    - if: ${{ inputs.type == 'download' }}
+      name: "Artifact Download: coverage"
+      uses: actions/download-artifact@v4
+      with:
+        # Name needs to match in the upload section
+        # Do not specify a path to ensure the restore
+        # puts the files in their original location
+        name: coverage

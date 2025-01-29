@@ -63,7 +63,7 @@ namespace Ingot.Testing
                 sb.AppendLine(exception.ToString());
             }
 
-            TestContext.Error?.Write(sb.ToString());
+            TestContext.Out?.Write(sb.ToString());
         }
 
         private class NoOpDisposable : IDisposable

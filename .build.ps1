@@ -21,6 +21,8 @@ param(
     
     [string] $NupkgPushApiKey,
 
+    [bool] $Serve = $False,
+
     [bool] $Force = $False
 )
 
@@ -800,6 +802,21 @@ task src-coverage {
 
     Ingot-GenerateCodeCoverageReport -ReportType "Html";
     Ingot-GenerateCodeCoverageReport -ReportType "JsonSummary";
+}, `
+src-coverage-serve
+
+task src-coverage-serve -If($Serve) {
+    
+    Ingot-Write-StepStart "Opening coverage report...";
+
+    $coverageHtmlDirectory = Ingot-Get-CodeCoverageReport-DirectoryPath -ReportType "Html";
+    $coverageHtmlIndex = "${coverageHtmlDirectory}\index.html";
+
+    Ingot-Write-Debug "Invoking '${coverageHtmlIndex}' to open default browser...";
+    exec { . $coverageHtmlIndex }
+    Ingot-Write-Info "Successfully invoked '${coverageHtmlIndex}' opening default browser";
+    
+    Ingot-Write-StepEnd-Success "Successfully opened coverage report";
 }
 
 # Synopsis: [Specific] Cleans the nuget output folder

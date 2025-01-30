@@ -729,9 +729,7 @@ task src-publish-remote -If(($NupkgPushSource) -And ($NupkgPushApiKey)) `
     src-pack-validate, `
 {    
     Write-Step-Start "Retrieving nupkg files...";
-
-    New-Directory $nugetLocalSource;
-
+    
     $nupkgFilter = "*.nupkg";
     $nupkgFiles = Get-ChildItem $NupkgDirectory -recurse | Where-Object {$_.name -like $nupkgFilter};
     Write-Files-Found $nupkgFiles -Directory $NupkgDirectory -Filter $nupkgFilter;

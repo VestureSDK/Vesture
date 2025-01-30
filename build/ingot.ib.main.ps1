@@ -743,9 +743,6 @@ task src-publish-remote -If(($NupkgPushSource) -And ($NupkgPushApiKey)) `
         
         Write-Step-Start "Publishing nupkg '$($_.Name)' to '${NupkgPushSource}'...";
 
-        $localFeedFilePath = "${nugetLocalSource}/$($_.Name)";
-        Remove-File $localFeedFilePath;
-
         Write-Log Debug "Invoking 'dotnet nuget' to push nupkg '$($_.FullName)' to '${NupkgPushSource}'";
         exec { dotnet nuget push $_.FullName --api-key $NupkgPushApiKey --source $NupkgPushSource --skip-duplicate };
         Write-Log Information "Sucessfully invoked 'dotnet nuget' to push nupkg '$($_.FullName)' to '${NupkgPushSource}'";

@@ -147,7 +147,7 @@ task ci-github-src-coverage-summary {
     }
     Write-Log Information  "GitHub action summary file exists '$($env:GITHUB_STEP_SUMMARY)'";
 
-    $testCoverageReportDirectory = Ingot-Get-CodeCoverageReport-DirectoryPath -ReportType $reportType;
+    $testCoverageReportDirectory = Get-CodeCoverageReport-DirectoryPath -ReportType $reportType;
     $testCoverageReportFile = "${testCoverageReportDirectory}/SummaryGithub.md";
     
     $markdownSummaryContent = Get-Content $testCoverageReportFile -Raw;

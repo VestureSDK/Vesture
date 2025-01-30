@@ -26,12 +26,12 @@ function Add-ExecutionEnvironment {
     $script:ExecutionEnvironments += @($executionEnvironment);
 }
 
-function Ingot-IsOnCi {
+function Test-CI-ExecutionEnvironment {
     return Test-Path env:CI;
 }
 
-function Ingot-IsOnLocal {
-    return -Not (Ingot-IsOnCi);
+function Test-Local-ExecutionEnvironment {
+    return -Not (Test-CI-ExecutionEnvironment);
 }
 
 function Test-Shell-Is-Pwsh {
@@ -39,162 +39,133 @@ function Test-Shell-Is-Pwsh {
 }
 
 # ---------------------------------------
+# Logging
+# ---------------------------------------
+
+enum LogLevel {
+    Error = 1
+    Warning = 2
+    Information = 4
+    Debug = 8
+    Trace = 16
+ }
+
+function Set-MinimumLogLevel {
+    param (
+        $Level
+    )
+
+    if (-Not $script:MinimumLogLevel)
+    {
+        $minimumLogLevel = [LogLevel]::Trace;
+        $minimumLogLevel += [LogLevel]::Debug;
+        $minimumLogLevel += [LogLevel]::Information;
+        $minimumLogLevel += [LogLevel]::Warning;
+        $minimumLogLevel += [LogLevel]::Error;
+
+        if ($Level -ne 'trace') {  
+            $minimumLogLevel -= [LogLevel]::Trace;
+            
+            if ($Level -ne 'debug') {  
+                $minimumLogLevel -= [LogLevel]::Debug;
+                
+                if ($Level -ne 'information') {  
+                    $minimumLogLevel -= [LogLevel]::Information; 
+                    
+                    if ($Level -ne 'warning') {  
+                        $minimumLogLevel -= [LogLevel]::Warning; 
+                    }
+                }
+            }
+        }
+
+        $script:MinimumLogLevel = $minimumLogLevel;
+    }
+}
+
+function Write-Log {
+    param (
+        [LogLevel] $Level,
+        $Content = $undefined,
+        $Data = $undefined
+    )
+
+    if ($Level -band $script:MinimumLogLevel)
+    {
+        if ($Level -eq [LogLevel]::Trace) { Write-Build DarkGray $Content; }
+        if ($Level -eq [LogLevel]::Debug) { Write-Build DarkGray $Content; }
+        if ($Level -eq [LogLevel]::Information) { Write-Build White $Content; }
+        if ($Level -eq [LogLevel]::Warning) { Write-Warning $Content; }
+
+        if ($Level -eq [LogLevel]::Error) { 
+            
+            $errorInfo = (
+                "`n`u{2717}  ERROR`n" +
+                "----------------------------------------------------------------------`n" +
+                "${Content}`n`n" +
+                "Kindly check logs for more details.`n"
+            );
+            
+            Write-Error $errorInfo; 
+        }
+
+        if ($Data) { $Data }
+    }
+}
+
+# ---------------------------------------
 # Write
 # ---------------------------------------
 
-function Ingot-Write-Build {
-
-    param (
-        $Color,
-        $Content,
-        $AsCard
-    )
-
-    if ($AsCard)
-    {
-        Write-Build $Color "`n----------------------------------------------------------------------`n";
-    }
-
-    Write-Build $Color $Content;
-    
-    if ($AsCard)
-    {
-        Write-Build $Color "`n----------------------------------------------------------------------`n";
-    }
-}
-
-function Ingot-Write-Debug {
-
-    param (
-        $Content,
-        $AsCard
-    )
-
-    Ingot-Write-Build -Color DarkGray -Content $Content -AsCard $AsCard;
-}
-function Ingot-Write-Info {
-
-    param (
-        $Content,
-        $AsCard
-    )
-
-    Ingot-Write-Build -Color Gray -Content $Content -AsCard $AsCard;
-}
-
-function Ingot-Write-Warning {
-
-    param (
-        $Content,
-        $AsCard
-    )
-
-    Ingot-Write-Build -Color Yellow -Content $Content -AsCard $AsCard;
-}
-function Ingot-Write-Success {
-
-    param (
-        $Content,
-        $AsCard
-    )
-    
-    Ingot-Write-Build -Color Green -Content $Content -AsCard $AsCard;
-}
-
-function Ingot-Error {
-
-    param (
-        $Content
-    )
-    
-    $errorInfo = (
-        "`n`u{2717}  ERROR (exit 1)`n" +
-        "----------------------------------------------------------------------`n" +
-        "${Content}`n`n" +
-        "Kindly check logs for more details.`n"
-    );
-
-    return $errorInfo;
-}
-
-function Ingot-Write-StepStart {
+function Write-Step-Start {
 
     param (
         $Content
     )
 
-    Ingot-Write-Build -Color Magenta -Content "`n`u{25A2}  ${Content}";
+    Write-Build Magenta "`n`u{25A2}  ${Content}";
 }
 
-function Ingot-Write-StepEnd-Success {
+function Write-Step-End {
 
     param (
         $Content,
         $Color
     )
 
-    Ingot-Write-Build -Color Green -Content "`u{2713}  ${Content}";
+    Write-Build Green "`u{2713}  ${Content}";
 }
 
-function Ingot-Write-StepEnd-Warning {
-
-    param (
-        $Content,
-        $Color
-    )
-
-    Ingot-Write-Warning -Content "`n`u{203C}  ${Content}";
-}
-
-function Ingot-Write-FileContent {
+function Write-File-Content {
 
     param (
         $File,
         $Content
     )
 
-    Ingot-Write-Debug -Content (
+    Write-Log Trace  -Content (
         "File '${File}' content:`n" +
         "----------------------------------`n" +
         "${Content}`n" +
-        ">> EOF"
+        "----------------------------------"
     );
 }
 
-function Ingot-Write-FileLookup-Start {
-
-    param (
-        $FileFilter,
-        $Directory
-    )
-
-    if (-Not $FileFilter)
-    {
-        $FileFilter = "*";
-    }
-
-    Ingot-Write-Debug "Getting files matching filter '${FileFilter}' in directory '${Directory}'...";
-}
-
-function Ingot-Write-FileLookup-End {
+function Write-Files-Found {
     
     param (
-        $FileFilter,
-        $Directory,
-        $Files
+        $Files,
+        [string] $Directory,
+        [string] $Filter
     )
 
-    if (-Not $FileFilter)
+    if (-Not $Filter) 
     {
-        $FileFilter = "*";
+        Write-Log Information "Found $($Files.Count) files in directory '${Directory}'" -Data $Files; 
     }
-
-    Ingot-Write-Info "Found $($Files.Count) files matching filter '${FileFilter}' in directory '${Directory}'"
-    if (-Not ($Files.Count -eq 0))
+    else 
     {
-        $Files | ForEach-Object -Process {
-            Ingot-Write-Debug "    - $($_.FullName)";
-        }
+        Write-Log Information "Found $($Files.Count) files matching filter '${Filter}' in directory '${Directory}'" -Data $Files;
     }
 }
 
@@ -202,60 +173,78 @@ function Ingot-Write-FileLookup-End {
 # Functional
 # ---------------------------------------
 
-function Ingot-Ensure-FileLookup-NotEmpty
-{
+function Assert-Files-Found {
     param (
-        $FileFilter,
-        $Directory,
-        $Files
+        $Files,
+        [string] $Directory,
+        [string] $Filter
     )
 
     if ($Files.Count -eq 0)
     {
-        throw Ingot-Error "No files matching filter '${FileFilter}' in directory '${Directory}'";
+        if (-Not $Filter)
+        {
+            $Content = "No files found in directory '${Directory}'";
+        }
+        else 
+        {
+            $Content = "No files found in directory '${Directory}' matching filter '${Filter}'";
+        }
+
+        Write-Log Error $Content;
     }
 }
 
-function Ingot-Delete-Directory {
-    
-    param (
-        $Directory
-    )
+function Remove-Directory {
+    param ([string] $Path)
 
-    Ingot-Write-Debug "Checking if directory '${Directory}' exists...";
-    if (-Not (Test-Path $Directory))
+    # If directory does not exist, don't do anything
+    Write-Log Trace  "Checking if directory '${Path}' exists...";
+    $directory = Get-Item -Path $Path -ErrorAction SilentlyContinue;
+    if (-Not ($directory))
     {
-        Ingot-Write-Info "Directory '${Directory}' does not exist. No cleanup necessary";
+        Write-Log Trace  "Directory '${Path}' does not exist";
         return;
     }
+    Write-Log Trace  "Directory '${Path}' exists" -Data $directory;
 
-    Ingot-Write-Debug "Directory '${Directory}' exists";
-
-    Ingot-Write-FileLookup-Start -Directory $Directory;
-    $files = Get-ChildItem $Directory -File -Recurse;
-    Ingot-Write-FileLookup-End -Directory $Directory -Files $files;
-    
-    Ingot-Write-Debug "Deleting directory '${Directory}' and its $($files.Count) files...";
-    Remove-Item -Recurse -Force $Directory;
-    Ingot-Write-Info "Deleted directory '${Directory}' and its $($files.Count) files"
+    # Else deletes it and its files
+    $files = Get-ChildItem $Path -File -Recurse;
+    Write-Log Debug "Deleting directory '${Path}' and $($Files.Count) children files" -Data $files;
+    Remove-Item -Recurse -Force $Path;
+    Write-Log Information  "Deleted directory '${Path}' and its $($files.Count) files"
 }
 
-function Ingot-Create-Directory {
-    
-    param (
-        $Directory
-    )
+function Remove-File {
+    param ([string] $Path)
 
-    Ingot-Write-Debug "Checking if directory '${Directory}' exists...";
-    if (Test-Path $Directory)
+    if (Test-Path $Path)
     {
-        Ingot-Write-Info "Directory '${Directory}' exists. No need to create it";
+        Write-Log Trace "Removing existing file '${Path}'...";
+        Remove-Item $Path -Force;
+        Write-Log Debug "File '${Path}' deleted";
+    }
+    else {
+        Write-Log Debug "File '${Path}' does not exist";
+    }
+}
+
+function New-Directory { 
+    param ([string] $Path)
+
+    # If directory exists already, don't do anything
+    Write-Log Trace "Checking if directory '${Path}' exists...";
+    $directory = Get-Item -Path $Path -ErrorAction SilentlyContinue;
+    if ($directory)
+    {
+        Write-Log Trace "Directory '${Path}' exists already" -Data $directory;
         return;
     }
+    Write-Log Trace  "Directory '${Path}' does not exist";
 
-    Ingot-Write-Debug "Directory '${Directory}' does not exist";
-    
-    Ingot-Write-Debug "Creating directory '${Directory}'...";
-    New-Item -ItemType Directory -Force -Path $Directory
-    Ingot-Write-Info "Created directory '${Directory}'";
+    # Else create the directory
+    Write-Log Debug  "Creating directory '${Path}'...";
+    $directory = New-Item -ItemType Directory -Force -Path $Path
+    Write-Log Information "Created directory '${Path}'";
+    Write-Log Trace -Data $directory;
 }

@@ -4,19 +4,8 @@ on:
   workflow_call: {}
 
 jobs:
-  src-linter:
-    name: Linter
-    runs-on: ubuntu-24.04
-    container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
-    timeout-minutes: 3
-    steps:
-      - uses: stfbln/ingot/.github/actions/ingot-setup@main
-        name: Setup
-      - name: Linter
-        run: dotnet ib linter
 
   src-build:
-    needs: src-linter
     name: Build
     runs-on: ubuntu-24.04
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
@@ -30,6 +19,18 @@ jobs:
         uses: ./.github/actions/ingot-src/build-artifacts
         with:
           type: upload
+
+  src-linter:
+    needs: src-build
+    name: Linter
+    runs-on: ubuntu-24.04
+    container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
+    timeout-minutes: 3
+    steps:
+      - uses: stfbln/ingot/.github/actions/ingot-setup@main
+        name: Setup
+      - name: Linter
+        run: dotnet ib linter
 
   src-test:
     needs: src-build

@@ -52,35 +52,6 @@ jobs:
         with:
           type: upload
 
-  # src-test-report:
-  #   needs: src-test
-  #   if: ${{ !cancelled() && (needs.src-test.result == 'success' || needs.src-test.result == 'failure') }}
-  #   name: Test Report
-  #   runs-on: ubuntu-24.04
-  #   timeout-minutes: 3
-  #   permissions:
-  #     contents: read
-  #     issues: read
-  #     checks: write
-  #     pull-requests: write
-  #   steps:
-  #     # Checkout the git repo
-  #     - name: Git Checkout
-  #       uses: actions/checkout@v4
-  #       with:
-  #         # Ensures MinVer finds what it needs
-  #         fetch-depth: '0'
-  #         filter: 'tree:0'
-  #     - name: Download Test Result Artifacts
-  #       uses: ./.github/actions/ingot-src/test-artifacts
-  #       with:
-  #         type: download
-  #     - name: Publish Test Results
-  #       uses: EnricoMi/publish-unit-test-result-action@v2
-  #       with:
-  #         files: ./**/*.trx
-
-          
   src-coverage:
     needs: src-test
     if: ${{ !cancelled() && (needs.src-test.result == 'success' || needs.src-test.result == 'failure') }}

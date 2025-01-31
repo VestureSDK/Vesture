@@ -500,6 +500,25 @@ task src-test-clean {
     Write-Step-End "Successfully cleant test result directory";
 }
 
+task src-test-report {
+
+    Write-Step-Start "Generating test result summary...";
+
+    $summaryFile = "${TestResultDirectory}/test-result-summary.md";
+
+    Write-Log Debug  "Invoking 'liquid' to generate test result summary '${codeCoverageOutputFile}' from trx files...";
+    exec { dotnet liquid --inputs "File=${TestResultDirectory}/**.trx;Format=Trx" --output-file "${summaryFile}"; }
+    Write-Log Information  "Successfully invoked 'liquid' to generate test result summary";
+
+    $fileFilter = "summary.md";
+    $directory = "${TestResultDirectory}";
+
+    $summary = Get-ChildItem $directory -File -Recurse | Where-Object {$_.Name -like $fileFilter};
+    Write-Files-Found $summary -Directory $directory -Filter $fileFilter;
+
+    Write-Step-Start "Successfully generated test result summary";
+}
+
 # Synopsis: [Specific] Tests the built ./src code
 task src-test `
     src-test-clean, 
@@ -558,24 +577,8 @@ task src-test `
         Write-Step-End "Successfully validated run of '$($_.Name)' collected code coverage";
     }
 
-    Write-Step-Start "Generating test result summary...";
-
-    Write-Log Debug  "Invoking 'liquid' to generate test result summary '${codeCoverageOutputFile}' from trx files...";
-    
-    Write-Log Warning "Test result summary via 'liquid' currently not supported, it's not you, it's us.";
-    # exec { dotnet liquid --inputs "File=${TestResultDirectory}/**.trx;Format=Trx" --output-file "${summaryFile}"; }
-    
-    Write-Log Information  "Successfully invoked 'liquid' to generate test result summary";
-
-    $fileFilter = "summary.md";
-    $directory = "${TestResultDirectory}";
-
-    $summary = Get-ChildItem $directory -File -Recurse | Where-Object {$_.Name -like $fileFilter};
-    Write-Files-Found $summary -Directory $directory -Filter $fileFilter;
-
-    Write-Step-Start "Successfully generated test result summary";
-
-}
+}, `
+    src-test-report
 
 # Synopsis: [Specific] Cleans the code coverage outputs
 task src-coverage-clean {
@@ -588,8 +591,9 @@ task src-coverage-clean {
 }
 
 # Synopsis: [Specific] Generates code coverage reports
-task src-coverage {
-
+task src-coverage `
+    src-coverage-clean, `
+{
     Write-Step-Start "Retrieving tests code coverage...";
 
     $directory = "${TestResultDirectory}";

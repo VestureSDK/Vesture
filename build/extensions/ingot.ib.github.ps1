@@ -128,6 +128,30 @@ task ci-github-setup {
     Add-GitHub-EnvironmentVariable -Key "MinVerDefaultPreReleaseIdentifiers" -Value "alpha.0.$($env:GITHUB_RUN_ID).$($env:GITHUB_RUN_NUMBER)";
 }
 
+# Synopsis: [Specific] GitHub actions test report summary
+task ci-github-src-test-summary {
+
+    Write-Step-Start "Adding test result report to GitHub action summary...";
+
+    Write-Log Debug  "Ensuring GitHub action summary file exists...";
+    if ((-Not ($env:GITHUB_STEP_SUMMARY)) -Or (-Not (Test-Path $env:GITHUB_STEP_SUMMARY)))
+    {
+        Write-Log Error (
+            "GitHub action summary file '$($env:GITHUB_STEP_SUMMARY)' not found`n" +
+            "or GITHUB_STEP_SUMMARY environment variable undefined"
+        );
+    }
+    Write-Log Information  "GitHub action summary file exists '$($env:GITHUB_STEP_SUMMARY)'";
+
+    $testReportFile = "${TestResultDirectory}/test-result-summary.md";
+    
+    $markdownSummaryContent = Get-Content $testReportFile -Raw;
+    Write-File-Content -File $testReportFile -Content $markdownSummaryContent;
+    "${markdownSummaryContent}" >> $env:GITHUB_STEP_SUMMARY
+    
+    Write-Step-End "Successfully added test result report to GitHub action summary";
+}
+
 # Synopsis: [Specific] GitHub actions code coverage summary
 task ci-github-src-coverage-summary {
 
@@ -164,6 +188,8 @@ task ci-github-src-coverage-summary {
 # Setup
 # ---------------------------------------
 task ci-setup-before ci-github-setup
+
+task ci-test-finally ci-github-src-test-summary
 
 # Coverage
 # ---------------------------------------

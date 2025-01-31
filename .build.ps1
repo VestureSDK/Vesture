@@ -127,7 +127,7 @@ Exit-Build {
         }
 
         $msg += "`n----------------------------------------------------------------------`n"
-        Ingot-Write-Build -Color Red -Content $msg;
+        Write-Build Red $msg;
         Write-Error "Task flow '${BuildTask}' failed";
     }
 }

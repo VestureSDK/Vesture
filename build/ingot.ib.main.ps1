@@ -567,9 +567,12 @@ task src-test `
         if ($exitCode -ne 0)
         {
             $exitCodes = 1;
+            Write-Log Warning "Failed to invoke 'dotnet test' on '$($_.FullName)', exit code ${exitCode}";
+        }
+        else {
+            Write-Log Information "Successfully invoked 'dotnet test' on '$($_.FullName)'";
         }
         
-        Write-Log Information  "Successfully invoked 'dotnet test' on '$($_.FullName)'";
         
         Write-Step-End "Successfully ran tests declared in '$($_.Name)'";
         

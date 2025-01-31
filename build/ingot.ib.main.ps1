@@ -563,8 +563,8 @@ task src-test `
         $codeCoverageOutputFile = "${TestResultDirectory}/$($_.BaseName)";
 
         Write-Log Debug  "Invoking 'dotnet test' on '$($_.FullName)'`nand collecting code coverage to '${codeCoverageOutputFile}'...";
-        $exitCode = exec { dotnet test $_.FullName -c $BuildConfiguration --no-build --verbosity $DotnetVerbosity --results-directory $codeCoverageOutputFile --collect "Code Coverage" --logger "trx"; }
-        if ($exitCode -ne 0)
+        exec { dotnet test $_.FullName -c $BuildConfiguration --no-build --verbosity $DotnetVerbosity --results-directory $codeCoverageOutputFile --collect "Code Coverage" --logger "trx"; }
+        if ($LASTEXITCODE -ne 0)
         {
             $exitCodes = 1;
             Write-Log Warning "Failed to invoke 'dotnet test' on '$($_.FullName)', exit code ${exitCode}";

@@ -48,28 +48,15 @@ jobs:
       - name: Test
         run: dotnet ib test
       - if: '!cancelled()'
+        name: Test Coverage
+        run: dotnet ib coverage
+      - if: '!cancelled()'
         name: Upload Test Result Artifacts
         uses: ./.github/actions/ingot-src/test-artifacts
         with:
           type: upload
-
-  src-coverage:
-    needs: src-test
-    if: ${{ !cancelled() && (needs.src-test.result == 'success' || needs.src-test.result == 'failure') }}
-    name: Coverage Report
-    runs-on: ubuntu-24.04
-    container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
-    timeout-minutes: 3
-    steps:
-      - uses: stfbln/ingot/.github/actions/ingot-setup@main
-        name: Setup
-      - name: Download Test Result Artifacts
-        uses: ./.github/actions/ingot-src/test-artifacts
-        with:
-          type: download
-      - name: Test Coverage
-        run: dotnet ib coverage
-      - name: Upload Coverage Artifacts
+      - if: '!cancelled()'
+        name: Upload Coverage Artifacts
         uses: ./.github/actions/ingot-src/coverage-artifacts
         with:
           type: upload

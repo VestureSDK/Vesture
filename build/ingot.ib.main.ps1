@@ -573,7 +573,6 @@ task src-test `
             Write-Log Information "Successfully invoked 'dotnet test' on '$($_.FullName)'";
         }
         
-        
         Write-Step-End "Successfully ran tests declared in '$($_.Name)'";
         
         Write-Step-Start "Validating run of '$($_.Name)' created trx file...";

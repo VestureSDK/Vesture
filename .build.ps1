@@ -88,10 +88,15 @@ Enter-Build {
             }
             else
             {
-                Write-Log Warning (
+                $msg = (
                     "PowerShell Core (pwsh) enabled but not active`n" +
                     "Ensure to refresh environment variables by restarting your program"
                 );
+                if($env:TERM_PROGRAM -eq 'vscode') {
+                    $msg += "`nIt appears you are using Visual Studio Code (VSCode), ensure to close VSCode completely, not just the terminal.";      
+                }
+
+                Write-Log Warning $msg;
             }
         }
         else

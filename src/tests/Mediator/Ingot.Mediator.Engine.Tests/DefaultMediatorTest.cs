@@ -98,6 +98,8 @@ namespace Ingot.Mediator.Engine.Tests
         [Test]
         public void Ctor_ArgumentNullException_IfLoggerIsNull()
         {
+            Assert.Fail("test");
+            return;
             // Arrange
             // No arrange required
 

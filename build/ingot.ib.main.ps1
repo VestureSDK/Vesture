@@ -196,7 +196,8 @@ task ci-test-before -If($False)
 task ci-test-finally -If($False) 
 
 task ci-test `
-    src-test
+    ?src-test, `
+    src-test-report
     
 # Coverage
 # ---------------------------------------
@@ -254,10 +255,16 @@ task tool-ib-setup -If(-Not (Test-CI-ExecutionEnvironment)) {
         $pwshEnv = [System.Environment]::GetEnvironmentVariable($pwshEnvKey, $pwshEnvScope);
         if ($pwshEnv -eq $pwshEnvValue)
         {
-            Write-Log Warning (
+            $msg = (
                 "PowerShell Core (pwsh) enabled but not active. `n" +
                 "Ensure to refresh environment variables by restarting your program."
             );
+
+            if($env:TERM_PROGRAM -eq 'vscode') {
+                $msg += "`nIt appears you are using Visual Studio Code (VSCode), ensure to close VSCode completely, not just the terminal.";      
+            }
+
+            Write-Log Warning $msg;
         }
         else
         {
@@ -269,10 +276,16 @@ task tool-ib-setup -If(-Not (Test-CI-ExecutionEnvironment)) {
                 Write-Log Debug  "Setting environment variable '${pwshEnvKey}=${pwshEnvValue}' on scope ${pwshEnvScope}...";
                 [System.Environment]::SetEnvironmentVariable($pwshEnvKey, $pwshEnvValue, $pwshEnvScope);
                 
-                Write-Log Warning (
+                $msg = (
                     "PowerShell Core (pwsh) enabled but not active. `n" +
                     "Ensure to refresh environment variables by restarting your program."
                 );
+
+                if($env:TERM_PROGRAM -eq 'vscode') {
+                    $msg += "`nIt appears you are using Visual Studio Code (VSCode), ensure to close VSCode completely, not just the terminal.";      
+                }
+
+                Write-Log Warning $msg;
             }
             else
             {
@@ -507,7 +520,7 @@ task src-test-report {
     $summaryFile = "${TestResultDirectory}/test-result-summary.md";
 
     Write-Log Debug  "Invoking 'liquid' to generate test result summary '${codeCoverageOutputFile}' from trx files...";
-    exec { dotnet liquid --inputs "File=${TestResultDirectory}/**.trx;Format=Trx" --output-file "${summaryFile}"; }
+    exec { dotnet liquid --inputs "File=${TestResultDirectory}/**.trx;Format=Trx" --template "${BuildRoot}/build/liquid/test-report-summary.md" --output-file "${summaryFile}"; }
     Write-Log Information  "Successfully invoked 'liquid' to generate test result summary";
 
     $fileFilter = "summary.md";
@@ -542,6 +555,7 @@ task src-test `
 
     Write-Step-End "Successfully found $($testProjects.Count) test projects";
 
+    $exitCodes = 0;
     $testProjects | ForEach-Object -Process {
 
         Write-Step-Start "Running tests declared in '$($_.Name)'...";
@@ -549,7 +563,12 @@ task src-test `
         $codeCoverageOutputFile = "${TestResultDirectory}/$($_.BaseName)";
 
         Write-Log Debug  "Invoking 'dotnet test' on '$($_.FullName)'`nand collecting code coverage to '${codeCoverageOutputFile}'...";
-        exec { dotnet test $_.FullName -c $BuildConfiguration --no-build --verbosity $DotnetVerbosity --results-directory $codeCoverageOutputFile --collect "Code Coverage" --logger "trx"; }
+        $exitCode = exec { dotnet test $_.FullName -c $BuildConfiguration --no-build --verbosity $DotnetVerbosity --results-directory $codeCoverageOutputFile --collect "Code Coverage" --logger "trx"; }
+        if ($exitCode -ne 0)
+        {
+            $exitCodes = 1;
+        }
+        
         Write-Log Information  "Successfully invoked 'dotnet test' on '$($_.FullName)'";
         
         Write-Step-End "Successfully ran tests declared in '$($_.Name)'";
@@ -577,8 +596,12 @@ task src-test `
         Write-Step-End "Successfully validated run of '$($_.Name)' collected code coverage";
     }
 
-}, `
-    src-test-report
+    if ($exitCodes -ne 0)
+    {
+        Write-Log Error "Some tests have failed. Check logs for more details."
+    }
+
+}   
 
 # Synopsis: [Specific] Cleans the code coverage outputs
 task src-coverage-clean {

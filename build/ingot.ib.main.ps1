@@ -383,7 +383,7 @@ task tool-nuget-setup -If(-Not (Test-CI-ExecutionEnvironment)) {
     Write-Step-Start "Adding local NuGet source...";
 
     $nugetLocalFeedName = "ingot-local-feed";
-    $nugetLocalFeedValue = "${BuildRoot}/dist/local-nuget-feed";
+    $nugetLocalFeedValue = "./dist/local-nuget-feed";
 
     New-Directory $nugetLocalFeedValue;
 
@@ -521,6 +521,25 @@ task src-build `
 }, `
     src-build-validate
 
+# Synopsis: [Specific] Validates tests result report
+task src-test-result-validate {
+    Write-Step-Start "Validating test result summary file...";
+
+    $summaryFile = "${TestResultDirectory}/test-result-summary.md";
+    $file = Get-ChildItem -Path $summaryFile;
+    
+    if ($file)
+    {
+        Write-Log Trace "Found test result summary file '${summaryFile}'" -Data  $file;
+    }
+    else
+    {
+        Write-Log Error "Test result summary file '${summaryFile}' not found";
+    }
+
+    Write-Step-End "Successfully validated test result summary file";
+}
+
 # Synopsis: [Specific] Generates tests result report
 task src-test-result `
      src-test-validate, `
@@ -530,8 +549,7 @@ task src-test-result `
     $summaryFile = "${TestResultDirectory}/test-result-summary.md";
 
     Write-Log Debug  "Invoking 'liquid' to generate test result summary '${summaryFile}' from trx files...";
-    Write-Log Trace  "dotnet liquid --inputs `"File=${TestResultDirectory}/**.trx;Format=Trx`" --template `"${BuildRoot}/build/liquid/test-report-summary.md`" --output-file `"${summaryFile}`"";
-    exec { dotnet liquid --inputs "File=${TestResultDirectory}/**.trx;Format=Trx" --template "${BuildRoot}/build/liquid/test-report-summary.md" --output-file "${summaryFile}"; }
+    exec { dotnet liquid --inputs "File=${TestResultDirectory}/**.trx;Format=Trx" --template "./build/liquid/test-report-summary.md" --output-file "${summaryFile}"; }
     Write-Log Information  "Successfully invoked 'liquid' to generate test result summary";
 
     $fileFilter = "summary.md";
@@ -541,7 +559,8 @@ task src-test-result `
     Write-Files-Found $summary -Directory $directory -Filter $fileFilter;
 
     Write-Step-Start "Successfully generated test result summary";
-}
+}, `
+    src-test-result-validate
 
 # Synopsis: [Specific] Cleans test result report
 task src-test-result-clean {

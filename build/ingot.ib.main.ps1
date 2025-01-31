@@ -82,12 +82,13 @@ task setup `
 
 # Full
 # ---------------------------------------
-# Synopsis: full flow (format > linter >build > test > coverage > pack > publish)
+# Synopsis: full flow (format > linter > build > test > coverage > pack > publish)
 task full `
     format, `
     linter, `
     build, `
     test, `
+    test-result, `
     coverage, `
     pack, `
     publish
@@ -106,7 +107,7 @@ task format `
 
 # Linter
 # ---------------------------------------
-# Synopsis: Format source code
+# Synopsis: Validates source code format
 task linter `
     ci-linter-before, `
     ?ci-linter, `
@@ -122,11 +123,19 @@ task build `
 
 # Test
 # ---------------------------------------
-# Synopsis: Tests source code (build > test > coverage)
+# Synopsis: Tests source code
 task test `
     ci-test-before, `
     ?ci-test, `
     ci-test-finally
+
+# Test Report
+# ---------------------------------------
+# Synopsis: Generates tests report
+task test-result `
+    ci-test-result-before, `
+    ?ci-test-result, `
+    ci-test-result-finally
 
 # Coverage
 # ---------------------------------------
@@ -196,9 +205,16 @@ task ci-test-before -If($False)
 task ci-test-finally -If($False) 
 
 task ci-test `
-    ?src-test, `
-    src-test-report
-    
+    src-test
+
+# Test Result
+# ---------------------------------------
+task ci-test-result-before -If($False) 
+task ci-test-result-finally -If($False) 
+
+task ci-test-result `
+    src-test-result
+
 # Coverage
 # ---------------------------------------
 task ci-coverage-before -If($False) 
@@ -369,6 +385,8 @@ task tool-nuget-setup -If(-Not (Test-CI-ExecutionEnvironment)) {
     $nugetLocalFeedName = "ingot-local-feed";
     $nugetLocalFeedValue = "${BuildRoot}/dist/local-nuget-feed";
 
+    New-Directory $nugetLocalFeedValue;
+
     Write-Log Debug  "Invoking 'dotnet nuget' to add local NuGet source '${nugetLocalFeedName}' (${nugetLocalFeedValue})...";
     exec { dotnet nuget add source --configfile $nugetConfigFile --name $nugetLocalFeedName $nugetLocalFeedValue }
     Write-Log Information  "Successfully added local NuGet source '${nugetLocalFeedName}' (${nugetLocalFeedValue})";
@@ -503,23 +521,16 @@ task src-build `
 }, `
     src-build-validate
 
-# Synopsis: [Specific] Cleans the test result outputs
-task src-test-clean {
-
-    Write-Step-Start "Cleaning test result directory...";
-
-    Remove-Directory $TestResultDirectory;
-
-    Write-Step-End "Successfully cleant test result directory";
-}
-
-task src-test-report {
-
+# Synopsis: [Specific] Generates tests result report
+task src-test-result `
+     src-test-validate, `
+{
     Write-Step-Start "Generating test result summary...";
 
     $summaryFile = "${TestResultDirectory}/test-result-summary.md";
 
-    Write-Log Debug  "Invoking 'liquid' to generate test result summary '${codeCoverageOutputFile}' from trx files...";
+    Write-Log Debug  "Invoking 'liquid' to generate test result summary '${summaryFile}' from trx files...";
+    Write-Log Trace  "dotnet liquid --inputs `"File=${TestResultDirectory}/**.trx;Format=Trx`" --template `"${BuildRoot}/build/liquid/test-report-summary.md`" --output-file `"${summaryFile}`"";
     exec { dotnet liquid --inputs "File=${TestResultDirectory}/**.trx;Format=Trx" --template "${BuildRoot}/build/liquid/test-report-summary.md" --output-file "${summaryFile}"; }
     Write-Log Information  "Successfully invoked 'liquid' to generate test result summary";
 
@@ -530,6 +541,79 @@ task src-test-report {
     Write-Files-Found $summary -Directory $directory -Filter $fileFilter;
 
     Write-Step-Start "Successfully generated test result summary";
+}
+
+# Synopsis: [Specific] Cleans test result report
+task src-test-result-clean {
+
+    Write-Step-Start "Cleaning test result summary file...";
+
+    $summaryFile = "${TestResultDirectory}/test-result-summary.md";
+    $file = Get-ChildItem -Path $summaryFile;
+    
+    if ($file)
+    {
+        Write-Log Trace "Found test result summary file '${summaryFile}'" -Data  $file;
+        
+        Write-Log Debug "Deleting test result summary file '${summaryFile}'...";
+        Remove-Item $file -Force;
+        Write-Log Information "Successfully deleted test result summary file '${summaryFile}'...";
+    }
+    else
+    {
+        Write-Log Information "Test result summary file '${summaryFile}' not found";
+    }
+
+    Write-Step-End "Successfully cleant test result summary file";
+}
+
+# Synopsis: [Specific] Cleans the test result outputs
+task src-test-clean {
+
+    Write-Step-Start "Cleaning test result directory...";
+
+    Remove-Directory $TestResultDirectory;
+
+    Write-Step-End "Successfully cleant test result directory";
+}
+
+task src-test-validate {
+
+    Write-Step-Start "Getting test projects...";
+
+    $directory = "${SrcDirectory}";
+    $fileFilter = "*Tests.csproj";
+
+    $testProjects = Get-ChildItem $directory -File -Recurse | Where-Object {$_.FullName -like $fileFilter};
+    Write-Files-Found $testProjects -Directory $directory -Filter $fileFilter;
+    Assert-Files-Found $testProjects -Directory $directory -Filter $fileFilter;
+
+    Write-Step-End "Successfully found $($testProjects.Count) test projects";
+    
+    $testProjects | ForEach-Object -Process {
+
+        Write-Step-Start "Validating run of '$($_.Name)' created trx file...";
+        
+        $directory = "${codeCoverageOutputFile}";
+        $fileFilter = "*.trx";
+
+        $trxs = Get-ChildItem $directory -File -Recurse | Where-Object {$_.FullName -like $fileFilter};
+        Write-Files-Found $trxs -Directory $directory -Filter $fileFilter;
+        Assert-Files-Found $trxs -Directory $directory -Filter $fileFilter;
+
+        Write-Step-End "Successfully validated run of '$($_.Name)' created trx file";
+        
+        Write-Step-Start "Validating run of '$($_.Name)' collected code coverage...";
+        
+        $directory = "${codeCoverageOutputFile}";
+        $fileFilter = "*.coverage";
+
+        $codeCoverages = Get-ChildItem $directory -File -Recurse | Where-Object {$_.FullName -like $fileFilter};
+        Write-Files-Found $codeCoverages -Directory $directory -Filter $fileFilter;
+        Assert-Files-Found $codeCoverages -Directory $directory -Filter $fileFilter;
+
+        Write-Step-End "Successfully validated run of '$($_.Name)' collected code coverage";
+    }
 }
 
 # Synopsis: [Specific] Tests the built ./src code
@@ -574,28 +658,6 @@ task src-test `
         }
         
         Write-Step-End "Successfully ran tests declared in '$($_.Name)'";
-        
-        Write-Step-Start "Validating run of '$($_.Name)' created trx file...";
-        
-        $directory = "${codeCoverageOutputFile}";
-        $fileFilter = "*.trx";
-
-        $trxs = Get-ChildItem $directory -File -Recurse | Where-Object {$_.FullName -like $fileFilter};
-        Write-Files-Found $trxs -Directory $directory -Filter $fileFilter;
-        Assert-Files-Found $trxs -Directory $directory -Filter $fileFilter;
-
-        Write-Step-End "Successfully validated run of '$($_.Name)' created trx file";
-        
-        Write-Step-Start "Validating run of '$($_.Name)' collected code coverage...";
-        
-        $directory = "${codeCoverageOutputFile}";
-        $fileFilter = "*.coverage";
-
-        $codeCoverages = Get-ChildItem $directory -File -Recurse | Where-Object {$_.FullName -like $fileFilter};
-        Write-Files-Found $codeCoverages -Directory $directory -Filter $fileFilter;
-        Assert-Files-Found $codeCoverages -Directory $directory -Filter $fileFilter;
-
-        Write-Step-End "Successfully validated run of '$($_.Name)' collected code coverage";
     }
 
     if ($exitCodes -ne 0)
@@ -603,7 +665,7 @@ task src-test `
         Write-Log Error "Some tests have failed. Check logs for more details."
     }
 
-}   
+}, src-test-validate   
 
 # Synopsis: [Specific] Cleans the code coverage outputs
 task src-coverage-clean {
@@ -618,6 +680,7 @@ task src-coverage-clean {
 # Synopsis: [Specific] Generates code coverage reports
 task src-coverage `
     src-coverage-clean, `
+     src-test-validate, `
 {
     Write-Step-Start "Retrieving tests code coverage...";
 

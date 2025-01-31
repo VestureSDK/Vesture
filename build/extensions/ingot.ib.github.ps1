@@ -189,7 +189,9 @@ task ci-github-src-coverage-summary {
 # ---------------------------------------
 task ci-setup-before ci-github-setup
 
-task ci-test-finally ci-github-src-test-summary
+# Test Result
+# ---------------------------------------
+task ci-test-result-finally ci-github-src-test-summary
 
 # Coverage
 # ---------------------------------------

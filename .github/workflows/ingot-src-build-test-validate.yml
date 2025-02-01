@@ -13,12 +13,26 @@ jobs:
     steps:
       - uses: stfbln/ingot/.github/actions/ingot-setup@main
         name: Setup
+      
+      - id: build-cache
+        name: Restore Build Cache
+        uses: actions/cache/restore@v4
+        with:
+          path: '**/src/**/bin/**'
+          key: "${{ runner.os }}-build-src }}"
+
       - name: Build
         run: dotnet ib build
       - name: Upload Build Artifacts
         uses: ./.github/actions/ingot-src/build-artifacts
         with:
           type: upload
+
+      - name: Save Build Cache
+        uses: actions/cache/save@v4
+        with:
+          path: '**/src/**/bin/**'
+          key: ${{ steps.build-cache.outputs.cache-primary-key }}
 
   src-linter:
     needs: src-build

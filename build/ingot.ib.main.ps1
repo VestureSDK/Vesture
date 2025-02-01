@@ -549,7 +549,8 @@ task src-test-result `
     $summaryFile = "${TestResultDirectory}/test-result-summary.md";
 
     Write-Log Debug  "Invoking 'liquid' to generate test result summary '${summaryFile}' from trx files...";
-    exec { dotnet liquid --inputs "File=${TestResultDirectory}/**.trx;Format=Trx" --template "./build/liquid/test-report-summary.md" --output-file "${summaryFile}"; }
+    Write-Log Warning "'liquid' currently does not support multi-targetted test results. Skipping"
+    # exec { dotnet liquid --inputs "File=${TestResultDirectory}/**.trx;Format=Trx" --template "./build/liquid/test-report-summary.md" --output-file "${summaryFile}"; }
     Write-Log Information  "Successfully invoked 'liquid' to generate test result summary";
 
     $fileFilter = "summary.md";
@@ -559,8 +560,9 @@ task src-test-result `
     Write-Files-Found $summary -Directory $directory -Filter $fileFilter;
 
     Write-Step-Start "Successfully generated test result summary";
-}, `
-    src-test-result-validate
+}
+# , `
+    # src-test-result-validate
 
 # Synopsis: [Specific] Cleans test result report
 task src-test-result-clean {

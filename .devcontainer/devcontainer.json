@@ -3,9 +3,11 @@
 {
 	"name": "Ingot",
 
+	"build": { "dockerfile": "../build/docker/Dockerfile" },
+
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	// Use the same image as the CI to ensure reproducibility
-	"image": "mcr.microsoft.com/dotnet/sdk:9.0.102-noble",
+	// "image": "mcr.microsoft.com/dotnet/sdk:9.0.102-noble",
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},

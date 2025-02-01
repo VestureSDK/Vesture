@@ -191,7 +191,8 @@ task ci-setup-before ci-github-setup
 
 # Test Result
 # ---------------------------------------
-task ci-test-result-finally ci-github-src-test-summary
+# Currently not supported due to liquid incapacity to handle multi targetted tests
+# task ci-test-result-finally ci-github-src-test-summary
 
 # Coverage
 # ---------------------------------------

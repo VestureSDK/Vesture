@@ -17,15 +17,6 @@ jobs:
       # invoke build is initialized
       - uses: stfbln/ingot/.github/actions/ingot-setup@main
         name: Setup
-      
-      # Restore previous build cache to allow 
-      # Roslyn to benefit from incremental build
-      - id: build-cache
-        name: Restore Build Cache
-        uses: actions/cache/restore@v4
-        with:
-          path: '**/src/**/bin/**'
-          key: "${{ runner.os }}-build-src }}"
 
       # Builds the source code
       - name: Build
@@ -36,14 +27,6 @@ jobs:
         uses: ./.github/actions/ingot-src/build-artifacts
         with:
           type: upload
-
-      # Saves build cache to allow 
-      # Roslyn to benefit from incremental build
-      - name: Save Build Cache
-        uses: actions/cache/save@v4
-        with:
-          path: '**/src/**/bin/**'
-          key: ${{ steps.build-cache.outputs.cache-primary-key }}
 
   # Ensure formatting of source code
   src-linter:

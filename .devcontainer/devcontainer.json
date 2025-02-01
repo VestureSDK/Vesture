@@ -5,6 +5,9 @@
 
 	"build": { "dockerfile": "../build/docker/Dockerfile" },
 
+	"workspaceMount": "source=/mnt/k/Ingot,target=/workspace,type=bind,consistency=delegated",
+	"workspaceFolder": "/workspace",
+
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	// Use the same image as the CI to ensure reproducibility
 	// "image": "mcr.microsoft.com/dotnet/sdk:9.0.102-noble",

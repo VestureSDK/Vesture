@@ -1,0 +1,11 @@
+{
+	"name": "Ingot",
+	"build": { "dockerfile": "../build/docker/Dockerfile" },
+	"workspaceMount": "source=__DevContainerMount__,target=/workspace,type=bind,consistency=delegated",
+	"workspaceFolder": "/workspace",
+	"postStartCommand":  "dotnet tool restore && dotnet ib setup",
+	"remoteUser": "root",
+	"containerEnv": {
+		"IS_DEVCONTAINER": "true"
+	}
+}

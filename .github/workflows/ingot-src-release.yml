@@ -1,27 +1,39 @@
 name: Ingot Source (Release)
 
+# Runs only on tags since
+# it publishes to nuget.org
 on:
   push:
     tags:
       - '*'
 
 jobs:
+  
+  # Builds, test and validate the source code
+  # it finishes by uploading the nuget packages
+  # as an artifact.
   build-test-validate:
     name: Source
     uses: stfbln/ingot/.github/workflows/ingot-src-build-test-validate.yml@main
 
+  # Publishes the nuget packages
+  # to nuget.org
   src-publish-nuget-org:
-    if: ${{ startsWith(github.event.ref, 'refs/tags') }}
-    needs:
-      - build-test-validate
+    needs: build-test-validate
     name: Source / Publish (nuget.org)
     runs-on: ubuntu-24.04
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     cancel-timeout-minutes: 5
     timeout-minutes: 5
     steps:
+      
+      # Gets git sources and ensures 
+      # invoke build is initialized
       - uses: stfbln/ingot/.github/actions/ingot-setup@main
         name: Setup
+      
+      # Publishes the nuget packages
+      # to nuget.org
       - name: Push
         uses: ./.github/actions/ingot-src/package-publish
         with:

@@ -5,15 +5,21 @@ on:
 
 jobs:
 
+  # Builds the source code
   src-build:
     name: Build
     runs-on: ubuntu-24.04
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     timeout-minutes: 5
     steps:
+      
+      # Gets git sources and ensures 
+      # invoke build is initialized
       - uses: stfbln/ingot/.github/actions/ingot-setup@main
         name: Setup
       
+      # Restore previous build cache to allow 
+      # Roslyn to benefit from incremental build
       - id: build-cache
         name: Restore Build Cache
         uses: actions/cache/restore@v4
@@ -21,31 +27,45 @@ jobs:
           path: '**/src/**/bin/**'
           key: "${{ runner.os }}-build-src }}"
 
+      # Builds the source code
       - name: Build
         run: dotnet ib build
+      
+      # Upload build result for the other jobs
       - name: Upload Build Artifacts
         uses: ./.github/actions/ingot-src/build-artifacts
         with:
           type: upload
 
+      # Saves build cache to allow 
+      # Roslyn to benefit from incremental build
       - name: Save Build Cache
         uses: actions/cache/save@v4
         with:
           path: '**/src/**/bin/**'
           key: ${{ steps.build-cache.outputs.cache-primary-key }}
 
+  # Ensure formatting of source code
   src-linter:
+
+    # Needs the build for efficiency purpose
     needs: src-build
     name: Linter
     runs-on: ubuntu-24.04
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     timeout-minutes: 3
     steps:
+      
+      # Gets git sources and ensures 
+      # invoke build is initialized
       - uses: stfbln/ingot/.github/actions/ingot-setup@main
         name: Setup
+        
+      # Ensures formatting of source code
       - name: Linter
         run: dotnet ib linter
-
+  
+  # Tests the source code
   src-test:
     needs: src-build
     name: Test
@@ -53,28 +73,48 @@ jobs:
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     timeout-minutes: 5
     steps:
+      
+      # Gets git sources and ensures 
+      # invoke build is initialized
       - uses: stfbln/ingot/.github/actions/ingot-setup@main
         name: Setup
+
+      # Retrieves the build artifact to avoid
+      # re-building the source code
       - name: Download Build Artifacts
         uses: ./.github/actions/ingot-src/build-artifacts
         with:
           type: download
+      
+      # Test the source code and 
+      # produces test result
       - name: Test
         run: dotnet ib test
+      
+      # Produces test coverage report
+      # runs even if test failed
       - if: '!cancelled()'
         name: Test Coverage
         run: dotnet ib coverage
+      
+      # Uploads test results 
+      # for download if needed
       - if: '!cancelled()'
         name: Upload Test Result Artifacts
         uses: ./.github/actions/ingot-src/test-artifacts
         with:
           type: upload
+      
+      # Uploads coverage 
+      # for download if needed
       - if: '!cancelled()'
         name: Upload Coverage Artifacts
         uses: ./.github/actions/ingot-src/coverage-artifacts
         with:
           type: upload
 
+  # Creates nuget packages 
+  # from build output
   src-pack:
     needs: src-build
     name: Pack
@@ -82,14 +122,26 @@ jobs:
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     timeout-minutes: 3
     steps:
+
+      # Gets git sources and ensures 
+      # invoke build is initialized
       - uses: stfbln/ingot/.github/actions/ingot-setup@main
         name: Setup
+
+      # Retrieves the build artifact to avoid
+      # re-building the source code
       - name: Download Build Artifacts
         uses: ./.github/actions/ingot-src/build-artifacts
         with:
           type: download
+
+      # Creates nuget packages 
+      # from build output
       - name: Pack
         run: dotnet ib pack
+      
+      # Uploads nuget packages for
+      # publish and download if needed
       - name: Upload Package Artifacts
         uses: ./.github/actions/ingot-src/package-artifacts
         with:

@@ -1,5 +1,8 @@
 name: Ingot Source (Staging)
 
+# Runs on anyting relevant to a src code
+# change, but NOT for tags which is taken
+# care of by the "Release" pipeline.
 on:
   push:
     tags-ignore:
@@ -28,27 +31,40 @@ on:
     branches:
       - '*'
 
+# Allows to auto cancel the pipelines
+# if a new commit is pushed to the same
+# PR or branch.
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
-
+  
+  # Builds, test and validate the source code
+  # it finishes by uploading the nuget packages
+  # as an artifact.
   build-test-validate:
     name: Source
     uses: stfbln/ingot/.github/workflows/ingot-src-build-test-validate.yml@main
 
+  # Publishes the nuget packages
+  # to feedz.io
   src-publish-feedz:
-    needs:
-      - build-test-validate
+    needs: build-test-validate
     name: Source / Publish (feedz.io)
     runs-on: ubuntu-24.04
     container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
     cancel-timeout-minutes: 5
     timeout-minutes: 5
     steps:
+      
+      # Gets git sources and ensures 
+      # invoke build is initialized
       - uses: stfbln/ingot/.github/actions/ingot-setup@main
         name: Setup
+      
+      # Publishes the nuget packages
+      # to feedz.io
       - name: Push
         uses: ./.github/actions/ingot-src/package-publish
         with:

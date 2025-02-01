@@ -41,20 +41,12 @@ namespace Ingot.Mediator.Engine.Pipeline.Internal.NoOp
             INoOpInvocationHandlerStrategyResolver handlerStrategyResolver
         )
         {
-            ArgumentNullException.ThrowIfNull(contextFactory, nameof(contextFactory));
-            ArgumentNullException.ThrowIfNull(
-                preInvocationPipelineMiddlewareResolver,
-                nameof(preInvocationPipelineMiddlewareResolver)
-            );
-            ArgumentNullException.ThrowIfNull(middlewares, nameof(middlewares));
-            ArgumentNullException.ThrowIfNull(
-                preHandlerMiddlewareResolver,
-                nameof(preHandlerMiddlewareResolver)
-            );
-            ArgumentNullException.ThrowIfNull(
-                handlerStrategyResolver,
-                nameof(handlerStrategyResolver)
-            );
+            if (contextFactory is null) { throw new ArgumentNullException(nameof(contextFactory)); }
+            if (preInvocationPipelineMiddlewareResolver is null) { throw new ArgumentNullException(nameof(preInvocationPipelineMiddlewareResolver)); }
+            if (middlewares is null) { throw new ArgumentNullException(nameof(middlewares)); }
+            if (preHandlerMiddlewareResolver is null) { throw new ArgumentNullException(nameof(preHandlerMiddlewareResolver)); }
+            if (handlerStrategyResolver is null) { throw new ArgumentNullException(nameof(handlerStrategyResolver)); }
+
             _loggerFactory = loggerFactory;
             _contextFactory = contextFactory;
             _preInvocationPipelineMiddlewareResolver = preInvocationPipelineMiddlewareResolver;

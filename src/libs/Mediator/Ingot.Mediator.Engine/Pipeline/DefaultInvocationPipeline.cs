@@ -5,6 +5,7 @@ using Ingot.Mediator.Engine.Pipeline.Internal;
 using Ingot.Mediator.Engine.Pipeline.Resolvers;
 using Ingot.Mediator.Engine.Pipeline.Strategies;
 using Ingot.Mediator.Invocation;
+using Ingot.Mediator.Requests;
 using Microsoft.Extensions.Logging;
 
 namespace Ingot.Mediator.Engine.Pipeline
@@ -70,18 +71,12 @@ namespace Ingot.Mediator.Engine.Pipeline
             IInvocationHandlerStrategy<TRequest, TResponse> handlerStrategy
         )
         {
-            ArgumentNullException.ThrowIfNull(contextFactory, nameof(logger));
-            ArgumentNullException.ThrowIfNull(contextFactory, nameof(contextFactory));
-            ArgumentNullException.ThrowIfNull(
-                preInvocationPipelineMiddlewareResolver,
-                nameof(preInvocationPipelineMiddlewareResolver)
-            );
-            ArgumentNullException.ThrowIfNull(middlewares, nameof(middlewares));
-            ArgumentNullException.ThrowIfNull(
-                preHandlerMiddlewareResolver,
-                nameof(preHandlerMiddlewareResolver)
-            );
-            ArgumentNullException.ThrowIfNull(handlerStrategy, nameof(handlerStrategy));
+            if (contextFactory is null) { throw new ArgumentNullException(nameof(logger)); }
+            if (contextFactory is null) { throw new ArgumentNullException(nameof(contextFactory)); }
+            if (preInvocationPipelineMiddlewareResolver is null) { throw new ArgumentNullException(nameof(preInvocationPipelineMiddlewareResolver)); }
+            if (middlewares is null) { throw new ArgumentNullException(nameof(middlewares)); }
+            if (preHandlerMiddlewareResolver is null) { throw new ArgumentNullException(nameof(preHandlerMiddlewareResolver)); }
+            if (handlerStrategy is null) { throw new ArgumentNullException(nameof(handlerStrategy)); }
 
             _logger = logger;
             _contextFactory = contextFactory;

@@ -40,8 +40,8 @@ namespace Ingot.Mediator.Engine.Pipeline.Strategies
             IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>> resolver
         )
         {
-            ArgumentNullException.ThrowIfNull(logger, nameof(logger));
-            ArgumentNullException.ThrowIfNull(resolver, nameof(resolver));
+            if (logger is null) { throw new ArgumentNullException(nameof(logger)); }
+            if (resolver is null) { throw new ArgumentNullException(nameof(resolver)); }
 
             _logger = logger;
             _resolver = resolver;

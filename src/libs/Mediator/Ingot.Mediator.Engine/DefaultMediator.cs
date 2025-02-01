@@ -1,4 +1,7 @@
-﻿using System.Collections.Frozen;
+﻿# if NET8_0_OR_GREATER
+using System.Collections.Frozen;
+#endif
+
 using Ingot.Mediator.Commands;
 using Ingot.Mediator.Engine.Pipeline;
 using Ingot.Mediator.Engine.Pipeline.Extensions;
@@ -26,7 +29,7 @@ namespace Ingot.Mediator.Engine
     /// <remarks>
     /// <para>
     /// The <see cref="DefaultMediator"/> uses the provided <see cref="IInvocationPipeline{TResponse}"/>
-    /// instances to create an efficient cache based on <see cref="FrozenDictionary{TKey, TValue}"/> to
+    /// instances to create an efficient cache based on <see cref="IDictionary{TKey, TValue}"/> to
     /// lookup the right pipeline for the incoming <see cref="IRequest{TResponse}"/>, <see cref="ICommand"/>,
     /// <see cref="IEvent"/> and invoke the corresponding <see cref="IInvocationMiddleware{TRequest, TResponse}"/>s
     /// and <see cref="IInvocationHandler{TRequest, TResponse}"/>.
@@ -66,12 +69,9 @@ namespace Ingot.Mediator.Engine
             INoOpInvocationPipelineResolver noOpInvocationPipelineResolver
         )
         {
-            ArgumentNullException.ThrowIfNull(logger, nameof(logger));
-            ArgumentNullException.ThrowIfNull(invocationPipelines, nameof(invocationPipelines));
-            ArgumentNullException.ThrowIfNull(
-                noOpInvocationPipelineResolver,
-                nameof(noOpInvocationPipelineResolver)
-            );
+            if (logger is null) { throw new ArgumentNullException(nameof(logger)); }
+            if (invocationPipelines is null) { throw new ArgumentNullException(nameof(invocationPipelines)); }
+            if (noOpInvocationPipelineResolver is null) { throw new ArgumentNullException(nameof(noOpInvocationPipelineResolver)); }
 
             _logger = logger;
             _noOpInvocationPipelineResolver = noOpInvocationPipelineResolver;
@@ -127,7 +127,7 @@ namespace Ingot.Mediator.Engine
             CancellationToken cancellationToken = default
         )
         {
-            ArgumentNullException.ThrowIfNull(contract, nameof(contract));
+            if (contract is null) { throw new ArgumentNullException(nameof(contract)); }
 
             var pipeline = GetInvocationPipeline<TResponse>(contract);
             return pipeline.HandleAsync(contract, cancellationToken);
@@ -141,7 +141,7 @@ namespace Ingot.Mediator.Engine
             CancellationToken cancellationToken = default
         )
         {
-            ArgumentNullException.ThrowIfNull(contract, nameof(contract));
+            if (contract is null) { throw new ArgumentNullException(nameof(contract)); }
 
             var context = await HandleAndCaptureAsync<TResponse>(contract, cancellationToken)
                 .ConfigureAwait(false);
@@ -209,7 +209,7 @@ namespace Ingot.Mediator.Engine
             return HandleAsync<EventResponse>(@event, cancellationToken);
         }
 
-        private static FrozenDictionary<
+        private static IDictionary<
             (Type request, Type response),
             IInvocationPipeline
         > CreateInvocationPipelineCache(IEnumerable<IInvocationPipeline> invocationPipelines)
@@ -221,7 +221,12 @@ namespace Ingot.Mediator.Engine
                     invocationPipeline;
             }
 
+#if NET8_0_OR_GREATER
             return dict.ToFrozenDictionary();
+#else
+            return dict;
+#endif
+
         }
     }
 }

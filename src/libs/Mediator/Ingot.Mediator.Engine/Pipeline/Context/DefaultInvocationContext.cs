@@ -19,7 +19,7 @@ namespace Ingot.Mediator.Engine.Pipeline.Context
         /// <exception cref="ArgumentNullException"><paramref name="request"/> is <see langword="null" />.</exception>
         public DefaultInvocationContext(object request)
         {
-            ArgumentNullException.ThrowIfNull(request, nameof(request));
+            if (request is null) { throw new ArgumentNullException(nameof(request)); }
 
             Request = request;
 

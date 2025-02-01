@@ -18,7 +18,7 @@
         /// <exception cref="ArgumentNullException"><paramref name="componentFactory"/> is <see langword="null" />.</exception>
         public TransientInvocationComponentResolver(Func<TComponent> componentFactory)
         {
-            ArgumentNullException.ThrowIfNull(componentFactory, nameof(componentFactory));
+            if (componentFactory is null) { throw new ArgumentNullException(nameof(componentFactory)); }
 
             _componentFactory = componentFactory;
         }

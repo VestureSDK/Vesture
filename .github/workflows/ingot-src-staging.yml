@@ -53,7 +53,7 @@ jobs:
     needs: build-test-validate
     name: Source / Publish (feedz.io)
     runs-on: ubuntu-24.04
-    container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
+    container: stfbln/ingot:latest
     cancel-timeout-minutes: 5
     timeout-minutes: 5
     steps:

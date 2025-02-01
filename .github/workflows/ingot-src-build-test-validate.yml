@@ -9,7 +9,7 @@ jobs:
   src-build:
     name: Build
     runs-on: ubuntu-24.04
-    container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
+    container: stfbln/ingot:latest
     timeout-minutes: 5
     steps:
       
@@ -35,7 +35,7 @@ jobs:
     needs: src-build
     name: Linter
     runs-on: ubuntu-24.04
-    container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
+    container: stfbln/ingot:latest
     timeout-minutes: 3
     steps:
       
@@ -53,7 +53,7 @@ jobs:
     needs: src-build
     name: Test
     runs-on: ubuntu-24.04
-    container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
+    container: stfbln/ingot:latest
     timeout-minutes: 5
     steps:
       
@@ -102,7 +102,7 @@ jobs:
     needs: src-build
     name: Pack
     runs-on: ubuntu-24.04
-    container: mcr.microsoft.com/dotnet/sdk:9.0.102-noble
+    container: stfbln/ingot:latest
     timeout-minutes: 3
     steps:
 

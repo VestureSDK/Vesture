@@ -8,8 +8,10 @@ namespace Ingot.Mediator.Engine.Pipeline.Resolvers
     /// a <typeparamref name="TComponent"/>.
     /// </summary>
     /// <inheritdoc cref="IInvocationComponentResolver{TComponent}"/>
-    public class DeferredSingletonInvocationComponentResolver<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] TComponent>
-        : IInvocationComponentResolver<TComponent>
+    public class DeferredSingletonInvocationComponentResolver<
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+            TComponent
+    > : IInvocationComponentResolver<TComponent>
     {
         private readonly Lazy<TComponent> _componentInitializer;
 
@@ -20,7 +22,10 @@ namespace Ingot.Mediator.Engine.Pipeline.Resolvers
         /// <exception cref="ArgumentNullException"><paramref name="componentInitializer"/> is <see langword="null" />.</exception>
         public DeferredSingletonInvocationComponentResolver(Lazy<TComponent> componentInitializer)
         {
-            if (componentInitializer is null) { throw new ArgumentNullException(nameof(componentInitializer)); }
+            if (componentInitializer is null)
+            {
+                throw new ArgumentNullException(nameof(componentInitializer));
+            }
 
             _componentInitializer = componentInitializer;
         }

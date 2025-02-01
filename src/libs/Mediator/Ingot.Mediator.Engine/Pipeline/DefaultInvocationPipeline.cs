@@ -71,12 +71,30 @@ namespace Ingot.Mediator.Engine.Pipeline
             IInvocationHandlerStrategy<TRequest, TResponse> handlerStrategy
         )
         {
-            if (contextFactory is null) { throw new ArgumentNullException(nameof(logger)); }
-            if (contextFactory is null) { throw new ArgumentNullException(nameof(contextFactory)); }
-            if (preInvocationPipelineMiddlewareResolver is null) { throw new ArgumentNullException(nameof(preInvocationPipelineMiddlewareResolver)); }
-            if (middlewares is null) { throw new ArgumentNullException(nameof(middlewares)); }
-            if (preHandlerMiddlewareResolver is null) { throw new ArgumentNullException(nameof(preHandlerMiddlewareResolver)); }
-            if (handlerStrategy is null) { throw new ArgumentNullException(nameof(handlerStrategy)); }
+            if (contextFactory is null)
+            {
+                throw new ArgumentNullException(nameof(logger));
+            }
+            if (contextFactory is null)
+            {
+                throw new ArgumentNullException(nameof(contextFactory));
+            }
+            if (preInvocationPipelineMiddlewareResolver is null)
+            {
+                throw new ArgumentNullException(nameof(preInvocationPipelineMiddlewareResolver));
+            }
+            if (middlewares is null)
+            {
+                throw new ArgumentNullException(nameof(middlewares));
+            }
+            if (preHandlerMiddlewareResolver is null)
+            {
+                throw new ArgumentNullException(nameof(preHandlerMiddlewareResolver));
+            }
+            if (handlerStrategy is null)
+            {
+                throw new ArgumentNullException(nameof(handlerStrategy));
+            }
 
             _logger = logger;
             _contextFactory = contextFactory;

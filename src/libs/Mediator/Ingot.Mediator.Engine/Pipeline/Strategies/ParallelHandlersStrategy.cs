@@ -39,8 +39,14 @@ namespace Ingot.Mediator.Engine.Pipeline.Strategies
             > resolvers
         )
         {
-            if (logger is null) { throw new ArgumentNullException(nameof(logger)); }
-            if (resolvers is null) { throw new ArgumentNullException(nameof(resolvers)); }
+            if (logger is null)
+            {
+                throw new ArgumentNullException(nameof(logger));
+            }
+            if (resolvers is null)
+            {
+                throw new ArgumentNullException(nameof(resolvers));
+            }
 
             if (!resolvers.Any())
             {

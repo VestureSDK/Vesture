@@ -28,7 +28,10 @@ namespace Ingot.Mediator.Engine.Pipeline.Internal
             ILogger<DefaultPrePipelineAndHandlerMiddleware> logger
         )
         {
-            if (logger is null) { throw new ArgumentNullException(nameof(logger)); }
+            if (logger is null)
+            {
+                throw new ArgumentNullException(nameof(logger));
+            }
 
             _logger = logger;
         }

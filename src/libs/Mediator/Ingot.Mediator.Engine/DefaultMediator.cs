@@ -1,8 +1,4 @@
-﻿# if NET8_0_OR_GREATER
-using System.Collections.Frozen;
-#endif
-
-using Ingot.Mediator.Commands;
+﻿using Ingot.Mediator.Commands;
 using Ingot.Mediator.Engine.Pipeline;
 using Ingot.Mediator.Engine.Pipeline.Extensions;
 using Ingot.Mediator.Engine.Pipeline.Internal.NoOp;
@@ -10,6 +6,9 @@ using Ingot.Mediator.Events;
 using Ingot.Mediator.Invocation;
 using Ingot.Mediator.Requests;
 using Microsoft.Extensions.Logging;
+# if NET8_0_OR_GREATER
+using System.Collections.Frozen;
+#endif
 
 namespace Ingot.Mediator.Engine
 {
@@ -69,9 +68,18 @@ namespace Ingot.Mediator.Engine
             INoOpInvocationPipelineResolver noOpInvocationPipelineResolver
         )
         {
-            if (logger is null) { throw new ArgumentNullException(nameof(logger)); }
-            if (invocationPipelines is null) { throw new ArgumentNullException(nameof(invocationPipelines)); }
-            if (noOpInvocationPipelineResolver is null) { throw new ArgumentNullException(nameof(noOpInvocationPipelineResolver)); }
+            if (logger is null)
+            {
+                throw new ArgumentNullException(nameof(logger));
+            }
+            if (invocationPipelines is null)
+            {
+                throw new ArgumentNullException(nameof(invocationPipelines));
+            }
+            if (noOpInvocationPipelineResolver is null)
+            {
+                throw new ArgumentNullException(nameof(noOpInvocationPipelineResolver));
+            }
 
             _logger = logger;
             _noOpInvocationPipelineResolver = noOpInvocationPipelineResolver;
@@ -127,7 +135,10 @@ namespace Ingot.Mediator.Engine
             CancellationToken cancellationToken = default
         )
         {
-            if (contract is null) { throw new ArgumentNullException(nameof(contract)); }
+            if (contract is null)
+            {
+                throw new ArgumentNullException(nameof(contract));
+            }
 
             var pipeline = GetInvocationPipeline<TResponse>(contract);
             return pipeline.HandleAsync(contract, cancellationToken);
@@ -141,7 +152,10 @@ namespace Ingot.Mediator.Engine
             CancellationToken cancellationToken = default
         )
         {
-            if (contract is null) { throw new ArgumentNullException(nameof(contract)); }
+            if (contract is null)
+            {
+                throw new ArgumentNullException(nameof(contract));
+            }
 
             var context = await HandleAndCaptureAsync<TResponse>(contract, cancellationToken)
                 .ConfigureAwait(false);
@@ -226,7 +240,6 @@ namespace Ingot.Mediator.Engine
 #else
             return dict;
 #endif
-
         }
     }
 }

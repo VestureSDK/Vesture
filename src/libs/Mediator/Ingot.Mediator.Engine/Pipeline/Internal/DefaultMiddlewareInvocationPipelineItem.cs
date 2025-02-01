@@ -42,8 +42,14 @@ namespace Ingot.Mediator.Engine.Pipeline.Internal
             IInvocationComponentResolver<IInvocationMiddleware<TRequest, TResponse>> resolver
         )
         {
-            if (resolver is null) { throw new ArgumentNullException(nameof(resolver)); }
-            if (middlewareType is null) { throw new ArgumentNullException(nameof(middlewareType)); }
+            if (resolver is null)
+            {
+                throw new ArgumentNullException(nameof(resolver));
+            }
+            if (middlewareType is null)
+            {
+                throw new ArgumentNullException(nameof(middlewareType));
+            }
 
             Order = order;
             MiddlewareType = middlewareType;

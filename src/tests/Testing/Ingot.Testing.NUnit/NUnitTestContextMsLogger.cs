@@ -48,7 +48,10 @@ namespace Ingot.Testing
                 return;
             }
 
-            if (formatter is null) { throw new ArgumentNullException(nameof(formatter)); }
+            if (formatter is null)
+            {
+                throw new ArgumentNullException(nameof(formatter));
+            }
 
             var message = formatter(state, exception);
             var sb = new StringBuilder();

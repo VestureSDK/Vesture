@@ -22,7 +22,10 @@ namespace Ingot.Mediator.Engine.Pipeline.Internal.NoOp
         /// <exception cref="ArgumentNullException"><paramref name="loggerFactory"/> is <see langword="null"/>.</exception>
         public DefaultNoOpInvocationHandlerStrategyResolver(ILoggerFactory loggerFactory)
         {
-            if (loggerFactory is null) { throw new ArgumentNullException(nameof(loggerFactory)); }
+            if (loggerFactory is null)
+            {
+                throw new ArgumentNullException(nameof(loggerFactory));
+            }
 
             _loggerFactory = loggerFactory;
         }

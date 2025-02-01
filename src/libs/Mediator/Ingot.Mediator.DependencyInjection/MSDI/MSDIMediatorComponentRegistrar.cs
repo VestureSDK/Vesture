@@ -34,7 +34,10 @@ namespace Ingot.Mediator.DependencyInjection.MSDI
         /// <exception cref="ArgumentNullException"><paramref name="services"/> is <see langword="null" />.</exception>
         public MSDIMediatorComponentRegistrar(IServiceCollection services)
         {
-            if (services is null) { throw new ArgumentNullException(nameof(services)); }
+            if (services is null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
 
             _services = services;
 
@@ -84,7 +87,10 @@ namespace Ingot.Mediator.DependencyInjection.MSDI
             int? order = null
         )
         {
-            if (middleware is null) { throw new ArgumentNullException(nameof(middleware)); }
+            if (middleware is null)
+            {
+                throw new ArgumentNullException(nameof(middleware));
+            }
 
             var middlewareType = middleware.GetType();
             if (!_services.Any(sd => sd.ServiceType == middlewareType))
@@ -154,7 +160,10 @@ namespace Ingot.Mediator.DependencyInjection.MSDI
             IInvocationHandler<TRequest, TResponse> handler
         )
         {
-            if (handler is null) { throw new ArgumentNullException(nameof(handler)); }
+            if (handler is null)
+            {
+                throw new ArgumentNullException(nameof(handler));
+            }
 
             _services.AddSingleton<
                 IInvocationComponentResolver<IInvocationHandler<TRequest, TResponse>>
@@ -216,7 +225,10 @@ namespace Ingot.Mediator.DependencyInjection.MSDI
             IInvocationHandlerStrategy<TRequest, TResponse> strategy
         )
         {
-            if (strategy is null) { throw new ArgumentNullException(nameof(strategy)); }
+            if (strategy is null)
+            {
+                throw new ArgumentNullException(nameof(strategy));
+            }
 
             _services.AddSingleton(strategy);
         }

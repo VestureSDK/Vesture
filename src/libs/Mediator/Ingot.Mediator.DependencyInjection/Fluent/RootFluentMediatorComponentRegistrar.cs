@@ -28,7 +28,10 @@ namespace Ingot.Mediator.DependencyInjection.Fluent
         /// <exception cref="ArgumentNullException"><paramref name="registrar"/> is <see langword="null" />.</exception>
         public RootFluentMediatorComponentRegistrar(IMediatorComponentRegistrar registrar)
         {
-            if (registrar is null) { throw new ArgumentNullException(nameof(registrar)); }
+            if (registrar is null)
+            {
+                throw new ArgumentNullException(nameof(registrar));
+            }
 
             Registrar = registrar;
         }

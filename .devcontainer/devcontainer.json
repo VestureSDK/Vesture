@@ -1,9 +1,13 @@
 {
 	"name": "Ingot",
 	"build": { "dockerfile": "../build/docker/Dockerfile" },
-	"postStartCommand":  "dotnet tool restore && dotnet ib setup",
+	"postCreateCommand":  "dotnet tool restore && dotnet ib setup",
 	"remoteUser": "root",
 	"containerEnv": {
 		"IS_DEVCONTAINER": "true"
-	}
+	},
+	"mounts": [
+		"source=profile,target=/home/vscode,type=volume",
+		"source=nuget,target=/root/.nuget,type=volume"
+	]
 }

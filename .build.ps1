@@ -109,7 +109,7 @@ Enter-Build {
 }
 
 Enter-BuildJob {
-    
+
     # Allows for nicer output
     Write-Build DarkGray "";
 }

@@ -80,6 +80,14 @@ task setup `
     ?ci-setup, `
     ci-setup-finally
 
+# Clean
+# ---------------------------------------
+# Synopsis: Cleans output from previous runs
+task clean `
+    ci-clean-before, `
+    ?ci-clean, `
+    ci-clean-finally
+
 # Full
 # ---------------------------------------
 # Synopsis: full flow (format > linter > build > test > coverage > pack > publish)
@@ -181,7 +189,19 @@ task ci-setup-finally -If($False)
 task ci-setup `
     tool-ib-setup, `
     tool-nuget-setup, `
+    tool-minver-setup, `
     tool-minver-validate
+
+# Clean
+# ---------------------------------------
+task ci-clean-before -If($False)
+task ci-clean-finally -If($False) 
+
+task ci-clean `
+    src-test-result-clean, `
+    src-test-clean, `
+    src-coverage-clean, `
+    src-pack-clean
 
 # Linter
 # ---------------------------------------
@@ -197,6 +217,7 @@ task ci-build-before -If($False)
 task ci-build-finally -If($False) 
 
 task ci-build `
+    tool-minver-setup, `
     src-build
 
 # Test
@@ -229,6 +250,7 @@ task ci-pack-before -If($False)
 task ci-pack-finally -If($False) 
 
 task ci-pack `
+    tool-minver-setup, `
     src-pack
 
 # Publish
@@ -237,6 +259,7 @@ task ci-publish-before -If($False)
 task ci-publish-finally -If($False) 
 
 task ci-publish `
+    tool-minver-setup, `
     src-pack-validate, `
     src-publish-local, `
     src-publish-remote
@@ -316,6 +339,22 @@ task tool-ib-setup -If(-Not (Test-CI-ExecutionEnvironment)) {
     }
 }
 
+# Synopsis: [Specific] Setup minver pre-release identifiers
+task tool-minver-setup -If(-Not ($env:MinVerDefaultPreReleaseIdentifiers)) {
+    
+    Write-Step-Start "Setting up MinVer...";
+
+    if (Test-Local-ExecutionEnvironment)
+    {
+        Write-Log Debug "Setting MinVer computed pre-release identifiers for local version...";
+        $script:MinVerDefaultPreReleaseIdentifiers = "alpha.0.local"
+        $env:MinVerDefaultPreReleaseIdentifiers = $script:MinVerDefaultPreReleaseIdentifiers;
+        Write-Log Information "Set MinVer computed pre-release identifiers to '$($script:MinVerDefaultPreReleaseIdentifiers)'...";
+    }
+    
+    Write-Step-End "Successfuly setup MinVer"
+}
+
 # Synopsis: [Specific] Ensures minver is correctly setup
 task tool-minver-validate {
 
@@ -353,60 +392,26 @@ task tool-minver-validate {
 # Synopsis: [Specific] Configures nuget for local feed
 task tool-nuget-setup -If(-Not (Test-CI-ExecutionEnvironment)) {
 
-    Write-Step-Start "Creating NuGet config file...";
+    Write-Step-Start "Retrieving nuget local push source...";
 
-    $nugetConfigFile = "./nuget.config";
-    if (Test-Path $nugetConfigFile)
+    Write-Log Debug "Invoking 'dotnet nuget' to get config 'defaultPushSource'";
+    $nugetLocalSource = exec { dotnet nuget config get "defaultPushSource" };
+    Write-Log Information "Successfuly invoked 'dotnet nuget' to get config 'defaultPushSource'";
+    
+    if (-Not $nugetLocalSource)
     {
-        Write-Log Debug  "NuGet config file '${nugetConfigFile}' exists already. Deleting it...";
-        Remove-Item $nugetConfigFile -Force;
-        if (Test-Path $nugetConfigFile)
-        {
-            Write-Log Error "Failed to create NuGet config file '${nugetConfigFile}'";
-        }
-        Write-Log Information  "Deleted existing NuGet config file '${nugetConfigFile}'";
+        Write-Error "Could not retrieve nuget local push source";
     }
 
-    Write-Log Debug  "Creating empty NuGet config file '${nugetConfigFile}'...";
-    '<configuration></configuration>' > $nugetConfigFile;
-    if (-Not (Test-Path $nugetConfigFile))
-    {
-        Write-Log Error "Failed to create NuGet config file '${nugetConfigFile}'";
-    }
-    Write-Log Information  "Created empty NuGet config file '${nugetConfigFile}'";
+    Write-Step-End "Successfully retrieved local push source '${nugetLocalSource}'";
 
-    $nugetConfigContent = Get-Content $nugetConfigFile -Raw;
-    Write-File-Content -File $nugetConfigFile -Content $nugetConfigContent;
+    Write-Step-Start "Creating local NuGet source...";
 
-    Write-Step-End "Successfully created NuGet config file";
-
-    Write-Step-Start "Adding local NuGet source...";
-
-    $nugetLocalFeedName = "ingot-local-feed";
     $nugetLocalFeedValue = "./dist/local-nuget-feed";
 
     New-Directory $nugetLocalFeedValue;
 
-    Write-Log Debug  "Invoking 'dotnet nuget' to add local NuGet source '${nugetLocalFeedName}' (${nugetLocalFeedValue})...";
-    exec { dotnet nuget add source --configfile $nugetConfigFile --name $nugetLocalFeedName $nugetLocalFeedValue }
-    Write-Log Information  "Successfully added local NuGet source '${nugetLocalFeedName}' (${nugetLocalFeedValue})";
-
-    $nugetConfigContent = Get-Content $nugetConfigFile -Raw;
-    Write-File-Content -File $nugetConfigFile -Content $nugetConfigContent;
-    
-    Write-Step-End "Successfully added local NuGet source";
-
-    Write-Step-Start "Setting local NuGet push source...";
-
-    $nugetDefaultPushSourceKey = "defaultPushSource";
-    Write-Log Debug  "Invoking 'dotnet nuget' to set NuGet configuration '${nugetDefaultPushSourceKey}' (${nugetLocalFeedValue})...";
-    exec { dotnet nuget config set --configfile $nugetConfigFile $nugetDefaultPushSourceKey $nugetLocalFeedValue }
-    Write-Log Information  "Successfully set NuGet configuration '${nugetDefaultPushSourceKey}' (${nugetLocalFeedValue})";
-
-    $nugetConfigContent = Get-Content $nugetConfigFile -Raw;
-    Write-File-Content -File $nugetConfigFile -Content $nugetConfigContent;
-    
-    Write-Step-End "Successfully set local NuGet push source";
+    Write-Step-End "Successfully created local NuGet source";
 }
 
 # Synopsis: [Specific] Opens ./src/Ingot.sln in Visual Studio
@@ -570,7 +575,7 @@ task src-test-result-clean {
     Write-Step-Start "Cleaning test result summary file...";
 
     $summaryFile = "${TestResultDirectory}/test-result-summary.md";
-    $file = Get-ChildItem -Path $summaryFile;
+    $file = Get-ChildItem -Path $summaryFile -ErrorAction SilentlyContinue;
     
     if ($file)
     {
@@ -835,7 +840,8 @@ task src-publish-local -If(-Not (Test-CI-ExecutionEnvironment)) `
         
         Write-Step-End "Successfully published nupkg '$($_.Name)' to '${nugetLocalFeedName}'";
     }
-}
+}, `
+    src-sample-update-nuget
 
 # Synopsis: [Specific] Publishes the packaged *.nupkg to a remote feed
 task src-publish-remote -If(($NupkgPushSource) -And ($NupkgPushApiKey)) `
@@ -860,6 +866,17 @@ task src-publish-remote -If(($NupkgPushSource) -And ($NupkgPushApiKey)) `
         
         Write-Step-End "Successfully published nupkg '$($_.Name)' to '${NupkgPushSource}'";
     }
+}
+
+task src-sample-update-nuget -If(Test-Local-ExecutionEnvironment) {
+
+    Write-Step-Start "Update samples with latest nuget...";
+
+    Write-Log Debug "Invoking 'dotnet restore' to force updating samples with latest local version";
+    exec { dotnet restore ./samples --force };
+    Write-Log Information "Successfuly invoked 'dotnet restore' to update samples with latest local version";
+    
+    Write-Step-End "Successfully updated samples with latest nuget";
 }
 
 task Docs-Clean {

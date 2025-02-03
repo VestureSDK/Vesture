@@ -893,9 +893,34 @@ task src-sample-update-nuget {
     Write-Step-Start "Update samples with latest nuget...";
 
     Write-Log Debug "Invoking 'dotnet restore' to force updating samples with latest local version";
-    exec { dotnet restore ./samples --force };
+    exec { dotnet restore ./samples --force }
     Write-Log Information "Successfuly invoked 'dotnet restore' to update samples with latest local version";
     
+    Write-Log Debug "Invoking 'dotnet list' to list packages used by the sample projects...";
+    $versions = exec { dotnet list ./samples package }
+    
+    if ($versions)
+    {
+        Write-Log Information "Successfully invoked 'dotnet list' to list packages used by the sample projects";
+        Write-Log Trace $versions;
+    }
+    else {
+        Write-Log Error "Versions returned by 'dotnet list' is empty"
+    }
+
+    Write-Log Debug  "Invoking 'minver' to compute version...";
+    $version = exec { dotnet minver -v d }
+    Write-Log Information  "Retrieved MinVer computed version '${version}'";
+
+    Write-Log Debug "Ensuring MinVer version '${version}' is present in sample projects nuget config...";
+    if ($versions -like "*${version}*")
+    {
+        Write-Log Information "MinVer version '${version}' is present in sample projects nuget config";
+    }
+    else {
+        Write-Log Error "MinVer version '${version}' is not present in sample projects nuget config";
+    }
+
     Write-Step-End "Successfully updated samples with latest nuget";
 }
 

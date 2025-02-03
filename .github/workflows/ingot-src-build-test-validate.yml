@@ -164,7 +164,7 @@ jobs:
       # Publishes the nuget packages locally
       # before testing the samples
       - name: Test Samples
-        run: dotnet ib src-publish-local
+        run: dotnet ib publish
 
       # Tests the samples
       - name: Test Samples

@@ -6,11 +6,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PublishAot>true</PublishAot>
+    <PublishSingleFile>true</PublishSingleFile>
     <InvariantGlobalization>true</InvariantGlobalization>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Ingot.Mediator" Version="*-*" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.1" />
   </ItemGroup>
 
 </Project>

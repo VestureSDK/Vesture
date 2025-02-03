@@ -916,18 +916,21 @@ task src-sample-publish `
     if ($IsWindows)
     {
         $rid = "win-x64";
+        $extension = ".exe";
         Write-Log Information "Current platform is Windows, using RID '${rid}'";
     }
 
     if ($IsLinux)
     {
         $rid = "linux-x64";
+        $extension = ".bin";
         Write-Log Information "Current platform is Linux, using RID '${rid}'";
     }
 
     if ($IsMacOS)
     {
         $rid = "osx-x64";
+        $extension = ".bin";
         Write-Log Information "Current platform is MacOS, using RID '${rid}'";
     }
 
@@ -949,12 +952,13 @@ task src-sample-publish `
         Write-Step-Start "Publishing sample '$($_.Name)' for runtime '${rid}'...";
 
         $nameWithoutExtension = $_.Name -replace $_.Extension, "";
+        $applicationName = "${nameWithoutExtension}${extension}";
         $outputFolder = "${sampleOutputDirectory}/${nameWithoutExtension}";
 
         New-Directory $outputFolder;
 
         Write-Log Debug  "Invoking 'dotnet publish' to publish '$($_.FullName)' for runtime '${rid}'...";
-        exec { dotnet publish $_.FullName -c 'Release' --verbosity $DotnetVerbosity -o $outputFolder -r $rid }
+        exec { dotnet publish $_.FullName -c 'Release' --verbosity $DotnetVerbosity -o $outputFolder -r $rid -p "AssemblyName=${applicationName}" }
         Write-Log Information  "Successfully invoked 'dotnet publish' to publish '$($_.FullName)' for runtime '${rid}'";
         
         Write-Step-End "Successfully published sample '$($_.Name)' for runtime '${rid}'";
@@ -963,11 +967,35 @@ task src-sample-publish `
 
 task src-sample-validate {
 
+    Write-Step-Start "Detecting OS...";
+
+    if ($IsWindows)
+    {
+        $rid = "win-x64";
+        $fileFilter = "*.exe";
+        Write-Log Information "Current platform is Windows, using RID '${rid}'";
+    }
+
+    if ($IsLinux)
+    {
+        $rid = "linux-x64";
+        $fileFilter = "*.bin";
+        Write-Log Information "Current platform is Linux, using RID '${rid}'";
+    }
+
+    if ($IsMacOS)
+    {
+        $rid = "osx-x64";
+        $fileFilter = "*.bin";
+        Write-Log Information "Current platform is MacOS, using RID '${rid}'";
+    }
+
+    Write-Step-End "Successfully detected OS";
+
     $sampleOutputDirectory = "./dist/samples";
 
     Write-Step-Start "Retrieving sample executables...";
 
-    $fileFilter = "*.exe";
     $sampleExecutables = Get-ChildItem $sampleOutputDirectory -Filter $fileFilter -Recurse;
     Write-Files-Found $sampleExecutables -Directory $sampleOutputDirectory -Filter $fileFilter;
     Assert-Files-Found $sampleExecutables -Directory $sampleOutputDirectory -Filter $fileFilter;
@@ -984,7 +1012,7 @@ task src-sample-validate {
         if ($LASTEXITCODE -ne 0)
         {
             $exitCodes = 1;
-            Write-Log Warning "Failed to invoke 'dotnet test' on '$($_.FullName)', exit code ${exitCode}";
+            Write-Log Warning "Failed to validate sample executable '$($_.FullName)', exit code ${exitCode}";
         }
         else {
             Write-Step-End "Successfully validated sample executable '$($_.Name)'";

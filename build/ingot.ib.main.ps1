@@ -409,7 +409,7 @@ task tool-minver-validate {
 }
 
 # Synopsis: [Specific] Configures nuget for local feed
-task tool-nuget-setup -If(-Not (Test-CI-ExecutionEnvironment)) {
+task tool-nuget-setup -If(Test-Local-ExecutionEnvironment -Or $Force) {
 
     Write-Step-Start "Retrieving nuget local push source...";
 
@@ -817,7 +817,7 @@ task src-pack `
     src-pack-validate
 
 # Synopsis: [Specific] Publishes the packaged *.nupkg to a local feed
-task src-publish-local -If(-Not (Test-CI-ExecutionEnvironment) -Or $Force) `
+task src-publish-local -If(Test-Local-ExecutionEnvironment -Or $Force) `
     tool-nuget-setup, `
     src-pack-validate, `
 {

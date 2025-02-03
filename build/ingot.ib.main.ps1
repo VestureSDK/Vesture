@@ -409,7 +409,7 @@ task tool-minver-validate {
 }
 
 # Synopsis: [Specific] Configures nuget for local feed
-task tool-nuget-setup -If(Test-Local-ExecutionEnvironment -Or $Force) {
+task tool-nuget-setup {
 
     Write-Step-Start "Retrieving nuget local push source...";
 
@@ -817,7 +817,7 @@ task src-pack `
     src-pack-validate
 
 # Synopsis: [Specific] Publishes the packaged *.nupkg to a local feed
-task src-publish-local -If(Test-Local-ExecutionEnvironment -Or $Force) `
+task src-publish-local `
     tool-nuget-setup, `
     src-pack-validate, `
 {
@@ -888,7 +888,7 @@ task src-publish-remote -If(($NupkgPushSource) -And ($NupkgPushApiKey)) `
 }
 
 # Synopsis: [Specific] Updates the samples nuget packages to use latest available package
-task src-sample-update-nuget -If(Test-Local-ExecutionEnvironment) {
+task src-sample-update-nuget {
 
     Write-Step-Start "Update samples with latest nuget...";
 

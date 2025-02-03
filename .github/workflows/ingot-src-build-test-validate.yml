@@ -140,6 +140,8 @@ jobs:
         os: [ubuntu-24.04, windows-2022, macos-15]
     runs-on: ${{ matrix.os }}
     timeout-minutes: 3
+    env:
+      pwsh: "pwsh"
     steps:
 
       # Setup dotnet since we are 
@@ -162,7 +164,9 @@ jobs:
       # Publishes the nuget packages locally
       # before testing the samples
       - name: Test Samples
-        run: |
-          dotnet ib src-publish-local -Force
-          dotnet ib test-sample
+        run: dotnet ib src-publish-local
+
+      # Tests the samples
+      - name: Test Samples
+        run: dotnet ib test-sample
 

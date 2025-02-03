@@ -95,6 +95,13 @@ jobs:
         uses: ./.github/actions/ingot-src/coverage-artifacts
         with:
           type: upload
+      
+      # Publishes the nuget packages locally
+      # before testing the samples
+      - name: Test Samples
+        run: |
+          dotnet ib src-publish-local -Force
+          dotnet ib test-sample
 
   # Creates nuget packages 
   # from build output

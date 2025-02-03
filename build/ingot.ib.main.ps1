@@ -817,7 +817,7 @@ task src-pack `
     src-pack-validate
 
 # Synopsis: [Specific] Publishes the packaged *.nupkg to a local feed
-task src-publish-local -If(-Not (Test-CI-ExecutionEnvironment)) `
+task src-publish-local -If(-Not (Test-CI-ExecutionEnvironment) -Or $Force) `
     tool-nuget-setup, `
     src-pack-validate, `
 {

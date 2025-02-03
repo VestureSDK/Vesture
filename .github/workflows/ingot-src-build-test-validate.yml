@@ -95,13 +95,6 @@ jobs:
         uses: ./.github/actions/ingot-src/coverage-artifacts
         with:
           type: upload
-      
-      # Publishes the nuget packages locally
-      # before testing the samples
-      - name: Test Samples
-        run: |
-          dotnet ib src-publish-local -Force
-          dotnet ib test-sample
 
   # Creates nuget packages 
   # from build output
@@ -136,3 +129,41 @@ jobs:
         uses: ./.github/actions/ingot-src/package-artifacts
         with:
           type: upload
+  
+  # Test the sample apps 
+  # on different platforms
+  src-sample-test:
+    needs: src-pack
+    name: Test Samples
+    strategy:
+      matrix:
+        os: [ubuntu-24.04, windows-2022, macos-15]
+    runs-on: ${{ matrix.os }}
+    container: stfbln/ingot:latest
+    timeout-minutes: 3
+    steps:
+
+      # Setup dotnet since we are 
+      # not in a container
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: '9.0.x'
+
+      # Gets git sources and ensures 
+      # invoke build is initialized
+      - uses: stfbln/ingot/.github/actions/ingot-setup@main
+        name: Setup
+
+      # Downloads the package artifact
+      - name: Download Package Artifacts
+        uses: ./.github/actions/ingot-src/package-artifacts
+        with:
+          type: download
+      
+      # Publishes the nuget packages locally
+      # before testing the samples
+      - name: Test Samples
+        run: |
+          dotnet ib src-publish-local -Force
+          dotnet ib test-sample
+

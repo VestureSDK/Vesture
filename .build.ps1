@@ -11,6 +11,8 @@ param(
 
     [string] $SrcDirectory = './src',
 
+    [string] $SamplesDirectory = './samples',
+
     [string] $NupkgDirectory = './dist/nuget',
 
     [string] $TestResultDirectory = './dist/test-result',

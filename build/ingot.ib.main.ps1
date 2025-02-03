@@ -99,7 +99,8 @@ task full `
     test-result, `
     coverage, `
     pack, `
-    publish
+    publish, `
+    test-sample
     
 # IDE
 # ---------------------------------------
@@ -136,6 +137,14 @@ task test `
     ci-test-before, `
     ?ci-test, `
     ci-test-finally
+
+# Test Samples
+# ---------------------------------------
+# Synopsis: Tests samples
+task test-sample `
+    ci-test-sample-before, `
+    ?ci-test-sample, `
+    ci-test-sample-finally
 
 # Test Report
 # ---------------------------------------
@@ -201,7 +210,8 @@ task ci-clean `
     src-test-result-clean, `
     src-test-clean, `
     src-coverage-clean, `
-    src-pack-clean
+    src-pack-clean, `
+    src-sample-publish-clean
 
 # Linter
 # ---------------------------------------
@@ -235,6 +245,15 @@ task ci-test-result-finally -If($False)
 
 task ci-test-result `
     src-test-result
+    
+# Test Samples
+# ---------------------------------------
+task ci-test-sample-before -If($False) 
+task ci-test-sample-finally -If($False) 
+
+task ci-test-sample `
+    src-sample-publish, `
+    src-sample-validate
 
 # Coverage
 # ---------------------------------------
@@ -868,6 +887,7 @@ task src-publish-remote -If(($NupkgPushSource) -And ($NupkgPushApiKey)) `
     }
 }
 
+# Synopsis: [Specific] Updates the samples nuget packages to use latest available package
 task src-sample-update-nuget -If(Test-Local-ExecutionEnvironment) {
 
     Write-Step-Start "Update samples with latest nuget...";
@@ -877,6 +897,104 @@ task src-sample-update-nuget -If(Test-Local-ExecutionEnvironment) {
     Write-Log Information "Successfuly invoked 'dotnet restore' to update samples with latest local version";
     
     Write-Step-End "Successfully updated samples with latest nuget";
+}
+
+task src-sample-publish-clean {
+
+    Write-Step-Start "Cleaning samples output...";
+    
+    Remove-Directory "./dist/samples";
+
+    Write-Step-End "Successfully cleant samples output...";
+}
+
+task src-sample-publish `
+    src-sample-publish-clean, 
+{
+    Write-Step-Start "Detecting OS...";
+
+    if ($IsWindows)
+    {
+        $rid = "win-x64";
+        Write-Log Information "Current platform is Windows, using RID '${rid}'";
+    }
+
+    if ($IsLinux)
+    {
+        $rid = "linux-x64";
+        Write-Log Information "Current platform is Linux, using RID '${rid}'";
+    }
+
+    if ($IsMacOS)
+    {
+        $rid = "osx-x64";
+        Write-Log Information "Current platform is MacOS, using RID '${rid}'";
+    }
+
+    Write-Step-End "Successfully detected OS";
+
+    $sampleOutputDirectory = "./dist/samples";
+
+    Write-Step-Start "Retrieving sample projects...";
+
+    $fileFilter = "*.csproj";
+    $sampleProjects = Get-ChildItem $SamplesDirectory -Filter $fileFilter -Recurse;
+    Write-Files-Found $sampleProjects -Directory $SamplesDirectory -Filter $fileFilter;
+    Assert-Files-Found $sampleProjects -Directory $SamplesDirectory -Filter $fileFilter;
+
+    Write-Step-End "Successfully found $($sampleProjects.Count) sample projects";
+
+    $sampleProjects | ForEach-Object -Process {
+
+        Write-Step-Start "Publishing sample '$($_.Name)' for runtime '${rid}'...";
+
+        $nameWithoutExtension = $_.Name -replace $_.Extension, "";
+        $outputFolder = "${sampleOutputDirectory}/${nameWithoutExtension}";
+
+        New-Directory $outputFolder;
+
+        Write-Log Debug  "Invoking 'dotnet publish' to publish '$($_.FullName)' for runtime '${rid}'...";
+        exec { dotnet publish $_.FullName -c 'Release' --verbosity $DotnetVerbosity -o $outputFolder -r $rid }
+        Write-Log Information  "Successfully invoked 'dotnet publish' to publish '$($_.FullName)' for runtime '${rid}'";
+        
+        Write-Step-End "Successfully published sample '$($_.Name)' for runtime '${rid}'";
+    }
+}
+
+task src-sample-validate {
+
+    $sampleOutputDirectory = "./dist/samples";
+
+    Write-Step-Start "Retrieving sample executables...";
+
+    $fileFilter = "*.exe";
+    $sampleExecutables = Get-ChildItem $sampleOutputDirectory -Filter $fileFilter -Recurse;
+    Write-Files-Found $sampleExecutables -Directory $sampleOutputDirectory -Filter $fileFilter;
+    Assert-Files-Found $sampleExecutables -Directory $sampleOutputDirectory -Filter $fileFilter;
+
+    Write-Step-End "Successfully found $($sampleExecutables.Count) sample executables";
+
+    $exitCodes = 0;
+    $sampleExecutables | ForEach-Object -Process {
+
+        Write-Step-Start "Validating sample executable '$($_.Name)'...";
+        
+        exec { & $($_.FullName) }
+        
+        if ($LASTEXITCODE -ne 0)
+        {
+            $exitCodes = 1;
+            Write-Log Warning "Failed to invoke 'dotnet test' on '$($_.FullName)', exit code ${exitCode}";
+        }
+        else {
+            Write-Step-End "Successfully validated sample executable '$($_.Name)'";
+        }
+    }
+
+    if ($exitCodes -ne 0)
+    {
+        Write-Log Error "Some sample executables have failed. Check logs for more details."
+    }
 }
 
 task Docs-Clean {

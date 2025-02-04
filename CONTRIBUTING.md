@@ -54,7 +54,7 @@ To note as well, this repository uses Native AOT publish and you might need to i
 >
 > ***
 
-#### Local Post-Clone Setup
+#### Post-Clone Setup
 
 After installing all the **Prerequisites** and cloning the repository, ensure to run the following commands from the repository root directory to setup the various tools and validate your configuration.
 

@@ -5,6 +5,10 @@ inputs:
   type:
     description: 'The type of artifact action, either upload or download'
     required: true
+  name:
+    description: 'The name of the artifact to either upload or download'
+    required: false
+    default: 'coverage'
 runs:
   using: 'composite'
   steps:
@@ -24,7 +28,7 @@ runs:
       uses: actions/upload-artifact@v4
       with:
         # Name needs to match in the download section
-        name: coverage
+        name: ${{ inputs.name }}
         if-no-files-found: error
         retention-days: 1
         path: ${{ env.INGOT_COVERAGEGLOB }}
@@ -41,4 +45,4 @@ runs:
         # Name needs to match in the upload section
         # Do not specify a path to ensure the restore
         # puts the files in their original location
-        name: coverage
+        name: ${{ inputs.name }}

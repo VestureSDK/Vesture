@@ -45,7 +45,7 @@ jobs:
   # as an artifact.
   build-test-validate:
     name: Source
-    uses: stfbln/ingot/.github/workflows/ingot-src-build-test-validate.yml@add-cross-platform-test
+    uses: stfbln/ingot/.github/workflows/ingot-src-build-test-validate.yml@main
 
   # Publishes the nuget packages
   # to feedz.io

@@ -1,6 +1,6 @@
-name: 'Ingot Build Artifact'
-description: 'Upload/Download Ingot build artifact'
-author: 'Ingot'
+name: 'Build Artifact'
+description: 'Upload/Download build artifact'
+author: 'stfbln'
 inputs:
   type:
     description: 'The type of artifact action, either upload or download'
@@ -27,7 +27,7 @@ runs:
         name: build
         if-no-files-found: error
         retention-days: 1
-        path: ${{ env.INGOT_SRCRELEASEGLOB }}
+        path: ${{ env.REPOSITORY_SRCRELEASEGLOB }}
 
     # -----------------------------------
     # Download

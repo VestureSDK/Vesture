@@ -99,7 +99,8 @@ To ensure reproducibility between local and CI environment, this repository uses
 | `dotnet ib setup` | Runs the initial setup for the repo |
 | `dotnet ib clean` | Cleans output from previous runs |
 | `dotnet ib full` | Runs the full flow |
-| `dotnet ib ide` | Opens ./src/Ingot.sln in Visual Studio |
+| `dotnet ib ide` | Opens the repository's solution (.sln) in Visual Studio |
+| `dotnet ib update` | Updates the repository's various dependencies |
 
 ## Need Help?
 

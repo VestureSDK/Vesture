@@ -1,4 +1,4 @@
-name: Ingot Source (Staging)
+name: Source (Staging)
 
 # Runs on anyting relevant to a src code
 # change, but NOT for tags which is taken
@@ -45,7 +45,7 @@ jobs:
   # as an artifact.
   build-test-validate:
     name: Source
-    uses: stfbln/ingot/.github/workflows/ingot-src-build-test-validate.yml@main
+    uses: stfbln/ingot/.github/workflows/source-build-test-validate.yml@main
 
   # Publishes the nuget packages
   # to feedz.io
@@ -60,13 +60,13 @@ jobs:
       
       # Gets git sources and ensures 
       # invoke build is initialized
-      - uses: stfbln/ingot/.github/actions/ingot-setup@main
+      - uses: stfbln/ingot/.github/actions/setup@main
         name: Setup
       
       # Publishes the nuget packages
       # to feedz.io
       - name: Push
-        uses: ./.github/actions/ingot-src/package-publish
+        uses: ./.github/actions/source/package-publish
         with:
           nuget-source: "https://f.feedz.io/stfbln/ingot/nuget/index.json"
           nuget-api-key: "${{ secrets.FEEDZ_API_KEY }}"

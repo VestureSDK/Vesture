@@ -11,6 +11,8 @@ param(
 
     [string] $SrcDirectory = './src',
 
+    [string] $MainSolutionFileNameWithExtension = 'Ingot.sln',
+
     [string] $SamplesDirectory = './samples',
 
     [string] $NupkgDirectory = './dist/nuget',
@@ -41,7 +43,7 @@ param(
 # ***************************************
 
 # Imports helper file
-. "${BuildRoot}/build/ingot.ib.helpers.ps1";
+. "${BuildRoot}/build/ib.helpers.ps1";
 
 # Set output rendering to use ANSI code
 if ($PsStyle)
@@ -126,7 +128,7 @@ Exit-Build {
 
     if ($propagateErrorsToBuild -And (-Not (${*}.Errors.Count -eq 0)))
     {
-        $msg = ("`n`nTask flow '${BuildTask}' is not allowed to failed and encountered some errors");
+        $msg = ("`n`nTask flow '${BuildTask}' is not allowed to fail and encountered some errors");
         ${*}.Errors | ForEach-Object -Process {
             $msg += "`n----------------------------------------------------------------------`n"
             $msg += "`n'$($_.Task.Name)':`n" +
@@ -148,7 +150,7 @@ Exit-Build {
 # ***************************************
 
 # Imports main file
-. "${BuildRoot}/build/ingot.ib.main.ps1";
+. "${BuildRoot}/build/ib.main.ps1";
 
 # Imports extension files
-. "${BuildRoot}/build/extensions/ingot.ib.github.ps1";
+. "${BuildRoot}/build/extensions/ib.github.ps1";

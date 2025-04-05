@@ -1,4 +1,4 @@
-name: Ingot Source Build/Test/Validate
+name: Source Build/Test/Validate
 
 on:
   workflow_call: 
@@ -28,7 +28,7 @@ jobs:
       
       # Gets git sources and ensures 
       # invoke build is initialized
-      - uses: stfbln/ingot/.github/actions/ingot-setup@main
+      - uses: stfbln/ingot/.github/actions/setup@main
         name: Setup
 
       # Builds the source code
@@ -37,7 +37,7 @@ jobs:
       
       # Upload build result for the other jobs
       - name: Upload Build Artifacts
-        uses: ./.github/actions/ingot-src/build-artifacts
+        uses: ./.github/actions/source/build-artifacts
         with:
           type: upload
 
@@ -54,7 +54,7 @@ jobs:
       
       # Gets git sources and ensures 
       # invoke build is initialized
-      - uses: stfbln/ingot/.github/actions/ingot-setup@main
+      - uses: stfbln/ingot/.github/actions/setup@main
         name: Setup
         
       # Ensures formatting of source code
@@ -95,13 +95,13 @@ jobs:
 
       # Gets git sources and ensures 
       # invoke build is initialized
-      - uses: stfbln/ingot/.github/actions/ingot-setup@main
+      - uses: stfbln/ingot/.github/actions/setup@main
         name: Setup
 
       # Retrieves the build artifact to avoid
       # re-building the source code
       - name: Download Build Artifacts
-        uses: ./.github/actions/ingot-src/build-artifacts
+        uses: ./.github/actions/source/build-artifacts
         with:
           type: download
       
@@ -120,7 +120,7 @@ jobs:
       # for download if needed
       - if: '!cancelled()'
         name: Upload Test Result Artifacts
-        uses: ./.github/actions/ingot-src/test-artifacts
+        uses: ./.github/actions/source/test-artifacts
         with:
           type: upload
           name: test-result-${{ matrix.os }}
@@ -129,7 +129,7 @@ jobs:
       # for download if needed
       - if: '!cancelled()'
         name: Upload Coverage Artifacts
-        uses: ./.github/actions/ingot-src/coverage-artifacts
+        uses: ./.github/actions/source/coverage-artifacts
         with:
           type: upload
           name: coverage-${{ matrix.os }}
@@ -166,13 +166,13 @@ jobs:
 
       # Gets git sources and ensures 
       # invoke build is initialized
-      - uses: stfbln/ingot/.github/actions/ingot-setup@main
+      - uses: stfbln/ingot/.github/actions/setup@main
         name: Setup
 
       # Retrieves the build artifact to avoid
       # re-building the source code
       - name: Download Build Artifacts
-        uses: ./.github/actions/ingot-src/build-artifacts
+        uses: ./.github/actions/source/build-artifacts
         with:
           type: download
       
@@ -191,7 +191,7 @@ jobs:
       # for download if needed
       - if: '!cancelled()'
         name: Upload Test Result Artifacts
-        uses: ./.github/actions/ingot-src/test-artifacts
+        uses: ./.github/actions/source/test-artifacts
         with:
           type: upload
           name: test-result-${{ matrix.os }}
@@ -200,7 +200,7 @@ jobs:
       # for download if needed
       - if: '!cancelled()'
         name: Upload Coverage Artifacts
-        uses: ./.github/actions/ingot-src/coverage-artifacts
+        uses: ./.github/actions/source/coverage-artifacts
         with:
           type: upload
           name: coverage-${{ matrix.os }}
@@ -217,13 +217,13 @@ jobs:
 
       # Gets git sources and ensures 
       # invoke build is initialized
-      - uses: stfbln/ingot/.github/actions/ingot-setup@main
+      - uses: stfbln/ingot/.github/actions/setup@main
         name: Setup
 
       # Retrieves the build artifact to avoid
       # re-building the source code
       - name: Download Build Artifacts
-        uses: ./.github/actions/ingot-src/build-artifacts
+        uses: ./.github/actions/source/build-artifacts
         with:
           type: download
 
@@ -235,7 +235,7 @@ jobs:
       # Uploads nuget packages for
       # publish and download if needed
       - name: Upload Package Artifacts
-        uses: ./.github/actions/ingot-src/package-artifacts
+        uses: ./.github/actions/source/package-artifacts
         with:
           type: upload
   
@@ -269,12 +269,12 @@ jobs:
 
       # Gets git sources and ensures 
       # invoke build is initialized
-      - uses: stfbln/ingot/.github/actions/ingot-setup@main
+      - uses: stfbln/ingot/.github/actions/setup@main
         name: Setup
 
       # Downloads the package artifact
       - name: Download Package Artifacts
-        uses: ./.github/actions/ingot-src/package-artifacts
+        uses: ./.github/actions/source/package-artifacts
         with:
           type: download
       
@@ -314,12 +314,12 @@ jobs:
 
       # Gets git sources and ensures 
       # invoke build is initialized
-      - uses: stfbln/ingot/.github/actions/ingot-setup@main
+      - uses: stfbln/ingot/.github/actions/setup@main
         name: Setup
 
       # Downloads the package artifact
       - name: Download Package Artifacts
-        uses: ./.github/actions/ingot-src/package-artifacts
+        uses: ./.github/actions/source/package-artifacts
         with:
           type: download
       

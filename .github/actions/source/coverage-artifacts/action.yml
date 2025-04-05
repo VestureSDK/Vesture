@@ -1,6 +1,6 @@
-name: 'Ingot Test Artifact'
-description: 'Upload/Download Ingot test artifact'
-author: 'Ingot'
+name: 'Coverage Artifact'
+description: 'Upload/Download coverage artifact'
+author: 'stfbln'
 inputs:
   type:
     description: 'The type of artifact action, either upload or download'
@@ -8,7 +8,7 @@ inputs:
   name:
     description: 'The name of the artifact to either upload or download'
     required: false
-    default: 'test-result'
+    default: 'coverage'
 runs:
   using: 'composite'
   steps:
@@ -24,14 +24,14 @@ runs:
 
     # Upload the artifact
     - if: ${{ inputs.type == 'upload' }}
-      name: "Artifact Upload: test-result"
+      name: "Artifact Upload: coverage"
       uses: actions/upload-artifact@v4
       with:
         # Name needs to match in the download section
         name: ${{ inputs.name }}
         if-no-files-found: error
         retention-days: 1
-        path: ${{ env.INGOT_TESTRESULTGLOB }}
+        path: ${{ env.REPOSITORY_COVERAGEGLOB }}
 
     # -----------------------------------
     # Download
@@ -39,7 +39,7 @@ runs:
 
     # Download the artifact
     - if: ${{ inputs.type == 'download' }}
-      name: "Artifact Download: test-result"
+      name: "Artifact Download: coverage"
       uses: actions/download-artifact@v4
       with:
         # Name needs to match in the upload section

@@ -1,6 +1,6 @@
-name: 'Ingot Setup'
-description: 'Sets up the environment for the Ingot project'
-author: 'Ingot'
+name: 'Setup'
+description: 'Sets up the environment for the repository'
+author: 'stfbln'
 runs:
   using: 'composite'
   steps:

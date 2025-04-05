@@ -1,6 +1,6 @@
-name: 'Ingot Package Artifact'
-description: 'Upload/Download Ingot package artifact'
-author: 'Ingot'
+name: 'Package Artifact'
+description: 'Upload/Download package artifact'
+author: 'stfbln'
 inputs:
   type:
     description: 'The type of artifact action, either upload or download'
@@ -27,7 +27,7 @@ runs:
         name: nupkg
         if-no-files-found: error
         retention-days: 1
-        path: ${{ env.INGOT_NUPKGGLOB }}
+        path: ${{ env.REPOSITORY_NUPKGGLOB }}
 
     # -----------------------------------
     # Download

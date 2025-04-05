@@ -1,6 +1,6 @@
-name: 'Ingot Build Artifact Upload'
-description: 'Sets up the environment for the Ingot project'
-author: 'Ingot'
+name: 'Build Artifact Upload'
+description: 'Publishes nuget packages'
+author: 'stfbln'
 inputs:
   nuget-source:
     description: 'Nuget feed source'
@@ -14,7 +14,7 @@ runs:
 
     # Downloads the package artifact
     - name: Download Package Artifacts
-      uses: ./.github/actions/ingot-src/package-artifacts
+      uses: ./.github/actions/source/package-artifacts
       with:
         type: download
     

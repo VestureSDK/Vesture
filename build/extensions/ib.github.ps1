@@ -25,7 +25,7 @@ function Add-GitHub-EnvironmentVariable {
         $Value
     )
 
-    Write-Step-Start "Appending Ingot environment variable '${Key}' to GitHub environment";
+    Write-Step-Start "Appending repository environment variable '${Key}' to GitHub environment";
 
     Write-Log Debug  "Ensuring GitHub environment file exists...";
     if ((-Not ($env:GITHUB_ENV)) -Or (-Not (Test-Path $env:GITHUB_ENV)))
@@ -40,32 +40,32 @@ function Add-GitHub-EnvironmentVariable {
     $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw;
     Write-File-Content -File $env:GITHUB_ENV -Content $githubEnvironmentContent;
 
-    Write-Log Debug  "Checking if Ingot environment variable '${Key}' needs to be appended to GitHub environment";
+    Write-Log Debug  "Checking if repository environment variable '${Key}' needs to be appended to GitHub environment";
     if(Test-Path "env:${Key}")
     {
-        Write-Log Information  "Ingot environment variable '${Key}' already present in GitHub environment";
+        Write-Log Information  "Repository environment variable '${Key}' already present in GitHub environment";
     }
     else
     {
-        Write-Log Information  "Ingot environment variable '${Key}' is not present in GitHub environment";
+        Write-Log Information  "Repository environment variable '${Key}' is not present in GitHub environment";
 
         $kvp = "${Key}=${Value}";
         
-        Write-Log Debug  "Appending Ingot environment variable '${Key}' to GitHub environment...";
+        Write-Log Debug  "Appending repository environment variable '${Key}' to GitHub environment...";
         "${kvp}" >> $env:GITHUB_ENV;
-        Write-Log Information  "Appended Ingot environment variable '${Key}' to GitHub environment";
+        Write-Log Information  "Appended repository environment variable '${Key}' to GitHub environment";
 
         $githubEnvironmentContent = Get-Content $env:GITHUB_ENV -Raw;
         Write-File-Content -File $env:GITHUB_ENV -Content $githubEnvironmentContent;
         
-        Write-Log Debug  "Validating Ingot environment variable '${Key}' appended to GitHub environment...";
+        Write-Log Debug  "Validating repository environment variable '${Key}' appended to GitHub environment...";
         if ($githubEnvironmentContent -Match $Key)
         {
-            Write-Step-End "Successfully appended Ingot environment variable '${Key}' to GitHub environment";
+            Write-Step-End "Successfully appended repository environment variable '${Key}' to GitHub environment";
         }
         else
         {
-            Write-Log Error "Ingot environment variable '${Key}' not found in GitHub environment"
+            Write-Log Error "Repository environment variable '${Key}' not found in GitHub environment"
         }
     }
 }
@@ -94,7 +94,7 @@ task ci-github-setup {
 
     # Ensures when running in containers 
     # the ownership is not dubious
-    Write-Step-Start "Adding Ingot to git safe directories...";
+    Write-Step-Start "Adding repository to git safe directories...";
         
     Write-Log Debug  "Ensuring root directory '${BuildRoot}' is a git repository...";
     if (-Not (Test-Path "${BuildRoot}/.git"))
@@ -107,22 +107,22 @@ task ci-github-setup {
     exec { git config --global --add safe.directory $BuildRoot }
     Write-Log Information  "Added root directory '${BuildRoot}' to git safe directories";
 
-    Write-Step-End "Successfully added Ingot to git safe directories";
+    Write-Step-End "Successfully added repository to git safe directories";
 
     # To ease handling of configuration within GitHub
     # actions, the configuration of this invoke-build
     # is exposed via environment variables to be re-used
     # within the .yml workflow or action files
-    Add-GitHub-EnvironmentVariable -Key "INGOT_DOTNETVERBOSITY" -Value $DotnetVerbosity;
-    Add-GitHub-EnvironmentVariable -Key "INGOT_BUILDCONFIGURATION" -Value $BuildConfiguration;
-    Add-GitHub-EnvironmentVariable -Key "INGOT_SRCDIRECTORY" -Value $SrcDirectory;
-    Add-GitHub-EnvironmentVariable -Key "INGOT_SRCRELEASEGLOB" -Value "./**/bin/*";
-    Add-GitHub-EnvironmentVariable -Key "INGOT_NUPKGDIRECTORY" -Value $NupkgDirectory;
-    Add-GitHub-EnvironmentVariable -Key "INGOT_NUPKGGLOB" -Value "./**/*.nupkg";
-    Add-GitHub-EnvironmentVariable -Key "INGOT_TESTRESULTDIRECTORY" -Value $TestResultDirectory;
-    Add-GitHub-EnvironmentVariable -Key "INGOT_TESTRESULTGLOB" -Value "**/test-result/*";
-    Add-GitHub-EnvironmentVariable -Key "INGOT_COVERAGEDIRECTORY" -Value $TestCoverageDirectory;
-    Add-GitHub-EnvironmentVariable -Key "INGOT_COVERAGEGLOB" -Value "**/test-coverage/*";
+    Add-GitHub-EnvironmentVariable -Key "REPOSITORY_DOTNETVERBOSITY" -Value $DotnetVerbosity;
+    Add-GitHub-EnvironmentVariable -Key "REPOSITORY_BUILDCONFIGURATION" -Value $BuildConfiguration;
+    Add-GitHub-EnvironmentVariable -Key "REPOSITORY_SRCDIRECTORY" -Value $SrcDirectory;
+    Add-GitHub-EnvironmentVariable -Key "REPOSITORY_SRCRELEASEGLOB" -Value "./**/bin/*";
+    Add-GitHub-EnvironmentVariable -Key "REPOSITORY_NUPKGDIRECTORY" -Value $NupkgDirectory;
+    Add-GitHub-EnvironmentVariable -Key "REPOSITORY_NUPKGGLOB" -Value "./**/*.nupkg";
+    Add-GitHub-EnvironmentVariable -Key "REPOSITORY_TESTRESULTDIRECTORY" -Value $TestResultDirectory;
+    Add-GitHub-EnvironmentVariable -Key "REPOSITORY_TESTRESULTGLOB" -Value "**/test-result/*";
+    Add-GitHub-EnvironmentVariable -Key "REPOSITORY_COVERAGEDIRECTORY" -Value $TestCoverageDirectory;
+    Add-GitHub-EnvironmentVariable -Key "REPOSITORY_COVERAGEGLOB" -Value "**/test-coverage/*";
 
     # Set GitHub specific MinVer config
     Add-GitHub-EnvironmentVariable -Key "MinVerDefaultPreReleaseIdentifiers" -Value "alpha.0.$($env:GITHUB_RUN_ID).$($env:GITHUB_RUN_NUMBER)";

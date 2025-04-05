@@ -74,7 +74,7 @@ function New-CodeCoverage
 
 # Update
 # ---------------------------------------
-# Synopsis: Updates the repo
+# Synopsis: Updates the repository's various dependencies
 task update `
     dotnet-tools-update, `
     nuget-packages-update
@@ -118,7 +118,7 @@ task full `
     
 # IDE
 # ---------------------------------------
-# Synopsis: Opens ./src/Ingot.sln in Visual Studio
+# Synopsis: Opens repository's solution (.sln) in Visual Studio
 task ide `
     tool-visual-studio-open
 
@@ -512,7 +512,7 @@ task tool-nuget-setup {
     Write-Step-End "Successfully created local NuGet source";
 }
 
-# Synopsis: [Specific] Opens ./src/Ingot.sln in Visual Studio
+# Synopsis: [Specific] Opens the repository's solution (.sln) in Visual Studio
 task tool-visual-studio-open {
 
     Write-Step-Start "Searching Visual Studio installation...";
@@ -547,8 +547,8 @@ task tool-visual-studio-open {
     
     Write-Step-Start "Opening Visual Studio...";
 
-    $slnFilePath = "${SrcDirectory}/Ingot.sln";
-    Write-Log Debug  "Invoking Visual Studio to open Ingot solution '${slnFilePath}'...";
+    $slnFilePath = "${SrcDirectory}/${MainSolutionFileNameWithExtension}";
+    Write-Log Debug  "Invoking Visual Studio to open the repository's solution (.sln) '${slnFilePath}'...";
     exec { & $vsPath $slnFilePath -donotloadprojects }
     Write-Log Information  "Invoked Visual Studio successfully";
 
@@ -924,7 +924,7 @@ task src-publish-local `
 
     Write-Step-End "Successfully retrieved $($nupkgFiles.Count) nupkg files";
 
-    $nugetLocalFeedName = "ingot-local-feed";
+    $nugetLocalFeedName = "local-nuget-feed";
     $nupkgFiles | ForEach-Object -Process {
         
         Write-Step-Start "Publishing nupkg '$($_.Name)' to '${nugetLocalFeedName}'...";

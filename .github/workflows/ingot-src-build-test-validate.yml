@@ -4,14 +4,14 @@ on:
   workflow_call: 
     inputs:
       advanced_validation:
-        description: 'Defines if all the platforms should be tested or only the main ones'
+        description: 'advanced_validation: Defines if all the platforms should be tested or only the main ones'
         default: false
         required: false
         type: boolean
   workflow_dispatch:
     inputs:
       advanced_validation:
-        description: 'Defines if all the platforms should be tested or only the main ones'
+        description: 'advanced_validation: Defines if all the platforms should be tested or only the main ones'
         default: false
         required: false
         type: boolean
@@ -136,7 +136,7 @@ jobs:
 
   src-test-advanced:
     needs: src-build
-    name: Test
+    name: Test (Advanced)
     if: ${{ inputs.advanced_validation }}
     strategy:
       matrix:
@@ -243,7 +243,7 @@ jobs:
   # on different platforms
   src-sample-test:
     needs: src-pack
-    name: Test Samples
+    name: Test Samples (Advanced)
     strategy:
       matrix:
         os: 

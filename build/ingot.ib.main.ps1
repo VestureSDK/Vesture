@@ -78,6 +78,13 @@ function New-CodeCoverage
 task update `
     dotnet-tools-update, `
     nuget-packages-update
+    
+# Update
+# ---------------------------------------
+# Synopsis: Verifies if an update has to be done on the repo
+task update-verify `
+    update, `
+    repo-validate-pristine
 
 # Setup
 # ---------------------------------------
@@ -336,6 +343,23 @@ task nuget-packages-update -If(Test-Local-ExecutionEnvironment) {
     Write-Log Information  "Successfully invoked dotnet 'dotnet outdated'";
 
     Write-Step-End "Successfully updated nuget packages";
+}
+
+task repo-validate-pristine -If(Test-Local-ExecutionEnvironment) {
+
+    Write-Step-Start "Ensuring git repository is pristine...";
+
+    Write-Log Debug  "Invoking 'git' to validate status...";
+    $files = exec { git status --porcelain }
+    Write-Log Information  "Successfully invoked 'git' to retrieved changed files" -Data $files;
+
+    if ($files)
+    {
+        Write-Error "Git repository is not pristine, check logs for more details";
+    }
+    else {
+        Write-Step-End "Git repository is pristine";
+    }
 }
 
 # ---------------------------------------

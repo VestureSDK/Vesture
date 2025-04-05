@@ -6,14 +6,8 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<LangVersion>13.0</LangVersion>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
     <IsAotCompatible Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">true</IsAotCompatible>
     <IsAotCompatible Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net9.0'))">true</IsAotCompatible>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
 	</PropertyGroup>
 
   <PropertyGroup>
@@ -21,19 +15,9 @@
     <DefineConstants>MULTI_TARGETING_SUPPORT_ATTRIBUTES</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <Authors>Stéphane Boulnois</Authors>
-    <Copyright>Copyright © Stéphane Boulnois 2025</Copyright>
-    <PackageProjectUrl>https://github.com/stfbln/Ingot</PackageProjectUrl>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <RepositoryUrl>https://github.com/stfbln/Ingot</RepositoryUrl>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageIcon>ICON.png</PackageIcon>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-  </PropertyGroup>
+  <ImportGroup>
+    <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+  </ImportGroup>
 
   <ItemGroup>
     <PackageReference Include="MinVer">

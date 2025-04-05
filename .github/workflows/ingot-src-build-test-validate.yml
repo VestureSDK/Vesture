@@ -102,6 +102,7 @@ jobs:
         uses: ./.github/actions/ingot-src/test-artifacts
         with:
           type: upload
+          name: test-result-${{ matrix.os }}
       
       # Uploads coverage 
       # for download if needed
@@ -110,6 +111,7 @@ jobs:
         uses: ./.github/actions/ingot-src/coverage-artifacts
         with:
           type: upload
+          name: coverage-${{ matrix.os }}
 
   # Creates nuget packages 
   # from build output

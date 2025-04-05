@@ -74,6 +74,12 @@ function New-CodeCoverage
 
 # Setup
 # ---------------------------------------
+# Synopsis: Updates the repo
+task update `
+    repo-update
+
+# Setup
+# ---------------------------------------
 # Synopsis: Runs the initial setup for the repo
 task setup `
     ci-setup-before, `
@@ -284,6 +290,42 @@ task ci-publish `
     src-publish-remote
 
 # ---------------------------------------
+# Repository Tasks
+# ---------------------------------------
+
+# Synopsis: [Specific] Updates the repository various versions to latest
+task repo-update -If(Test-Local-ExecutionEnvironment) {
+
+    # Updates all dotnet tools
+    Write-Step-Start "Updating dotnet tools...";
+    
+    Write-Log Debug  "Invoking 'dotnet' to get a list of tools...";
+    $tools = exec { dotnet tool list }
+    Write-Log Information  "Successfully retrieved dotnet tools" -Data $tools;
+
+    for (($i = 2); $i -lt $tools.Length; $i++)
+    {
+        $toolParsed = $tools[$i] -Split " " | Where-Object -FilterScript { $_ -ne "" }
+        $tool = $toolParsed[0];
+        $version = $toolParsed[1];
+
+        Write-Log Debug  "Invoking 'dotnet' to update tool '$tool'...";
+        
+        if ($version -like "*-*")
+        {
+            exec { dotnet tool update $tool --prerelease }
+        }
+        else {
+            exec { dotnet tool update $tool }
+        }
+
+        Write-Log Information  "Successfully invoked 'dotnet' to update tool '$tool'";
+    }
+
+    Write-Step-End "Successfully updated dotnet tools";
+}
+
+# ---------------------------------------
 # Tools Tasks
 # ---------------------------------------
 
@@ -350,7 +392,7 @@ task tool-ib-setup -If(-Not (Test-CI-ExecutionEnvironment)) {
                 Write-Log Warning ( 
                     "PowerShell Core (pwsh) not available in your system. `n" +
                     "You should install PowerShell Core (pwsh) to ensure consistent experience across different platforms and on the CI.`n" +
-                    "See https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell-on-windows " +
+                    "See https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell " +
                     "for more details on how to install PowerShell Core."
                 );
             }

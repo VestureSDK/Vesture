@@ -3,21 +3,21 @@
   "isRoot": true,
   "tools": {
     "docfx": {
-      "version": "2.78.2",
+      "version": "2.78.3",
       "commands": [
         "docfx"
       ],
       "rollForward": false
     },
     "ib": {
-      "version": "5.12.1",
+      "version": "5.12.2",
       "commands": [
         "ib"
       ],
       "rollForward": false
     },
     "dotnet-reportgenerator-globaltool": {
-      "version": "5.4.3",
+      "version": "5.4.5",
       "commands": [
         "reportgenerator"
       ],
@@ -38,7 +38,7 @@
       "rollForward": false
     },
     "dotnet-coverage": {
-      "version": "17.13.1",
+      "version": "17.14.2",
       "commands": [
         "dotnet-coverage"
       ],

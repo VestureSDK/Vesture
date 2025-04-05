@@ -72,11 +72,12 @@ function New-CodeCoverage
 #
 # ***************************************
 
-# Setup
+# Update
 # ---------------------------------------
 # Synopsis: Updates the repo
 task update `
-    repo-update
+    dotnet-tools-update, `
+    nuget-packages-update
 
 # Setup
 # ---------------------------------------
@@ -293,8 +294,8 @@ task ci-publish `
 # Repository Tasks
 # ---------------------------------------
 
-# Synopsis: [Specific] Updates the repository various versions to latest
-task repo-update -If(Test-Local-ExecutionEnvironment) {
+# Synopsis: [Specific] Updates the dotnet tools to latest
+task dotnet-tools-update -If(Test-Local-ExecutionEnvironment) {
 
     # Updates all dotnet tools
     Write-Step-Start "Updating dotnet tools...";
@@ -323,6 +324,18 @@ task repo-update -If(Test-Local-ExecutionEnvironment) {
     }
 
     Write-Step-End "Successfully updated dotnet tools";
+}
+
+# Synopsis: [Specific] Updates the nuget packages to latest
+task nuget-packages-update -If(Test-Local-ExecutionEnvironment) {
+    
+    Write-Step-Start "Updating nuget packages...";
+
+    Write-Log Debug  "Invoking 'dotnet outdated' to update nuget packages...";
+    exec { dotnet outdated $SrcDirectory -u }
+    Write-Log Information  "Successfully invoked dotnet 'dotnet outdated'";
+
+    Write-Step-End "Successfully updated nuget packages";
 }
 
 # ---------------------------------------

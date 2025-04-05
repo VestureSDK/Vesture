@@ -1,7 +1,20 @@
 name: Ingot Source Build/Test/Validate
 
 on:
-  workflow_call: {}
+  workflow_call: 
+    inputs:
+      advanced_validation:
+        description: 'Defines if all the platforms should be tested or only the main ones'
+        default: false
+        required: false
+        type: boolean
+  workflow_dispatch:
+    inputs:
+      advanced_validation:
+        description: 'Defines if all the platforms should be tested or only the main ones'
+        default: false
+        required: false
+        type: boolean
 
 jobs:
 
@@ -60,15 +73,79 @@ jobs:
           # currently unavailable for private repositories
           # - ubuntu-24.04-arm
           # MacOS ARM environment
-          - macos-13
-          # MacOS AMD environment
           - macos-15
-          # Windows server environment
-          # Server 2025 equivalent to "Windows 12"
+          # Windows Server 2025 equivalent to "Windows 12"
           - windows-2025
-          # Server 2022 equivalent to "Windows 11"
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    env:
+      pwsh: "pwsh"
+    steps:
+      
+      # Setup dotnet since we are 
+      # not in a container
+      # it also requires net8 runtime
+      # for testing
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      # Gets git sources and ensures 
+      # invoke build is initialized
+      - uses: stfbln/ingot/.github/actions/ingot-setup@main
+        name: Setup
+
+      # Retrieves the build artifact to avoid
+      # re-building the source code
+      - name: Download Build Artifacts
+        uses: ./.github/actions/ingot-src/build-artifacts
+        with:
+          type: download
+      
+      # Test the source code and 
+      # produces test result
+      - name: Test
+        run: dotnet ib test
+      
+      # Produces test coverage report
+      # runs even if test failed
+      - if: '!cancelled()'
+        name: Test Coverage
+        run: dotnet ib coverage
+      
+      # Uploads test results 
+      # for download if needed
+      - if: '!cancelled()'
+        name: Upload Test Result Artifacts
+        uses: ./.github/actions/ingot-src/test-artifacts
+        with:
+          type: upload
+          name: test-result-${{ matrix.os }}
+      
+      # Uploads coverage 
+      # for download if needed
+      - if: '!cancelled()'
+        name: Upload Coverage Artifacts
+        uses: ./.github/actions/ingot-src/coverage-artifacts
+        with:
+          type: upload
+          name: coverage-${{ matrix.os }}
+
+  src-test-advanced:
+    needs: src-build
+    name: Test
+    if: ${{ inputs.advanced_validation }}
+    strategy:
+      matrix:
+        os:
+          # MacOS AMD environment
+          - macos-13
+          # Windows Server 2022 equivalent to "Windows 11"
           - windows-2022
-          # Server 2019 equivalent to "Windows 10"
+          # Windows Server 2019 equivalent to "Windows 10"
           - windows-2019
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
@@ -175,16 +252,9 @@ jobs:
           # currently unavailable for private repositories
           # - ubuntu-24.04-arm
           # MacOS ARM environment
-          - macos-13
-          # MacOS AMD environment
           - macos-15
-          # Windows server environment
-          # Server 2025 equivalent to "Windows 12"
+          # Windows Server 2025 equivalent to "Windows 12"
           - windows-2025
-          # Server 2022 equivalent to "Windows 11"
-          - windows-2022
-          # Server 2019 equivalent to "Windows 10"
-          - windows-2019
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
     env:
@@ -217,3 +287,47 @@ jobs:
       - name: Test Samples
         run: dotnet ib test-sample
 
+  src-sample-test-advanced:
+    needs: src-pack
+    name: Test Samples
+    if: ${{ inputs.advanced_validation }}
+    strategy:
+      matrix:
+        os: 
+          # MacOS AMD environment
+          - macos-13
+          # Windows Server 2022 equivalent to "Windows 11"
+          - windows-2022
+          # Windows Server 2019 equivalent to "Windows 10"
+          - windows-2019
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    env:
+      pwsh: "pwsh"
+    steps:
+
+      # Setup dotnet since we are 
+      # not in a container
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      # Gets git sources and ensures 
+      # invoke build is initialized
+      - uses: stfbln/ingot/.github/actions/ingot-setup@main
+        name: Setup
+
+      # Downloads the package artifact
+      - name: Download Package Artifacts
+        uses: ./.github/actions/ingot-src/package-artifacts
+        with:
+          type: download
+      
+      # Publishes the nuget packages locally
+      # before testing the samples
+      - name: Test Samples
+        run: dotnet ib publish
+
+      # Tests the samples
+      - name: Test Samples
+        run: dotnet ib test-sample

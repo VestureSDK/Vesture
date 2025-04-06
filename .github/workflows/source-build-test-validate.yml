@@ -28,7 +28,7 @@ jobs:
       
       # Gets git sources and ensures 
       # invoke build is initialized
-      - uses: stfbln/ingot/.github/actions/setup@main
+      - uses: stfbln/vesture/.github/actions/setup@main
         name: Setup
 
       # Builds the source code
@@ -54,7 +54,7 @@ jobs:
       
       # Gets git sources and ensures 
       # invoke build is initialized
-      - uses: stfbln/ingot/.github/actions/setup@main
+      - uses: stfbln/vesture/.github/actions/setup@main
         name: Setup
         
       # Ensures formatting of source code
@@ -95,7 +95,7 @@ jobs:
 
       # Gets git sources and ensures 
       # invoke build is initialized
-      - uses: stfbln/ingot/.github/actions/setup@main
+      - uses: stfbln/vesture/.github/actions/setup@main
         name: Setup
 
       # Retrieves the build artifact to avoid
@@ -166,7 +166,7 @@ jobs:
 
       # Gets git sources and ensures 
       # invoke build is initialized
-      - uses: stfbln/ingot/.github/actions/setup@main
+      - uses: stfbln/vesture/.github/actions/setup@main
         name: Setup
 
       # Retrieves the build artifact to avoid
@@ -217,7 +217,7 @@ jobs:
 
       # Gets git sources and ensures 
       # invoke build is initialized
-      - uses: stfbln/ingot/.github/actions/setup@main
+      - uses: stfbln/vesture/.github/actions/setup@main
         name: Setup
 
       # Retrieves the build artifact to avoid
@@ -269,7 +269,7 @@ jobs:
 
       # Gets git sources and ensures 
       # invoke build is initialized
-      - uses: stfbln/ingot/.github/actions/setup@main
+      - uses: stfbln/vesture/.github/actions/setup@main
         name: Setup
 
       # Downloads the package artifact
@@ -314,7 +314,7 @@ jobs:
 
       # Gets git sources and ensures 
       # invoke build is initialized
-      - uses: stfbln/ingot/.github/actions/setup@main
+      - uses: stfbln/vesture/.github/actions/setup@main
         name: Setup
 
       # Downloads the package artifact

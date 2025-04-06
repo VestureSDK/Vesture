@@ -1,5 +1,5 @@
 {
-	"name": "Ingot",
+	"name": "Vesture",
 	"build": { "dockerfile": "../build/docker/Dockerfile" },
 	"postCreateCommand":  "dotnet tool restore && dotnet ib setup",
 	"remoteUser": "root",

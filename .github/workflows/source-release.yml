@@ -14,7 +14,7 @@ jobs:
   # as an artifact.
   build-test-validate:
     name: Source
-    uses: stfbln/ingot/.github/workflows/source-build-test-validate.yml@main
+    uses: stfbln/vesture/.github/workflows/source-build-test-validate.yml@main
 
   # Publishes the nuget packages
   # to nuget.org
@@ -29,7 +29,7 @@ jobs:
       
       # Gets git sources and ensures 
       # invoke build is initialized
-      - uses: stfbln/ingot/.github/actions/setup@main
+      - uses: stfbln/vesture/.github/actions/setup@main
         name: Setup
       
       # Publishes the nuget packages

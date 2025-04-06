@@ -1,5 +1,5 @@
 ---
-uid: Ingot.Mediator.DependencyInjection
+uid: Vesture.Mediator.DependencyInjection
 summary: *content
 ---
 
@@ -7,7 +7,7 @@ summary: *content
 
 ---
 
-The namespace <xref:Ingot.Mediator.DependencyInjection> provides integration components 
+The namespace <xref:Vesture.Mediator.DependencyInjection> provides integration components 
 for configuring and managing dependency injection for the mediator pattern. It includes 
 utilities and extensions that allow developers to register handlers, middlewares, and other 
 mediator-related services in an Inversion of Control container.

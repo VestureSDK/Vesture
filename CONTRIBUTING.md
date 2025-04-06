@@ -7,7 +7,7 @@ Thank you for your interest in contributing! We aim to keep the process simple a
 Clone the repository and then either follow the **Devcontainer** setup (recommended) or **Local** below.
 
 ```bash
-git clone https://github.com/stfbln/Ingot.git
+git clone https://github.com/stfbln/Vesture.git
 ```
 
 ### Devcontainer

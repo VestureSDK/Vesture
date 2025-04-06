@@ -2,13 +2,13 @@
 
 ## Get Started
 
-[![Ingot Source (Release)](https://github.com/stfbln/Ingot/actions/workflows/ingot-src-release.yml/badge.svg)](https://github.com/stfbln/Ingot/actions/workflows/ingot-src-release.yml)
+[![Source (Release)](https://github.com/stfbln/Vesture/actions/workflows/source-release.yml/badge.svg)](https://github.com/stfbln/Vesture/actions/workflows/source-release.yml)
 
-* ![NuGet Version](https://img.shields.io/nuget/v/Ingot.Mediator?label=Ingot.Mediator&link=https%3A%2F%2Fwww.nuget.org%2Fpackages%2FIngot.Mediator%2F0.0.2)
+* ![NuGet Version](https://img.shields.io/nuget/v/Vesture.Mediator?label=Vesture.Mediator&link=https%3A%2F%2Fwww.nuget.org%2Fpackages%Vesture.Mediator%2F0.0.2)
 
 ## Staging
 
-[![Ingot Source (Staging)](https://github.com/stfbln/Ingot/actions/workflows/ingot-src-staging.yml/badge.svg)](https://github.com/stfbln/Ingot/actions/workflows/ingot-src-staging.yml)
+[![Source (Staging)](https://github.com/stfbln/Vesture/actions/workflows/source-staging.yml/badge.svg)](https://github.com/stfbln/Vesture/actions/workflows/source-staging.yml)
 
 ## Contributing
 

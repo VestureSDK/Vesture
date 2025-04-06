@@ -1,0 +1,8 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\libs\Mediator\Vesture.Mediator.Engine\Vesture.Mediator.Engine.csproj" />
+    <ProjectReference Include="..\Vesture.Mediator.Abstractions.Mocks\Vesture.Mediator.Abstractions.Mocks.csproj" />
+  </ItemGroup>
+
+</Project>

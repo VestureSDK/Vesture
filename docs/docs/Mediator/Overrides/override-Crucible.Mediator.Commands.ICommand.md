@@ -1,11 +1,11 @@
 ---
-uid: Ingot.Mediator.Commands.ICommand
+uid: Vesture.Mediator.Commands.ICommand
 ---
 
 [!INCLUDE [example](../Fragments/marker-devx-tip.md)]
 
 ---
-uid: Ingot.Mediator.Commands.ICommand
+uid: Vesture.Mediator.Commands.ICommand
 example: [*content]
 ---
 
@@ -19,7 +19,7 @@ public class SampleCommand : ICommand
 ```
 
 ---
-uid: Ingot.Mediator.Commands.ICommand
+uid: Vesture.Mediator.Commands.ICommand
 example: []
 remarks: *content
 ---

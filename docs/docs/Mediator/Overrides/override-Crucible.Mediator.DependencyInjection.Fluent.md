@@ -1,9 +1,9 @@
 ---
-uid: Ingot.Mediator.DependencyInjection.Fluent
+uid: Vesture.Mediator.DependencyInjection.Fluent
 summary: *content
 ---
 
-The namespace <xref:Ingot.Mediator.DependencyInjection.Fluent> provides a fluent API 
+The namespace <xref:Vesture.Mediator.DependencyInjection.Fluent> provides a fluent API 
 for configuring dependency injection for the mediator. It allows developers to chain method calls 
 to register handlers, middlewares, and pipelines with enhanced readability and ease of use.
 

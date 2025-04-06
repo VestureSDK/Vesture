@@ -1,11 +1,11 @@
 ---
-uid: Ingot.Mediator.Events.IEvent
+uid: Vesture.Mediator.Events.IEvent
 ---
 
 [!INCLUDE [example](../Fragments/marker-devx-tip.md)]
 
 ---
-uid: Ingot.Mediator.Events.IEvent
+uid: Vesture.Mediator.Events.IEvent
 example: [*content]
 ---
 

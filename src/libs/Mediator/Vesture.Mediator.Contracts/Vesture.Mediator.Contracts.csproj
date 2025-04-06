@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Provides annotations for the Mediator pattern, useful for contract libraries without full abstraction dependencies.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\..\ICON.png" Pack="true" PackagePath="" />
+    <None Include="..\..\..\..\LICENSE.md" Pack="true" PackagePath="" />
+    <None Include="..\..\..\..\README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+	<PropertyGroup>
+		<RootNamespace>Vesture.Mediator</RootNamespace>
+	</PropertyGroup>
+
+</Project>

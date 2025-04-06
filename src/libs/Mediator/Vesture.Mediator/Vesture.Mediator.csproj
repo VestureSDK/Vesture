@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>A meta package referencing all Vesture Mediator components, providing a full mediator solution with minimal setup.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\..\ICON.png" Pack="true" PackagePath="" />
+    <None Include="..\..\..\..\LICENSE.md" Pack="true" PackagePath="" />
+    <None Include="..\..\..\..\README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+  
+	<ItemGroup>
+    <ProjectReference Include="..\Vesture.Mediator.Contracts\Vesture.Mediator.Contracts.csproj" />
+    <ProjectReference Include="..\Vesture.Mediator.Abstractions\Vesture.Mediator.Abstractions.csproj" />
+		<ProjectReference Include="..\Vesture.Mediator.DependencyInjection\Vesture.Mediator.DependencyInjection.csproj" />
+		<ProjectReference Include="..\Vesture.Mediator.Engine\Vesture.Mediator.Engine.csproj" />
+	</ItemGroup>
+
+</Project>

@@ -1,5 +1,5 @@
 ---
-uid: Ingot.Mediator.Events
+uid: Vesture.Mediator.Events
 summary: *content
 ---
 
@@ -7,9 +7,9 @@ summary: *content
 
 ---
 
-The namespace <xref:Ingot.Mediator.Events> includes classes and interfaces
-to handle the mediator event use case with <xref:Ingot.Mediator.Events.IEvent> 
-as contract and <xref:Ingot.Mediator.Events.EventHandler`1> as handler.
+The namespace <xref:Vesture.Mediator.Events> includes classes and interfaces
+to handle the mediator event use case with <xref:Vesture.Mediator.Events.IEvent> 
+as contract and <xref:Vesture.Mediator.Events.EventHandler`1> as handler.
 
 Events represent occurrences or actions that have already taken place, 
 and they typically notify other parts of the system to react. 

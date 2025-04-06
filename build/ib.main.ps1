@@ -967,40 +967,52 @@ task src-publish-remote -If(($NupkgPushSource) -And ($NupkgPushApiKey)) `
 }
 
 # Synopsis: [Specific] Updates the samples nuget packages to use latest available package
-task src-sample-update-nuget {
+task src-sample-update-nuget tool-minver-setup, {
 
-    Write-Step-Start "Update samples with latest nuget...";
+    Write-Step-Start "Finding samples projects...";
 
-    Write-Log Debug "Invoking 'dotnet restore' to force updating samples with latest local version";
-    exec { dotnet restore ./samples --force }
-    Write-Log Information "Successfuly invoked 'dotnet restore' to update samples with latest local version";
-    
-    Write-Log Debug "Invoking 'dotnet list' to list packages used by the sample projects...";
-    $versions = exec { dotnet list ./samples package }
-    
-    if ($versions)
-    {
-        Write-Log Information "Successfully invoked 'dotnet list' to list packages used by the sample projects";
-        Write-Log Trace $versions;
-    }
-    else {
-        Write-Log Error "Versions returned by 'dotnet list' is empty"
-    }
+    $fileFilter = "*.csproj";
+    $sampleProjects = Get-ChildItem $SamplesDirectory -Filter $fileFilter -Recurse;
+    Write-Files-Found $sampleProjects -Directory $SamplesDirectory -Filter $fileFilter;
+    Assert-Files-Found $sampleProjects -Directory $SamplesDirectory -Filter $fileFilter;
+
+    Write-Step-End "Successfully found $($sampleProjects.Count) sample projects";
 
     Write-Log Debug  "Invoking 'minver' to compute version...";
     $version = exec { dotnet minver -v d }
     Write-Log Information  "Retrieved MinVer computed version '${version}'";
 
-    Write-Log Debug "Ensuring MinVer version '${version}' is present in sample projects nuget config...";
-    if ($versions -like "*${version}*")
-    {
-        Write-Log Information "MinVer version '${version}' is present in sample projects nuget config";
-    }
-    else {
-        Write-Log Error "MinVer version '${version}' is not present in sample projects nuget config";
-    }
+    $sampleProjects | ForEach-Object -Process {
 
-    Write-Step-End "Successfully updated samples with latest nuget";
+        Write-Step-Start "Update sample project '$($_.Name)' with latest nuget...";
+
+        Write-Log Debug "Invoking 'dotnet restore' to force updating the sample project '$($_.FullName)' with latest local version";
+        exec { dotnet restore $($_.FullName) --force }
+        Write-Log Information "Successfuly invoked 'dotnet restore' to update the sample project '$($_.FullName)' with latest local version";
+        
+        Write-Log Debug "Invoking 'dotnet list' to list packages used by the sample project '$($_.FullName)'...";
+        $versions = exec { dotnet list $($_.FullName) package }
+        
+        if ($versions)
+        {
+            Write-Log Information "Successfully invoked 'dotnet list' to list packages used by the sample project '$($_.FullName)'" -Data $versions;
+        }
+        else {
+            Write-Log Error "Versions returned by 'dotnet list' is empty for the sample project '$($_.FullName)'"
+        }
+
+        Write-Log Debug "Ensuring MinVer version '${version}' is present in the sample project '$($_.FullName)' nuget config...";
+        if ($($versions -join "") -like "*${version}*")
+        {
+            Write-Log Information "MinVer version '${version}' is present in the sample project '$($_.FullName)' nuget config";
+        }
+        else {
+            Write-Log Error "MinVer version '${version}' is not present in the sample project '$($_.FullName)' nuget config";
+        }
+
+        Write-Step-End "Successfully updated sample project '$($_.Name)' with latest nuget";
+        
+    }
 }
 
 task src-sample-publish-clean {

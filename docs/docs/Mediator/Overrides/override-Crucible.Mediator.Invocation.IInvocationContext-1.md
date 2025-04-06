@@ -1,9 +1,9 @@
 ---
-uid: Ingot.Mediator.Invocation.IInvocationContext`1
+uid: Vesture.Mediator.Invocation.IInvocationContext`1
 ---
 
 > [!WARNING]
-> While relevant, the <xref:Ingot.Mediator.Invocation.IInvocationContext`1> 
+> While relevant, the <xref:Vesture.Mediator.Invocation.IInvocationContext`1> 
 > is mostly used for syntactic sugar. For more information kindly 
-> refer to the relevant <xref:Ingot.Mediator.Invocation.IInvocationContext> 
+> refer to the relevant <xref:Vesture.Mediator.Invocation.IInvocationContext> 
 > interface instead.

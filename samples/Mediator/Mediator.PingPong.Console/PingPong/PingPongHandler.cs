@@ -1,4 +1,4 @@
-﻿using Ingot.Mediator.Requests;
+﻿using Vesture.Mediator.Requests;
 using SampleConsole.PingPong.Contracts;
 
 namespace SampleConsole.PingPong

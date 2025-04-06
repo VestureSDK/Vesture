@@ -11,7 +11,7 @@ param(
 
     [string] $SrcDirectory = './src',
 
-    [string] $MainSolutionFileNameWithExtension = 'Ingot.sln',
+    [string] $MainSolutionFileNameWithExtension = 'Vesture.sln',
 
     [string] $SamplesDirectory = './samples',
 

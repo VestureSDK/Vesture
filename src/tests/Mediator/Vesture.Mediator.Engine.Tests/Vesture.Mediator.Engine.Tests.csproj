@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsTestProject>true</IsTestProject>
+    <IsPackable>false</IsPackable>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\libs\Mediator\Vesture.Mediator.Engine\Vesture.Mediator.Engine.csproj" />
+    <ProjectReference Include="..\..\..\mocks\Mediator\Vesture.Mediator.Engine.Mocks\Vesture.Mediator.Engine.Mocks.csproj" />
+    <ProjectReference Include="..\Vesture.Mediator.Abstractions.Tests\Vesture.Mediator.Abstractions.Tests.csproj" />
+  </ItemGroup>
+
+</Project>

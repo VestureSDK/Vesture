@@ -1,0 +1,8 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\libs\Mediator\Vesture.Mediator.DependencyInjection\Vesture.Mediator.DependencyInjection.csproj" />
+    <ProjectReference Include="..\Vesture.Mediator.Engine.Tests\Vesture.Mediator.Engine.Tests.csproj" />
+  </ItemGroup>
+
+</Project>

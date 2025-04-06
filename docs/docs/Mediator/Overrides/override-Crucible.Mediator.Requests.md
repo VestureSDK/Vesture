@@ -1,5 +1,5 @@
 ---
-uid: Ingot.Mediator.Requests
+uid: Vesture.Mediator.Requests
 summary: *content
 ---
 
@@ -7,9 +7,9 @@ summary: *content
 
 ---
 
-The namespace <xref:Ingot.Mediator.Requests> includes classes and interfaces
-to handle the mediator request use case with <xref:Ingot.Mediator.Requests.IRequest`1> 
-as contract and <xref:Ingot.Mediator.Requests.RequestHandler`2> as handler.
+The namespace <xref:Vesture.Mediator.Requests> includes classes and interfaces
+to handle the mediator request use case with <xref:Vesture.Mediator.Requests.IRequest`1> 
+as contract and <xref:Vesture.Mediator.Requests.RequestHandler`2> as handler.
 
 Requests typically represent queries or operations that require a 
 response or result, such as retrieving data or performing calculations. 

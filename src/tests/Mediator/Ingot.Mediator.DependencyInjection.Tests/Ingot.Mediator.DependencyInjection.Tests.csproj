@@ -1,8 +1,0 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\libs\Mediator\Ingot.Mediator.DependencyInjection\Ingot.Mediator.DependencyInjection.csproj" />
-    <ProjectReference Include="..\Ingot.Mediator.Engine.Tests\Ingot.Mediator.Engine.Tests.csproj" />
-  </ItemGroup>
-
-</Project>

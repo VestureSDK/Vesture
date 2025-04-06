@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Vesture.Mediator.Mocks</RootNamespace>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\libs\Mediator\Vesture.Mediator.Abstractions\Vesture.Mediator.Abstractions.csproj" />
+  </ItemGroup>
+
+</Project>

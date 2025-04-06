@@ -1,0 +1,72 @@
+name: Source (Staging)
+
+# Runs on anyting relevant to a src code
+# change, but NOT for tags which is taken
+# care of by the "Release" pipeline.
+on:
+  push:
+    tags-ignore:
+      - '**'
+    paths:
+      - 'src/**'
+      - '.github/**'
+      - '**/.build.ps1'
+      - '**/build/*'
+      - '**/global.json'
+      - '**/dotnet-tools.json'
+      - '**/nuget.config'
+      - '**/*.props'
+    branches:
+      - main
+  pull_request:
+    paths:
+      - 'src/**'
+      - '.github/**'
+      - '**/.build.ps1'
+      - '**/build/*'
+      - '**/global.json'
+      - '**/dotnet-tools.json'
+      - '**/nuget.config'
+      - '**/*.props'
+    branches:
+      - '*'
+
+# Allows to auto cancel the pipelines
+# if a new commit is pushed to the same
+# PR or branch.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  
+  # Builds, test and validate the source code
+  # it finishes by uploading the nuget packages
+  # as an artifact.
+  build-test-validate:
+    name: Source
+    uses: stfbln/vesture/.github/workflows/source-build-test-validate.yml@main
+
+  # Publishes the nuget packages
+  # to feedz.io
+  src-publish-feedz:
+    needs: build-test-validate
+    name: Source / Publish (feedz.io)
+    runs-on: ubuntu-24.04
+    container: stfbln/ingot:latest
+    cancel-timeout-minutes: 5
+    timeout-minutes: 5
+    steps:
+      
+      # Gets git sources and ensures 
+      # invoke build is initialized
+      - uses: stfbln/vesture/.github/actions/setup@main
+        name: Setup
+      
+      # Publishes the nuget packages
+      # to feedz.io
+      - name: Push
+        uses: ./.github/actions/source/package-publish
+        with:
+          nuget-source: "https://f.feedz.io/stfbln/vesture/nuget/index.json"
+          nuget-api-key: "${{ secrets.FEEDZ_API_KEY }}"

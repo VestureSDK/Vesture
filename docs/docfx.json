@@ -24,7 +24,7 @@
     //    {
     //      "src": "../src",
     //      "files": [
-    //        "**/Ingot.Mediator.csproj"
+    //        "**/Vesture.Mediator.csproj"
     //      ]
     //    }
     //  ],
@@ -62,8 +62,8 @@
       "template"
     ],
     "globalMetadata": {
-      "_appName": "Ingot",
-      "_appTitle": "Ingot",
+      "_appName": "Vesture",
+      "_appTitle": "Vesture",
       "_appLogoPath": "images/ICON.png",
       "_enableSearch": true,
       "_appFooter": null,

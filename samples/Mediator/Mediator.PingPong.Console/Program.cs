@@ -1,4 +1,4 @@
-﻿using Ingot.Mediator;
+﻿using Vesture.Mediator;
 using Microsoft.Extensions.DependencyInjection;
 using SampleConsole.PingPong;
 using SampleConsole.PingPong.Contracts;

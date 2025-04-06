@@ -243,7 +243,7 @@ jobs:
   # on different platforms
   src-sample-test:
     needs: src-pack
-    name: Test Samples (Advanced)
+    name: Test Samples
     strategy:
       matrix:
         os: 
@@ -289,7 +289,7 @@ jobs:
 
   src-sample-test-advanced:
     needs: src-pack
-    name: Test Samples
+    name: Test Samples (Advanced)
     if: ${{ inputs.advanced_validation }}
     strategy:
       matrix:

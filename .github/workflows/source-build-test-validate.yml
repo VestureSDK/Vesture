@@ -70,8 +70,7 @@ jobs:
         os: 
           # Linux environment 
           - ubuntu-24.04
-          # currently unavailable for private repositories
-          # - ubuntu-24.04-arm
+          - ubuntu-24.04-arm
           # MacOS ARM environment
           - macos-15
           # Windows Server 2025 equivalent to "Windows 12"
@@ -249,8 +248,7 @@ jobs:
         os: 
           # Linux environment 
           - ubuntu-24.04
-          # currently unavailable for private repositories
-          # - ubuntu-24.04-arm
+          - ubuntu-24.04-arm
           # MacOS ARM environment
           - macos-15
           # Windows Server 2025 equivalent to "Windows 12"

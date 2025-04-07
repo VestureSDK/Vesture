@@ -45,7 +45,7 @@ jobs:
   # as an artifact.
   build-test-validate:
     name: Source
-    uses: stfbln/vesture/.github/workflows/source-build-test-validate.yml@main
+    uses: stfbln/vesture/.github/workflows/source-build-test-validate.yml@add-linux-arm
 
   # Publishes the nuget packages
   # to feedz.io

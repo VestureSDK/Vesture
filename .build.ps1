@@ -1429,25 +1429,78 @@ task src-sample-publish `
 {
     Write-Step-Start "Detecting OS...";
 
+    # Gets the OS architectur ein order to determine the proper RID
+    # $rid = switch ($osArchitecture) {
+    #     "X64"  { "" }
+    #     "X86"  { "" }
+    #     "Arm"  { "" }
+    #     "Arm64" { "" }
+    #     Default { "" }
+    # }
+    $osArchitecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture
+    Write-Log Information "Determined OS architecture to be '$osArchitecture'";
+
     if ($IsWindows)
     {
-        $rid = "win-x64";
         $extension = ".exe";
-        Write-Log Information "Current platform is Windows, using RID '${rid}'";
+        $rid = switch ($osArchitecture) {
+            "X64"  { "win-x64" }
+            "X86"  { "win-x86" }
+            "Arm"  { "" }
+            "Arm64" { "win-arm64" }
+            Default { "" }
+        }
+
+        if ($rid)
+        {
+            Write-Log Information "Current platform is Windows, using RID '${rid}'";
+        }
+        else 
+        {
+            Write-Error "Current platform is Windows but could not determine RID"
+        }
     }
 
     if ($IsLinux)
     {
-        $rid = "linux-x64";
         $extension = ".bin";
-        Write-Log Information "Current platform is Linux, using RID '${rid}'";
+        $rid = switch ($osArchitecture) {
+            "X64"  { "linux-x64" }
+            "X86"  { "" }
+            "Arm"  { "linux-arm" }
+            "Arm64" { "linux-arm64" }
+            Default { "" }
+        }
+
+        if ($rid)
+        {
+            Write-Log Information "Current platform is Linux, using RID '${rid}'";
+        }
+        else 
+        {
+            Write-Error "Current platform is Linux but could not determine RID"
+        }
     }
 
     if ($IsMacOS)
     {
-        $rid = "osx-x64";
         $extension = ".bin";
-        Write-Log Information "Current platform is MacOS, using RID '${rid}'";
+        $rid = switch ($osArchitecture) {
+            "X64"  { "osx-x64" }
+            "X86"  { "" }
+            "Arm"  { "" }
+            "Arm64" { "osx-arm64" }
+            Default { "" }
+        }
+
+        if ($rid)
+        {
+            Write-Log Information "Current platform is MacOS, using RID '${rid}'";
+        }
+        else 
+        {
+            Write-Error "Current platform is MacOS but could not determine RID"
+        }
     }
 
     Write-Step-End "Successfully detected OS";

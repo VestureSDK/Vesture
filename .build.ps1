@@ -26,12 +26,18 @@ param(
     [string] $TestCoverageCoberturaFileName = 'test-result.cobertura.coverage',
 
     [string] $TestCoverageReportDirectory = './dist/test-coverage/report',
+    
+    [string] $DocsDirectory = './docs',
+    
+    [string] $DocsOutputDirectory = './dist/docs',
 
     [string] $NupkgPushSource,
     
     [string] $NupkgPushApiKey,
 
     [switch] $Serve,
+    
+    [int] $ServePort = 8187,
 
     [switch] $Force
 )
@@ -476,8 +482,8 @@ function New-CodeCoverage
 # ---------------------------------------
 # Synopsis: Updates the repository's various dependencies
 task update `
-    dotnet-tools-update, `
-    nuget-packages-update
+    repo-dotnet-tools-update, `
+    repo-nuget-packages-update
     
 # Update
 # ---------------------------------------
@@ -592,6 +598,14 @@ task publish `
     ?ci-publish, `
     ci-publish-finally
 
+# Docs
+# ---------------------------------------
+# Synopsis: Builds the docs, use -Serve to open the browser
+task docs `
+    ci-docs-before, `
+    ?ci-docs, `
+    ci-docs-finally
+
 # ***************************************
 # 
 #
@@ -697,12 +711,23 @@ task ci-publish `
     src-publish-local, `
     src-publish-remote
 
+
+# Docs
+# ---------------------------------------
+task ci-docs-before -If($False) 
+task ci-docs-finally -If($False) 
+
+task ci-docs `
+    src-docs-clean, `
+    src-docs-build, `
+    src-docs-serve
+
 # ---------------------------------------
 # Repository Tasks
 # ---------------------------------------
 
 # Synopsis: [Specific] Updates the dotnet tools to latest
-task dotnet-tools-update -If(Test-Local-ExecutionEnvironment) {
+task repo-dotnet-tools-update -If(Test-Local-ExecutionEnvironment) {
 
     # Updates all dotnet tools
     Write-Step-Start "Updating dotnet tools...";
@@ -734,7 +759,7 @@ task dotnet-tools-update -If(Test-Local-ExecutionEnvironment) {
 }
 
 # Synopsis: [Specific] Updates the nuget packages to latest
-task nuget-packages-update -If(Test-Local-ExecutionEnvironment) {
+task repo-nuget-packages-update -If(Test-Local-ExecutionEnvironment) {
     
     Write-Step-Start "Updating nuget packages...";
 
@@ -1594,21 +1619,55 @@ task src-sample-validate {
     }
 }
 
-task Docs-Clean {
-    REmove-Item -Force -Recurse ./docs/docs/Mediator/References -ErrorAction SilentlyContinue
-    REmove-Item -Force -Recurse ./docs/docs/Mediator/Advanced/References -ErrorAction SilentlyContinue
-    REmove-Item -Force -Recurse ./docs/_site -ErrorAction SilentlyContinue
+# ---------------------------------------
+# Docs Tasks
+# ---------------------------------------
+
+task src-docs-clean {
+    
+    Write-Step-Start "Cleaning documentation output '$DocsOutputDirectory'...";
+
+    Remove-Item -Force -Recurse $DocsOutputDirectory -ErrorAction SilentlyContinue
+    
+    Write-Step-End "Successfully cleant documentation output '$DocsOutputDirectory'";
+
+    Write-Step-Start "Retrieving documentation reference directories...";
+
+    $directoryFilter = "References";
+    $referenceDirectories = Get-ChildItem $DocsDirectory -Recurse -Directory -Filter $directoryFilter
+    Write-Files-Found $referenceDirectories -Directory $DocsDirectory -Filter $directoryFilter;
+
+    Write-Step-End "Successfully found $($referenceDirectories.Count) sample documentation reference directories";
+
+    $referenceDirectories | ForEach-Object -Process {
+
+        Write-Step-Start "Deleting documentation reference directory '$($_.FullName)'...";
+        Remove-Item -Force -Recurse $($_.FullName) -ErrorAction SilentlyContinue;
+        Write-Step-End "Successfully deleted documentation reference directory '$($_.FullName)'";
+    }
 }
 
-task Docs-Build {
-    dotnet docfx ./docs/docfx.json
+task src-docs-build {
+    
+    Write-Step-Start "Building documentation...";
+
+    Write-Log Debug  "Invoking 'docfx' to build documentation...";
+    exec { dotnet docfx "$DocsDirectory/docfx.json" -o $DocsOutputDirectory }
+    Write-Log Information  "Successfully invoked 'docfx' to build documentation";
+
+    Write-Step-End "Successfully built documentation";
 }
 
-task Docs-Serve {
-    dotnet docfx serve ./docs/_site --open-browser
-}
+task src-docs-serve -If($Serve) {
 
-task Docs Docs-Clean, Docs-Build, Docs-Serve
+    Write-Step-Start "Opening documentation website...";
+    
+    Write-Log Debug  "Invoking 'docfx' to serve documentation website...";
+    exec { dotnet docfx serve $DocsOutputDirectory --open-browser -p $ServePort }
+    Write-Log Information  "Successfully invoked 'docfx' to serve documentation website";
+
+    Write-Step-End "Successfully opened documentation website";
+}
 
 # Imports extension files
 # GitHub

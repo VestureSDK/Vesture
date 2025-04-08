@@ -123,6 +123,7 @@ task ci-github-setup {
     Add-GitHub-EnvironmentVariable -Key "REPOSITORY_TESTRESULTGLOB" -Value "**/test-result/*";
     Add-GitHub-EnvironmentVariable -Key "REPOSITORY_COVERAGEDIRECTORY" -Value $TestCoverageDirectory;
     Add-GitHub-EnvironmentVariable -Key "REPOSITORY_COVERAGEGLOB" -Value "**/test-coverage/*";
+    Add-GitHub-EnvironmentVariable -Key "REPOSITORY_DOCSOUTPUTDIRECTORY" -Value $DocsOutputDirectory;
 
     # Set GitHub specific MinVer config
     Add-GitHub-EnvironmentVariable -Key "MinVerDefaultPreReleaseIdentifiers" -Value "alpha.0.$($env:GITHUB_RUN_ID).$($env:GITHUB_RUN_NUMBER)";

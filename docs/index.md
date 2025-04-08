@@ -1,6 +1,6 @@
 ---
 _layout: landing
-redirect_url: "docs/introduction.html" 
+# redirect_url: "docs/introduction.html"
 ---
 
 # This is the **HOMEPAGE**.

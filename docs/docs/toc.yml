@@ -1,7 +1,7 @@
-- name: Introduction
-  href: introduction.md
-- name: Getting Started
-  href: getting-started.md
+# - name: Introduction
+#   href: introduction.md
+# - name: Getting Started
+#   href: getting-started.md
 - name: Components
 - name: Mediator
   href: Mediator/toc.yml

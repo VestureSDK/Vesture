@@ -1,6 +1,6 @@
 - name: Best Practices
   href: best-practices.md
-- name: Troubleshooting
-  href: troubleshooting.md
-- name: Design Decisions
-  href: design-decisions.md
+# - name: Troubleshooting
+#   href: troubleshooting.md
+# - name: Design Decisions
+#   href: design-decisions.md

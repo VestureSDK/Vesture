@@ -28,7 +28,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-24.04
-    container: stfbln/ingot:latest
+    container: stfbln/vesture-ci:latest
     steps:
         # Gets git sources and ensures 
         # invoke build is initialized

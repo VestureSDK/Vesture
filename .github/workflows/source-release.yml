@@ -22,7 +22,7 @@ jobs:
     needs: build-test-validate
     name: Source / Publish (nuget.org)
     runs-on: ubuntu-24.04
-    container: stfbln/ingot:latest
+    container: stfbln/vesture-ci:latest
     cancel-timeout-minutes: 5
     timeout-minutes: 5
     steps:

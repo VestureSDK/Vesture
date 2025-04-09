@@ -22,7 +22,7 @@ jobs:
   src-build:
     name: Build
     runs-on: ubuntu-24.04
-    container: stfbln/ingot:latest
+    container: stfbln/vesture-ci:latest
     timeout-minutes: 5
     steps:
       
@@ -48,7 +48,7 @@ jobs:
     needs: src-build
     name: Linter
     runs-on: ubuntu-24.04
-    container: stfbln/ingot:latest
+    container: stfbln/vesture-ci:latest
     timeout-minutes: 3
     steps:
       
@@ -133,6 +133,21 @@ jobs:
           type: upload
           name: coverage-${{ matrix.os }}
 
+  # Allows GitHub to determine a 
+  # status check for the test matrix
+  src-test-status-check:
+    needs: src-test
+    name: Test Status Check
+    runs-on: ubuntu-24.04
+    if: always()
+    steps:
+      - name: Successful Test
+        if: ${{ !(contains(needs.*.result, 'failure')) }}
+        run: exit 0
+      - name: Failing Test
+        if: ${{ contains(needs.*.result, 'failure') }}
+        run: exit 1
+
   src-test-advanced:
     needs: src-build
     name: Test (Advanced)
@@ -210,7 +225,7 @@ jobs:
     needs: src-build
     name: Pack
     runs-on: ubuntu-24.04
-    container: stfbln/ingot:latest
+    container: stfbln/vesture-ci:latest
     timeout-minutes: 3
     steps:
 
@@ -284,6 +299,21 @@ jobs:
       # Tests the samples
       - name: Test Samples
         run: dotnet ib test-sample
+
+  # Allows GitHub to determine a status 
+  # check for the sample test matrix
+  src-sample-test-status-check:
+    needs: src-sample-test
+    name: Sample Test Status Check
+    runs-on: ubuntu-24.04
+    if: always()
+    steps:
+      - name: Successful Test
+        if: ${{ !(contains(needs.*.result, 'failure')) }}
+        run: exit 0
+      - name: Failing Test
+        if: ${{ contains(needs.*.result, 'failure') }}
+        run: exit 1
 
   src-sample-test-advanced:
     needs: src-pack

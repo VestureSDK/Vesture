@@ -1,0 +1,55 @@
+name: Publish Docker CI
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    paths:
+      - 'build/docker/Dockerfile'
+    branches: 
+      - "main"
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'tag: The tag to push the built image as'
+        default: "latest"
+        required: false
+        type: string
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "docker"
+  cancel-in-progress: false
+
+jobs:
+  build-and-push:
+    name: Docker / Build And Push
+    environment:
+      name: docker.io/stfbln/vesture-ci
+      url: https://hub.docker.com/repository/docker/stfbln/vesture-ci/tags
+    env:
+      DOCKER_REGISTRY: "stfbln/vesture-ci"
+      DOCKER_FILE: "./build/docker/Dockerfile"
+    runs-on: ubuntu-24.04
+    steps:
+        # Checkout the git repo
+        - name: Git Checkout
+          uses: actions/checkout@v4
+          with:
+            # Ensures MinVer finds what it needs
+            fetch-depth: '0'
+            filter: 'tree:0'
+
+        # Login to docker.io
+        - name: Docker Login
+          run: 'echo "${{ secrets.DOCKER_PASSWORD }}" | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin'
+            
+        # Build and tag the image
+        - name: Docker Build
+          run: docker build . --file ${{ env.DOCKER_FILE }} --tag "${{ env.DOCKER_REGISTRY }}:${{ inputs.tag }}"
+
+        # Push the image
+        - name: Docker Push
+          run: docker push stfbln/vesture-ci:latest

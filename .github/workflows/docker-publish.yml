@@ -27,7 +27,7 @@ jobs:
   build-and-push:
     name: Docker / Build And Push
     environment:
-      name: docker.io/stfbln/vesture-ci
+      name: docker-ci:stfbln/vesture-ci
       url: https://hub.docker.com/repository/docker/stfbln/vesture-ci/tags
     env:
       DOCKER_REGISTRY: "stfbln/vesture-ci"

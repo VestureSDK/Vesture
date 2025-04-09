@@ -25,6 +25,9 @@ jobs:
     container: stfbln/vesture-ci:latest
     cancel-timeout-minutes: 5
     timeout-minutes: 5
+    environment:
+      name: "nuget:nuget.org/Vesture.*"
+      url: https://www.nuget.org/packages?q=vesture
     steps:
       
       # Gets git sources and ensures 

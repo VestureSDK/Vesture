@@ -1,4 +1,4 @@
-name: Publish docs
+name: Publish Docs
 
 on:
   # Runs on pushes targeting the default branch
@@ -25,7 +25,7 @@ jobs:
   build-and-deploy:
     name: Docs / Build And Deploy
     environment:
-      name: "docs:stfbln.github.io/Vesture"
+      name: "docs:vesturesdk.github.io/Vesture/"
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-24.04
     container: stfbln/vesture-ci:latest

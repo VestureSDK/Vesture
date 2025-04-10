@@ -148,6 +148,7 @@ jobs:
         if: ${{ contains(needs.*.result, 'failure') }}
         run: exit 1
 
+  # Runs test on "advanced" platforms
   src-test-advanced:
     needs: src-build
     name: Test (Advanced)
@@ -300,21 +301,7 @@ jobs:
       - name: Test Samples
         run: dotnet ib test-sample
 
-  # Allows GitHub to determine a status 
-  # check for the sample test matrix
-  src-sample-test-status-check:
-    needs: src-sample-test
-    name: Test Samples Status Check
-    runs-on: ubuntu-24.04
-    if: always()
-    steps:
-      - name: Successful Test
-        if: ${{ !(contains(needs.*.result, 'failure')) }}
-        run: exit 0
-      - name: Failing Test
-        if: ${{ contains(needs.*.result, 'failure') }}
-        run: exit 1
-
+  # Runs samples test on "advanced" platforms
   src-sample-test-advanced:
     needs: src-pack
     name: Test Samples (Advanced)
@@ -359,3 +346,18 @@ jobs:
       # Tests the samples
       - name: Test Samples
         run: dotnet ib test-sample
+
+  # Allows GitHub to determine a status 
+  # check for the sample test matrix
+  src-sample-test-status-check:
+    needs: src-sample-test
+    name: Test Samples Status Check
+    runs-on: ubuntu-24.04
+    if: always()
+    steps:
+      - name: Successful Test
+        if: ${{ !(contains(needs.*.result, 'failure')) }}
+        run: exit 0
+      - name: Failing Test
+        if: ${{ contains(needs.*.result, 'failure') }}
+        run: exit 1

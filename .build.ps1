@@ -34,6 +34,8 @@ param(
     [string] $NupkgPushSource,
     
     [string] $NupkgPushApiKey,
+    
+    [string] $RID,
 
     [switch] $Serve,
     
@@ -1452,83 +1454,90 @@ task src-sample-publish-clean {
 task src-sample-publish `
     src-sample-publish-clean, 
 {
-    Write-Step-Start "Detecting OS...";
+    Write-Step-Start "Detecting Runtime Identifier (RID)...";
 
-    # Gets the OS architectur ein order to determine the proper RID
-    # $rid = switch ($osArchitecture) {
-    #     "X64"  { "" }
-    #     "X86"  { "" }
-    #     "Arm"  { "" }
-    #     "Arm64" { "" }
-    #     Default { "" }
-    # }
-    $osArchitecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture
-    Write-Log Information "Determined OS architecture to be '$osArchitecture'";
-
-    if ($IsWindows)
+    if ($RID)
     {
-        $extension = ".exe";
-        $rid = switch ($osArchitecture) {
-            "X64"  { "win-x64" }
-            "X86"  { "win-x86" }
-            "Arm"  { "" }
-            "Arm64" { "win-arm64" }
-            Default { "" }
+        $rid = $RID;
+    }
+    else 
+    {
+        # Gets the OS architectur ein order to determine the proper RID
+        # $rid = switch ($osArchitecture) {
+        #     "X64"  { "" }
+        #     "X86"  { "" }
+        #     "Arm"  { "" }
+        #     "Arm64" { "" }
+        #     Default { "" }
+        # }
+        $osArchitecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture
+        Write-Log Information "Determined OS architecture to be '$osArchitecture'";
+
+        if ($IsWindows)
+        {
+            $extension = ".exe";
+            $rid = switch ($osArchitecture) {
+                "X64"  { "win-x64" }
+                "X86"  { "win-x86" }
+                "Arm"  { "" }
+                "Arm64" { "win-arm64" }
+                Default { "" }
+            }
+
+            if ($rid)
+            {
+                Write-Log Information "Current platform is Windows, using RID '${rid}'";
+            }
+            else 
+            {
+                Write-Error "Current platform is Windows but could not determine RID"
+            }
         }
 
-        if ($rid)
+        if ($IsLinux)
         {
-            Write-Log Information "Current platform is Windows, using RID '${rid}'";
+            $extension = ".bin";
+            $rid = switch ($osArchitecture) {
+                "X64"  { "linux-x64" }
+                "X86"  { "" }
+                "Arm"  { "linux-arm" }
+                "Arm64" { "linux-arm64" }
+                Default { "" }
+            }
+
+            if ($rid)
+            {
+                Write-Log Information "Current platform is Linux, using RID '${rid}'";
+            }
+            else 
+            {
+                Write-Error "Current platform is Linux but could not determine RID"
+            }
         }
-        else 
+
+        if ($IsMacOS)
         {
-            Write-Error "Current platform is Windows but could not determine RID"
+            $extension = ".bin";
+            $rid = switch ($osArchitecture) {
+                "X64"  { "osx-x64" }
+                "X86"  { "" }
+                "Arm"  { "" }
+                "Arm64" { "osx-arm64" }
+                Default { "" }
+            }
+
+            if ($rid)
+            {
+                Write-Log Information "Current platform is MacOS, using RID '${rid}'";
+            }
+            else 
+            {
+                Write-Error "Current platform is MacOS but could not determine RID"
+            }
         }
     }
 
-    if ($IsLinux)
-    {
-        $extension = ".bin";
-        $rid = switch ($osArchitecture) {
-            "X64"  { "linux-x64" }
-            "X86"  { "" }
-            "Arm"  { "linux-arm" }
-            "Arm64" { "linux-arm64" }
-            Default { "" }
-        }
-
-        if ($rid)
-        {
-            Write-Log Information "Current platform is Linux, using RID '${rid}'";
-        }
-        else 
-        {
-            Write-Error "Current platform is Linux but could not determine RID"
-        }
-    }
-
-    if ($IsMacOS)
-    {
-        $extension = ".bin";
-        $rid = switch ($osArchitecture) {
-            "X64"  { "osx-x64" }
-            "X86"  { "" }
-            "Arm"  { "" }
-            "Arm64" { "osx-arm64" }
-            Default { "" }
-        }
-
-        if ($rid)
-        {
-            Write-Log Information "Current platform is MacOS, using RID '${rid}'";
-        }
-        else 
-        {
-            Write-Error "Current platform is MacOS but could not determine RID"
-        }
-    }
-
-    Write-Step-End "Successfully detected OS";
+    Write-Step-End "Successfully detected Runtime Identifier (RID) '$rid'";
 
     $sampleOutputDirectory = "./dist/samples";
 

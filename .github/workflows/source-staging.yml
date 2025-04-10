@@ -45,7 +45,7 @@ jobs:
   # as an artifact.
   build-test-validate:
     name: Source
-    uses: stfbln/vesture/.github/workflows/source-build-test-validate.yml@main
+    uses: VestureSDK/vesture/.github/workflows/source-build-test-validate.yml@main
 
   # Publishes the nuget packages
   # to feedz.io
@@ -63,7 +63,7 @@ jobs:
       
       # Gets git sources and ensures 
       # invoke build is initialized
-      - uses: stfbln/vesture/.github/actions/setup@main
+      - uses: VestureSDK/vesture/.github/actions/setup@main
         name: Setup
       
       # Publishes the nuget packages

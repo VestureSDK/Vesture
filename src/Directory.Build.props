@@ -11,9 +11,9 @@
   <PropertyGroup>
     <Authors>Stéphane Boulnois</Authors>
     <Copyright>Copyright © Stéphane Boulnois 2025</Copyright>
-    <PackageProjectUrl>https://github.com/stfbln/Vesture</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/VestureSDK/Vesture</PackageProjectUrl>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <RepositoryUrl>https://github.com/stfbln/Vesture</RepositoryUrl>
+    <RepositoryUrl>https://github.com/VestureSDK/Vesture</RepositoryUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageIcon>ICON.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>

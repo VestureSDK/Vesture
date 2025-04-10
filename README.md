@@ -1,4 +1,4 @@
-# ![image](https://raw.githubusercontent.com/stfbln/Vesture/refs/heads/main/docs/images/banner.png)
+# ![image](https://raw.githubusercontent.com/VestureSDK/Vesture/refs/heads/main/docs/images/banner.png)
 
 ## Build fast; Run faster
 
@@ -16,4 +16,4 @@ We're just getting started. Upcoming features will expand the framework’s capa
 
 ## Contributing
 
-For your development setup and help to contribute; Please read our [Contributing Guidelines](https://github.com/stfbln/Vesture/blob/main/CONTRIBUTING.md).
+For your development setup and help to contribute; Please read our [Contributing Guidelines](https://github.com/VestureSDK/Vesture/blob/main/CONTRIBUTING.md).

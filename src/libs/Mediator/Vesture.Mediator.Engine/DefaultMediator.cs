@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Collections.Frozen;
+using Microsoft.Extensions.Logging;
 using Vesture.Mediator.Commands;
 using Vesture.Mediator.Engine.Pipeline;
 using Vesture.Mediator.Engine.Pipeline.Extensions;
@@ -6,9 +7,6 @@ using Vesture.Mediator.Engine.Pipeline.Internal.NoOp;
 using Vesture.Mediator.Events;
 using Vesture.Mediator.Invocation;
 using Vesture.Mediator.Requests;
-# if NET8_0_OR_GREATER
-using System.Collections.Frozen;
-#endif
 
 namespace Vesture.Mediator.Engine
 {
@@ -235,11 +233,7 @@ namespace Vesture.Mediator.Engine
                     invocationPipeline;
             }
 
-#if NET8_0_OR_GREATER
             return dict.ToFrozenDictionary();
-#else
-            return dict;
-#endif
         }
     }
 }

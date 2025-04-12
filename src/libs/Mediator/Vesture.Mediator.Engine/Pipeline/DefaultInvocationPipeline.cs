@@ -6,7 +6,6 @@ using Vesture.Mediator.Engine.Pipeline.Internal;
 using Vesture.Mediator.Engine.Pipeline.Resolvers;
 using Vesture.Mediator.Engine.Pipeline.Strategies;
 using Vesture.Mediator.Invocation;
-using Vesture.Mediator.Requests;
 
 namespace Vesture.Mediator.Engine.Pipeline
 {
